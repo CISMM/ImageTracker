@@ -27,21 +27,23 @@ LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
 # Image processing library
 #######################################
 SET (ImageTracker_SRCS
-    BlurFilterSchedule.cxx
-    CommonTypes.h
-    DemonsPipeline.cxx
-	FilePattern.cxx
-	FileSet.cxx
-	FileSetImageReader.cxx
-	ImageRegistration.cxx
-	ImageStatistics.cxx
-	MultiImageRegistrationProcessor.cxx
-	MultiRegionRegistration.cxx
-	MultiRegionRegistrationPipeline.cxx
-	RegistrationOutput.cxx
-	StopWatch.cxx
-	ThresholdPipeline.cxx
-	TransformGroup.cxx
+    BlurFilterSchedule.cxx                      BlurFilterSchedule.h
+                                                CommonTypes.h
+    DemonsPipeline.cxx                          DemonsPipeline.h
+	FilePattern.cxx                             FilePattern.h
+	FileSet.cxx                                 FileSet.h
+	FileSetImageReader.cxx                      FileSetImageReader.h
+	GlobalRegistrationPipeline.cxx              GlobalRegistrationPipeline.h
+	ImageRegistration.cxx                       ImageRegistration.h
+	ImageStatistics.cxx                         ImageStatistics.h
+	Logger.cxx                                  Logger.h
+	MultiImageRegistrationProcessor.cxx         MultiImageRegistrationProcessor.h
+	MultiRegionRegistration.cxx                 MultiRegionRegistration.h
+	MultiRegionRegistrationPipeline.cxx         MultiRegionRegistrationPipeline.h
+	RegistrationOutput.cxx                      RegistrationOutput.h
+	StopWatch.cxx                               StopWatch.h
+	ThresholdPipeline.cxx                       ThresholdPipeline.h
+	TransformGroup.cxx                          TransformGroup.h
 )
 ADD_LIBRARY(ImageTracker ImageTracker_SRCS)
 TARGET_LINK_LIBRARIES(ImageTracker ITKBasicFilters)
@@ -67,7 +69,8 @@ IF(READY_FOR_PRIME_TIME)
   ENDIF(ITK_CSWIG_JAVA)
 ENDIF(READY_FOR_PRIME_TIME)
 
+
 #######################################
-# Test directories
+# wxWindows and Test suites
 #######################################
-SUBDIRS(TestSuite Tests)
+SUBDIRS(wxGui TestSuite Tests)
