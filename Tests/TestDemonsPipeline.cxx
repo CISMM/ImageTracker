@@ -1,0 +1,57 @@
+#include "TestDemonsPipeline.h"
+
+#include "itkExceptionObject.h"
+
+#include "..\DemonsPipeline.h"
+#include "..\FileSet.h"
+
+TestDemonsPipeline::TestDemonsPipeline(void)
+{
+}
+
+TestDemonsPipeline::~TestDemonsPipeline(void)
+{
+}
+
+void TestDemonsPipeline::run()
+{
+    this->testUpdate();
+}
+
+void TestDemonsPipeline::testUpdate()
+{
+    try
+    {
+        // Set up in/out files
+        std::string inDir  = "C:\\UNC CS\\Research\\nano\\data\\Lisa\\out\\WH200311\\";
+        std::string outDir = "C:\\UNC CS\\Research\\nano\\data\\Lisa\\out\\WH200311\\";
+
+        std::string prefix = "Blur6MeanWHrh01-";
+        std::string ext = ".png";
+        int start = 2;
+        int end = 4;
+        int places = 2;
+        FileSet* pInFiles = new FileSet(new FilePattern(inDir, prefix, ext, start, end, places));
+        FileSet* pOutFiles = new FileSet(new FilePattern(outDir, "Demons-" + prefix, ".vtk", start, end-1, places));
+        
+        // Set up Demons registration
+        DemonsPipeline* pDemons = new DemonsPipeline();
+        pDemons->SetInputFiles(pInFiles);
+        pDemons->SetOutputFiles(pOutFiles);
+        
+        // Run registration
+        pDemons->Update();
+
+        delete pDemons;
+        delete pInFiles;
+        delete pOutFiles;
+
+        succeed_();
+    }
+    catch (itk::ExceptionObject &err)
+    {
+        std::cout << "Exception caught!" << std::endl;
+        std::cout << err << std::endl;
+        fail_("Exception occurred.");
+    }
+}
