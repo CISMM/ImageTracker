@@ -1,0 +1,296 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>ImageTracker Manual</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="styles.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<table width="100%"  border="0" cellspacing="0" cellpadding="5">
+  <tr><!-- header -->
+    <td colspan="2" align="right" class="header-text">
+		ImageTracker
+	</td>
+  </tr>
+  <tr>
+    <td width="10%" class="gutter-text">
+	<p>
+		<a href="index.html" class="gutter-text">Home</a><br>
+		<a href="" class="gutter-text">Download</a><br>
+		<a href="manual.html" class="gutter-text">Manual</a><br>
+		<a href="about.html" class="gutter-text">About</a><br>
+	</p>
+	</td>
+	<td width="90%">
+		<table width="100%" border="0" cellspacing="0" cellpadding="5"> <!-- content -->
+		  <tr>
+			<td width="5%">&nbsp;</td>
+			<td width="50%">
+				<p class="section">Table of Contents
+				<ul>
+				<li><a href="#introduction" class="menu-section">Introduction</a></li>
+				<li><a href="#installation" class="menu-section">Installation</a></li>
+				<li><a href="#loadingdata" class="menu-section">Loading Data</a></li>
+				<li><a href="#imagealignment" class="menu-section">Image Alignment</a></li>
+				<ul>
+					<li><a href="#thresholding" class="menu-subsection">Thresholding</a></li>
+					<li><a href="#smoothing" class="menu-subsection">Smoothing</a></li>
+					<li><a href="#output" class="menu-subsection">Output</a></li>
+					<li><a href="#execution" class="menu-subsection">Execution</a></li>
+				</ul>
+				<li><a href="#versionhistory" class="menu-section">Version History</a></li>
+				<ul>
+					<li><a href="#v1.00" class="menu-subsection">Version 1.00</a></li>
+				</ul>
+				</ul>
+				</p>
+			</td>
+			<td width="40%">&nbsp;</td>
+			<td width="5%">&nbsp;</td>
+	  	  </tr>
+	  	  <tr>
+			<td>&nbsp;</td>
+			<td>
+				<p class="section"><a name="introduction">Introduction</a></p>
+				<p>ImageTracker is an application designed to track and measure motion
+				in image sequences. Videos often contain motion of several types, and
+				analysis of these motions can be difficult. For example, videos of
+				cells dividing show the cell moving within solution, kinetochores moving
+				back and forth accross the cell equator, and microtubule structures
+				migrating from the equator to the poles. ImageTracker allows for analysis
+				of this type of motion through a multi-scale approach. The video is first
+				stabilized with respect to global motion; flow analysis of smaller scale
+				structures follows.</p>
+				<p>ImageTracker was written to analyze microscopy videos. Several challenges
+				in analyzing microscopy video means ImageTracker's performance will
+				depend partially on the nature of the video being analyzed.  In particular,
+				performance may suffer on videos that have low signal-to-noise ratio,
+				poor feature resolution, sparse temporal sampling (objects move too
+				much between fames), and short object life (features appear and disappear
+				frequently).</p>
+			</td>
+			<td>
+				<p class="note">Click on any of the screenshots below to see the
+				full-resolution	image</p>
+			</td>
+			<td>&nbsp;</td>
+		  </tr>
+	  	  <tr>
+	  	    <td>&nbsp;</td>
+	  	    <td>
+				<p class="section"><a name="installation">Installation</a></p>
+			  	<p>Remove previous versions of ImageTracker from your computer before
+				installing updates. To uninstall ImageTracker, select Start--&gt;All
+				Programs--&gt;NSRG--&gt;ImageTracker--&gt;Uninstall ImageTracker from
+				the start menu. </p>
+			  	<p>Note: ImageTracker is a stand-alone application at this time and does
+				not require the NSRG Runtime. </p>
+				<p>Download and execute the installer from \\nsrg-cs\installers; we
+				recommend that you accept all default parameters in order to conform to NSRG
+				standards. This will create a folder on your harddrive, C:\NSRG\bin\ImageTracker,
+				and will add to your programs menu a folder NSRG\ImageTracker.</p>
+		    	<p>Run ImageTracker by selecting Start--&gt;All Programs--&gt;NSRG--&gt;
+				ImageTracker--&gt;ImageTracker. </p>
+				<p>The main ImageTracker window is shown to the right. The window consists of
+				a menu bar, main canvas, and a status bar. ImageTracker will launch new
+				dialog windows for different purposes, for example, loading files and
+				logging information. Most of these windows may be moved around the screen,
+				risized, or temporarily hidden.</p>
+				<p>Program information will be written to a Logger window at various points
+				during execution. This information may be useful for making sure the application
+				is still running, or debugging the application if something goes wrong. Click the
+				Hide button on the Logger window to remove it from your desktop. You can recall
+				it by selecting View--&gt;Logger from the ImageTracker menu.</p>
+			</td>
+	  	    <td><a href="img/ImageTracker.jpg"><img src="img/ImageTracker.jpg" width="300"></a></td>
+	  	    <td>&nbsp;</td>
+  	      </tr>
+	  	  <tr>
+	  	    <td>&nbsp;</td>
+	  	    <td>
+				<p class="section"><a name="loadingdata">Loading Data</a></p>
+				<p>ImageTracker operates on sets of image files. Currently, ImageTracker
+				does not support metamorph stacks or video files. Although ImageTracker
+				technically can read PNG, TIFF, and JPEG image files, the best luck so
+				far has been in reading 8-bit PNG images. Future releases may have support
+				for a wider variety of image formats.</p>
+				<p>Open a set of image files by selecting the menu item File--&gt;Open. This
+				displays a dialog that allows to manage the set of active image files. Click
+				on the "Add" button to bring up a directory browser. Navigate to the directory
+				that contains your image files, and select the image files you would like to
+				process.</p>
+				<p>When the ImageTracker active files list is populated, selecting a file in
+				this list will display the image in the main window. You may add or remove
+				files from this list, but all active files must reside in the same directory.</p>
+				<p>Clicking "OK" on the active files dialog hides the dialog, but does not clear
+				the active files list. You can recall this list at any time by selecting
+				Files--&gt;Open from the menu.</p>
+			</td>
+	  	    <td>
+				<a href="img/OpenFiles.jpg"><img src="img/OpenFiles.jpg" width="300"></a><br>
+		    	<a href="img/ViewImage.jpg"><img src="img/ViewImage.jpg" width="300"></a>
+			</td>
+	  	    <td>&nbsp;</td>
+  	      </tr>
+	  	  <tr>
+	  	    <td>&nbsp;</td>
+	  	    <td>
+				<p class="section"><a name="imagealignment">Image Alignment</a></p>
+				<p>ImageTracker can stabilize video sequences with respect to certain types
+				of motion through image alignment or registration. In this process an object
+				of interest is identified by the user. ImageTracker will attempt to align all
+				images in the sequence such that this object of interest appears in the same
+				location across all frames. In this context, Alignment, Registration, and
+				Stabilization are all terms that describe the same process.</p>
+				<p>Launch the registration dialog by selecting Actions--&gt;Register from the
+				ImageTracker menu. The alignment dialog consists of several sections:
+				Thresholding, Smoothing, and Output.</p>
+				<p>Thresholding and Smoothing alter input images so that alignment is easier
+				to perform. If the preview checkbox on the registration dialog is selected,
+				the first image in the active image list will appear in the ImageTracker
+				main window with the appropriate pre-processing filters applied. Under certain
+				situations, the preview checkbox may be checked but the image in the ImageTracker
+				window is not properly updated. In this case, simply un-check and re-check the
+				preview checkbox. (This may happen if you select an image in the active files
+				dialog and then return to the registration dialog.)</p>
+			</td>
+	  	    <td>&nbsp;</td>
+	  	    <td>&nbsp;</td>
+  	      </tr>
+	  	  <tr>
+	  	    <td>&nbsp;</td>
+	  	    <td>
+				<p class="subsection"><a name="thresholding">Thresholding</a></p>
+				<p>Thresholding selects a range of pixel intensity values to use for
+				registration. In many images, an object of interest will be of a certain
+				intensity, and background objects will be of a different intensity.
+				Selecting an appropriate threshold range will allow the registration
+				process to operate only on the object(s) of interest. At right is an
+				image of a cell that has been properly thresholded to select the mitotic
+				spindle and exclude the cell membrane from the registration.</p>
+			</td>
+	  	    <td><a href="img/Threshold.jpg"><img src="img/Threshold.jpg" width="300"></a></td>
+	  	    <td>&nbsp;</td>
+  	      </tr>
+	  	  <tr>
+	  	    <td>&nbsp;</td>
+	  	    <td>
+				<p class="subsection"><a name="smoothing">Smoothing</a></p>
+				<p>Smoothing an image improves image registration by removing small-scale
+				features. Withouth smoothing, the registration process may get "caught" in
+				local image details, and not find the best global alignment. The goal here
+				is to adjust the degree of smoothing such that the object of interest
+				appears as a cohesive image feature without many small-scale details. An
+				example of an appropriately smoothed and thresholded mitotic spindle is
+				shown to the right.</p>
+			</td>
+	  	    <td><a href="img/Smooth.jpg"><img src="img/Smooth.jpg" width="300"></a></td>
+	  	    <td>&nbsp;</td>
+  	      </tr>
+	  	  <tr>
+	  	    <td>&nbsp;</td>
+	  	    <td>
+				<p class="subsection"><a name="output">Output</a></p>
+				<p>The output image registration is a list of image transformations that
+				describe how to align images in the sequence. The output section of the
+				registration dialog allows you to select a text file in which to save
+				this information. You may also choose to apply these transformations to
+				the original images and save the registered image sequence. The Transforms
+				and Images checkboxes at the bottom of the registration dialog indicate that
+				you want to save these data.</p>
+				<p>Select a transforms file by checking the transforms checkbox and clicking
+				on the File button to select an output file. After selecting a transforms
+				file, the directory in which to save registered images is set to the same
+				directory. (Similarly, if you select an images output directory first, a
+				default transforms file is selected for you.)</p>
+				<p>If you are saving the transfomed image files, the prefix text box indicates
+				the prefix you want to apply to all registered images. This prefix will be
+				prepended to the original image file names. The image at right shows the
+				registration dialog configured to save both transform data and transformed
+				images.</p>
+			</td>
+	  	    <td><a href="img/Output.jpg"><img src="img/Output.jpg" width="300"></a></td>
+	  	    <td>&nbsp;</td>
+  	      </tr>
+	  	  <tr>
+	  	    <td>&nbsp;</td>
+	  	    <td>
+				<p class="subsection"><a name="execution">Execution</a></p>
+				<p>Once the thresholding, smoothing, and output sections of the registration
+				dialog have been adjusted to your preferences, you are ready to perform the
+				image registration. Clicking on the Next button at the bottom of the dialog
+				will advance the image registration processor by one image pair. That is,
+				ImageTracker will find the optimal transformation between the current and
+				next image in the sequence. No data will be saved until the end of the
+				image sequence is reached, but advancing in this manner for the first one
+				or two images may help you determine if the prefiltering parameters are
+				resonable or give you an indication of how long it will take to align
+				all images in the sequence.</p>
+				<p>Clicking the Run All button will register all images in the sequence
+				and output the appropriate data at the end of registration. This may take a
+				while...the Logger may provide some information during this process, but
+				sometimes the registration process consumes all available resources, and
+				the information will not be provided.</p>
+			</td>
+	  	    <td><a href="img/Registration.jpg"><img src="img/Registration.jpg" width="300"></a></td>
+	  	    <td>&nbsp;</td>
+  	      </tr>
+	  	  <tr>
+	  	    <td>&nbsp;</td>
+	  	    <td>After performing registration, you can view the transformed images in the
+			directory specified in the output section of the registration dialog. Note that
+			you can use ImageTracker as an image viewer to see these results. Remove the
+			input images from the active image list, and add the output images. The image
+			at right shows one frame from the alignment of the sample images provided in
+			this manual. Note that the absolute black regions of the image were outside
+			the view of the original image frame.</td>
+	  	    <td><a href="img/PostRegistration.jpg"><img src="img/PostRegistration.jpg" width="300"></a></td>
+	  	    <td>&nbsp;</td>
+  	      </tr>
+	  	  <tr>
+	  	    <td>&nbsp;</td>
+	  	    <td>
+				<p class="section"><a name="versionhistory">Version History</a></p>
+				<p>The sections below outline the changes made to ImageTracker at each revision.</p>
+			</td>
+	  	    <td>&nbsp;</td>
+	  	    <td>&nbsp;</td>
+  	      </tr>
+	  	  <tr>
+	  	    <td>&nbsp;</td>
+	  	    <td>
+				<p class="subsection"><a name="v1.00">Version 1.00</a></p>
+				<p>Features</p>
+				<ul>
+					<li>Loading and viewing images sequences</li>
+					<li>Global registration of image sequences</li>
+					<li>Threshold prefilter for registration</li>
+					<li>Smoothing prefilter for registration</li>
+					<li>Saving registration transform data and transformed original image files.</li>
+					<li>Multi-level logging to window</li>
+				</ul>
+				<p>Known bugs</p>
+				<ul>
+					<li>Images other than 8-bin PNG may not load properly</li>
+					<li>Image canvas disappears on occasion; when viewing lots of images or resizing image canvas</li>
+					<li>Large images may cause exceptions on resizing canvas</li>
+					<li>Memory leak: memory use grows when running registration multiple times</li>
+				</ul>
+			</td>
+	  	    <td>&nbsp;</td>
+	  	    <td>&nbsp;</td>
+  	      </tr>
+		</table>
+	</td>
+  </tr>
+  <tr>
+    <td colspan="2" align="right" class="footer-text">
+		ImageTracker<br>
+		by Brian Eastwood
+	</td>
+  </tr>
+</table>
+
+</body>
+</html>

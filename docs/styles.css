@@ -1,0 +1,82 @@
+body 
+{
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+td
+{
+	vertical-align:top;
+}
+
+a
+{
+	color: #000000;
+}
+
+a:hover
+{
+	color:#666666;
+}
+
+.header-text 
+{
+	font-size: x-large;
+	font-weight: bold;
+	color: #999999;
+	background-color: #111155;
+}
+
+.footer-text 
+{
+	font-size: small;
+	font-weight: bold;
+	color: #CCCCAA;
+	background-color: #111155;
+}
+
+.gutter-text
+{
+	background-color: #CCCCCC;
+}
+
+a.gutter-text
+{
+	font-size: larger;
+	text-decoration: none;
+}
+
+.section
+{
+	font-size:large;
+	font-weight:bold;
+}
+
+.subsection
+{
+	font-size:larger;
+	font-weight:bold;
+}
+
+.menu-section
+{
+	font-size:larger;
+	font-weight:bold;
+}
+
+.menu-subsection
+{
+	font-size:medium;
+	font-weight:bold;
+}
+
+.warning
+{
+	color:#CC0000;
+	font-weight:normal;
+}
+
+.note
+{
+	font-size:smaller;
+	font-style:italic;
+}
