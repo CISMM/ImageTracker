@@ -5,7 +5,8 @@
 #include "GlobalRegistrationDialog.h"
 #include "ImageCanvas.h"
 
-static const wxChar *TITLE = _T("Image Tracker");
+static const wxChar *TITLE = _T("ImageTracker");
+static const wxChar *VERSION = _T("v1.00");
 static const wxChar *AUTHOR = _T("Brian Eastwood");
 static const wxChar *INFO = _T("(c) 2005");
 

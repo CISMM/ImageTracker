@@ -61,7 +61,7 @@ void ImageViewer::OnAbout( wxCommandEvent &event )
 {
     wxString ret(_T("\n"));
     wxString msg(TITLE);
-    msg.append(ret).append(AUTHOR).append(ret).append(INFO);
+    msg.append(_T(" ")).append(VERSION).append(ret).append(AUTHOR).append(ret).append(INFO);
     wxMessageDialog about(this, msg, wxString(_T("About ")).append(TITLE), wxOK);
     about.ShowModal();
 }
