@@ -1,9 +1,5 @@
 #include "FileSetImageReader.h"
 
-FileSetImageReader::FileSetImageReader(void)
-{
-}
-
 FileSetImageReader::FileSetImageReader(FileSet* fileSet)
 {
     this->SetFileSet(fileSet);
@@ -16,7 +12,11 @@ FileSetImageReader::~FileSetImageReader(void)
 void FileSetImageReader::SetFileSet(FileSet* fileSet)
 {
     this->fileSet = fileSet;
-    this->fileIt = this->fileSet->GetFileNames()->begin();
+    
+    if (this->fileSet)
+    {
+        this->fileIt = this->fileSet->GetFileNames()->begin();
+    }
 }
 
 FileSet* FileSetImageReader::GetFileSet()
@@ -57,15 +57,23 @@ std::string FileSetImageReader::NextFileName()
     return NULL;
 }
 
-FileSetImageReader::ImageType::Pointer FileSetImageReader::CurrentImage()
+FileSetImageReader::InternalImageType::Pointer FileSetImageReader::FirstImage()
 {
-    ReaderType::Pointer reader = ReaderType::New();
-    reader->SetFileName(this->CurrentFileName().c_str());
-    reader->Update();
-    return reader->GetOutput();
+    this->fileIt = this->fileSet->GetFileNames()->begin();
+    return this->CurrentImage();
 }
 
-FileSetImageReader::ImageType::Pointer FileSetImageReader::NextImage()
+FileSetImageReader::InternalImageType::Pointer FileSetImageReader::CurrentImage()
+{
+    ReaderType::Pointer reader = ReaderType::New();
+    CasterType::Pointer caster = CasterType::New();
+    reader->SetFileName(this->CurrentFileName().c_str());
+    caster->SetInput(reader->GetOutput());
+    caster->Update();
+    return caster->GetOutput();
+}
+
+FileSetImageReader::InternalImageType::Pointer FileSetImageReader::NextImage()
 {
     if (this->HasNext())
     {
@@ -80,4 +88,25 @@ FileSetImageReader::ImageType::Pointer FileSetImageReader::NextImage()
 void FileSetImageReader::Next()
 {
     *(this->fileIt)++;
+}
+
+void FileSetImageReader::GetMinMax(InternalImageType::PixelType* min, InternalImageType::PixelType* max)
+{
+    InternalImageType::Pointer img = this->CurrentImage();
+    IteratorType iter(img, img->GetLargestPossibleRegion());
+    iter.GoToBegin();
+    *min = iter.Get();
+    *max = iter.Get();
+
+    for ( ; !iter.IsAtEnd(); ++iter)
+    {
+        if (*max < iter.Get())
+        {
+            *max = iter.Get();
+        }
+        if (*min > iter.Get())
+        {
+            *min = iter.Get();
+        }
+    }
 }

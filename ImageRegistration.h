@@ -40,7 +40,7 @@ public:
 
     //Image types
     //todo: Can we parameterize class on this?
-    typedef CommonTypes::ImageType ImageType;
+    typedef CommonTypes::InternalImageType ImageType;
 
     //Registration classes
     //todo: Can we parameterize class with these

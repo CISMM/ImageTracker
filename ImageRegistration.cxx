@@ -87,8 +87,8 @@ void ImageRegistration::SetupOptimizer(OptimizerType::Pointer optimizer, Transfo
     optimizer->SetScales(optimizerScales);
 
     //Set up step lengths
-    optimizer->SetMaximumStepLength(0.05);
-    optimizer->SetMinimumStepLength(0.0005);
+    optimizer->SetMaximumStepLength(0.5);
+    optimizer->SetMinimumStepLength(0.01);
     optimizer->SetNumberOfIterations(200);
 
     //Set up an observer to record optimizer info at each optimization stage

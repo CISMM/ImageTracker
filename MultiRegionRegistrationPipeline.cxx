@@ -55,13 +55,13 @@ void MultiRegionRegistrationPipeline::Update()
     }
 
     FileSetImageReader* pReader = new FileSetImageReader(this->source);
-    FileSetImageReader::ImageType::Pointer pCurrent = pReader->CurrentImage();
+    FileSetImageReader::InternalImageType::Pointer pCurrent = pReader->CurrentImage();
 
     typedef itk::ImageFileWriter<MultiRegionRegistration::OutputImageType> WriterType;
     WriterType::Pointer writer = WriterType::New();
     FileSet::FileIterator outIt = this->destination->GetFileNames()->begin();
 
-    FileSetImageReader::ImageType::Pointer pNext = NULL;
+    FileSetImageReader::InternalImageType::Pointer pNext = NULL;
     MultiRegionRegistration::OutputImageType::Pointer outImage = NULL;
 
     for ( ; pReader->HasNext() &&

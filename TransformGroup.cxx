@@ -1,3 +1,4 @@
+#include "TransformGroup.h"
 
 #include <iostream>
 #include <fstream>
@@ -7,14 +8,43 @@
 #include "itkTransform.h"
 #include "itkCenteredRigid2DTransform.h"
 
-#include "TransformGroup.h"
+#include "Logger.h"
 
-/**
- * Saves a group of transforms to a file.  The transforms are saved in a format
- * that can be read by LoadTransforms().  The file format is:
- *  TransformClass paramCount: param1, param2, param3, ... paramN
- *  ...
- */
+void TransformGroup::LogTransforms(TransformVector* transforms)
+{
+    if (!transforms)
+    {
+        Logger::logWarn("LogTransforms(): The transform group was NULL.");
+    }
+    else
+    {
+        char vars[200];
+        std::string text;
+        TransformGroup::TransformPointer transform;
+        Logger::logInfo("LogTransforms(): ");
+        
+        for (TransformGroup::TransformVector::iterator tranIt = transforms->begin();
+            tranIt != transforms->end();
+            tranIt++)
+        {
+            transform = *tranIt;
+            const TransformType::ParametersType params = transform->GetParameters();
+            int paramCount = params.GetNumberOfElements();
+            
+            // Prefix with transform class name
+            sprintf(vars, "%s (%i): ", transform->GetNameOfClass(), paramCount);
+            text = vars;
+            for (int i=0; i < paramCount; i++)
+            {
+                sprintf(vars, "%9.5f, ", params.get(i));
+                text += vars;
+            }
+
+            Logger::logInfo(text);
+        }
+    }
+}
+
 void TransformGroup::SaveTransforms(TransformVector* transforms, std::string fileName)
 {
     // Open file for writing.  Write over contents in file.
@@ -23,8 +53,9 @@ void TransformGroup::SaveTransforms(TransformVector* transforms, std::string fil
     // Ensure the file was openned properly
     if (fileOut.bad())
     {
-        std::cerr << "TransformGroup::SaveTransforms() Warning: Could not open file " 
-            << fileName << ". Transforms not saved." << std::endl;
+        char text[200];
+        sprintf(text, "TransformGroup::SaveTransforms() Warning: Could not open file %s. Transforms not saved.", fileName.c_str());
+        Logger::logError(text);
         return;
     }
 
@@ -63,9 +94,9 @@ void TransformGroup::SaveTransforms(TransformVector* transforms, std::string fil
     fileOut.close();
 
     // Log transform count, if debugging.
-#ifdef DEBUG
-    std::clog << count << " transforms written to " << fileName << "." << std::endl;
-#endif
+    char text[200];
+    sprintf(text, "%i transforms written to %s.", count, fileName.c_str());
+    Logger::logDebug(text);
 }
 
 TransformGroup::TransformVector* TransformGroup::LoadTransforms(std::string fileName)
@@ -77,8 +108,10 @@ TransformGroup::TransformVector* TransformGroup::LoadTransforms(std::string file
     // Ensure the file has been openned properly
     if (inFile.bad())
     {
-        std::cerr << "TransformGroup::LoadTransforms() Warning: Could not open file "
-            << fileName << ". No transforms loaded." << std::endl;
+        char text[200];
+        sprintf(text, 
+            "TransformGroup::LoadTransforms() Warning: Coult not open file %s. No transforms loaded.", fileName.c_str());
+        Logger::logError(text);
         return transforms;
     }
 
@@ -109,9 +142,9 @@ TransformGroup::TransformVector* TransformGroup::LoadTransforms(std::string file
 
     inFile.close();
 
-#ifdef DEBUG
-    std::clog << transforms->size() << " transforms read from file " << fileName << "." << std::endl;
-#endif
+    char text[200];
+    sprintf(text, "%i transforms read from file %s.", transforms->size(), fileName.c_str());
+    Logger::logDebug(text);
 
     return transforms;
 }

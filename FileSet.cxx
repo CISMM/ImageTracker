@@ -25,11 +25,27 @@ FileSet::FileSet(FilePattern* pattern)
     this->SetFileNames(pNames);
 }
 
+FileSet::FileSet(FileVector * names)
+{
+    this->fileNames = names;
+}
+
+FileSet::FileSet(FileSet * files, std::string prefix)
+{
+    this->directory = files->directory;
+    this->fileNames = new FileSet::FileVector();
+    
+    for (FileSet::FileVector::iterator fit = files->fileNames->begin(); fit != files->fileNames->end(); fit++)
+    {
+        this->fileNames->push_back(prefix + *fit);
+    }
+}
+
 FileSet::~FileSet(void)
 {
 }
 
-void FileSet::SetFileNames(std::vector<std::string>* names)
+void FileSet::SetFileNames(FileVector * names)
 {
     this->fileNames = names;
 }
@@ -56,7 +72,8 @@ std::string FileSet::FullFileName(FileIterator it)
 
 std::string FileSet::PadInt(int anInt, unsigned int places)
 {
-    std::string intStr = itoa(anInt, "", 10);
+    char buffer[33];
+    std::string intStr(itoa(anInt, buffer, 10));
     while (intStr.size() < places)
     {
         intStr.insert(intStr.begin(), '0');
