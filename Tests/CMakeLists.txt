@@ -19,4 +19,4 @@ SET (TestCases_SRCS
 	TestVideoRegistration.cxx
 )
 ADD_EXECUTABLE(TestCases ${TestCases_SRCS})
-TARGET_LINK_LIBRARIES(TestCases TestSuite ImageTracker ITKCommon ITKBasicFilters ITKIO ITKNumerics)
+TARGET_LINK_LIBRARIES(TestCases TestSuite ImageTrackerBase ITKCommon ITKBasicFilters ITKIO ITKNumerics)
