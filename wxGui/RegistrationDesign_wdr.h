@@ -68,18 +68,21 @@ wxSizer *CreateLoggerDialog( wxWindow *parent, bool call_fit = TRUE, bool set_si
 const int IV_CANVAS = 10030;
 wxSizer *CreateViewerDialog( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
+const int ID_SCROLLED = 10031;
+wxSizer *CreateImageWindowDialog( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
+
 // Declare menubar functions
 
-const int IV_MENU_FILE = 10031;
-const int IV_FILES = 10032;
-const int ID_MENU = 10033;
-const int IV_EXIT = 10034;
-const int IV_MENU_ACTIONS = 10035;
-const int IV_REGISTER = 10036;
-const int IV_MENU_VIEW = 10037;
-const int IV_MENU_LOGGER = 10038;
-const int IV_MENU_HELP = 10039;
-const int IV_ABOUT = 10040;
+const int IV_MENU_FILE = 10032;
+const int IV_FILES = 10033;
+const int ID_MENU = 10034;
+const int IV_EXIT = 10035;
+const int IV_MENU_ACTIONS = 10036;
+const int IV_REGISTER = 10037;
+const int IV_MENU_VIEW = 10038;
+const int IV_MENU_LOGGER = 10039;
+const int IV_MENU_HELP = 10040;
+const int IV_ABOUT = 10041;
 wxMenuBar *CreateViewerMenu();
 
 // Declare toolbar functions

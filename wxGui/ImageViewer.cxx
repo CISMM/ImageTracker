@@ -1,8 +1,6 @@
 #include "./ImageViewer.h"
 #include "./DialogLogger.h"
 
-IMPLEMENT_APP(ViewerApp)
-
 bool ViewerApp::OnInit()
 {
     ImageViewer *frame = new ImageViewer((wxWindow *) NULL);

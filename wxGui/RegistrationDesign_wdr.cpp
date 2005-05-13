@@ -282,6 +282,24 @@ wxSizer *CreateViewerDialog( wxWindow *parent, bool call_fit, bool set_sizer )
     return item0;
 }
 
+wxSizer *CreateImageWindowDialog( wxWindow *parent, bool call_fit, bool set_sizer )
+{
+    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
+
+    ImageCanvas *item1 = new ImageCanvas( parent, ID_SCROLLED, wxDefaultPosition, wxSize(400,320), wxHSCROLL|wxVSCROLL );
+    item1->SetScrollbars( 10, 10, 20, 100, 0, 0 );
+    item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    if (set_sizer)
+    {
+        parent->SetSizer( item0 );
+        if (call_fit)
+            item0->SetSizeHints( parent );
+    }
+    
+    return item0;
+}
+
 // Implement menubar functions
 
 wxMenuBar *CreateViewerMenu()

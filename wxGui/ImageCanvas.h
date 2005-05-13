@@ -40,7 +40,7 @@ public:
         const wxPoint &position = wxDefaultPosition, 
         const wxSize &size = wxDefaultSize, 
         long style = wxHSCROLL | wxVSCROLL, 
-        const wxString &name = "scrolledWindow");
+        const wxString &name = _("Image"));
 
     /*
      * Destroy an image canvas.
