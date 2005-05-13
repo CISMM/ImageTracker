@@ -9,12 +9,14 @@
 #include "itkMeanSquaresImageToImageMetric.h"
 #include "itkNormalizedCorrelationImageToImageMetric.h"
 #include "itkLinearInterpolateImageFunction.h"
+#include "itkPointSet.h"
 #include "itkRegularStepGradientDescentOptimizer.h"
 #include "itkVector.h"
 #include "itkRegionOfInterestImageFilter.h"
 
-#include "ImageRegistration.h"
 #include "CommonTypes.h"
+#include "Feature.h"
+#include "ImageRegistration.h"
 
 /**
  * Performs image registration of multiple regions of interest.
@@ -54,12 +56,14 @@ public:
     typedef itk::RegularStepGradientDescentOptimizer OptimizerType;
     typedef itk::LinearInterpolateImageFunction<InputImageType, double> InterpolatorType;
     typedef itk::ImageRegistrationMethod<InputImageType, InputImageType> RegistrationType;
+    typedef itk::PointSet<Feature, 2> PointSetType;
 
     void SetFixedImage(InputImageType::Pointer fixed);
     void SetMovingImage(InputImageType::Pointer moving);
     void SetRadiusOfInterest(int pixels);
     void SetROIRatio(double ratio);
     OutputImageType::Pointer Update(void);
+    OutputImageType::Pointer Update(PointSetType::Pointer features);
 
 private:
     TransformType::Pointer DoRegister(InputImageType::Pointer fixed, InputImageType::Pointer moving);

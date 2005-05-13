@@ -15,7 +15,7 @@ public:
     FileSet* GetDestination(void);
     void SetRegistrar(MultiRegionRegistration* registrar);
     MultiRegionRegistration* GetRegistrar(void);
-    void Update(void);
+    void Update(bool findFeatures = false);
 
 private:
     FileSet* source;

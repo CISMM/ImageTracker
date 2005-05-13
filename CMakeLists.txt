@@ -22,6 +22,8 @@ INCLUDE_DIRECTORIES(${ITK_INCLUDE_DIRS})
 
 LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
 
+# wxWindows Setup
+INCLUDE( ${CMAKE_ROOT}/Modules/Use_wxWindows.cmake )
 
 #######################################
 # Image processing library
@@ -30,10 +32,12 @@ SET (ImageTrackerBase_SRCS
     BlurFilterSchedule.cxx                      BlurFilterSchedule.h
                                                 CommonTypes.h
     DemonsPipeline.cxx                          DemonsPipeline.h
+                                                Feature.h
 	FilePattern.cxx                             FilePattern.h
 	FileSet.cxx                                 FileSet.h
 	FileSetImageReader.cxx                      FileSetImageReader.h
 	GlobalRegistrationPipeline.cxx              GlobalRegistrationPipeline.h
+	HarrisFeatureDetector.cxx                   HarrisFeatureDetector.h
 	ImageRegistration.cxx                       ImageRegistration.h
 	ImageStatistics.cxx                         ImageStatistics.h
 	Logger.cxx                                  Logger.h
@@ -41,12 +45,13 @@ SET (ImageTrackerBase_SRCS
 	MultiRegionRegistration.cxx                 MultiRegionRegistration.h
 	MultiRegionRegistrationPipeline.cxx         MultiRegionRegistrationPipeline.h
 	RegistrationOutput.cxx                      RegistrationOutput.h
+	                                            Sort.h
 	StopWatch.cxx                               StopWatch.h
 	ThresholdPipeline.cxx                       ThresholdPipeline.h
 	TransformGroup.cxx                          TransformGroup.h
 )
 ADD_LIBRARY(ImageTrackerBase ImageTrackerBase_SRCS)
-TARGET_LINK_LIBRARIES(ImageTrackerBase ITKBasicFilters)
+TARGET_LINK_LIBRARIES(ImageTrackerBase ImageTrackerGui ITKCommon ITKBasicFilters ITKIO ITKAlgorithms)
 
 
 #######################################
