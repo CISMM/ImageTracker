@@ -30,8 +30,6 @@ public:
     typedef CommonTypes::TransformType TransformType;
     typedef std::vector<TransformType::Pointer> TransformVector;
     typedef itk::ImageFileReader<ImageType> ReaderType;
-    // !todo: make this work in all dimensions
-    // typedef itk::DiscreteGaussianImageFilter<ImageType, ImageType> SmoothType;
     typedef itk::RecursiveGaussianImageFilter<ImageType, ImageType> SmoothType;
     typedef itk::ThresholdImageFilter<ImageType> ThresholdType;
     typedef itk::ImageRegistrationMethod<ImageType, ImageType> RegistrationType;
@@ -169,7 +167,7 @@ public:
     typedef CommonTypes::TransformType TransformType;
     typedef itk::MeanSquaresImageToImageMetric<ImageType, ImageType> MetricType;
     typedef itk::RegularStepGradientDescentOptimizer OptimizerType;
-    typedef itk::LinearInterpolateImageFunction<ImageType, double> InterpolatorType;
+    typedef itk::LinearInterpolateImageFunction<ImageType, TransformType::ScalarType> InterpolatorType;
     typedef itk::ImageRegistrationMethod<ImageType, ImageType> RegistrationType;
 
     /*

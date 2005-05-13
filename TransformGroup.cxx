@@ -127,7 +127,8 @@ TransformGroup::TransformVector* TransformGroup::LoadTransforms(std::string file
         inFile >> paramCount;
 
         TransformGroup::TransformType::ParametersType* params = new TransformGroup::TransformType::ParametersType(paramCount);
-        itk::CenteredRigid2DTransform<double>::Pointer xForm = itk::CenteredRigid2DTransform<double>::New();
+        TransformType::Pointer xForm = TransformType::New();
+        // itk::CenteredRigid2DTransform<double>::Pointer xForm = itk::CenteredRigid2DTransform<double>::New();
         xForm->SetIdentity();
 
         for (int i = 0; i < paramCount; i++)

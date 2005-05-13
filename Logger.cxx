@@ -18,7 +18,10 @@ Logger::~Logger(void)
 void Logger::Destroy()
 {
     if (Logger::s_instance)
+    {
         delete Logger::s_instance;
+        Logger::s_instance = NULL;
+    }
 }
 
 Logger* Logger::Instance()

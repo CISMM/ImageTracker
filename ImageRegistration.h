@@ -52,7 +52,7 @@ public:
     typedef itk::MeanSquaresImageToImageMetric<ImageType, ImageType> MetricType;
     //typedef itk::NormalizedCorrelationImageToImageMetric<ImageType, ImageType> MetricType;
     typedef itk::RegularStepGradientDescentOptimizer OptimizerType;
-    typedef itk::LinearInterpolateImageFunction<ImageType, double> InterpolatorType;
+    typedef itk::LinearInterpolateImageFunction<ImageType, TransformType::ScalarType> InterpolatorType;
     typedef itk::ImageRegistrationMethod<ImageType, ImageType> RegistrationType;
 
     //Image registration functions
