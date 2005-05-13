@@ -1,8 +1,9 @@
 #include "TestStopWatch.h"
 
 #include <time.h>
-#include <iostream>
+#include <string>
 
+#include "..\Logger.h"
 #include "..\StopWatch.h"
 
 TestStopWatch::TestStopWatch(void)
@@ -15,6 +16,7 @@ TestStopWatch::~TestStopWatch(void)
 
 void TestStopWatch::run()
 {
+    Logger::logInfo("Running TestStopWatch");
     this->testStartStop();
 }
 
@@ -27,10 +29,12 @@ void TestStopWatch::testStartStop()
     {
         this->sleep(1);
         label = "test lap ";
-        label.append(itoa(i, "", 10));
+        label.append(itoa(i, new char[5], 10));
         watch->Lap(label);
     }
-    std::cout << "Elapsed: " << watch->ElapsedTime() << std::endl;
+    char message[80];
+    sprintf(message, "Elapsed: %5.4f", watch->ElapsedTime());
+    Logger::logDebug(message);
     watch->Stop("test stop");
     watch->Print();
     succeed_();
