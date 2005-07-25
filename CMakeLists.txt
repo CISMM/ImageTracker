@@ -9,8 +9,8 @@ ELSE(ITK_FOUND)
 ENDIF(ITK_FOUND)
 
 #INCLUDE (${CMAKE_ROOT}/Modules/FindVTK.cmake)
-#IF (USE_VTK_FILE)
-#  INCLUDE(${USE_VTK_FILE})
+#IF (VTK_USE_FILE)
+#  INCLUDE(${VTK_USE_FILE})
 #ENDIF (USE_VTK_FILE)
 
 # Load the CableSwig settings used by ITK.
@@ -25,22 +25,32 @@ LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
 # wxWindows Setup
 INCLUDE( ${CMAKE_ROOT}/Modules/Use_wxWindows.cmake )
 
+# ImageMagick setup
+INCLUDE ( ./Use_ImageMagick.cmake )
+
 #######################################
 # Image processing library
 #######################################
 SET (ImageTrackerBase_SRCS
+                                                BilateralVectorImageFilter.h
     BlurFilterSchedule.cxx                      BlurFilterSchedule.h
+                                                CLGOpticFlowImageFilter.h
+    CLGOpticFlowPipeline.cxx                    CLGOpticFlowPipeline.h
                                                 CommonTypes.h
     DemonsPipeline.cxx                          DemonsPipeline.h
                                                 Feature.h
+    FeatureTrackingPipeline.cxx                 FeatureTrackingPipeline.h                                                
 	FilePattern.cxx                             FilePattern.h
 	FileSet.cxx                                 FileSet.h
 	FileSetImageReader.cxx                      FileSetImageReader.h
+                                                Gaussian2DVectorFilter.h
 	GlobalRegistrationPipeline.cxx              GlobalRegistrationPipeline.h
 	HarrisFeatureDetector.cxx                   HarrisFeatureDetector.h
 	ImageRegistration.cxx                       ImageRegistration.h
 	ImageStatistics.cxx                         ImageStatistics.h
+	ItkMagickIO.cxx                             ItkMagickIO.h
 	Logger.cxx                                  Logger.h
+	LogStream.cxx                               LogStream.h
 	MultiImageRegistrationProcessor.cxx         MultiImageRegistrationProcessor.h
 	MultiRegionRegistration.cxx                 MultiRegionRegistration.h
 	MultiRegionRegistrationPipeline.cxx         MultiRegionRegistrationPipeline.h
@@ -49,9 +59,10 @@ SET (ImageTrackerBase_SRCS
 	StopWatch.cxx                               StopWatch.h
 	ThresholdPipeline.cxx                       ThresholdPipeline.h
 	TransformGroup.cxx                          TransformGroup.h
+	Use_ImageMagick.cmake
 )
 ADD_LIBRARY(ImageTrackerBase ImageTrackerBase_SRCS)
-TARGET_LINK_LIBRARIES(ImageTrackerBase ImageTrackerGui ITKCommon ITKBasicFilters ITKIO ITKAlgorithms)
+TARGET_LINK_LIBRARIES(ImageTrackerBase ImageTrackerGui ITKCommon ITKBasicFilters ITKIO ITKAlgorithms CORE_RL_Magick++_ )
 
 
 #######################################
