@@ -11,16 +11,22 @@
 
 #include "../wxGui/DialogLogger.h"
 
+#include "TestBilateralVectorFilter.h"
+#include "TestCLGOpticFlowImageFilter.h"
 #include "TestDemonsPipeline.h"
 #include "TestFileSet.h"
 #include "TestFileSetImageReader.h"
 #include "TestGlobalRegistrationPipeline.h"
 #include "TestHarrisFeatureDetector.h"
+#include "TestImageMagick.h"
 #include "TestImageRescale.h"
 #include "TestImageStatistics.h"
 #include "TestImageWindow.h"
+#include "TestItkMagickIO.h"
 #include "TestLogger.h"
+#include "TestLogStream.h"
 #include "TestMultiRegionRegistration.h"
+#include "TestRandomVectorImage.h"
 #include "TestRegistrationOutput.h"
 #include "TestSort.h"
 #include "TestStopWatch.h"
@@ -67,24 +73,31 @@ void TestCaseFrame::CreateMyMenuBar()
 void TestCaseFrame::OnRunTests( wxCommandEvent &event )
 {
         TestSuite::Suite suite("Video Registration Suite");
+        // suite.addTest(new TestRandomVectorImage);
+        // suite.addTest(new TestBilateralVectorFilter);
+        // suite.addTest(new TestCLGOpticFlowImageFilter);
+        // suite.addTest(new TestDemonsPipeline);
         // suite.addTest(new TestFileSet);
         // suite.addTest(new TestFileSetImageReader);
-        // suite.addTest(new TestGlobalRegistrationPipeline);
+        // suite.addTest(new TestGlobalRegistrationPipeline);        
+        // suite.addTest(new TestHarrisFeatureDetector);
+        // suite.addTest(new TestImageMagick);
+        // suite.addTest(new TestImageRescale);
+        // suite.addTest(new TestImageStatistics);
+        // suite.addTest(new TestImageWindow);        
+        // suite.addTest(new TestItkMagickIO);
         // suite.addTest(new TestLogger);
-        suite.addTest(new TestHarrisFeatureDetector);
-        // suite.addTest(new TestImageWindow);
+        // suite.addTest(new TestLogStream);
+        // suite.addTest(new TestMultiRegionRegistration);
+        
         // suite.addTest(new TestRegistrationOutput);
+        // suite.addTest(new TestSort);
+        // suite.addTest(new TestStopWatch);
         // suite.addTest(new TestThresholdPipeline);
         // suite.addTest(new TestTransformGroup);
-        // suite.addTest(new TestVideoRegistration);
-        suite.addTest(new TestMultiRegionRegistration);
-        suite.addTest(new TestSort);
-        // suite.addTest(new TestStopWatch);
-        // suite.addTest(new TestImageStatistics);
-        // suite.addTest(new TestDemonsPipeline);
         // suite.addTest(new TestVectorConvert);
         // suite.addTest(new TestVectorWrite);
-        // suite.addTest(new TestImageRescale);
+        // suite.addTest(new TestVideoRegistration);
         suite.run();
         long errs = suite.report();
 
@@ -122,7 +135,8 @@ IMPLEMENT_APP(TestCaseApp)
 int main()
 {
     TestSuite::Suite suite("Video Registration Suite");
-    suite.addTest(new TestMultiRegionRegistration);
+    suite.addTest(new TestLogStream);
+    // suite.addTest(new TestMultiRegionRegistration);
     // suite.addTest(new TestVectorWrite);
     suite.run();
     long errs = suite.report();
