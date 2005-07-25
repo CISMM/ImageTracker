@@ -1,4 +1,8 @@
 #include "FileSetImageReader.h"
+#include "itkStatisticsImageFilter.h"
+
+#include "ItkMagickIO.h"
+#include "Logger.h"
 
 FileSetImageReader::FileSetImageReader(FileSet* fileSet)
 {
@@ -65,12 +69,29 @@ FileSetImageReader::InternalImageType::Pointer FileSetImageReader::FirstImage()
 
 FileSetImageReader::InternalImageType::Pointer FileSetImageReader::CurrentImage()
 {
-    ReaderType::Pointer reader = ReaderType::New();
-    CasterType::Pointer caster = CasterType::New();
-    reader->SetFileName(this->CurrentFileName().c_str());
-    caster->SetInput(reader->GetOutput());
-    caster->Update();
-    return caster->GetOutput();
+    typedef itk::StatisticsImageFilter<InternalImageType> StatsType;
+    StatsType::Pointer stats = StatsType::New();
+
+    stats->SetInput(ItkMagickIO::Read(this->CurrentFileName()));
+    
+    // return ItkMagickIO::Read(this->CurrentFileName());
+
+    //ReaderType::Pointer reader = ReaderType::New();
+    //CasterType::Pointer caster = CasterType::New();
+    //reader->SetFileName(this->CurrentFileName().c_str());
+    //caster->SetInput(reader->GetOutput());
+    //stats->SetInput(caster->GetOutput());
+    // caster->Update();
+    // return caster->GetOutput();
+
+    stats->Update();
+    char text[80];
+    sprintf(text, "Min: %5.2f", stats->GetMinimum());
+    Logger::logDebug(text);
+    sprintf(text, "Max: %5.2f", stats->GetMaximum());
+    Logger::logDebug(text);
+
+    return stats->GetOutput();
 }
 
 FileSetImageReader::InternalImageType::Pointer FileSetImageReader::NextImage()

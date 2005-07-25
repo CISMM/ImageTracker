@@ -41,6 +41,20 @@ FileSet::FileSet(FileSet * files, std::string prefix)
     }
 }
 
+FileSet::FileSet(FileSet * files, std::string prefix, std::string ext)
+{
+    this->directory = files->directory;
+    this->fileNames = new FileSet::FileVector();
+
+    for (FileSet::FileVector::iterator fit = files->fileNames->begin(); fit != files->fileNames->end(); fit++)
+    {
+        std::string name = prefix + *fit;
+        std::string::size_type idx = name.find_last_of(".");
+        name = name.substr(0, idx+1);
+        this->fileNames->push_back(name + ext);
+    }
+}
+
 FileSet::~FileSet(void)
 {
 }

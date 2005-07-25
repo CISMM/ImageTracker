@@ -32,8 +32,12 @@
 class MultiRegionRegistration
 {
 public:
-    MultiRegionRegistration(void);
-    ~MultiRegionRegistration(void);
+    MultiRegionRegistration(int radius = 5, double roiRatio = 2.0)
+    {
+        this->SetRadiusOfInterest(radius);
+        this->SetROIRatio(roiRatio);
+    }
+    ~MultiRegionRegistration(void) {}
 
     // Input / Ouput types
     // MUST be float, and MUST be CovariantVector--other seemingly similar
@@ -58,10 +62,12 @@ public:
     typedef itk::ImageRegistrationMethod<InputImageType, InputImageType> RegistrationType;
     typedef itk::PointSet<Feature, 2> PointSetType;
 
-    void SetFixedImage(InputImageType::Pointer fixed);
-    void SetMovingImage(InputImageType::Pointer moving);
-    void SetRadiusOfInterest(int pixels);
-    void SetROIRatio(double ratio);
+    void SetFixedImage(InputImageType::Pointer fixed) { this->fixedImage = fixed; }
+    void SetMovingImage(InputImageType::Pointer moving) { this->movingImage = moving; }
+    int GetRadiusOfInterest() { return this->radiusOfInterest; }
+    double GetROIRatio() { return this->roiRatio; }
+    void SetRadiusOfInterest(int pixels) { this->radiusOfInterest = pixels; }
+    void SetROIRatio(double ratio) { this->roiRatio = ratio; }
     OutputImageType::Pointer Update(void);
     OutputImageType::Pointer Update(PointSetType::Pointer features);
 

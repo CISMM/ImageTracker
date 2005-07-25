@@ -44,6 +44,12 @@ public:
     FileSet(FileSet * files, std::string prefix);
 
     /*
+     * Create a new FileSet by prepending a prefix to the front
+     * of all file names and changing the extension.
+     */
+    FileSet(FileSet* files, std::string prefix, std::string ext);
+
+    /*
      * Destructor.
      */
     ~FileSet(void);

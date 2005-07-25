@@ -65,7 +65,7 @@ void MultiRegionRegistrationPipeline::Update(bool findFeatures)
 
     FileSetImageReader::InternalImageType::Pointer pNext = NULL;
     MultiRegionRegistration::OutputImageType::Pointer outImage = NULL;
-    HarrisFeatureDetector* detector = new HarrisFeatureDetector();
+    HarrisFeatureDetector* detector = new HarrisFeatureDetector(2000, 1.2);
 
     for ( ; pReader->HasNext() &&
             outIt != this->destination->GetFileNames()->end(); 
@@ -79,7 +79,7 @@ void MultiRegionRegistrationPipeline::Update(bool findFeatures)
         if (findFeatures) // Only compute motion where there is enough information
         {
             HarrisFeatureDetector::PointSetType::Pointer features = 
-                detector->findFeatures(pCurrent, 2000, 1.2);
+                detector->findFeatures(pCurrent);
             outImage = registrar->Update(features);
         }
         else

@@ -7,37 +7,6 @@
 
 #include "Logger.h"
 
-MultiRegionRegistration::MultiRegionRegistration(void)
-{
-    // Set up some default parameters
-    this->roiRatio = 2.0;
-    this->radiusOfInterest = 5;
-}
-
-MultiRegionRegistration::~MultiRegionRegistration(void)
-{
-}
-
-void MultiRegionRegistration::SetFixedImage(InputImageType::Pointer fixed)
-{
-    this->fixedImage = fixed;
-}
-
-void MultiRegionRegistration::SetMovingImage(InputImageType::Pointer moving)
-{
-    this->movingImage = moving;
-}
-
-void MultiRegionRegistration::SetRadiusOfInterest(int pixels)
-{
-    this->radiusOfInterest = pixels;
-}
-
-void MultiRegionRegistration::SetROIRatio(double ratio)
-{
-    this->roiRatio = ratio;
-}
-
 MultiRegionRegistration::OutputImageType::Pointer MultiRegionRegistration::Update()
 {
     if (this->movingImage == NULL || this->fixedImage == NULL)

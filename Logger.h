@@ -13,7 +13,7 @@ enum
     LOG_ALL
 };
 
-const static int LOG_LEVEL = LOG_ALL;
+const static int LOG_LEVEL = LOG_INFO;
 
 class ILog;
 
