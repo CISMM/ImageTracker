@@ -36,8 +36,11 @@ void TestHarrisFeatureDetector::testDetector()
     for (int i = 0; i < scales; i++)
     {
         if (i > 0) scale = scale * 1.4;
+
+        detector->SetMaxCount(count);
+        detector->SetSigma(scale);
         HarrisFeatureDetector::PointSetType::Pointer features = 
-            detector->findFeatures(reader->GetOutput(), count, scale);
+            detector->findFeatures(reader->GetOutput());
         test_(features->GetNumberOfPoints() <= count);
     }
 }
