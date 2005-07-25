@@ -16,23 +16,15 @@
 // TODO: Remove after debugging
 #include "./wxGui/ImageWindow.h"
 
-HarrisFeatureDetector::HarrisFeatureDetector(void)
-{
-}
-
-HarrisFeatureDetector::~HarrisFeatureDetector(void)
-{
-}
-
 /**
  * Finds Harris corner features within a given image.  The number of
  * features found is limited by maxCount.
  */
 HarrisFeatureDetector::PointSetType::Pointer
-    HarrisFeatureDetector::findFeatures(ImageType::Pointer image, int maxCount, double sigma)
+    HarrisFeatureDetector::findFeatures(ImageType::Pointer image)
 {
-     ImageType::Pointer weightImg = this->harrisWeight(image, sigma);
-     PointSetType::Pointer features = this->findMaxima(weightImg, maxCount);
+     ImageType::Pointer weightImg = this->harrisWeightImage(image);
+     PointSetType::Pointer features = this->findMaxima(weightImg);
 
      return features;
 }
@@ -45,7 +37,7 @@ HarrisFeatureDetector::PointSetType::Pointer
  * order.
  */
 HarrisFeatureDetector::PointSetType::Pointer
-    HarrisFeatureDetector::findMaxima(ImageType::Pointer image, int maxCount)
+    HarrisFeatureDetector::findMaxima(ImageType::Pointer image)
 {
     Logger::logDebug("HarrisFeatureDetector: Finding local maxima.");
     // Create a neighborhood filter.  This allows us to traverse the image one
@@ -87,7 +79,7 @@ HarrisFeatureDetector::PointSetType::Pointer
     int pId = 0;
 
     for (std::vector<Feature>::iterator it = features->begin();
-        it != features->end(), pId < maxCount;
+        it != features->end(), pId < this->GetMaxCount();
         it++, pId++)
     {
         Feature feat = *it;
@@ -102,8 +94,9 @@ HarrisFeatureDetector::PointSetType::Pointer
     }
 
     // Log results
-    char* pointCount = itoa(featurePoints->GetNumberOfPoints(), new char[5], 10);
-    char* featCount = itoa(features->size(), new char[5], 10);
+    char pointCount[16], featCount[16];
+    itoa(featurePoints->GetNumberOfPoints(), pointCount, 10);
+    itoa(features->size(), featCount, 10);
 
     std::string msg = "Selected maxima: ";
     msg.append(pointCount).append("/").append(featCount);
@@ -121,7 +114,7 @@ HarrisFeatureDetector::PointSetType::Pointer
  * all singular values are large.
  */
 HarrisFeatureDetector::ImageType::Pointer
-    HarrisFeatureDetector::harrisWeight(ImageType::Pointer image, double sigma)
+    HarrisFeatureDetector::harrisWeightImage(ImageType::Pointer image)
 {
     Logger::logDebug("HarrisFeatureDetector: calculating Harris feature weights.");
     typedef itk::RecursiveGaussianImageFilter<ImageType, ImageType>
@@ -134,8 +127,8 @@ HarrisFeatureDetector::ImageType::Pointer
     DerivativeFilterType::Pointer dy = DerivativeFilterType::New();
     dx->SetDirection(0);
     dy->SetDirection(1);
-    dx->SetSigma(sigma);
-    dy->SetSigma(sigma);
+    dx->SetSigma(this->GetSigma());
+    dy->SetSigma(this->GetSigma());
 
     DuplicatorType::Pointer copier = DuplicatorType::New();
 
@@ -181,7 +174,7 @@ HarrisFeatureDetector::ImageType::Pointer
 
     // DEBUG
     //char message[40];
-    //sprintf(message, "HarrisWeights, sigma=%3.1f", sigma);
+    //sprintf(message, "HarrisWeights, sigma=%3.1f", this.GetSigma());
     //ImageWindow::ImShow(weightImg, message);
 
     return weightImg;

@@ -12,14 +12,26 @@ public:
     typedef CommonTypes::InternalImageType ImageType;
     typedef itk::PointSet<Feature, 2> PointSetType;
 
-    HarrisFeatureDetector(void);
-    ~HarrisFeatureDetector(void);
+    HarrisFeatureDetector(int maxCount = 1000, double sigma = 0.7)
+    {
+        this->SetMaxCount(maxCount);
+        this->SetSigma(sigma);
+    }
 
-    PointSetType::Pointer findFeatures(ImageType::Pointer image, int maxCount = 1000, double sigma = 0.7);
+    ~HarrisFeatureDetector(void){}
+
+    PointSetType::Pointer findFeatures(ImageType::Pointer image);
+    ImageType::Pointer harrisWeightImage(ImageType::Pointer image);
+
+    int GetMaxCount() { return this->maxCount; }
+    double GetSigma() { return this->sigma; }
+    void SetMaxCount(int maxCount) { this->maxCount = maxCount; }
+    void SetSigma(double sigma) { this->sigma = sigma; }
 
 private:
-    ImageType::Pointer harrisWeight(ImageType::Pointer image, double sigma = 0.7);
-    PointSetType::Pointer findMaxima(ImageType::Pointer wtImage, int maxCount);
+    int maxCount;
+    double sigma;
+    PointSetType::Pointer findMaxima(ImageType::Pointer wtImage);
 };
 
 namespace Function
