@@ -7,6 +7,7 @@
 <link href="styles.css" rel="stylesheet" type="text/css">
 </head>
 <body>
+<a name="top"></a>
 <table width="100%"  border="0" cellspacing="0" cellpadding="5">
   <tr><!-- header -->
     <td colspan="2" align="right" class="header-text">
@@ -39,9 +40,17 @@
 					<li><a href="#output" class="menu-subsection">Output</a></li>
 					<li><a href="#execution" class="menu-subsection">Execution</a></li>
 				</ul>
+				<li><a href="#flow" class="menu-section">Flow Computation</a></li>
+				<ul>
+					<li><a href="#feature" class="menu-subsection">Feature-based Tracking</a></li>
+					<li><a href="#clg" class="menu-subsection">CLG Optical Flow</a></li>					
+				    <li><a href="#visualization" class="menu-subsection">Visualization</a></li>
+				    <li><a href="#sparse" class="menu-subsection">Sparse fields</a></li>
+				</ul>
 				<li><a href="#versionhistory" class="menu-section">Version History</a></li>
 				<ul>
-					<li><a href="#v1.00" class="menu-subsection">Version 1.00</a></li>
+					<li><a href="#v2.00" class="menu-subsection">Version 2.00</a></li>
+				    <li><a href="#v1.00" class="menu-subsection">Version 1.00</a></li>
 				</ul>
 				</ul>
 				</p>
@@ -71,10 +80,9 @@
 				frequently).</p>
 			</td>
 			<td>
-				<p class="note">Click on any of the screenshots below to see the
-				full-resolution	image</p>
+			<p class="note">Click on any of the screenshots below to see the full-resolution image</p>
 			</td>
-			<td>&nbsp;</td>
+			<td><p><a href="#top">Top</a></p></td>
 		  </tr>
 	  	  <tr>
 	  	    <td>&nbsp;</td>
@@ -103,8 +111,11 @@
 				Hide button on the Logger window to remove it from your desktop. You can recall
 				it by selecting View--&gt;Logger from the ImageTracker menu.</p>
 			</td>
-	  	    <td><a href="img/ImageTracker.jpg"><img src="img/ImageTracker.jpg" width="300"></a></td>
-	  	    <td>&nbsp;</td>
+	  	    <td>
+			<p><a href="img/ImageTracker.jpg"><img src="img/ImageTracker.jpg" width="300"></a></p>
+  	        <p class="caption">The ImageTracker main window. </p>
+			</td>
+	  	    <td><p><a href="#top">Top</a></p></td>
   	      </tr>
 	  	  <tr>
 	  	    <td>&nbsp;</td>
@@ -128,10 +139,12 @@
 				Files--&gt;Open from the menu.</p>
 			</td>
 	  	    <td>
-				<a href="img/OpenFiles.jpg"><img src="img/OpenFiles.jpg" width="300"></a><br>
-		    	<a href="img/ViewImage.jpg"><img src="img/ViewImage.jpg" width="300"></a>
+			<p><a href="img/OpenFiles.jpg"><img src="img/OpenFiles.jpg" width="300"></a></p>
+			<p class="caption">The Open Files dialog controls which image files are active in ImageTracker.</p>
+			<p><a href="img/ViewImage.jpg"><img src="img/ViewImage.jpg" width="300"></a></p>
+			<p class="caption">ImageTracker displaying a file sequence of mitosis images.</p>
 			</td>
-	  	    <td>&nbsp;</td>
+	  	    <td><p><a href="#top">Top</a></p></td>
   	      </tr>
 	  	  <tr>
 	  	    <td>&nbsp;</td>
@@ -156,7 +169,7 @@
 				dialog and then return to the registration dialog.)</p>
 			</td>
 	  	    <td>&nbsp;</td>
-	  	    <td>&nbsp;</td>
+	  	    <td><p><a href="#top">Top</a></p></td>
   	      </tr>
 	  	  <tr>
 	  	    <td>&nbsp;</td>
@@ -170,8 +183,11 @@
 				image of a cell that has been properly thresholded to select the mitotic
 				spindle and exclude the cell membrane from the registration.</p>
 			</td>
-	  	    <td><a href="img/Threshold.jpg"><img src="img/Threshold.jpg" width="300"></a></td>
-	  	    <td>&nbsp;</td>
+	  	    <td>
+			<p><a href="img/Threshold.jpg"><img src="img/Threshold.jpg" width="300"></a></p>
+			<p class="caption">Thresholding an image controls what intensity ranges are considered during global alignment.</p>
+			</td>
+	  	    <td><p><a href="#top">Top</a></p></td>
   	      </tr>
 	  	  <tr>
 	  	    <td>&nbsp;</td>
@@ -185,8 +201,11 @@
 				example of an appropriately smoothed and thresholded mitotic spindle is
 				shown to the right.</p>
 			</td>
-	  	    <td><a href="img/Smooth.jpg"><img src="img/Smooth.jpg" width="300"></a></td>
-	  	    <td>&nbsp;</td>
+	  	    <td>
+			<p><a href="img/Smooth.jpg"><img src="img/Smooth.jpg" width="300"></a></p>
+			<p class="caption">Smoothing an image selects the scale of the object being aligned.</p>
+			</td>
+	  	    <td><p><a href="#top">Top</a></p></td>
   	      </tr>
 	  	  <tr>
 	  	    <td>&nbsp;</td>
@@ -210,8 +229,11 @@
 				registration dialog configured to save both transform data and transformed
 				images.</p>
 			</td>
-	  	    <td><a href="img/Output.jpg"><img src="img/Output.jpg" width="300"></a></td>
-	  	    <td>&nbsp;</td>
+	  	    <td>
+			<p><a href="img/Output.jpg"><img src="img/Output.jpg" width="300"></a></p>
+			<p class="caption">Specifying the output files for a registration.</p>
+			</td>
+	  	    <td><p><a href="#top">Top</a></p></td>
   	      </tr>
 	  	  <tr>
 	  	    <td>&nbsp;</td>
@@ -233,8 +255,11 @@
 				sometimes the registration process consumes all available resources, and
 				the information will not be provided.</p>
 			</td>
-	  	    <td><a href="img/Registration.jpg"><img src="img/Registration.jpg" width="300"></a></td>
-	  	    <td>&nbsp;</td>
+	  	    <td>
+			<p><a href="img/Registration.jpg"><img src="img/Registration.jpg" width="300"></a></p>
+			<p class="caption">Executing a registration.</p>
+			</td>
+	  	    <td><p><a href="#top">Top</a></p></td>
   	      </tr>
 	  	  <tr>
 	  	    <td>&nbsp;</td>
@@ -245,17 +270,152 @@
 			at right shows one frame from the alignment of the sample images provided in
 			this manual. Note that the absolute black regions of the image were outside
 			the view of the original image frame.</td>
-	  	    <td><a href="img/PostRegistration.jpg"><img src="img/PostRegistration.jpg" width="300"></a></td>
+	  	    <td>
+			</p><a href="img/PostRegistration.jpg"><img src="img/PostRegistration.jpg" width="300"></a></p>
+			<p class="caption">Viewing the results of a registration.</p>
+			</td>
+	  	    <td><p><a href="#top">Top</a></p></td>
+  	      </tr>
+	  	  <tr>
+	  	    <td>&nbsp;</td>
+	  	    <td><p><a name="flow"></a><span class="section">Flow Computation</span> </p>
+  	        <p>ImageTracker provides several methods to determine the image flow from an image sequence. Optic flow is an estimation of real-world motion projected onto the image plane. In the case of 2D motion where the image plane is parallel to the motion plane, optic flow is a good estimate of real-world motion. This scenario is common in microscopy.</p>
+  	        <p>To access the optic flow computation methods, select Actions--&gt;Optic Flow from the ImageTracker menu. The options are:</p>
+  	        <dl>
+  	          <dt>Track Features</dt>
+  	          <dd>Find features of interest within an image and track each of these features across the video sequence; this is good for images that have well-defined features and for motion that may not be spatially smooth</dd>
+  	          <dt>Combined Local Global</dt>
+  	          <dd>Use an iterative algorithm to compute flow estimates at every location in the image; this is good for image sequences containing coherent flow</dd>
+  	          </dl>
+  	        <p>Each of these options are described in more detail in the following sections.</p>
+  	        <p>Flow computation results in a vector image in which each pixel vector represents the computed velocity in the image's x and y directions. Visualization of these images is described in a later section. </p></td>
+	  	    <td>
+			<p><img src="img/ActionMenu.jpg" width="238" height="77"></p>
+			<p class="caption">Optic flow methods.</p>
+			</td>
+	  	    <td><p><a href="#top">Top</a></p></td>
+  	      </tr>
+	  	  <tr>
+	  	    <td>&nbsp;</td>
+	  	    <td><p><a name="feature"></a><span class="subsection">Feature-based Tracking</span></p>
+  	        <p>Feature-based tracking attempts to compute motion in images by matching image regions (features) across multiple images. Essential to this technique is the ability to find strong image features&#8212;good features to track are image patches that are high in texture content (the local image area has a large gradient in more than one direction). Once image features are detected in an initial image, corresponding features are found in the next image in the sequence through  local registration.</p>
+  	        <p>The feature tracker dialog allows the user to configure the following parameters:</p>
+  	        <dl>
+  	          <dt>Max Count</dt>
+  	          <dd>The number of feaures to find; this influences the density of the resulting flow image</dd>
+  	          <dt>Scale</dt>
+  	          <dd>Indicates the size (in pixels) of image features; adjust this to the approximate size of the features of interest in the image</dd>
+  	          <dt>Max Distance</dt>
+  	          <dd>The maximum distance (in pixels) that a feature might move between frames; this defines the image patch search area during the local registration step</dd>
+  	          <dt>Preview</dt>
+  	          <dd>Display a feature image reflecting the selected scale parameter in the ImageTracker image window</dd>
+  	          <dt>Output Images</dt>
+  	          <dd>Specify where to output the vector images representing image flow</dd>
+  	          <dt>Prefix</dt>
+  	          <dd>Specify a prefix to add to input image names to create the output image names</dd>
+  	          </dl>
+  	        <p>Scale selection is one of the most important parameters in this algorithm. Adjust this paramter such that the feature preview image  has well-defined bright patches that correspond to the features of interest. See the images at the right for an example. </p>
+  	        <p>Clicking the Run All button will start the feature tracking process. This may take a while. Though some information is logged during this process, the application may become too busy to update the logger window.</p></td>
+	  	    <td>
+			<p><a href="img/IceImage.jpg"><img src="img/IceImage.jpg" width="300"></a></p>
+			<p class="caption">One frame of an image sequence of a fluid cooling in a chamber.</p>
+			<p><a href="img/FeatureTracker.jpg"><img src="img/FeatureTracker.jpg" width="300"></a></p>
+			<p class="caption">Controlling feature-based tracking on the fluid flow sequence.</p>
+			</td>
+	  	    <td><p><a href="#top">Top</a></p></td>
+  	      </tr>
+	  	  <tr>
+	  	    <td>&nbsp;</td>
+	  	    <td><p><a name="clg"></a><span class="subsection">CLG Optical Flow</span></p>
+  	        <p>The Combined Local Global (CLG) method of optical flow computation is described in:</p>
+  	        <p><em>Bruhn, Andres, Joachim Weickert, and Christoph Schnorr. Lucas/Kanade meets Horn/Schunck: Combining local and global optic flow methods. International Journal of Computer Vision, 61(3), 211-231, 2005.</em></p>
+			<p>The implementation provided in ImageTracker is the single-resolution, simple temporal difference variant. The  algorithm is to iteratively estimates optical flow by minimizing an engergy functional that includes a local intensity constancy term (the Lucas/Kanade part) and a global smoothness term (the Horn/Schunck part). </p>
+			<p>The following parameters on the CLG Optic Flow dialog control the operation of the algorithm:</p>
+			<dl>
+			  <dt>Spatial Sigma</dt>
+			  <dd>The spatial smoothing applied to the input images during derivative computation; adjust this to the noise level present in the images</dd>
+			  <dt>Regularization</dt>
+			  <dd>Adjusts the constant scaling of the smoothness term in the energy functional; a larger number will result in smoother flow fields, a smaller number will allow more turbulent flow fields</dd>
+			  <dt>Relaxation</dt>
+			  <dd>The constant to use during the successive over-relaxation (SOR) step of the algorithm; this affects the speed of the iterative algorithm&#8212;Bruhn et al suggest a value in the range 1.90-1.99</dd>
+			  <dt>Iterations</dt>
+			  <dd>Specifies the number of iterations to complete when minimizing the error functional; more iterations will presumably provide a lower error residual, but will take longer</dd>
+			  <dt>Output Images</dt>
+			  <dd>Specifies where to save the flow field images computed</dd>
+			  <dt>Prefix</dt>
+			  <dd>Specifies the prefix to add to input file names to create output file names.</dd>
+			  </dl>
+			<p>Click the Run All button to start the optic flow computation. Though some information is logged during this process, the application may become too busy to update the logger window. </p></td>
+	  	    <td>
+			<p><a href="img/CLGOpticFlow.jpg"><img src="img/CLGOpticFlow.jpg" width="300"></a></p>
+			</td>
+	  	    <td><p><a href="#top">Top</a></p></td>
+  	      </tr>
+	  	  <tr>
+	  	    <td>&nbsp;</td>
+	  	    <td><p><a name="visualization" class="subsection">Visualization</a></p>
+  	        <p>ImageTracker does not provide visualization for computed flow fields (yet). <a href="http://www.paraview.org/HTML/Index.html" target="_blank">ParaView</a>, a free application from <a href="http://www.kitware.com/" target="_blank">Kitware</a>, provides this functionality. Follow the instructions from Kitware on how to install and run ParaView. The following  will help you create a visualization of flow fields with ParaView.</p>
+  	        <p>Select File--&gt;Open Data from the ParaView menu. Navigate to and select the flow field file(s) created by ImageTracker (.mha extension). The default visualization for vector image data is a scalar field of vector magnitude intensities. We will create arrow glyphs that will represent the magnitude and direction of the flow field. </p>
+  	        <p>Click on the Calculator icon on the ParaView tool bar, or select Filter--&gt;Calculator from the menu. Use the buttons on the calculator parameters tab to create the following expression:</p>
+  	        <p>-iHat*ImageFile_0+jHat*ImageFile_1</p>
+  	        <p>The ImageFile_x expressions are available under the scalars dropdown box. This expression computes a vector in ParaView from the scalar components stored in the image file. (Note that the negative sign in front of the x-axis expression represents a convention change from that used in ImageTracker.) Once the expression is entered, press the Accept button.</p>
+  	        <p>Select Filter--&gt;Glyph from the menu. ParaView will automatically select a vector scale factor appropriate to make the glyphs visible. Press the Accept button. </p>
+  	        <p>The default colormap in ParaView is a blue-to-red rainbow color scale. To change this, select the Display tab from the Glyph property control, and then press the Edit Color Map button. Click on the preset colormap button (beneath the lock icon), and select either Greyscale or CIELab Blue to Red. These colormaps may be easier to use to interpret vector data. </p>
+  	        <p>It may be helpful to view the original image data along with the vector flow fields. To do this, turn off the visualization of the Calculator filter (the arrow glyphs should remain). Select File--&gt;Open Data from the menu, and select the original image file(s). Note that Paraview does not support TIFF images, so you may have to convert files to a supported format, such as PNG. You may also want to adjust the maximum number of glyphs to display, or their scale factor. The image at the right shows a visualization of mucus flow using the steps thus far. </p>  	        </td>
+	  	    <td>
+			<p><a href="img/ParaViewMucus.jpg"><img src="img/ParaViewMucus.jpg" width="300"></a></p>
+			<p class="caption">Visualizing mucus flow using ParaView.</p>
+			</td>
+	  	    <td><p><a href="#top">Top</a></p></td>
+  	      </tr>
+	  	  <tr>
+	  	    <td>&nbsp;</td>
+	  	    <td>ParaView automatically detects other files that are part of the same file sequence. On the image file Parameter panel, use the Timestemps button to control the files that are part of a sequence and the Timestep slider to select the frame currently visible. The keyframe animation feature of ParaView can be used to create flow field animations. </td>
+	  	    <td>&nbsp;</td>
 	  	    <td>&nbsp;</td>
   	      </tr>
 	  	  <tr>
 	  	    <td>&nbsp;</td>
 	  	    <td>
-				<p class="section"><a name="versionhistory">Version History</a></p>
-				<p>The sections below outline the changes made to ImageTracker at each revision.</p>
+			<p><a name="sparse" class="subsection">Sparse Fields</a></p>
+			<p>The method described above works well for dense flow fields, such as those created using the CLG Optical Flow method. Sparse fields, such as those created by Feature Tracking, may not contain enough data to effectively represent the image motion without displaying a very large number of vector glyphs. An alternative is to crop the flow field data to restrict the region of interest.</p>	  	      <p>Select the input vector image source from the Selection Window, and select Filter--&gt;Crop from the  menu. Adjust the exten to crop using the Parameters tab. Click the Accept button when the crop region corresponds with the desired region of interest.</p>
+			<p>Select the Calculator filter object, and change its input to ImageClip1. This will change the region over which vector data is calculated and displayed. You may wish to adjust the glyph filter's parameters to increase the number of glyphs displayed or change the scaling factor. The images at the right show the results of cropping the sparse fields generated by feature tracking. </p>
+			</td>
+	  	    <td>
+			<p><a href="img/ParaViewSparseIce.jpg"><img src="img/ParaViewSparseIce.jpg" width="300"></a></p>
+			<p class="caption">Sparse flow field generated by feature tracking. </p>
+			<p><a href="img/ParaViewCropIce.jpg"><img src="img/ParaViewCropIce.jpg" width="300"></a></p>
+			<p class="caption">Region of interest selection using a Crop filter. </p>
+			</td>
+	  	    <td><p><a href="#top">Top</a></p></td>
+  	      </tr>
+	  	  <tr>
+	  	    <td>&nbsp;</td>
+	  	    <td>
+			<p class="section"><a name="versionhistory">Version History</a></p>
+			<p>The sections below outline the changes made to ImageTracker at each revision.</p>
 			</td>
 	  	    <td>&nbsp;</td>
+	  	    <td><p><a href="#top">Top</a></p></td>
+  	      </tr>
+	  	  <tr>
 	  	    <td>&nbsp;</td>
+	  	    <td><p><a name="v2.00" class="subsection">Version 2.00</a></p>
+  	        <p>Features</p>
+  	        <ul>
+  	          <li>Feature-based tracking</li>
+              <li>CLG optical flow computation </li>
+              <li>8 and 16 bit images supported</li>
+              <li>TIFF images supported</li>
+  	          <li> Better image data management </li>
+  	          </ul>
+  	        <p>Known bugs</p>
+  	        <ul>
+  	          <li>Feature tracking may fail if fewer features are found in an image than are specified to track </li>
+              <li>Reloading the Feature Tracker dialog does not reflect changes to the current images list</li>
+  	        </ul></td>
+	  	    <td>&nbsp;</td>
+	  	    <td><p><a href="#top">Top</a></p></td>
   	      </tr>
 	  	  <tr>
 	  	    <td>&nbsp;</td>
@@ -279,7 +439,7 @@
 				</ul>
 			</td>
 	  	    <td>&nbsp;</td>
-	  	    <td>&nbsp;</td>
+	  	    <td><p><a href="#top">Top</a></p></td>
   	      </tr>
 		</table>
 	</td>

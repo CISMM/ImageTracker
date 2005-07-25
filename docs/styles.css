@@ -11,11 +11,18 @@ td
 a
 {
 	color: #000000;
+	text-decoration:none;
+	font-weight:bold;
 }
 
 a:hover
 {
 	color:#666666;
+}
+
+dt
+{
+	font-style:italic;
 }
 
 .header-text 
@@ -39,12 +46,6 @@ a:hover
 	background-color: #CCCCCC;
 }
 
-a.gutter-text
-{
-	font-size: larger;
-	text-decoration: none;
-}
-
 .section
 {
 	font-size:large;
@@ -53,20 +54,26 @@ a.gutter-text
 
 .subsection
 {
-	font-size:larger;
+	font-size:medium;
+	font-weight:bold;
+}
+
+.subsubsection
+{
 	font-weight:bold;
 }
 
 .menu-section
 {
-	font-size:larger;
 	font-weight:bold;
+	text-decoration:none;
 }
 
 .menu-subsection
 {
-	font-size:medium;
-	font-weight:bold;
+	font-weight:normal;
+	font-style:italic;
+	text-decoration:none;
 }
 
 .warning
@@ -76,6 +83,12 @@ a.gutter-text
 }
 
 .note
+{
+	font-size:smaller;
+	font-style:italic;
+}
+
+.caption
 {
 	font-size:smaller;
 	font-style:italic;
