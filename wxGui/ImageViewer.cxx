@@ -3,13 +3,15 @@
 
 bool ViewerApp::OnInit()
 {
-    ImageViewer *frame = new ImageViewer((wxWindow *) NULL);
+    //ImageTrackerDialog *dlg = new ImageTrackerDialog((wxWindow* ) NULL, -1, _("Harris"));
+    //dlg->Show(true);
+    //SetTopWindow(dlg);
+    //return true;
 
+    ImageViewer *frame = new ImageViewer((wxWindow *) NULL);
     frame->Show(TRUE);
     SetTopWindow(frame);
-
     Logger::SetLogger(new DialogLogger());
-
     return TRUE;
 }
 
@@ -27,6 +29,8 @@ BEGIN_EVENT_TABLE(ImageViewer,wxFrame)
     EVT_MENU( IV_REGISTER, ImageViewer::OnRegister )
     EVT_MENU( IV_ABOUT, ImageViewer::OnAbout )
     EVT_MENU( IV_MENU_LOGGER, ImageViewer::OnViewLogger )
+    EVT_MENU( IV_TRACK, ImageViewer::OnTrack )
+    EVT_MENU( IV_CLGOpticFlow, ImageViewer::OnCLGOpticFlow )
 END_EVENT_TABLE()
 
 ImageViewer::ImageViewer( wxWindow *parent, wxWindowID id, const wxString &title,
@@ -40,6 +44,8 @@ ImageViewer::ImageViewer( wxWindow *parent, wxWindowID id, const wxString &title
 
     this->fileSetDialog = (FileSetDialog *) NULL;
     this->registrationDialog = (GlobalRegistrationDialog *) NULL;
+    this->featureDialog = (HarrisFeatureDialog *) NULL;
+    this->clgFlowDialog = (CLGOpticFlowDialog *) NULL;
 }
 
 ImageViewer::~ImageViewer()
@@ -48,6 +54,27 @@ ImageViewer::~ImageViewer()
 }
 
 // WDR: handler implementations for ImageViewer
+
+void ImageViewer::OnCLGOpticFlow( wxCommandEvent &event )
+{
+    // Ensure we have image files to use
+    if (!this->fileSetDialog || this->fileSetDialog->GetFileSet()->GetFileNames()->size() == 0)
+    {
+        Logger::logWarn("Please open image files first.");
+        this->OnOpenFiles(event);
+        return;
+    }
+
+    // Create the dialog, if it doesn't exist
+    if (!this->clgFlowDialog)
+    {
+        this->clgFlowDialog = new CLGOpticFlowDialog(this);
+    }
+
+    Logger::logVerbose("Showing CLG optic flow dialog.");
+    this->clgFlowDialog->SetInput(this->fileSetDialog->GetFileSet());
+    this->clgFlowDialog->Show(true);    
+}
 
 void ImageViewer::OnViewLogger( wxCommandEvent &event )
 {
@@ -82,6 +109,26 @@ void ImageViewer::OnRegister( wxCommandEvent &event )
     Logger::logVerbose("Showing registration dialog.");
     this->registrationDialog->GetPipeline()->SetInput(this->fileSetDialog->GetFileSet());
     this->registrationDialog->Show(true);
+}
+
+void ImageViewer::OnTrack( wxCommandEvent &event )
+{
+    if (!this->fileSetDialog || this->fileSetDialog->GetFileSet()->GetFileNames()->size() == 0)
+    {
+        Logger::logWarn("Please open image files first.");
+        this->OnOpenFiles(event);
+        return;
+    }
+
+    if (!this->featureDialog)
+    {
+        this->featureDialog = new HarrisFeatureDialog(this);
+        this->featureDialog->SetCanvas(this->GetCanvas());
+    }
+
+    Logger::logVerbose("Showing tracker dialog.");
+    this->featureDialog->SetInput(this->fileSetDialog->GetFileSet());
+    this->featureDialog->Show(true);
 }
 
 void ImageViewer::OnExit( wxCommandEvent &event )

@@ -1,5 +1,7 @@
 #include ".\ImageCanvas.h"
+#include "..\ItkMagickIO.h"
 #include "..\Logger.h"
+
 #include "itkExceptionObject.h"
 
 ImageCanvas::ImageCanvas(wxWindow *parent, wxWindowID id, 
@@ -26,20 +28,22 @@ void ImageCanvas::LoadFile(const wxString &name, wxBitmapType type)
 {
     this->clearImage();
 
-    try
-    {
-        ReaderType::Pointer reader = ReaderType::New();
-        reader->SetFileName(name.c_str());
-        reader->Update();
-        this->LoadItkImage(reader->GetOutput());
-    }
-    catch (itk::ExceptionObject &err)
-    {
-        wxString text;
-        text.Printf("Error occurred while trying to read image: %s", name.c_str());
-        Logger::logError(text.c_str());
-        Logger::logError(err.GetDescription());
-    }
+    this->LoadItkImage(ItkMagickIO::Read(name.c_str()));
+
+    //try
+    //{
+    //    ReaderType::Pointer reader = ReaderType::New();
+    //    reader->SetFileName(name.c_str());
+    //    reader->Update();
+    //    this->LoadItkImage(reader->GetOutput());
+    //}
+    //catch (itk::ExceptionObject &err)
+    //{
+    //    wxString text;
+    //    text.Printf("Error occurred while trying to read image: %s", name.c_str());
+    //    Logger::logError(text.c_str());
+    //    Logger::logError(err.GetDescription());
+    //}
     
     return;
 
@@ -107,8 +111,9 @@ void ImageCanvas::OnDraw(wxDC &dc)
 {
     if (this->theImage && this->theImage->Ok())
     {
-        wxBitmap *bitmap = new wxBitmap(this->theImage);
+        wxBitmap* bitmap = new wxBitmap(this->theImage);
         dc.DrawBitmap(*bitmap, 0, 0, FALSE);
+        delete bitmap;
     }
 }
 

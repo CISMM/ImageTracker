@@ -25,7 +25,7 @@ class LoggerDialog : public wxDialog
 {
 public:
     // constructors and destructors
-    LoggerDialog( wxWindow *parent, wxWindowID id, const wxString &title,
+    LoggerDialog( wxWindow *parent, wxWindowID id=-1, const wxString &title=_(""),
         const wxPoint& pos = wxDefaultPosition,
         const wxSize& size = wxDefaultSize,
         long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER );

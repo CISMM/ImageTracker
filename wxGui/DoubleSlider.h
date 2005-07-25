@@ -1,6 +1,5 @@
 #pragma once
 #include <wx/wx.h>
-
 /*
  * A simple extension to wxSlider that allows for double values.  Note that
  * since this is just an extension, all of the underlying wxSlider methods are
@@ -36,6 +35,7 @@ public:
     double GetDoubleValue();
 
 private:
+    // WDR: member variable declarations for SliderControl
     double min;
     double max;
     double interval;
