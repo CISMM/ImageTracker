@@ -43,7 +43,7 @@
 				<li><a href="#flow" class="menu-section">Flow Computation</a></li>
 				<ul>
 					<li><a href="#feature" class="menu-subsection">Feature-based Tracking</a></li>
-					<li><a href="#clg" class="menu-subsection">CLG Optical Flow</a></li>					
+					<li><a href="#clg" class="menu-subsection">CLG Optical Flow</a></li>
 				    <li><a href="#visualization" class="menu-subsection">Visualization</a></li>
 				    <li><a href="#sparse" class="menu-subsection">Sparse fields</a></li>
 				</ul>
@@ -357,7 +357,7 @@
   	        <p>ImageTracker does not provide visualization for computed flow fields (yet). <a href="http://www.paraview.org/HTML/Index.html" target="_blank">ParaView</a>, a free application from <a href="http://www.kitware.com/" target="_blank">Kitware</a>, provides this functionality. Follow the instructions from Kitware on how to install and run ParaView. The following  will help you create a visualization of flow fields with ParaView.</p>
   	        <p>Select File--&gt;Open Data from the ParaView menu. Navigate to and select the flow field file(s) created by ImageTracker (.mha extension). The default visualization for vector image data is a scalar field of vector magnitude intensities. We will create arrow glyphs that will represent the magnitude and direction of the flow field. </p>
   	        <p>Click on the Calculator icon on the ParaView tool bar, or select Filter--&gt;Calculator from the menu. Use the buttons on the calculator parameters tab to create the following expression:</p>
-  	        <p>-iHat*ImageFile_0+jHat*ImageFile_1</p>
+  	        <p><code>-iHat*ImageFile_0+jHat*ImageFile_1</code></p>
   	        <p>The ImageFile_x expressions are available under the scalars dropdown box. This expression computes a vector in ParaView from the scalar components stored in the image file. (Note that the negative sign in front of the x-axis expression represents a convention change from that used in ImageTracker.) Once the expression is entered, press the Accept button.</p>
   	        <p>Select Filter--&gt;Glyph from the menu. ParaView will automatically select a vector scale factor appropriate to make the glyphs visible. Press the Accept button. </p>
   	        <p>The default colormap in ParaView is a blue-to-red rainbow color scale. To change this, select the Display tab from the Glyph property control, and then press the Edit Color Map button. Click on the preset colormap button (beneath the lock icon), and select either Greyscale or CIELab Blue to Red. These colormaps may be easier to use to interpret vector data. </p>
