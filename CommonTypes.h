@@ -9,7 +9,7 @@
 class CommonTypes
 {
 public:
-    const static int Dimension = 2;
+    enum { Dimension = 2};
     typedef unsigned short InputPixelType;
     typedef itk::Image<InputPixelType, Dimension> InputImageType;
     
@@ -30,3 +30,4 @@ public:
 protected:
 private:
 };
+

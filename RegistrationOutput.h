@@ -37,10 +37,7 @@ public:
     typedef itk::CastImageFilter<InputImageType, OutputImageType> CastFilterType;
     typedef itk::ImageFileWriter<OutputImageType> WriterType;
 
-    const static int COMPOSE_NONE   = 1000;
-    const static int COMPOSE_POST   = 1001;
-    const static int COMPOSE_PRE    = 1002;
-
+    enum {COMPOSE_NONE   = 1000,  COMPOSE_POST   = 1001, COMPOSE_PRE    = 1002};
 
     void SetSource(FileSet* source);
     void SetTransforms(TransformGroup::TransformVector* newTransforms);

@@ -9,7 +9,7 @@
 
 MultiRegionRegistration::OutputImageType::Pointer MultiRegionRegistration::Update()
 {
-    if (this->movingImage == NULL || this->fixedImage == NULL)
+    if (this->movingImage.IsNull() || this->fixedImage.IsNull())
     {
         throw exception("Fixed or moving image not setup.");
     }
@@ -54,7 +54,7 @@ MultiRegionRegistration::OutputImageType::Pointer MultiRegionRegistration::Updat
             pTransform = NULL;
         }
 
-        if (pTransform == NULL)
+        if (pTransform.IsNull())
         {
             // If there is a problem with registration, set the transform
             // params to zero.
@@ -85,7 +85,7 @@ MultiRegionRegistration::OutputImageType::Pointer MultiRegionRegistration::Updat
 
 MultiRegionRegistration::OutputImageType::Pointer MultiRegionRegistration::Update(PointSetType::Pointer features)
 {
-    if (this->movingImage == NULL || this->fixedImage == NULL)
+    if (this->movingImage.IsNull() || this->fixedImage.IsNull())
     {
         throw exception("Fixed or moving image not setup.");
     }
@@ -149,7 +149,7 @@ MultiRegionRegistration::OutputImageType::Pointer MultiRegionRegistration::Updat
         }
 
         //Logger::logDebug("Got transform");
-        if (pTransform == NULL)
+        if (pTransform.IsNull())
         {
             // If there is a problem with registration, set the transform
             // params to zero.

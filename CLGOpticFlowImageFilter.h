@@ -44,7 +44,7 @@ public:
     * Yes, that would be a 3x3 matrix with 9 components, but we
     * actually only need the first two rows.
     */
-    static const unsigned int TensorSize = 6;
+    enum { TensorSize = 6};
     typedef itk::Vector< InternalValueType, TensorSize > TensorType;
     typedef itk::Image< TensorType, ImageDimension > TensorImageType;
     typedef typename TensorImageType::Pointer TensorImagePointer;

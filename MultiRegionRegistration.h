@@ -42,7 +42,7 @@ public:
     // Input / Ouput types
     // MUST be float, and MUST be CovariantVector--other seemingly similar
     // types don't work!
-    const static unsigned int VectorDimension = 2;
+    enum { VectorDimension = 2};
     typedef float ComponentType;
     typedef itk::Vector<ComponentType, VectorDimension> VectorType;
 

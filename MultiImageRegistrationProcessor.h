@@ -16,8 +16,7 @@ public:
     MultiImageRegistrationProcessor(void);
     ~MultiImageRegistrationProcessor(void);
 
-    const static int ALIGN_WITH_FIRST       = 1000;
-    const static int ALIGN_WITH_PREVIOUS    = 1001;
+    enum{ALIGN_WITH_FIRST       = 1000,  ALIGN_WITH_PREVIOUS    = 1001};
     typedef std::vector<CommonTypes::TransformPointer> TransformVector;
 
     /*

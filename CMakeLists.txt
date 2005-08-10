@@ -61,8 +61,31 @@ SET (ImageTrackerBase_SRCS
 	TransformGroup.cxx                          TransformGroup.h
 	Use_ImageMagick.cmake
 )
+
+SET (MAGICK_LIB 
+#	CORE_RL_bzlib_
+#	CORE_RL_coders_
+#	CORE_RL_filters_
+#	CORE_RL_jbig_
+#	CORE_RL_jp2_
+# 	CORE_RL_jpeg_
+# 	CORE_RL_lcms_
+# 	CORE_RL_libxml_
+	CORE_RL_magick_ 
+# 	CORE_RL_png_
+# 	CORE_RL_tiff_
+# 	CORE_RL_ttf_
+# 	CORE_RL_wmf_
+# 	CORE_RL_xlib_
+# 	CORE_RL_zlib_
+#   CORE_RL_wand_
+# 	X11
+# 	Xext
+	)
+	
+SET (CMAKE_VERBOSE_MAKEFILE ON)
 ADD_LIBRARY(ImageTrackerBase ImageTrackerBase_SRCS)
-TARGET_LINK_LIBRARIES(ImageTrackerBase ImageTrackerGui ITKCommon ITKBasicFilters ITKIO ITKAlgorithms CORE_RL_Magick++_ )
+TARGET_LINK_LIBRARIES(ImageTrackerBase ImageTrackerGui ITKCommon ITKBasicFilters ITKIO ITKAlgorithms ${MAGICK_LIB} )
 
 
 #######################################
