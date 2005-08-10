@@ -1,6 +1,6 @@
 % read images
-path = '..\..\data\Lisa\out\WH200311\';
-images = inputImages(path,'Blur6MeanWHrh01-0*.png');
+path = '..\..\data\Lisa\out\TestGUI\';
+images = inputImages(path,'Reg-GoodfromWHrh0*.png');
 % path = '..\..\data\test\Quenot\';
 % images = inputImages(path,'Ice*.png');
 

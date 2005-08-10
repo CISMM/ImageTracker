@@ -26,18 +26,23 @@ GIxx=filter2(G,Ixx);
 GIxy=filter2(G,Ixy);
 GIyy=filter2(G,Iyy);
 
+% Weighting function (Harris corner detector)
 R=(GIxx.*GIyy-GIxy.*GIxy)-0.04*(GIxx+GIyy).^2;
 
 ii=2:h-1;
 jj=2:w-1;
 
+% Find maximum in 4-neighborhoods
 M(ii,jj)=(R(ii,jj)>R(ii+1,jj-1)).*(R(ii,jj)>R(ii+1,jj)).*(R(ii,jj)>R(ii+1,jj+1)).*(R(ii,jj)>R(ii,jj-1)).*(R(ii,jj)>R(ii,jj+1)).*(R(ii,jj)>R(ii-1,jj-1)).*(R(ii,jj)>R(ii-1,jj)).*(R(ii,jj)>R(ii-1,jj+1));
 M(h,w)=0;
 
+% Harris score for all maxima
 RM=R.*M;
 
+% Find indices of non-zero scores
 [cy,cx,r]=find(RM);
 
+% Sort by Harris score
 [tmp,i]=sort(r);
 
 countI = min(count-1, length(i)-1);

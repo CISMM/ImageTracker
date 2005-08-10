@@ -43,7 +43,7 @@ features = [];
 % maximum at the corresponding scale.  If it does not, we discard the
 % point.
 for lev = 1:size(hpoints,1)
-    scale = scaleInit * scaleFact ^ (lev-1);
+    scale = scaleInit * scaleFact ^ (lev-1); %integration scale from harris features
     points = squeeze(hpoints(lev,:,:));
     for id = 1:size(points,1);
         x = points(id,2);
