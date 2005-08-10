@@ -157,7 +157,7 @@ wxImage* ImageCanvas::itkToWxImage(const ImageCanvas::RGBImage *image)
         ++data; ++data; ++data;
     }
 
-    wxImage* wxImg = new wxImage(nx, ny, buffer, FALSE);
+    wxImage* wxImg = new wxImage(nx, ny, buffer);
     data = (unsigned char *) NULL;
     return wxImg;
 }
@@ -184,7 +184,7 @@ wxImage* ImageCanvas::itkToWxImage(const ImageCanvas::DisplayImageType *image)
         ++data; ++data; ++data;
     }
 
-    wxImage* wxImg = new wxImage(nx, ny, buffer, FALSE);
+    wxImage* wxImg = new wxImage(nx, ny, buffer);
     data = (unsigned char *) NULL;
     return wxImg;
 }

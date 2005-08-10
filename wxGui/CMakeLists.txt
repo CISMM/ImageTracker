@@ -5,8 +5,6 @@
 # wxWindows Setup
 INCLUDE( ${CMAKE_ROOT}/Modules/Use_wxWindows.cmake )
 
-INCLUDE( ../Use_ImageMagick.cmake )
-
 SET (wxGui_SRCS
     CLGOpticFlowDialog.cxx          CLGOpticFlowDialog.h
     DialogLogger.cxx                DialogLogger.h
@@ -24,7 +22,7 @@ SET (wxGui_SRCS
 
 # A library, so others can use the GUI tools
 ADD_LIBRARY(ImageTrackerGui wxGui_SRCS)
-TARGET_LINK_LIBRARIES(ImageTrackerGui ImageTrackerBase CORE_RL_Magick++_ )
+TARGET_LINK_LIBRARIES(ImageTrackerGui ImageTrackerBase )
 
 ###################################
 # The ImageTracker GUI executable.

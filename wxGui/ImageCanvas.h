@@ -1,7 +1,6 @@
 #pragma once
 #include <wx/wx.h>
 #include <wx/image.h>
-#include "Magick++.h"
 #include "itkCastImageFilter.h"
 #include "itkImage.h"
 #include "itkImageFileReader.h"
@@ -66,8 +65,6 @@ public:
      * Load an image from an itkImage with intensity value pixels.
      */
     void LoadItkImage(InternalImageType::Pointer img);
-
-    void LoadImage(Magick::Image image);
 
     /*
      * Returns a constant reference to the image associated with this ImageCanvas.
