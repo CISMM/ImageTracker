@@ -2,7 +2,7 @@
 INCLUDE( ${CMAKE_ROOT}/Modules/Use_wxWindows.cmake )
 
 # ImageMagick Setup
-INCLUDE ( ../Use_ImageMagick.cmake )
+# INCLUDE ( ../Use_ImageMagick.cmake )
 
 ###################################
 # Test Cases

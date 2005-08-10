@@ -24,8 +24,8 @@ public:
 
         std::string msg = "";
         char num[40];
-        itoa(sizeof(Magick::Quantum), num, 10);
-        Logger::logInfo(msg.append("Magick::Quantum:\t").append(num));
+        // itoa(sizeof(Magick::Quantum), num, 10);
+        // Logger::logInfo(msg.append("Magick::Quantum:\t").append(num));
 
         msg = "";
         itoa(sizeof(ItkMagickIO::MagickPixelType), num, 10);
