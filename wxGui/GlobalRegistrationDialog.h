@@ -2,10 +2,10 @@
 #include <wx/wxprec.h>
 #include "DoubleSlider.h"
 #include "FileSetDialog.h"
-#include "ImageCanvas.h"
 #include "RegistrationDesign_wdr.h"
 
 #include "../GlobalRegistrationPipeline.h"
+#include "../vtkView/VtkCanvas.h"
 
 /*
  * A dialog control that allows for configuration of registration.
@@ -50,7 +50,7 @@ public:
      * Sets an ImageCanvas to be associated with this dialog.  The ImageCanvas will be
      * updated in preview mode.
      */
-    void SetCanvas(ImageCanvas *cavas);
+    void SetCanvas(VtkCanvas *cavas);
 
     /*
      * Get a value for the upper limit of the threshold controlled by this Dialog.  Returns
@@ -124,7 +124,7 @@ private:
     wxString transformFile;
     wxString outFileDir;
     wxString outFilePrefix;
-    ImageCanvas *canvas;
+    VtkCanvas *canvas;
     GlobalRegistrationPipeline *regPipe;
     
 

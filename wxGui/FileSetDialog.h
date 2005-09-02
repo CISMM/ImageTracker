@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
 #include <wx/wxprec.h>
-#include "ImageCanvas.h"
 #include "RegistrationDesign_wdr.h"
+#include "../vtkView/VtkCanvas.h"
 #include "../FileSet.h"
 
 
@@ -29,8 +29,8 @@ public:
         long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER );
     virtual ~FileSetDialog();
     
-    void SetCanvas(ImageCanvas *canvas);
-    ImageCanvas* GetCanvas();
+    void SetCanvas(VtkCanvas *canvas);
+    VtkCanvas* GetCanvas();
     FileSet* GetFileSet();
 
     // WDR: method declarations for FileSetDialog
@@ -50,7 +50,7 @@ private:
     void OnOk( wxCommandEvent &event );
 
     wxString directory;
-    ImageCanvas *canvas;
+    VtkCanvas *canvas;
 
 private:
     DECLARE_EVENT_TABLE()

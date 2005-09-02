@@ -34,7 +34,7 @@
 
 // Custom source
 #include "DoubleSlider.h"
-#include "ImageCanvas.h"
+#include "../vtkView/VtkCanvas.h"
 
 // Implement window functions
 
@@ -269,26 +269,7 @@ wxSizer *CreateViewerDialog( wxWindow *parent, bool call_fit, bool set_sizer )
 {
     wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
 
-    ImageCanvas *item1 = new ImageCanvas( parent, IV_CANVAS, wxDefaultPosition, wxSize(700,500), wxHSCROLL|wxVSCROLL );
-    item1->SetScrollbars( 10, 10, 100, 100, 0, 0 );
-    item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 0 );
-
-    if (set_sizer)
-    {
-        parent->SetSizer( item0 );
-        if (call_fit)
-            item0->SetSizeHints( parent );
-    }
-    
-    return item0;
-}
-
-wxSizer *CreateImageWindowDialog( wxWindow *parent, bool call_fit, bool set_sizer )
-{
-    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
-
-    ImageCanvas *item1 = new ImageCanvas( parent, ID_SCROLLED, wxDefaultPosition, wxSize(700,500), wxHSCROLL|wxVSCROLL );
-    item1->SetScrollbars( 10, 10, 100, 100, 0, 0 );
+    VtkCanvas *item1 = new VtkCanvas( parent, IV_CANVAS, wxDefaultPosition, wxSize(640,480), 0 );
     item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
     if (set_sizer)
@@ -403,26 +384,6 @@ wxSizer *CreateHLTrackerDialog( wxWindow *parent, bool call_fit, bool set_sizer 
     item27->Add( item29, 0, wxALIGN_CENTER|wxALL, 5 );
 
     item0->Add( item27, 0, wxALIGN_CENTER|wxALL, 5 );
-
-    if (set_sizer)
-    {
-        parent->SetSizer( item0 );
-        if (call_fit)
-            item0->SetSizeHints( parent );
-    }
-    
-    return item0;
-}
-
-wxSizer *SliderControl( wxWindow *parent, bool call_fit, bool set_sizer )
-{
-    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
-
-    DoubleSlider *item1 = new DoubleSlider( parent, ID_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(200,-1), wxSL_HORIZONTAL );
-    item0->Add( item1, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-
-    wxTextCtrl *item2 = new wxTextCtrl( parent, ID_TEXTCTRL, wxT(""), wxDefaultPosition, wxSize(80,-1), 0 );
-    item0->Add( item2, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
     if (set_sizer)
     {

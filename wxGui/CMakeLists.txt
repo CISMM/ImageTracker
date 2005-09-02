@@ -5,24 +5,21 @@
 # wxWindows Setup
 INCLUDE( ${CMAKE_ROOT}/Modules/Use_wxWindows.cmake )
 
-SET (wxGui_SRCS
+SET (Gui_SRCS
     CLGOpticFlowDialog.cxx          CLGOpticFlowDialog.h
     DialogLogger.cxx                DialogLogger.h
     DoubleSlider.cxx                DoubleSlider.h
     FileSetDialog.cxx               FileSetDialog.h
     GlobalRegistrationDialog.cxx    GlobalRegistrationDialog.h
     HarrisFeatureDialog.cxx         HarrisFeatureDialog.h
-	ImageCanvas.cxx                 ImageCanvas.h
-	ImageTrackerDialog.cxx          ImageTrackerDialog.h
-	ImageViewer.cxx                 ImageViewer.h
-	ImageWindow.cxx                 ImageWindow.h
+    ImageViewer.cxx                 ImageViewer.h
 	RegistrationDesign_wdr.cpp      RegistrationDesign_wdr.h
 	wxGui.rc
 )
 
 # A library, so others can use the GUI tools
-ADD_LIBRARY(ImageTrackerGui wxGui_SRCS)
-TARGET_LINK_LIBRARIES(ImageTrackerGui ImageTrackerBase )
+ADD_LIBRARY(ITGui Gui_SRCS)
+TARGET_LINK_LIBRARIES(ITGui ITCommon ITAlgorithms vtkView )
 
 ###################################
 # The ImageTracker GUI executable.
@@ -33,4 +30,4 @@ TARGET_LINK_LIBRARIES(ImageTrackerGui ImageTrackerBase )
 # IMPLEMENT_APP() macro.
 ###################################
 ADD_EXECUTABLE(ImageTracker WIN32 ImageTrackerApp.cxx)
-TARGET_LINK_LIBRARIES(ImageTracker ImageTrackerBase ImageTrackerGui)
+TARGET_LINK_LIBRARIES(ImageTracker vtkView ITGui ITCommon ITAlgorithms)

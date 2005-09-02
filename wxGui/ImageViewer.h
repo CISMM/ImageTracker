@@ -5,7 +5,7 @@
 #include "FileSetDialog.h"
 #include "GlobalRegistrationDialog.h"
 #include "HarrisFeatureDialog.h"
-#include "ImageCanvas.h"
+#include "../vtkView/VtkCanvas.h"
 
 
 static const wxChar *TITLE = _T("ImageTracker");
@@ -20,7 +20,7 @@ static const wxChar *ITK_FILETYPES = _T("PNG Files|*.png|"
                                         "All Files|*.*");
 
 
-class ViewerApp : public wxApp
+class TrackerApp : public wxApp
 {
 public:
     virtual bool OnInit();
@@ -47,7 +47,7 @@ public:
     virtual ~ImageViewer();
     
     // WDR: method declarations for ImageViewer
-    ImageCanvas* GetCanvas()  { return (ImageCanvas*) FindWindow( IV_CANVAS ); }
+    VtkCanvas* GetCanvas()  { return (VtkCanvas*) FindWindow( IV_CANVAS ); }
     
 private:
     // WDR: member variable declarations for ImageViewer

@@ -90,7 +90,7 @@ void GlobalRegistrationDialog::UpdateDialog()
     this->GetTextPrefix()->SetValue(this->outFilePrefix);
 }
 
-void GlobalRegistrationDialog::SetCanvas(ImageCanvas *canvas)
+void GlobalRegistrationDialog::SetCanvas(VtkCanvas *canvas)
 {
     this->canvas = canvas;
 }
@@ -164,7 +164,7 @@ void GlobalRegistrationDialog::UpdateCanvas()
             // Logger::logVerbose("...Updating current fixed image");
             this->GetPipeline()->GetCurrentFixedImage()->Update();
             // Logger::logVerbose("...Loading image data from ITK");
-            this->canvas->LoadItkImage(this->GetPipeline()->GetCurrentFixedImage());
+            this->canvas->SetItkImage(this->GetPipeline()->GetCurrentFixedImage());
             // Logger::logVerbose("Canvas updated.");
         }
         catch (itk::ExceptionObject &err)

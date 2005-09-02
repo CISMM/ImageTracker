@@ -1,7 +1,7 @@
 #include "./ImageViewer.h"
 #include "./DialogLogger.h"
 
-bool ViewerApp::OnInit()
+bool TrackerApp::OnInit()
 {
     //ImageTrackerDialog *dlg = new ImageTrackerDialog((wxWindow* ) NULL, -1, _("Harris"));
     //dlg->Show(true);

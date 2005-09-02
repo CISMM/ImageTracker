@@ -51,7 +51,7 @@ void HarrisFeatureDialog::UpdateCanvas()
 {
     if (this->GetCheckPreview()->IsChecked() && this->canvas)
     {
-        this->canvas->LoadItkImage(this->GetPipeline()->GetFeatureImage());
+        this->canvas->SetItkImage(this->GetPipeline()->GetFeatureImage());
     }
 }
 

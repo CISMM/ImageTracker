@@ -1,4 +1,4 @@
 #include "ImageViewer.h"
 #include <string>
 
-IMPLEMENT_APP(ViewerApp)
+IMPLEMENT_APP(TrackerApp)

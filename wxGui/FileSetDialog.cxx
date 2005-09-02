@@ -29,12 +29,12 @@ FileSetDialog::~FileSetDialog()
 {
 }
 
-void FileSetDialog::SetCanvas(ImageCanvas *canvas)
+void FileSetDialog::SetCanvas(VtkCanvas *canvas)
 {
     this->canvas = canvas;
 }
 
-ImageCanvas* FileSetDialog::GetCanvas()
+VtkCanvas* FileSetDialog::GetCanvas()
 {
     return this->canvas;
 }
@@ -71,7 +71,7 @@ void FileSetDialog::OnListFilesDoubleClick( wxCommandEvent &event )
     {
         int sel = (int) sels.Last();
         filename.append(this->directory).append(this->GetListFiles()->GetString(sel));
-        this->GetCanvas()->LoadFile(filename, wxBITMAP_TYPE_ANY);
+        this->GetCanvas()->SetFileName(filename.c_str());
     }
 }
 

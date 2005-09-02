@@ -8,11 +8,11 @@
 #pragma once
 #include <wx/wxprec.h>
 #include "DoubleSlider.h"
-#include "ImageCanvas.h"
 #include "RegistrationDesign_wdr.h"
 
 #include "../FeatureTrackingPipeline.h"
 #include "../FileSet.h"
+#include "../vtkView/VtkCanvas.h"
 
 // WDR: class declarations
 
@@ -45,7 +45,7 @@ public:
     DoubleSlider* GetSliderScale()  { return (DoubleSlider*) FindWindow( ID_SLIDER_SCALE ); }
     wxTextCtrl* GetTextScale()  { return (wxTextCtrl*) FindWindow( ID_TEXT_SCALE ); }
 
-    void SetCanvas(ImageCanvas* canvas) { this->canvas = canvas; }
+    void SetCanvas(VtkCanvas* canvas) { this->canvas = canvas; }
     void SetInput(FileSet* files) 
     { 
         this->GetPipeline()->SetSource(files);
@@ -89,7 +89,7 @@ private:
     wxString outFilePrefix;
     wxString outFileDir;
     FeatureTrackingPipeline* trackingPipe;
-    ImageCanvas* canvas;
+    VtkCanvas* canvas;
 
     DECLARE_EVENT_TABLE()
 };
