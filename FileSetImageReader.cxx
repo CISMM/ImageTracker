@@ -1,11 +1,11 @@
 #include "FileSetImageReader.h"
 #include "itkStatisticsImageFilter.h"
 
-#include "ItkMagickIO.h"
 #include "Logger.h"
 
 FileSetImageReader::FileSetImageReader(FileSet* fileSet)
 {
+    this->reader = ItkMagickIO::New();
     this->SetFileSet(fileSet);
 }
 
@@ -72,9 +72,9 @@ FileSetImageReader::InternalImageType::Pointer FileSetImageReader::CurrentImage(
     typedef itk::StatisticsImageFilter<InternalImageType> StatsType;
     StatsType::Pointer stats = StatsType::New();
 
-    stats->SetInput(ItkMagickIO::Read(this->CurrentFileName()));
+    stats->SetInput(this->reader->Read(this->CurrentFileName()));
     
-    // return ItkMagickIO::Read(this->CurrentFileName());
+    // return this->reader->Read(this->CurrentFileName());
 
     //ReaderType::Pointer reader = ReaderType::New();
     //CasterType::Pointer caster = CasterType::New();

@@ -1,42 +1,61 @@
 PROJECT(ImageTracker)
 
+#######################################
+# Include ITK
+#######################################
+
 FIND_PACKAGE(ITK)
 IF(ITK_FOUND)
   INCLUDE(${ITK_USE_FILE})
 ELSE(ITK_FOUND)
   MESSAGE(FATAL_ERROR
-          "Cannot build without ITK.  Please set ITK_DIR.")
+     "Cannot build without ITK.  Please set ITK_DIR.")
 ENDIF(ITK_FOUND)
 
-#INCLUDE (${CMAKE_ROOT}/Modules/FindVTK.cmake)
-#IF (VTK_USE_FILE)
-#  INCLUDE(${VTK_USE_FILE})
-#ENDIF (USE_VTK_FILE)
-
-# Load the CableSwig settings used by ITK.
-#SET(CableSwig_DIR ${ITK_CableSwig_DIR})
-#FIND_PACKAGE(CableSwig)
-
 INCLUDE_DIRECTORIES(${ITK_INCLUDE_DIRS})
-#                    ${ItkJava_SOURCE_DIR})
-
 LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
+
+#######################################
+# Include VTK
+#######################################
+
+FIND_PACKAGE(VTK)
+IF (VTK_FOUND)
+  INCLUDE(${VTK_USE_FILE})
+ELSE(VTK_FOUND)
+  MESSAGE(FATAL_ERROR
+     "Cannot build without VTK.  Please set VTK_DIR.")
+ENDIF (VTK_FOUND)
+
+INCLUDE_DIRECTORIES(${VTK_INCLUDE_DIRS})
+LINK_DIRECTORIES(${VTK_LIBRARY_DIRS})
 
 # wxWindows Setup
 INCLUDE( ${CMAKE_ROOT}/Modules/Use_wxWindows.cmake )
 
-# ImageMagick setup
-INCLUDE ( ./Use_ImageMagick.cmake )
+#######################################
+# Include ImageMagick
+#######################################
+INCLUDE (./vtkView/Use_ImageMagick.cmake)
+
+#######################################
+# Common architecture library
+#######################################
+SET (Common_SRCS
+												CommonTypes.h
+	Logger.cxx									Logger.h
+	LogStream.cxx								LogStream.h
+	StopWatch.cxx                               StopWatch.h
+)
 
 #######################################
 # Image processing library
 #######################################
-SET (ImageTrackerBase_SRCS
+SET (Algorithms_SRCS
                                                 BilateralVectorImageFilter.h
     BlurFilterSchedule.cxx                      BlurFilterSchedule.h
                                                 CLGOpticFlowImageFilter.h
     CLGOpticFlowPipeline.cxx                    CLGOpticFlowPipeline.h
-                                                CommonTypes.h
     DemonsPipeline.cxx                          DemonsPipeline.h
                                                 Feature.h
     FeatureTrackingPipeline.cxx                 FeatureTrackingPipeline.h                                                
@@ -48,47 +67,31 @@ SET (ImageTrackerBase_SRCS
 	HarrisFeatureDetector.cxx                   HarrisFeatureDetector.h
 	ImageRegistration.cxx                       ImageRegistration.h
 	ImageStatistics.cxx                         ImageStatistics.h
-	ItkMagickIO.cxx                             ItkMagickIO.h
-	Logger.cxx                                  Logger.h
-	LogStream.cxx                               LogStream.h
 	MultiImageRegistrationProcessor.cxx         MultiImageRegistrationProcessor.h
 	MultiRegionRegistration.cxx                 MultiRegionRegistration.h
 	MultiRegionRegistrationPipeline.cxx         MultiRegionRegistrationPipeline.h
 	RegistrationOutput.cxx                      RegistrationOutput.h
 	                                            Sort.h
-	StopWatch.cxx                               StopWatch.h
 	ThresholdPipeline.cxx                       ThresholdPipeline.h
 	TransformGroup.cxx                          TransformGroup.h
 	Use_ImageMagick.cmake
 )
-
-SET (MAGICK_LIB 
-#	CORE_RL_bzlib_
-#	CORE_RL_coders_
-#	CORE_RL_filters_
-#	CORE_RL_jbig_
-#	CORE_RL_jp2_
-# 	CORE_RL_jpeg_
-# 	CORE_RL_lcms_
-# 	CORE_RL_libxml_
-	CORE_RL_magick_ 
-# 	CORE_RL_png_
-# 	CORE_RL_tiff_
-# 	CORE_RL_ttf_
-# 	CORE_RL_wmf_
-# 	CORE_RL_xlib_
-# 	CORE_RL_zlib_
-#   CORE_RL_wand_
-# 	X11
-# 	Xext
-	)
 	
 SET (CMAKE_VERBOSE_MAKEFILE ON)
-ADD_LIBRARY(ImageTrackerBase ImageTrackerBase_SRCS)
-TARGET_LINK_LIBRARIES(ImageTrackerBase ImageTrackerGui ITKCommon ITKBasicFilters ITKIO ITKAlgorithms ${MAGICK_LIB} )
 
+ADD_LIBRARY(ITCommon Common_SRCS)
+ADD_LIBRARY(ITAlgorithms Algorithms_SRCS)
+TARGET_LINK_LIBRARIES(ITAlgorithms ITCommon ITKCommon ITKBasicFilters ITKIO ITKAlgorithms )
 
 #######################################
-# wxWindows and Test suites
+# Window components
 #######################################
-SUBDIRS(wxGui TestSuite Tests)
+SUBDIRS(vtkView wxGui)
+
+#######################################
+# Testing components
+#######################################
+OPTION (BUILD_IT_TESTS "Include ImageTracker unit tests" ON)
+IF (BUILD_IT_TESTS)
+	SUBDIRS(TestSuite Tests)
+ENDIF (BUILD_IT_TESTS)

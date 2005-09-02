@@ -8,6 +8,7 @@
 
 #include "CommonTypes.h"
 #include "FileSet.h"
+#include "./vtkView/ItkMagickIO.h"
 
 /*
  * Provides an easy way to read all files in a FileSet as
@@ -75,6 +76,7 @@ public:
 private:
     FileSet* fileSet;
     FileSet::FileIterator fileIt;
+    ItkMagickIO::Pointer reader;
 
     /**
      * Advance the FileSet iterator.

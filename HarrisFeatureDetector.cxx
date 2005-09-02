@@ -13,9 +13,6 @@
 #include "Logger.h"
 #include "Sort.h"
 
-// TODO: Remove after debugging
-#include "./wxGui/ImageWindow.h"
-
 /**
  * Finds Harris corner features within a given image.  The number of
  * features found is limited by maxCount.
