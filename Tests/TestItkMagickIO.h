@@ -1,10 +1,10 @@
 #pragma once
 #include <string>
 
-#include "..\ItkMagickIO.h"
+#include "..\vtkView\ItkMagickIO.h"
 #include "..\Logger.h"
 #include "..\TestSuite\Test.h"
-#include "..\wxGui\ImageWindow.h"
+#include "..\vtkView\ImageWindow.h"
 
 class TestItkMagickIO : public TestSuite::Test
 {
@@ -39,8 +39,9 @@ public:
         itoa(sizeof(CommonTypes::InternalPixelType), num, 10);
         Logger::logInfo(msg.append("InternalPixelType (float):\t").append(num));
 
+        ItkMagickIO::Pointer reader = ItkMagickIO::New();
         Logger::logDebug("Reading image through ImageMagick...");
-        ItkMagickIO::InternalImageType::Pointer img = ItkMagickIO::Read(dir + name);
+        ItkMagickIO::InternalImageType::Pointer img = reader->Read(dir + name);
         Logger::logDebug("Displaying image...");
         ImageWindow::ImShow(img, name);
     }

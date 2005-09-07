@@ -36,8 +36,7 @@
 #include "TestVectorWrite.h"
 #include "TestVideoRegistration.h"
 
-#include "../wxGui/DialogLogger.h"
-#include "../wxGui/ImageWindow.h"
+#include "../vtkView/ImageWindow.h"
 
 // WDR: class implementations
 
@@ -81,11 +80,11 @@ void TestCaseFrame::OnRunTests( wxCommandEvent &event )
         // suite.addTest(new TestFileSetImageReader);
         // suite.addTest(new TestGlobalRegistrationPipeline);        
         // suite.addTest(new TestHarrisFeatureDetector);
-        // suite.addTest(new TestImageMagick);
+        suite.addTest(new TestImageMagick);
         // suite.addTest(new TestImageRescale);
         // suite.addTest(new TestImageStatistics);
         // suite.addTest(new TestImageWindow);        
-        // suite.addTest(new TestItkMagickIO);
+        suite.addTest(new TestItkMagickIO);
         // suite.addTest(new TestLogger);
         // suite.addTest(new TestLogStream);
         // suite.addTest(new TestMultiRegionRegistration);

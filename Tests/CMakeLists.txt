@@ -37,6 +37,6 @@ SET (TestCases_SRCS
 )
 # ADD_EXECUTABLE(TestCases ${TestCases_SRCS})
 ADD_EXECUTABLE(TestCases WIN32 ${TestCases_SRCS})
-TARGET_LINK_LIBRARIES(TestCases TestSuite ImageTrackerBase ImageTrackerGui )
+TARGET_LINK_LIBRARIES(TestCases TestSuite ITCommon vtkView ITAlgorithms ITGui )
 
 

@@ -2,7 +2,7 @@
 
 #include "../Logger.h"
 #include "../CommonTypes.h"
-#include "../wxGui/ImageWindow.h"
+#include "../vtkView/ImageWindow.h"
 #include <string>
 #include "itkImageFileReader.h"
 
