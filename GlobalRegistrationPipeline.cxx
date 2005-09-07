@@ -230,11 +230,6 @@ GlobalRegistrationPipeline::TransformVector * GlobalRegistrationPipeline::GetTra
     return this->transforms;
 }
 
-void GlobalRegistrationPipeline::GetMinMax(ImageType::PixelType* min, ImageType::PixelType* max)
-{
-    this->reader->GetMinMax(min, max);
-}
-
 // RegistrationHelper
 RegistrationHelper::RegistrationHelper()
 {

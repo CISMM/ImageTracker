@@ -71,7 +71,7 @@ public:
     /************************************************************************/
     /* Gets the minimum and maximum pixel value for this reader's current image.
     /************************************************************************/
-    void GetMinMax(InternalImageType::PixelType* min, InternalImageType::PixelType* max);
+    void GetMinMax(InternalImageType::PixelType &min, InternalImageType::PixelType &max);
 
 private:
     FileSet* fileSet;

@@ -69,29 +69,19 @@ FileSetImageReader::InternalImageType::Pointer FileSetImageReader::FirstImage()
 
 FileSetImageReader::InternalImageType::Pointer FileSetImageReader::CurrentImage()
 {
-    typedef itk::StatisticsImageFilter<InternalImageType> StatsType;
-    StatsType::Pointer stats = StatsType::New();
+    return this->reader->Read(this->CurrentFileName());
 
-    stats->SetInput(this->reader->Read(this->CurrentFileName()));
-    
-    // return this->reader->Read(this->CurrentFileName());
-
-    //ReaderType::Pointer reader = ReaderType::New();
-    //CasterType::Pointer caster = CasterType::New();
-    //reader->SetFileName(this->CurrentFileName().c_str());
-    //caster->SetInput(reader->GetOutput());
-    //stats->SetInput(caster->GetOutput());
-    // caster->Update();
-    // return caster->GetOutput();
-
-    stats->Update();
-    char text[80];
-    sprintf(text, "Min: %5.2f", stats->GetMinimum());
-    Logger::logDebug(text);
-    sprintf(text, "Max: %5.2f", stats->GetMaximum());
-    Logger::logDebug(text);
-
-    return stats->GetOutput();
+    // typedef itk::StatisticsImageFilter<InternalImageType> StatsType;
+    // Compute and print max/min for image
+    //StatsType::Pointer stats = StatsType::New();
+    //stats->SetInput(this->reader->Read(this->CurrentFileName()));
+    //stats->Update();
+    //char text[80];
+    //sprintf(text, "Min: %5.2f", stats->GetMinimum());
+    //Logger::logDebug(text);
+    //sprintf(text, "Max: %5.2f", stats->GetMaximum());
+    //Logger::logDebug(text);
+    //return stats->GetOutput();
 }
 
 FileSetImageReader::InternalImageType::Pointer FileSetImageReader::NextImage()
@@ -111,23 +101,12 @@ void FileSetImageReader::Next()
     *(this->fileIt)++;
 }
 
-void FileSetImageReader::GetMinMax(InternalImageType::PixelType* min, InternalImageType::PixelType* max)
+void FileSetImageReader::GetMinMax(InternalImageType::PixelType &min, InternalImageType::PixelType &max)
 {
-    InternalImageType::Pointer img = this->CurrentImage();
-    IteratorType iter(img, img->GetLargestPossibleRegion());
-    iter.GoToBegin();
-    *min = iter.Get();
-    *max = iter.Get();
-
-    for ( ; !iter.IsAtEnd(); ++iter)
-    {
-        if (*max < iter.Get())
-        {
-            *max = iter.Get();
-        }
-        if (*min > iter.Get())
-        {
-            *min = iter.Get();
-        }
-    }
+    typedef itk::StatisticsImageFilter<InternalImageType> StatsType;
+    StatsType::Pointer stats = StatsType::New();
+    stats->SetInput(this->CurrentImage());
+    stats->Update();
+    min = stats->GetMinimum();
+    max = stats->GetMaximum();
 }

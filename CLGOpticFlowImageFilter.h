@@ -214,24 +214,6 @@ void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
         Logger::logWarn("CLGOpticFlowImageFilter::GenerateInputRequestedRegion(): One or more input images was not set!");
         return;
     }
-    //else
-    //{
-    //    // Generate the output image
-    //    outputPtr = OutputImageType::New();
-    //    OutputImageType::RegionType region;
-    //    OutputImageType::RegionType::IndexType idx;
-    //    OutputImageType::RegionType::SizeType size;
-    //    for (int d = 0; d < ImageDimension; d++)
-    //    {
-    //        idx[d] = ptr1->GetLargestPossibleRegion().GetIndex()[d];
-    //        size[d] = ptr1->GetLargestPossibleRegion().GetSize()[d];
-    //    }
-    //    region.SetIndex(idx);
-    //    region.SetSize(size);
-    //    outputPtr->SetRegions(region);
-    //    outputPtr->Allocate();
-    //    this->SetOutput(outputPtr);
-    //}
 
     // Get a copy of the input requested region
     Input1ImageType::RegionType region = ptr1->GetRequestedRegion();

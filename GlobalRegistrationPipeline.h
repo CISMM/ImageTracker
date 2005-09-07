@@ -132,7 +132,10 @@ public:
      */
     TransformVector * GetTransforms();
 
-    void GetMinMax(ImageType::PixelType* min, ImageType::PixelType* max);
+    void GetMinMax(ImageType::PixelType &min, ImageType::PixelType &max)
+    {
+        this->reader->GetMinMax(min, max);
+    }
 
 private:
     bool init;
