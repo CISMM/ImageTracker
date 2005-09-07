@@ -67,15 +67,15 @@ SET (vtkView_SRCS
 ADD_LIBRARY(vtkView vtkView_SRCS)
 TARGET_LINK_LIBRARIES(vtkView
 	ITCommon
-	ITKCommon 
-	ITKBasicFilters 
-	ITKIO 
-	ITKAlgorithms 
 	vtkIO
 	vtkCommon
 	vtkGraphics
 	vtkRendering
 	${MAGICK_LIB}
+	ITKCommon 
+	ITKBasicFilters 
+	ITKIO 
+	ITKAlgorithms
 )
 
 ADD_EXECUTABLE(vtkViewApp WIN32 VtkViewerApp.cxx)

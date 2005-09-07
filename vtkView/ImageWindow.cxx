@@ -34,7 +34,6 @@ ImageWindow::ImageWindow( wxWindow *parent, wxWindowID id, const wxString &title
 ImageWindow::~ImageWindow()
 {
     this->Close(true);
-    // delete this->GetCanvas();
 }
 
 void ImageWindow::ImShow(CommonTypes::InternalImageType::Pointer image)

@@ -1,7 +1,6 @@
 #include ".\ItkMagickIO.h"
 
 #include <Magick++.h>
-#include "itkImportImageFilter.h"
 #include "../Logger.h"
 
 // Make sure we initialize ImageMagick the first time through
@@ -49,13 +48,18 @@ ItkMagickIO::InternalImageType::Pointer ItkMagickIO::Read(std::string filename)
     region.SetIndex(index);
     region.SetSize(size);
 
-    double origin[Dimension];
-    double spacing[Dimension];
-    for (int d = 0; d < Dimension; d++)
-    {
-        origin[d] = 0.0;
-        spacing[d] = 1.0;
-    }
+    ImportType::OutputImageType::PointType origin;
+    ImportType::OutputImageType::SpacingType spacing;
+    origin.Fill(0.0);
+    spacing.Fill(1.0);
+
+    //double origin[Dimension];
+    //double spacing[Dimension];
+    //for (int d = 0; d < Dimension; d++)
+    //{
+    //    origin[d] = 0.0;
+    //    spacing[d] = 1.0;
+    //}
 
     // Import filter
     this->importer = ImportType::New();    

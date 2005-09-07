@@ -7,6 +7,15 @@
 #include "itkLightObject.h"
 #include "../CommonTypes.h"
 
+/*
+ * ItkMagickIO provides ITK image reading and writing through 
+ * ImageMagick.  Although ITK provides many image IO factories,
+ * their tiff readers and writers don't really work all that well.
+ * Since ImageMagick works on most if not all the microscopy data
+ * produced by the NSRG, we've sort of standardized on reading
+ * images with ImageMagick.  This class provides the link between
+ * ImageMagick and ITK pipelines.
+ */
 class ItkMagickIO : public itk::LightObject
 {
 public:
@@ -35,7 +44,7 @@ public:
     /*
      * Write an image to a file using ImageMagick.  Not sure we actually
      * need this capability, since ITK's image writers seem to work
-     * all right on data in itk's memory, so this method is not
+     * all right on data in ITK's memory, so this method is not
      * implemented.
      */
     void Write(std::string filename, InternalImageType::Pointer itkImage);
