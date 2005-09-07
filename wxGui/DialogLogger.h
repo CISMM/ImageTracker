@@ -21,14 +21,14 @@ class DialogLogger;
 /*
  * Dialog that contains a text control for logging messages.
  */
-class LoggerDialog : public wxDialog
+class LoggerDialog : public wxPanel
 {
 public:
     // constructors and destructors
-    LoggerDialog( wxWindow *parent, wxWindowID id=-1, const wxString &title=_(""),
+    LoggerDialog( wxWindow *parent, wxWindowID id=-1,
         const wxPoint& pos = wxDefaultPosition,
         const wxSize& size = wxDefaultSize,
-        long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER );
+        long style = wxTAB_TRAVERSAL | wxNO_BORDER );
     ~LoggerDialog();
     // WDR: method declarations for LoggerDialog
     wxTextCtrl* GetTextMessages()  { return (wxTextCtrl*) FindWindow( LOG_MESSAGES ); }
@@ -44,9 +44,6 @@ private:
     DialogLogger* logger;
 private:
     // WDR: handler declarations for LoggerDialog
-    void OnCopy( wxCommandEvent &event );
-    void OnHide( wxCommandEvent &event );
-    void OnClear( wxCommandEvent &event );
 
 private:
     DECLARE_EVENT_TABLE()

@@ -180,7 +180,7 @@ void GlobalRegistrationDialog::UpdateThresholdRange()
     if (this->regPipe)
     {
         GlobalRegistrationPipeline::ImageType::PixelType min=0, max=255;
-        this->GetPipeline()->GetMinMax(&min, &max);
+        this->GetPipeline()->GetMinMax(min, max);
         this->GetSliderAbove()->SetRange(min, max);
         this->GetSliderBelow()->SetRange(min, max);
     }

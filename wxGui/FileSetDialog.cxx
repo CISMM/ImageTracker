@@ -9,16 +9,15 @@
 
 // WDR: event table for FileSetDialog
 
-BEGIN_EVENT_TABLE(FileSetDialog,wxDialog)
-    EVT_BUTTON( FSD_OK, FileSetDialog::OnOk )
+BEGIN_EVENT_TABLE(FileSetDialog,wxPanel)
     EVT_BUTTON( FSD_REMOVE, FileSetDialog::OnRemove )
     EVT_BUTTON( FSD_ADD, FileSetDialog::OnAdd )
     EVT_LISTBOX( ID_LIST_FILES, FileSetDialog::OnListFilesDoubleClick )
 END_EVENT_TABLE()
 
-FileSetDialog::FileSetDialog( wxWindow *parent, wxWindowID id, const wxString &title,
+FileSetDialog::FileSetDialog( wxWindow *parent, wxWindowID id,
     const wxPoint &position, const wxSize& size, long style ) :
-    wxDialog( parent, id, title, position, size, style )
+    wxPanel( parent, id, position, size, style )
 {
     this->directory = "";
     // WDR: dialog function CreateFileSetDialog for FileSetDialog
@@ -53,11 +52,6 @@ FileSet* FileSetDialog::GetFileSet()
 
     files->SetFileNames(vFiles);
     return files;
-}
-
-void FileSetDialog::UpdateDialog()
-{
-    this->GetTextDir()->SetValue(this->directory);
 }
 
 // WDR: handler implementations for FileSetDialog
@@ -98,8 +92,6 @@ void FileSetDialog::OnAdd( wxCommandEvent &event )
             this->GetListFiles()->Append(file, (void *) path);
         }
     }
-
-    this->UpdateDialog();
 }
 
 void FileSetDialog::OnRemove( wxCommandEvent &event )
@@ -120,9 +112,4 @@ void FileSetDialog::OnRemove( wxCommandEvent &event )
             this->GetListFiles()->Delete(selections.Item(i) - i);
         }
     }
-}
-
-void FileSetDialog::OnOk( wxCommandEvent &event )
-{
-    this->Show(false);
 }

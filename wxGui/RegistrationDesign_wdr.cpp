@@ -35,6 +35,8 @@
 // Custom source
 #include "DoubleSlider.h"
 #include "../vtkView/VtkCanvas.h"
+#include "DialogLogger.h"
+#include "FileSetDialog.h"
 
 // Implement window functions
 
@@ -179,45 +181,24 @@ wxSizer *CreateRegistrationDialog( wxWindow *parent, bool call_fit, bool set_siz
 
 wxSizer *CreateFileSetDialog( wxWindow *parent, bool call_fit, bool set_sizer )
 {
-    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
+    wxStaticBox *item1 = new wxStaticBox( parent, -1, _("Image Files") );
+    wxStaticBoxSizer *item0 = new wxStaticBoxSizer( item1, wxVERTICAL );
 
-    wxBoxSizer *item1 = new wxBoxSizer( wxHORIZONTAL );
+    wxString *strs2 = (wxString*) NULL;
+    wxListBox *item2 = new wxListBox( parent, ID_LIST_FILES, wxDefaultPosition, wxSize(150,100), 0, strs2, wxLB_EXTENDED );
+    item0->Add( item2, 1, wxGROW|wxALL, 5 );
 
-    wxBoxSizer *item2 = new wxBoxSizer( wxVERTICAL );
+    wxBoxSizer *item3 = new wxBoxSizer( wxHORIZONTAL );
 
-    wxButton *item3 = new wxButton( parent, FSD_ADD, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
-    item3->SetToolTip( _("Add files to the list") );
-    item2->Add( item3, 0, wxALIGN_CENTER|wxALL, 5 );
+    wxButton *item4 = new wxButton( parent, FSD_ADD, _("+"), wxDefaultPosition, wxSize(30,-1), 0 );
+    item4->SetToolTip( _("Add files to this list") );
+    item3->Add( item4, 0, wxALIGN_CENTER|wxALL, 5 );
 
-    wxButton *item4 = new wxButton( parent, FSD_REMOVE, _("Remove"), wxDefaultPosition, wxDefaultSize, 0 );
-    item4->SetToolTip( _("Remove selected files from the list") );
-    item2->Add( item4, 0, wxALIGN_CENTER|wxALL, 5 );
+    wxButton *item5 = new wxButton( parent, FSD_REMOVE, _("-"), wxDefaultPosition, wxSize(30,-1), 0 );
+    item5->SetToolTip( _("Removes selected files from this list") );
+    item3->Add( item5, 0, wxALIGN_CENTER|wxALL, 5 );
 
-    item1->Add( item2, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5 );
-
-    wxString *strs5 = (wxString*) NULL;
-    wxListBox *item5 = new wxListBox( parent, ID_LIST_FILES, wxDefaultPosition, wxSize(200,300), 0, strs5, wxLB_EXTENDED );
-    item1->Add( item5, 1, wxGROW|wxALIGN_CENTER_HORIZONTAL|wxALL, 5 );
-
-    item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-
-    wxBoxSizer *item6 = new wxBoxSizer( wxHORIZONTAL );
-
-    wxStaticText *item7 = new wxStaticText( parent, ID_TEXT, _("Directory"), wxDefaultPosition, wxDefaultSize, 0 );
-    item6->Add( item7, 0, wxALIGN_CENTER|wxALL, 5 );
-
-    wxTextCtrl *item8 = new wxTextCtrl( parent, ID_TEXT_DIR, wxT(""), wxDefaultPosition, wxSize(80,-1), wxTE_READONLY );
-    item6->Add( item8, 1, wxALIGN_CENTER|wxALL, 5 );
-
-    item0->Add( item6, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-
-    wxBoxSizer *item9 = new wxBoxSizer( wxHORIZONTAL );
-
-    wxButton *item10 = new wxButton( parent, FSD_OK, _("OK"), wxDefaultPosition, wxDefaultSize, 0 );
-    item10->SetToolTip( _("Hide this window") );
-    item9->Add( item10, 0, wxALIGN_CENTER|wxALL, 5 );
-
-    item0->Add( item9, 0, wxALIGN_CENTER|wxALL, 5 );
+    item0->Add( item3, 0, wxALIGN_CENTER|wxALL, 0 );
 
     if (set_sizer)
     {
@@ -233,27 +214,9 @@ wxSizer *CreateLoggerDialog( wxWindow *parent, bool call_fit, bool set_sizer )
 {
     wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
 
-    wxTextCtrl *item1 = new wxTextCtrl( parent, LOG_MESSAGES, wxT(""), wxDefaultPosition, wxSize(600,300), wxTE_MULTILINE|wxTE_READONLY );
+    wxTextCtrl *item1 = new wxTextCtrl( parent, LOG_MESSAGES, wxT(""), wxDefaultPosition, wxSize(300,150), wxTE_MULTILINE|wxTE_READONLY );
     item1->SetToolTip( _("Logger messages") );
-    item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-
-    wxBoxSizer *item2 = new wxBoxSizer( wxHORIZONTAL );
-
-    wxButton *item3 = new wxButton( parent, LOG_COPY, _("Copy"), wxDefaultPosition, wxDefaultSize, 0 );
-    item3->SetToolTip( _("Copy logger messages to the clipboard") );
-    item2->Add( item3, 0, wxALIGN_CENTER|wxALL, 5 );
-
-    wxButton *item4 = new wxButton( parent, LOG_CLEAR, _("Clear"), wxDefaultPosition, wxDefaultSize, 0 );
-    item4->SetToolTip( _("Clear the logger text") );
-    item2->Add( item4, 0, wxALIGN_CENTER|wxALL, 5 );
-
-    item2->Add( 20, 20, 1, wxALIGN_CENTER|wxALL, 5 );
-
-    wxButton *item5 = new wxButton( parent, LOG_HIDE, _("Hide"), wxDefaultPosition, wxDefaultSize, 0 );
-    item5->SetToolTip( _("Hide the logger window") );
-    item2->Add( item5, 0, wxALIGN_CENTER|wxALL, 5 );
-
-    item0->Add( item2, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP, 5 );
+    item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_VERTICAL, 5 );
 
     if (set_sizer)
     {
@@ -399,21 +362,33 @@ wxSizer *CreateImageTrackerApp( wxWindow *parent, bool call_fit, bool set_sizer 
 {
     wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
 
-    wxFlexGridSizer *item1 = new wxFlexGridSizer( 3, 0, 0 );
+    wxFlexGridSizer *item1 = new wxFlexGridSizer( 2, 0, 0, 0 );
+    item1->AddGrowableCol( 0 );
+    item1->AddGrowableRow( 0 );
 
-    wxPanel *item2 = new wxPanel( parent, ID_PANEL_FILES, wxDefaultPosition, wxSize(200,400), 0 );
-    item1->Add( item2, 0, wxALIGN_CENTER|wxALL, 5 );
+    wxFlexGridSizer *item2 = new wxFlexGridSizer( 2, 0, 0 );
+    item2->AddGrowableCol( 1 );
+    item2->AddGrowableRow( 0 );
 
-    wxPanel *item3 = new wxPanel( parent, ID_PANEL_IMAGE, wxDefaultPosition, wxSize(400,400), 0 );
-    item1->Add( item3, 0, wxALIGN_CENTER|wxALL, 5 );
+    wxBoxSizer *item3 = new wxBoxSizer( wxVERTICAL );
 
-    wxPanel *item4 = new wxPanel( parent, ID_PANEL_CONTROL, wxDefaultPosition, wxSize(200,400), 0 );
-    item1->Add( item4, 0, wxALIGN_CENTER|wxALL, 5 );
+    FileSetDialog *item4 = new FileSetDialog( parent, IT_IMAGE_FILES, wxDefaultPosition, wxSize(150,150), 0 );
+    item3->Add( item4, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
-    item0->Add( item1, 0, wxALIGN_CENTER|wxALL, 5 );
+    wxPanel *item5 = new wxPanel( parent, ID_PANEL, wxDefaultPosition, wxSize(150,150), 0 );
+    item3->Add( item5, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
-    wxPanel *item5 = new wxPanel( parent, ID_PANEL_LOGGER, wxDefaultPosition, wxSize(600,160), 0 );
-    item0->Add( item5, 0, wxALIGN_CENTER|wxALL, 5 );
+    item2->Add( item3, 1, wxGROW|wxALL, 0 );
+
+    VtkCanvas *item6 = new VtkCanvas( parent, IT_CANVAS, wxDefaultPosition, wxSize(400,300), 0 );
+    item2->Add( item6, 1, wxGROW|wxALL, 5 );
+
+    item1->Add( item2, 1, wxGROW|wxALL, 0 );
+
+    LoggerDialog *item7 = new LoggerDialog( parent, IT_LOGGER, wxDefaultPosition, wxSize(200,100), 0 );
+    item1->Add( item7, 1, wxGROW|wxALIGN_BOTTOM|wxALL, 5 );
+
+    item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 0 );
 
     if (set_sizer)
     {

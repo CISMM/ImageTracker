@@ -1,5 +1,4 @@
 #include "./ImageViewer.h"
-#include "./DialogLogger.h"
 
 bool TrackerApp::OnInit()
 {
@@ -11,7 +10,6 @@ bool TrackerApp::OnInit()
     ImageViewer *frame = new ImageViewer((wxWindow *) NULL);
     frame->Show(TRUE);
     SetTopWindow(frame);
-    Logger::SetLogger(new DialogLogger());
     return TRUE;
 }
 
@@ -38,14 +36,16 @@ ImageViewer::ImageViewer( wxWindow *parent, wxWindowID id, const wxString &title
     wxFrame( parent, id, title, position, size, style )
 {
     // WDR: dialog function CreateViewerDialog for ImageViewer
-    CreateViewerDialog( this, TRUE );
+    CreateImageTrackerApp( this, TRUE );
     this->SetMenuBar(CreateViewerMenu());
     this->CreateStatusBar(2);
 
-    this->fileSetDialog = (FileSetDialog *) NULL;
     this->registrationDialog = (GlobalRegistrationDialog *) NULL;
     this->featureDialog = (HarrisFeatureDialog *) NULL;
     this->clgFlowDialog = (CLGOpticFlowDialog *) NULL;
+
+    this->GetFileSetPanel()->SetCanvas(this->GetCanvas());
+    Logger::SetLogger(new DialogLogger(this->GetLoggerPanel()));
 }
 
 ImageViewer::~ImageViewer()
@@ -58,7 +58,7 @@ ImageViewer::~ImageViewer()
 void ImageViewer::OnCLGOpticFlow( wxCommandEvent &event )
 {
     // Ensure we have image files to use
-    if (!this->fileSetDialog || this->fileSetDialog->GetFileSet()->GetFileNames()->size() == 0)
+    if (this->GetFileSetPanel()->GetFileSet()->GetFileNames()->size() == 0)
     {
         Logger::logWarn("Please open image files first.");
         this->OnOpenFiles(event);
@@ -72,7 +72,7 @@ void ImageViewer::OnCLGOpticFlow( wxCommandEvent &event )
     }
 
     Logger::logVerbose("Showing CLG optic flow dialog.");
-    this->clgFlowDialog->SetInput(this->fileSetDialog->GetFileSet());
+    this->clgFlowDialog->SetInput(this->GetFileSetPanel()->GetFileSet());
     this->clgFlowDialog->Show(true);    
 }
 
@@ -93,7 +93,7 @@ void ImageViewer::OnAbout( wxCommandEvent &event )
 
 void ImageViewer::OnRegister( wxCommandEvent &event )
 {
-    if (!this->fileSetDialog || this->fileSetDialog->GetFileSet()->GetFileNames()->size() == 0)
+    if (this->GetFileSetPanel()->GetFileSet()->GetFileNames()->size() == 0)
     {
         Logger::logWarn("Please open image files first.");
         this->OnOpenFiles(event);
@@ -107,13 +107,13 @@ void ImageViewer::OnRegister( wxCommandEvent &event )
     }
 
     Logger::logVerbose("Showing registration dialog.");
-    this->registrationDialog->GetPipeline()->SetInput(this->fileSetDialog->GetFileSet());
+    this->registrationDialog->GetPipeline()->SetInput(this->GetFileSetPanel()->GetFileSet());
     this->registrationDialog->Show(true);
 }
 
 void ImageViewer::OnTrack( wxCommandEvent &event )
 {
-    if (!this->fileSetDialog || this->fileSetDialog->GetFileSet()->GetFileNames()->size() == 0)
+    if (this->GetFileSetPanel()->GetFileSet()->GetFileNames()->size() == 0)
     {
         Logger::logWarn("Please open image files first.");
         this->OnOpenFiles(event);
@@ -127,7 +127,7 @@ void ImageViewer::OnTrack( wxCommandEvent &event )
     }
 
     Logger::logVerbose("Showing tracker dialog.");
-    this->featureDialog->SetInput(this->fileSetDialog->GetFileSet());
+    this->featureDialog->SetInput(this->GetFileSetPanel()->GetFileSet());
     this->featureDialog->Show(true);
 }
 
@@ -138,11 +138,5 @@ void ImageViewer::OnExit( wxCommandEvent &event )
 
 void ImageViewer::OnOpenFiles( wxCommandEvent &event )
 {
-    if (!this->fileSetDialog)
-    {
-        this->fileSetDialog = new FileSetDialog(this);
-        this->fileSetDialog->SetCanvas(this->GetCanvas());
-    }
-
-    this->fileSetDialog->Show(true);
+    this->GetFileSetPanel()->OnAdd(event);
 }

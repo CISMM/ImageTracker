@@ -8,15 +8,12 @@
 
 // WDR: event table for LoggerDialog
 
-BEGIN_EVENT_TABLE(LoggerDialog,wxDialog)
-    EVT_BUTTON( LOG_CLEAR, LoggerDialog::OnClear )
-    EVT_BUTTON( LOG_HIDE, LoggerDialog::OnHide )
-    EVT_BUTTON( LOG_COPY, LoggerDialog::OnCopy )
+BEGIN_EVENT_TABLE(LoggerDialog,wxPanel)
 END_EVENT_TABLE()
 
-LoggerDialog::LoggerDialog( wxWindow *parent, wxWindowID id, const wxString &title,
+LoggerDialog::LoggerDialog( wxWindow *parent, wxWindowID id,
     const wxPoint &position, const wxSize& size, long style ) :
-    wxDialog( parent, id, title, position, size, style )
+    wxPanel( parent, id, position, size, style )
 {
     // WDR: dialog function CreateLoggerDialog for LoggerDialog
     CreateLoggerDialog( this, TRUE ); 
@@ -34,33 +31,11 @@ void LoggerDialog::SetLogger(DialogLogger* logger)
 
 // WDR: handler implementations for LoggerDialog
 
-void LoggerDialog::OnCopy( wxCommandEvent &event )
-{
-    this->GetTextMessages()->SetSelection(-1, -1);
-    this->GetTextMessages()->Copy();
-    Logger::logInfo("Text copied to clipboard.");
-}
-
-void LoggerDialog::OnHide( wxCommandEvent &event )
-{
-    if (this->logger)
-    {
-        this->logger->setVisible(false);
-    }
-
-    this->Show(false);
-}
-
-void LoggerDialog::OnClear( wxCommandEvent &event )
-{
-    this->GetTextMessages()->Clear();
-}
-
 DialogLogger::DialogLogger(LoggerDialog* dialog, bool show)
 {
     if (!dialog)
     {
-        this->dialog = new LoggerDialog(NULL, -1, _("Logger"));
+        this->dialog = new LoggerDialog(NULL, -1);
     }
     else
     {
