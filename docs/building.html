@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>ImageTracker</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="styles.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<table width="100%"  border="0" cellspacing="0" cellpadding="5">
+  <tr><!-- header -->
+    <td colspan="2" align="right" class="header-text">
+		ImageTracker
+	</td>
+  </tr>
+  <tr>
+    <td width="10%" class="gutter-text">
+	<p>
+		<a href="index.html" class="gutter-text">Home</a><br>
+		<a href="download.html" class="gutter-text">Download</a><br>
+		<a href="manual.html" class="gutter-text">Manual</a><br>
+		<a href="building.html" class="gutter-text">Building</a><br>		
+		<a href="about.html" class="gutter-text">About</a><br>
+	</p>
+	</td>
+	<td width="90%">
+		<table width="100%" border="0" cellspacing="0" cellpadding="5"> <!-- content -->
+		  <tr>
+			<td width="5%">&nbsp;</td>
+			<td width="50%">ImageTracker leverages a number of open-source software packages. To build ImageTracker from source, one first needs to build these packages. The following instructions create a build of ImageTracker on a Windows XP machine using Microsoft's Visual Studio 2003 .NET. </td>
+			<td width="40%">&nbsp;</td>
+			<td width="5%">&nbsp;</td>
+	  	  </tr>
+		  <tr>
+		    <td>&nbsp;</td>
+		    <td><p class="section">ImageMagick</p>
+	        <p>ImageMagick is an open-source image handling library. Download the source from <a href="http://www.imagemagick.org/script/index.php">www.imagemagick.org</a>, and follow the build instructions. You first need to build the configuration wizard, which configures Visual Studio project files for various ImageMagick installation options. Using the configuration wizard, configure a &quot;Static multi-threaded DLL runtime.&quot; Also ensure that ImageMagick's QuantumDepth is 16. Once the project file is generated, open and build the ImageMagick solution as a &quot;Release.&quot;</p></td>
+		    <td>&nbsp;</td>
+		    <td>&nbsp;</td>
+	      </tr>
+		  <tr>
+		    <td>&nbsp;</td>
+		    <td><p class="section">CMAKE</p>
+		      <p>CMAKE is a cross-platform, compiler-independent make system. It is available from Kitware at <a href="http://www.cmake.org">www.cmake.org</a>. Download and install the latest stable release for Windows.</p>		      
+		      </td>
+		    <td>&nbsp;</td>
+		    <td>&nbsp;</td>
+	      </tr>
+		  <tr>
+		    <td>&nbsp;</td>
+		    <td><p class="section">ITK</p>
+	        <p>ITK is a powerful image processing and analysis library available from Kitware at <a href="http://www.itk.org">www.itk.org</a>. Download the latest source code release. Follow the instructions for using CMAKE to configure ITK for Visual Studio with the following important exception:</p>
+	        <ul>
+	          <li>In CMAKE, click on the &quot;Show Advanced Values&quot; checkbox to display advanced ITK configuration parameters</li>
+              <li>Turn &quot;ITK_USE_SYSTEM_TIFF&quot; ON, and press &quot;Configure&quot; (you'll get an error) </li>
+	          <li>Set &quot;TIFF_INCLUDE_DIR&quot; to the libtiff directory of your ImageMagick installation (e.g. C:\ImageMagick-6.2.3\tiff\libtiff)</li>
+	          <li>Set &quot;TIFF_LIBRARY&quot; to the static ImageMagick tiff library (e.g. C:\ImageMagick-6.2.3\VisualMagick\lib\CORE_RL_tiff_.lib)</li>
+	          <li>Press &quot;Configure&quot; and &quot;OK&quot; to build the Visual Studio project file</li>
+	          </ul>
+	        <p>Build &quot;Debug&quot; (if you plan to do any development) and &quot;Release&quot; versions of the ITK solution. </p></td>
+		    <td>&nbsp;</td>
+		    <td>&nbsp;</td>
+	      </tr>
+		  <tr>
+		    <td>&nbsp;</td>
+		    <td><p class="section">VTK</p>
+	        <p>VTK is a data visualization library available from Kitware at <a href="http://www.vtk.org">www.vtk.org</a>. Download, configure, and build the latest source code release using CMAKE and Visual Studio. Build both a &quot;Debug&quot; and &quot;Release&quot; version. </p></td>
+		    <td>&nbsp;</td>
+		    <td>&nbsp;</td>
+	      </tr>
+		  <tr>
+		    <td>&nbsp;</td>
+		    <td><p class="section">wxWidgets</p>
+	        <p>wxWidgets is a platform-independent graphical user interface (GUI) development library. Download and install the latest stable MSW version from <a href="http://www.wxWidgets.org">www.wxwidgets.org</a>. Build the wxWindows.dsw project (after converting to a .NET solution). Build both a &quot;Debug&quot; and &quot;Release&quot; version.</p></td>
+		    <td>&nbsp;</td>
+		    <td>&nbsp;</td>
+	      </tr>
+		  <tr>
+		    <td>&nbsp;</td>
+		    <td><p class="section">ImageTracker</p>
+	        <p>The ImageTracker source is available from CVS:</p>
+	        <ul>
+	          <li>CVSROOT: /afs/cs.unc.edu/proj/stm/src/</li>
+              <li>Repository: ImageTracker </li>
+	          </ul>
+	        <p>Create an ImageTracker solution file using CMAKE. I would suggest an out-of-source build to keep the code and binaries separate. The CMakeLists.txt file provided from CVS should configure everything for you. There is an advanced option to turn on or off building of test cases. Generate the solution file, and build ImageTracker! </p></td>
+		    <td>&nbsp;</td>
+		    <td>&nbsp;</td>
+	      </tr>
+		</table>
+	</td>
+  </tr>
+  <tr>
+    <td colspan="2" align="right" class="footer-text">
+		ImageTracker<br>
+		by Brian Eastwood
+	</td>
+  </tr>
+</table>
+
+</body>
+</html>
