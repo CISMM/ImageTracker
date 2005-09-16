@@ -1,4 +1,5 @@
 #include "FilePattern.h"
+#include <cassert>
 
 FilePattern::FilePattern(void)
 {
@@ -18,11 +19,11 @@ FilePattern::~FilePattern(void)
 {
 }
 
-bool FilePattern::Validate()
+bool FilePattern::Validate() const
 {
     // Validate the pattern
     assert(this->start <= this->end);
-    //assert(this->directory != NULL);
+    //assert(this->directory != 0);
     //assert(this->prefix != NULL);
     //assert(this->extension != null);
 

@@ -38,7 +38,7 @@ bool CLGOpticFlowPipeline::UpdateOne()
         this->flowFilter->SetInput2((ImageType::ConstPointer) (this->reader->NextImage()));
         // ImageWindow::ImShow(this->reader->CurrentImage(), "Next");
 
-        std::string filename = this->destination->FullFileName(this->destinationIt);
+        std::string filename = *(this->destinationIt);
         this->writer->SetFileName(filename.c_str());
         Logger::logInfo("Writing vector image: " + filename);
         writer->Update();

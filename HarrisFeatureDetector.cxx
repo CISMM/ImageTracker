@@ -113,7 +113,7 @@ HarrisFeatureDetector::PointSetType::Pointer
 HarrisFeatureDetector::ImageType::Pointer
     HarrisFeatureDetector::harrisWeightImage(ImageType::Pointer image)
 {
-    Logger::logDebug("HarrisFeatureDetector: calculating Harris feature weights.");
+    // Logger::logDebug("HarrisFeatureDetector: calculating Harris feature weights.");
     typedef itk::RecursiveGaussianImageFilter<ImageType, ImageType>
         DerivativeFilterType;
     typedef itk::ImageDuplicator<ImageType> DuplicatorType;

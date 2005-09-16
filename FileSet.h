@@ -1,14 +1,11 @@
 #pragma once
 
-#include <cassert>
-#include <iostream>
 #include <string>
 #include <vector>
 #include "FilePattern.h"
 
 /*
- * Represents a group of files.  The file group consists of
- * a directory and a list of file names in that directory.
+ * Represents a group of files.
  */
 class FileSet
 {
@@ -25,12 +22,15 @@ public:
     /*
      * Default constructor.
      */ 
-    FileSet(void);
+    FileSet(void) 
+    {
+        this->fileNames = new FileVector();
+    }
 
     /* 
      * Create a FileSet based on a file pattern.
      */
-    FileSet(FilePattern * pattern);
+    FileSet(const FilePattern* pattern);
 
     /*
      * Create a FileSet given a vector of file names.
@@ -41,33 +41,29 @@ public:
      * Create a new FileSet by prepending a prefix to the front
      * of all file names.
      */
-    FileSet(FileSet * files, std::string prefix);
+    FileSet(const FileSet* files, const std::string prefix);
 
     /*
      * Create a new FileSet by prepending a prefix to the front
      * of all file names and changing the extension.
      */
-    FileSet(FileSet* files, std::string prefix, std::string ext);
+    FileSet(const FileSet* files, const std::string prefix, const std::string ext);
 
     /*
      * Destructor.
      */
-    ~FileSet(void);
+    ~FileSet(void) 
+    {}
 
     /*
      * Set the list of file names for this FileSet. (Overwrites previous list.)
      */
-    void SetFileNames(FileVector * names);
+    void SetFileNames(FileVector* names);
 
     /*
      * Returns the list of file names in this FileSet.
      */
-    FileVector * GetFileNames(void);
-
-    /*
-     * Set the directory associated with this FileSet.
-     */ 
-    void SetDirectory(std::string dir);
+    FileVector* GetFileNames(void);
 
     /*
      * Get the directory for this FileSet.
@@ -75,16 +71,18 @@ public:
     std::string GetDirectory(void);
 
     /*
-     * Return the full file name (directory + file name) for the file
-     * indicated by the given vector iterator.
+     * Sets the directory for all file names in the FileSet.
      */
-    std::string FullFileName(FileIterator it);
+    void SetDirectory(std::string dir);
+
 private:
     /*
      * Prepend a given integer with zeros to the given number of places.
      */
     std::string PadInt(int anInt, unsigned int places);
+    std::string::size_type DirectoryIndex(const std::string filename);
+    std::string DirectoryPart(const std::string filename);
+    std::string FilePart(const std::string filename);
 
-    FileVector * fileNames;
-    std::string directory;
+    FileVector* fileNames;
 };

@@ -88,7 +88,7 @@ void MultiRegionRegistrationPipeline::Update(bool findFeatures)
         }
         
         // Write image to file
-        std::string filename = this->destination->FullFileName(outIt);
+        std::string filename = *outIt;
         Logger::logInfo("Writing vector image: " + filename);
         writer->SetFileName(filename.c_str());
         writer->SetInput(outImage);

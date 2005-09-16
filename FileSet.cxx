@@ -1,72 +1,63 @@
 #include "FileSet.h"
 
-FileSet::FileSet(void)
-{
-}
-
-FileSet::FileSet(FilePattern* pattern)
+FileSet::FileSet(const FilePattern* pattern)
 {
     pattern->Validate();
 
-    this->directory = pattern->directory;
-
     int count = pattern->end - pattern->start + 1;
-    std::vector<std::string>* pNames = new std::vector<std::string>();
+    this->fileNames = new FileVector();
 
-    for (int i = 0; i < count; i++)
+    for (int i = pattern->start; i <= (int) pattern->end; i++)
     {
-        std::string name = 
+        std::string name(pattern->directory +
             pattern->prefix + 
-            this->PadInt(pattern->start+i, pattern->places) + 
-            pattern->extension;
-        pNames->push_back(name);
+            this->PadInt(i, pattern->places) + 
+            pattern->extension);
+        this->fileNames->push_back(name);
     }
-
-    this->SetFileNames(pNames);
 }
 
-FileSet::FileSet(FileVector * names)
+FileSet::FileSet(FileVector* names)
 {
-    this->fileNames = names;
+    this->SetFileNames(names);
 }
 
-FileSet::FileSet(FileSet * files, std::string prefix)
+FileSet::FileSet(const FileSet* files, const std::string prefix)
 {
-    this->directory = files->directory;
-    this->fileNames = new FileSet::FileVector();
+    this->fileNames = new FileVector();
     
+    std::string::size_type idx = std::string::npos;
+
     for (FileSet::FileVector::iterator fit = files->fileNames->begin(); fit != files->fileNames->end(); fit++)
     {
-        this->fileNames->push_back(prefix + *fit);
+        std::string filename = *fit;
+        this->fileNames->push_back(
+            this->DirectoryPart(filename) + 
+            prefix + 
+            this->FilePart(filename));
     }
 }
 
-FileSet::FileSet(FileSet * files, std::string prefix, std::string ext)
+FileSet::FileSet(const FileSet* files, const std::string prefix, const std::string ext)
 {
-    this->directory = files->directory;
     this->fileNames = new FileSet::FileVector();
 
     for (FileSet::FileVector::iterator fit = files->fileNames->begin(); fit != files->fileNames->end(); fit++)
     {
-        std::string name = prefix + *fit;
-        std::string::size_type idx = name.find_last_of(".");
-        name = name.substr(0, idx+1);
-        this->fileNames->push_back(name + ext);
-    }
-}
+        std::string filename = *fit;
+        std::string newName = 
+            this->DirectoryPart(filename) + 
+            prefix + 
+            this->FilePart(filename);
 
-FileSet::~FileSet(void)
-{
+        std::string::size_type idx = newName.find_last_of(".");
+        this->fileNames->push_back(newName.substr(0, idx+1) + ext);
+    }
 }
 
 void FileSet::SetFileNames(FileVector * names)
 {
     this->fileNames = names;
-}
-
-void FileSet::SetDirectory(std::string dir)
-{
-    this->directory = dir;
 }
 
 std::vector<std::string>* FileSet::GetFileNames()
@@ -76,17 +67,27 @@ std::vector<std::string>* FileSet::GetFileNames()
 
 std::string FileSet::GetDirectory()
 {
-    return this->directory;
+    std::string dir("");
+    
+    if (this->fileNames != NULL && !this->fileNames->empty())
+    {
+        dir = this->DirectoryPart((*this->fileNames)[0]);
+    }
+
+    return dir;
 }
 
-std::string FileSet::FullFileName(FileIterator it)
+void FileSet::SetDirectory(std::string dir)
 {
-    return this->GetDirectory() + *it;
+    for (std::string::size_type i = 0; i < this->fileNames->size(); i++)
+    {
+        (*this->fileNames)[i] = dir + this->FilePart((*this->fileNames)[i]);
+    }
 }
 
 std::string FileSet::PadInt(int anInt, unsigned int places)
 {
-    char buffer[33];
+    char buffer[40];
     std::string intStr(itoa(anInt, buffer, 10));
     while (intStr.size() < places)
     {
@@ -94,4 +95,37 @@ std::string FileSet::PadInt(int anInt, unsigned int places)
     }
 
     return intStr;
+}
+
+std::string::size_type FileSet::DirectoryIndex(const std::string filename)
+{
+    // find the index of the last "\"
+    return filename.rfind("\\");
+}
+
+std::string FileSet::DirectoryPart(const std::string filename)
+{
+    std::string dir("");
+    std::string::size_type idx = DirectoryIndex(filename);
+    if (idx != std::string::npos)
+    {
+        // the directory part from the start 
+        // up to and including the last "/"
+        dir = filename.substr(0, idx+1);
+    }
+
+    return dir;
+}
+
+std::string FileSet::FilePart(const std::string filename)
+{
+    std::string file("");
+    std::string::size_type idx = DirectoryIndex(filename);
+    if (idx != std::string::npos)
+    {
+        // the file part is everything after the last "/"
+        file = filename.substr(idx+1);
+    }
+
+    return file;
 }

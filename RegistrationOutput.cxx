@@ -71,8 +71,8 @@ void RegistrationOutput::Update(void)
     writer->SetInput(caster->GetOutput());
 
     // Write the first image with no transformation
-    std::string inFile = source->GetDirectory() + *sourceIt;
-    std::string outFile = destination->GetDirectory() + *destIt;
+    std::string inFile = *sourceIt;
+    std::string outFile = *destIt;
     reader->SetFileName(inFile.c_str());
     reader->Update();
     resampler->SetTransform(transform);
@@ -104,8 +104,8 @@ void RegistrationOutput::Update(void)
         }
 
         // Write the first image with no transformation
-        inFile = source->GetDirectory() + *sourceIt;
-        outFile = destination->GetDirectory() + *destIt;
+        inFile = *sourceIt;
+        outFile = *destIt;
         reader->SetFileName(inFile.c_str());
         reader->Update();
         resampler->SetTransform(transform);

@@ -46,7 +46,7 @@ bool FileSetImageReader::HasNext()
 
 std::string FileSetImageReader::CurrentFileName()
 {
-    return this->fileSet->FullFileName(this->fileIt);
+    return *(this->fileIt);
 }
 
 std::string FileSetImageReader::NextFileName()

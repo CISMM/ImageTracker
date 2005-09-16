@@ -55,7 +55,11 @@ public:
     void SetMaxFeatures(int count) { this->detector->SetMaxCount(count); }
     void SetScale(double scale) { this->detector->SetSigma(scale); }
     void SetMaxDistance(int pixels) { this->registrar->SetRadiusOfInterest(pixels); }
-    void SetSource(FileSet* source) { this->source = source; }
+    void SetSource(FileSet* source) 
+    { 
+        this->source = source;
+        this->init = false;
+    }
     void SetDestination(FileSet* dest) 
     { 
         this->destination = dest;

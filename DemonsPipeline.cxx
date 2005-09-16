@@ -67,7 +67,7 @@ void DemonsPipeline::Update()
         demons->Update();
 
         // Write vector field output
-        std::string outFile = this->outFiles->FullFileName(outIt);
+        std::string outFile = *outIt;
         std::cout << "Writing => " << outFile << std::endl;
         writer->SetFileName(outFile.c_str());
         *outIt++;

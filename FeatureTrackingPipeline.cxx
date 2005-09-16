@@ -36,7 +36,7 @@ bool FeatureTrackingPipeline::UpdateOne()
         this->registrar->SetMovingImage(this->pCurrentImg);
         this->registrar->SetFixedImage(this->pNextImg);
         
-        std::string filename = this->destination->FullFileName(this->destinationIt);
+        std::string filename = *(this->destinationIt);
         this->writer->SetFileName(filename.c_str());
         this->writer->SetInput(
             this->registrar->Update(this->detector->findFeatures(this->pCurrentImg)));

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cassert>
-#include <iostream>
 #include <string>
 
 /*
@@ -31,7 +29,7 @@ public:
     /*
      * Determines if all required members have been set to create a pattern.
      */
-    bool Validate(void);
+    bool Validate(void) const;
 
     std::string directory;
     std::string prefix;
