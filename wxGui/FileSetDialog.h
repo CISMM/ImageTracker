@@ -45,7 +45,6 @@ private:
     void OnListFilesDoubleClick( wxCommandEvent &event );
     void OnRemove( wxCommandEvent &event );
 
-    wxString directory;
     VtkCanvas *canvas;
 
 private:

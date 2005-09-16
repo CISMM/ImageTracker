@@ -19,7 +19,6 @@ FileSetDialog::FileSetDialog( wxWindow *parent, wxWindowID id,
     const wxPoint &position, const wxSize& size, long style ) :
     wxPanel( parent, id, position, size, style )
 {
-    this->directory = "";
     // WDR: dialog function CreateFileSetDialog for FileSetDialog
     CreateFileSetDialog( this, TRUE ); 
 }
@@ -41,13 +40,13 @@ VtkCanvas* FileSetDialog::GetCanvas()
 FileSet* FileSetDialog::GetFileSet()
 {
     FileSet* files = new FileSet();
-    files->SetDirectory(this->directory.c_str());
 
     FileSet::FileVector* vFiles = new FileSet::FileVector();
+    wxString* pFile = NULL;
     for (int i = 0; i < this->GetListFiles()->GetCount(); i++)
     {
-        wxString file(this->GetListFiles()->GetString(i));
-        vFiles->push_back(file.c_str());
+        pFile = (wxString*) this->GetListFiles()->GetClientData(i);
+        vFiles->push_back(pFile->c_str());
     }
 
     files->SetFileNames(vFiles);
@@ -58,21 +57,20 @@ FileSet* FileSetDialog::GetFileSet()
 
 void FileSetDialog::OnListFilesDoubleClick( wxCommandEvent &event )
 {
-    wxString filename = "";
     wxArrayInt sels;
     int count = this->GetListFiles()->GetSelections(sels);
     if (count > 0)
     {
         int sel = (int) sels.Last();
-        filename.append(this->directory).append(this->GetListFiles()->GetString(sel));
-        this->GetCanvas()->SetFileName(filename.c_str());
+        wxString* filename = (wxString *) this->GetListFiles()->GetClientData(sel);
+        this->GetCanvas()->SetFileName(filename->c_str());
     }
 }
 
 void FileSetDialog::OnAdd( wxCommandEvent &event )
 {
     wxFileDialog addFiles(this, "Open files", 
-        this->directory, "", 
+        wxEmptyString, wxEmptyString, 
         FSD_FILETYPES, wxOPEN | wxMULTIPLE);
 
     if (addFiles.ShowModal() == wxID_OK)
@@ -82,8 +80,12 @@ void FileSetDialog::OnAdd( wxCommandEvent &event )
         addFiles.GetFilenames(files);
         addFiles.GetPaths(paths);
 
-        this->directory = wxString(addFiles.GetDirectory());
-        this->directory.append("\\");
+        // During multiple selectins, wxWidgets returns the last
+        // selected item at the top of the list.  Who knows why,
+        // but that means we have to sort so as not to confuse
+        // our users...
+        paths.Sort();
+        files.Sort();
 
         for (unsigned int i = 0; i < files.GetCount(); i++)
         {

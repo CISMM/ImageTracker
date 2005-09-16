@@ -47,6 +47,12 @@ public:
     GlobalRegistrationPipeline* GetPipeline();
 
     /*
+     * Initializes the output paramters of the dialog based on the input
+     * parameters from the pipeline.
+     */
+    void InitializeOutput();
+
+    /*
      * Sets an ImageCanvas to be associated with this dialog.  The ImageCanvas will be
      * updated in preview mode.
      */
@@ -121,9 +127,6 @@ private:
      */
     void SaveOutput();
 
-    wxString transformFile;
-    wxString outFileDir;
-    wxString outFilePrefix;
     VtkCanvas *canvas;
     GlobalRegistrationPipeline *regPipe;
     

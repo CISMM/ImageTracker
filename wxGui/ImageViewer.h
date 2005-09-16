@@ -64,7 +64,6 @@ private:
     void OnTrack( wxCommandEvent &event );
     void OnImageScale( wxCommandEvent &event );
     void OnImageTrueSize( wxCommandEvent &event );
-    void OnViewLogger( wxCommandEvent &event );
     void OnAbout( wxCommandEvent &event );
     void OnRegister( wxCommandEvent &event );
     void OnExit( wxCommandEvent &event );

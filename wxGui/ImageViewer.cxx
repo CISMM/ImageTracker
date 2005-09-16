@@ -26,7 +26,6 @@ BEGIN_EVENT_TABLE(ImageViewer,wxFrame)
     EVT_MENU( IV_EXIT, ImageViewer::OnExit )
     EVT_MENU( IV_REGISTER, ImageViewer::OnRegister )
     EVT_MENU( IV_ABOUT, ImageViewer::OnAbout )
-    EVT_MENU( IV_MENU_LOGGER, ImageViewer::OnViewLogger )
     EVT_MENU( IV_TRACK, ImageViewer::OnTrack )
     EVT_MENU( IV_CLGOpticFlow, ImageViewer::OnCLGOpticFlow )
 END_EVENT_TABLE()
@@ -76,12 +75,6 @@ void ImageViewer::OnCLGOpticFlow( wxCommandEvent &event )
     this->clgFlowDialog->Show(true);    
 }
 
-void ImageViewer::OnViewLogger( wxCommandEvent &event )
-{
-    Logger::setVisible(true);
-    Logger::logVerbose("Setting logger visible.");
-}
-
 void ImageViewer::OnAbout( wxCommandEvent &event )
 {
     wxString ret(_T("\n"));
@@ -108,6 +101,7 @@ void ImageViewer::OnRegister( wxCommandEvent &event )
 
     Logger::logVerbose("Showing registration dialog.");
     this->registrationDialog->GetPipeline()->SetInput(this->GetFileSetPanel()->GetFileSet());
+    this->registrationDialog->InitializeOutput();
     this->registrationDialog->Show(true);
 }
 

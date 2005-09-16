@@ -372,10 +372,10 @@ wxSizer *CreateImageTrackerApp( wxWindow *parent, bool call_fit, bool set_sizer 
 
     wxBoxSizer *item3 = new wxBoxSizer( wxVERTICAL );
 
-    FileSetDialog *item4 = new FileSetDialog( parent, IT_IMAGE_FILES, wxDefaultPosition, wxSize(150,150), 0 );
+    FileSetDialog *item4 = new FileSetDialog( parent, IT_IMAGE_FILES, wxDefaultPosition, wxSize(200,150), 0 );
     item3->Add( item4, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
-    wxPanel *item5 = new wxPanel( parent, ID_PANEL, wxDefaultPosition, wxSize(150,150), 0 );
+    wxPanel *item5 = new wxPanel( parent, ID_PANEL, wxDefaultPosition, wxSize(200,150), 0 );
     item3->Add( item5, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
     item2->Add( item3, 1, wxGROW|wxALL, 0 );
@@ -508,6 +508,26 @@ wxSizer *CreateCLGOpticFlowDialog( wxWindow *parent, bool call_fit, bool set_siz
     return item0;
 }
 
+wxSizer *MyDialogFunc( wxWindow *parent, bool call_fit, bool set_sizer )
+{
+    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
+
+    wxSlider *item1 = new wxSlider( parent, ID_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(100,-1), wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS );
+    item0->Add( item1, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    wxSlider *item2 = new wxSlider( parent, ID_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(100,-1), 0 );
+    item0->Add( item2, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    if (set_sizer)
+    {
+        parent->SetSizer( item0 );
+        if (call_fit)
+            item0->SetSizeHints( parent );
+    }
+    
+    return item0;
+}
+
 // Implement menubar functions
 
 wxMenuBar *CreateViewerMenu()
@@ -531,12 +551,8 @@ wxMenuBar *CreateViewerMenu()
     item0->Append( item2, _("&Actions") );
     
     wxMenu* item4 = new wxMenu;
-    item4->Append( IV_MENU_LOGGER, _("&Logger"), _("Show the logging window") );
-    item0->Append( item4, _("&View") );
-    
-    wxMenu* item5 = new wxMenu;
-    item5->Append( IV_ABOUT, _("A&bout"), _("About this application") );
-    item0->Append( item5, _("&Help") );
+    item4->Append( IV_ABOUT, _("A&bout"), _("About this application") );
+    item0->Append( item4, _("&Help") );
     
     return item0;
 }

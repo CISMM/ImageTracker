@@ -91,20 +91,21 @@ const int ID_TEXT_ITERATIONS = 10046;
 const int ID_SLIDER_ITERATIONS = 10047;
 wxSizer *CreateCLGOpticFlowDialog( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
+const int ID_SLIDER = 10048;
+wxSizer *MyDialogFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
+
 // Declare menubar functions
 
-const int IV_MENU_FILE = 10048;
-const int IV_FILES = 10049;
-const int ID_MENU = 10050;
-const int IV_EXIT = 10051;
-const int IV_MENU_ACTIONS = 10052;
-const int IV_REGISTER = 10053;
-const int IV_TRACK = 10054;
-const int IV_CLGOpticFlow = 10055;
-const int IV_MENU_VIEW = 10056;
-const int IV_MENU_LOGGER = 10057;
-const int IV_MENU_HELP = 10058;
-const int IV_ABOUT = 10059;
+const int IV_MENU_FILE = 10049;
+const int IV_FILES = 10050;
+const int ID_MENU = 10051;
+const int IV_EXIT = 10052;
+const int IV_MENU_ACTIONS = 10053;
+const int IV_REGISTER = 10054;
+const int IV_TRACK = 10055;
+const int IV_CLGOpticFlow = 10056;
+const int IV_MENU_HELP = 10057;
+const int IV_ABOUT = 10058;
 wxMenuBar *CreateViewerMenu();
 
 // Declare toolbar functions

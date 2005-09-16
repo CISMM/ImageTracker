@@ -15,9 +15,6 @@ GlobalRegistrationDialog::GlobalRegistrationDialog(wxWindow *parent, wxWindowID 
 {
     this->canvas = NULL;
     this->regPipe = NULL;
-    this->transformFile = "";
-    this->outFileDir = "";
-    this->outFilePrefix = "Reg-";
 
     // WDR: dialog function CreateRegistrationDialog for GlobalRegistrationDialog
     CreateRegistrationDialog(this, TRUE);
@@ -44,6 +41,8 @@ void GlobalRegistrationDialog::InitializeDialog()
     this->GetSliderAbove()->SetValue(0);
     this->GetSliderBelow()->SetValue(0);
     this->GetSliderSmooth()->SetValue(1.0);
+
+    this->GetTextPrefix()->SetValue("Reg-");
 }
 
 void GlobalRegistrationDialog::UpdateDialog()
@@ -82,12 +81,15 @@ void GlobalRegistrationDialog::UpdateDialog()
     this->GetTextSmooth()->SetValue(text);
 
     this->GetTextTransform()->Enable(this->GetCheckTransform()->IsChecked());
-    this->GetTextTransform()->SetValue(this->transformFile);
-
     this->GetTextOutdir()->Enable(this->GetCheckImages()->IsChecked());
-    this->GetTextOutdir()->SetValue(this->outFileDir);
     this->GetTextPrefix()->Enable(this->GetCheckImages()->IsChecked());
-    this->GetTextPrefix()->SetValue(this->outFilePrefix);
+}
+
+void GlobalRegistrationDialog::InitializeOutput()
+{
+    wxString out(this->GetPipeline()->GetInput()->GetDirectory().c_str());
+    this->GetTextOutdir()->SetValue(out);
+    this->GetTextTransform()->SetValue(out.append("Transforms.txt"));
 }
 
 void GlobalRegistrationDialog::SetCanvas(VtkCanvas *canvas)
@@ -193,26 +195,28 @@ void GlobalRegistrationDialog::SaveOutput()
         wxString text;
 
         if (this->GetCheckTransform()->IsChecked() && 
-            !this->transformFile.IsEmpty())
+            !this->GetTextTransform()->GetValue().IsEmpty())
         {
+            wxString xformFile = this->GetTextTransform()->GetValue();
             text = "";
-            text.Printf("Saving transforms to: %s", this->transformFile.c_str());
+            text.Printf("Saving transforms to: %s", xformFile.c_str());
             Logger::logInfo(text.c_str());
             TransformGroup::LogTransforms(this->GetPipeline()->GetTransforms());
-            this->GetPipeline()->SetTransformFile(this->transformFile.c_str());
+            this->GetPipeline()->SetTransformFile(xformFile.c_str());
             this->GetPipeline()->SaveTransforms();
         }
 
         if (this->GetCheckImages()->IsChecked() && 
-            !(this->outFileDir.IsEmpty() || this->outFilePrefix.IsEmpty()))
+            !(this->GetTextOutdir()->GetValue().IsEmpty() || 
+              this->GetTextPrefix()->GetValue().IsEmpty()))
         {
             text = "";
-            text.Printf("Saving image files to: %s", this->outFileDir.c_str());
+            text.Printf("Saving image files to: %s", this->GetTextOutdir()->GetValue().c_str());
             Logger::logInfo(text.c_str());
             FileSet *outFiles = new FileSet(
                 this->GetPipeline()->GetInput(), 
-                this->outFilePrefix.c_str());
-            outFiles->SetDirectory(this->outFileDir.c_str());
+                this->GetTextPrefix()->GetValue().c_str());
+            outFiles->SetDirectory(this->GetTextOutdir()->GetValue().c_str());
             
             this->GetPipeline()->SetOutput(outFiles);
             this->GetPipeline()->SaveImages();
@@ -248,15 +252,14 @@ void GlobalRegistrationDialog::OnOutDirectory( wxCommandEvent &event )
 {
     if (this->GetCheckImages()->IsChecked())
     {
-        wxDirDialog dir(this, _("Choose a directory"), this->outFileDir, wxDD_NEW_DIR_BUTTON);
+        wxDirDialog dir(this, _("Choose a directory"), this->GetTextOutdir()->GetValue(), wxDD_NEW_DIR_BUTTON);
         if (dir.ShowModal() == wxID_OK)
         {
-            this->outFileDir = wxString(dir.GetPath());
-            this->outFileDir.append("\\");
+            this->GetTextOutdir()->SetValue(dir.GetPath() + "\\");
             
-            if (this->transformFile.IsSameAs(""))
+            if (this->GetTextTransform()->GetValue().IsSameAs(""))
             {
-                this->transformFile = wxString(dir.GetPath() + "\\Transforms.txt");
+                this->GetTextTransform()->SetValue(dir.GetPath() + "\\Transforms.txt");
             }
         }
     }
@@ -267,15 +270,14 @@ void GlobalRegistrationDialog::OnTransformFile( wxCommandEvent &event )
 {
     if (this->GetCheckTransform()->IsChecked())
     {
-        wxFileDialog save(this, _("Choose a file"), this->outFileDir);
+        wxFileDialog save(this, _("Choose a file"), this->GetTextOutdir()->GetValue());
         if (save.ShowModal() == wxID_OK)
         {
-            this->transformFile = wxString(save.GetPath());
+            this->GetTextTransform()->SetValue(save.GetPath());
 
-            if (this->outFileDir.IsSameAs(""))
+            if (this->GetTextOutdir()->GetValue().IsSameAs(""))
             {
-                this->outFileDir = wxString(save.GetDirectory());
-                this->outFileDir.append("\\");
+                this->GetTextOutdir()->SetValue(save.GetDirectory() + "\\");
             }
         }
     }
