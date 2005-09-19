@@ -1,5 +1,4 @@
 #include ".\ImageCanvas.h"
-#include "..\ItkMagickIO.h"
 #include "..\Logger.h"
 
 #include "itkExceptionObject.h"
@@ -15,20 +14,15 @@ ImageCanvas::ImageCanvas(wxWindow *parent, wxWindowID id,
     this->theImage = (wxImage *) NULL;
     //this->originalImage = (wxImage *) NULL;
 
+    this->reader = ItkMagickIO::New();
     this->mode = IMAGE_TRUE_SIZE;
 }
-
-ImageCanvas::~ImageCanvas(void)
-{
-    this->clearImage();
-}
-
 
 void ImageCanvas::LoadFile(const wxString &name, wxBitmapType type)
 {
     this->clearImage();
 
-    this->LoadItkImage(ItkMagickIO::Read(name.c_str()));
+    this->LoadItkImage(this->reader->Read(name.c_str()));
 
     //try
     //{

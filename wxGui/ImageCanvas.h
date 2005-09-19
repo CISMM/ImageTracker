@@ -9,6 +9,7 @@
 #include "itkRGBPixel.h"
 
 #include "../CommonTypes.h"
+#include "../vtkView/ItkMagickIO.h"
 
 enum {
     IMAGE_TRUE_SIZE = 1000,
@@ -44,7 +45,10 @@ public:
     /*
      * Destroy an image canvas.
      */
-    ~ImageCanvas(void);
+    virtual ~ImageCanvas(void)
+    {
+        this->clearImage();
+    }
 
     /*
      * Handles displaying the associated image on this ImageCanvas.
@@ -112,7 +116,7 @@ private:
      * A reference to the image associated with this ImageCanvas.
      */
     wxImage *theImage;
-    //wxImage *originalImage;
+    ItkMagickIO::Pointer reader;
     int mode;
 
 DECLARE_EVENT_TABLE();
