@@ -42,10 +42,9 @@ INCLUDE (./vtkView/Use_ImageMagick.cmake)
 # Common architecture library
 #######################################
 SET (Common_SRCS
-												CommonTypes.h
-	Logger.cxx									Logger.h
-	LogStream.cxx								LogStream.h
-	StopWatch.cxx                               StopWatch.h
+                    CommonTypes.h
+    Logger.cxx      Logger.h
+    StopWatch.cxx   StopWatch.h
 )
 
 #######################################
@@ -59,28 +58,29 @@ SET (Algorithms_SRCS
     DemonsPipeline.cxx                          DemonsPipeline.h
                                                 Feature.h
     FeatureTrackingPipeline.cxx                 FeatureTrackingPipeline.h                                                
-	FilePattern.cxx                             FilePattern.h
-	FileSet.cxx                                 FileSet.h
-	FileSetImageReader.cxx                      FileSetImageReader.h
+    FilePattern.cxx                             FilePattern.h
+    FileSet.cxx                                 FileSet.h
+    FileSetImageReader.cxx                      FileSetImageReader.h
                                                 Gaussian2DVectorFilter.h
-	GlobalRegistrationPipeline.cxx              GlobalRegistrationPipeline.h
-	HarrisFeatureDetector.cxx                   HarrisFeatureDetector.h
-	ImageRegistration.cxx                       ImageRegistration.h
-	ImageStatistics.cxx                         ImageStatistics.h
-	MultiImageRegistrationProcessor.cxx         MultiImageRegistrationProcessor.h
-	MultiRegionRegistration.cxx                 MultiRegionRegistration.h
-	MultiRegionRegistrationPipeline.cxx         MultiRegionRegistrationPipeline.h
-	RegistrationOutput.cxx                      RegistrationOutput.h
-	                                            Sort.h
-	ThresholdPipeline.cxx                       ThresholdPipeline.h
-	TransformGroup.cxx                          TransformGroup.h
-	Use_ImageMagick.cmake
+    GlobalRegistrationPipeline.cxx              GlobalRegistrationPipeline.h
+    HarrisFeatureDetector.cxx                   HarrisFeatureDetector.h
+    ImageRegistration.cxx                       ImageRegistration.h
+    ImageStatistics.cxx                         ImageStatistics.h
+    MultiImageRegistrationProcessor.cxx         MultiImageRegistrationProcessor.h
+    MultiRegionRegistration.cxx                 MultiRegionRegistration.h
+    MultiRegionRegistrationPipeline.cxx         MultiRegionRegistrationPipeline.h
+                                                RegistrationMotionFilter.h
+    RegistrationOutput.cxx                      RegistrationOutput.h
+                                                Sort.h
+    ThresholdPipeline.cxx                       ThresholdPipeline.h
+    TransformGroup.cxx                          TransformGroup.h
+    Use_ImageMagick.cmake
 )
-	
+    
 SET (CMAKE_VERBOSE_MAKEFILE ON)
 
-ADD_LIBRARY(ITCommon Common_SRCS)
-ADD_LIBRARY(ITAlgorithms Algorithms_SRCS)
+ADD_LIBRARY(ITCommon ${Common_SRCS})
+ADD_LIBRARY(ITAlgorithms ${Algorithms_SRCS})
 TARGET_LINK_LIBRARIES(ITAlgorithms ITCommon ITKCommon ITKBasicFilters ITKIO ITKAlgorithms )
 
 #######################################
@@ -93,5 +93,5 @@ SUBDIRS(vtkView wxGui)
 #######################################
 OPTION (BUILD_IT_TESTS "Include ImageTracker unit tests" ON)
 IF (BUILD_IT_TESTS)
-	SUBDIRS(TestSuite Tests)
+    SUBDIRS(TestSuite Tests)
 ENDIF (BUILD_IT_TESTS)

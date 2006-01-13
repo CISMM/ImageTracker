@@ -65,7 +65,7 @@ public:
             writer->SetInput(filter->GetOutput());
             
             img2 = reader->CurrentFileName();
-            out = filesOut->FullFileName(outIt);
+            out = *outIt;
             *(outIt)++;
             writer->SetFileName(out.c_str());
 

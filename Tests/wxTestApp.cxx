@@ -24,9 +24,9 @@
 #include "TestImageWindow.h"
 #include "TestItkMagickIO.h"
 #include "TestLogger.h"
-#include "TestLogStream.h"
 #include "TestMultiRegionRegistration.h"
 #include "TestRandomVectorImage.h"
+#include "TestRegistrationMotionFilter.h"
 #include "TestRegistrationOutput.h"
 #include "TestSort.h"
 #include "TestStopWatch.h"
@@ -80,15 +80,14 @@ void TestCaseFrame::OnRunTests( wxCommandEvent &event )
         // suite.addTest(new TestFileSetImageReader);
         // suite.addTest(new TestGlobalRegistrationPipeline);        
         // suite.addTest(new TestHarrisFeatureDetector);
-        suite.addTest(new TestImageMagick);
+        // suite.addTest(new TestImageMagick);
         // suite.addTest(new TestImageRescale);
         // suite.addTest(new TestImageStatistics);
         // suite.addTest(new TestImageWindow);        
-        suite.addTest(new TestItkMagickIO);
+        // suite.addTest(new TestItkMagickIO);
         // suite.addTest(new TestLogger);
-        // suite.addTest(new TestLogStream);
         // suite.addTest(new TestMultiRegionRegistration);
-        
+		// suite.addTest(new TestRegistrationMotionFilter);
         // suite.addTest(new TestRegistrationOutput);
         // suite.addTest(new TestSort);
         // suite.addTest(new TestStopWatch);
@@ -129,13 +128,14 @@ void TestCaseFrame::OnCloseWindow( wxCloseEvent &event )
 // TestCaseApp
 //------------------------------------------------------------------------------
 
-IMPLEMENT_APP(TestCaseApp)
+// IMPLEMENT_APP(TestCaseApp)
 
 int main()
 {
     TestSuite::Suite suite("Video Registration Suite");
-    suite.addTest(new TestLogStream);
-    // suite.addTest(new TestMultiRegionRegistration);
+    // suite.addTest(new TestLogStream);
+	suite.addTest(new TestRegistrationMotionFilter);
+    suite.addTest(new TestMultiRegionRegistration);
     // suite.addTest(new TestVectorWrite);
     suite.run();
     long errs = suite.report();

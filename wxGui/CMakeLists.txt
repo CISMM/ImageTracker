@@ -18,7 +18,7 @@ SET (Gui_SRCS
 )
 
 # A library, so others can use the GUI tools
-ADD_LIBRARY(ITGui Gui_SRCS)
+ADD_LIBRARY(ITGui ${Gui_SRCS})
 TARGET_LINK_LIBRARIES(ITGui ITCommon ITAlgorithms vtkView )
 
 ###################################

@@ -27,18 +27,9 @@ void TestMultiRegionRegistration::testUpdate()
     try
     {
         Logger::logDebug("TestMultiRegionRegistration: \n\tSetting up IO files....");
-        std::string inDir("C:\\UNC_CS\\Research\\nano\\data\\Fibrin\\lolo-2004-05-14-2narea\\");
-        std::string outDir("C:\\UNC_CS\\Research\\nano\\data\\Fibrin\\lolo-2004-05-14-2narea\\");
-        //std::string inDir  = "C:\\UNC_CS\\Research\\nano\\data\\test\\Quenot\\";
-        //std::string outDir = "C:\\UNC_CS\\Research\\nano\\data\\test\\Quenot\\";
-
-        std::string prefix = "mani4";
-        std::string ext = ".png";
-        int start = 15;
-        int end = 16;
-        int places = 2;
-        FileSet* pInFiles = new FileSet(new FilePattern(inDir, prefix, ext, start, end, places));
-        FileSet* pOutFiles = new FileSet(new FilePattern(outDir, "HarrisT2D-" + prefix, ".mha", start, end-1, places));
+        std::string dir = "D:\\beastwoo\\UNC_CS\\Research\\Nano\\data\\test\\";
+        FileSet* filesIn = new FileSet(new FilePattern(dir, "RotateNoise-", ".png", 2, 3, 2));
+        FileSet* filesOut = new FileSet(filesIn, "RegMulti-", "mha");
 
         //Set up file registerer
         Logger::logDebug("\tSetting up registration performer....");
@@ -49,19 +40,19 @@ void TestMultiRegionRegistration::testUpdate()
         Logger::logDebug("\tSetting up registration pipeline.");
         MultiRegionRegistrationPipeline* pPipeline = new MultiRegionRegistrationPipeline();
         pPipeline->SetRegistrar(registrar);
-        pPipeline->SetSource(pInFiles);
-        pPipeline->SetDestination(pOutFiles);
+        pPipeline->SetSource(filesIn);
+        pPipeline->SetDestination(filesOut);
         
         Logger::logDebug("\tRunning registration....");
         StopWatch* pWatch = new StopWatch();
-        pWatch->Start("Started");
-        pPipeline->Update(true);
+        pWatch->Start("Started MultiRegionRegistration");
+        pPipeline->Update(false); // true: find features first
         pWatch->Stop("Finished");
         pWatch->Print();
 
         delete(pWatch);
-        delete(pInFiles);
-        delete(pOutFiles);
+        delete(filesIn);
+		delete(filesOut);
         delete(registrar);
         delete(pPipeline);
 

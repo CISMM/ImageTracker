@@ -64,7 +64,7 @@ SET (vtkView_SRCS
 	wxVTKRenderWindowInteractor.cxx		wxVTKRenderWindowInteractor.h
 )
 
-ADD_LIBRARY(vtkView vtkView_SRCS)
+ADD_LIBRARY(vtkView ${vtkView_SRCS})
 TARGET_LINK_LIBRARIES(vtkView
 	ITCommon
 	vtkIO
