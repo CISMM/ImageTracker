@@ -8,5 +8,4 @@ public:
     ~TestLogger(void);
     void run();
     void testStreamLogger();
-    void testDelete();
 };

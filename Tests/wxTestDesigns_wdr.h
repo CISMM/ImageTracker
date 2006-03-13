@@ -29,10 +29,13 @@
 
 // Declare window functions
 
+const int ID_LOG_PANEL = 10000;
+wxSizer *CreateTestDialog( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
+
 // Declare menubar functions
 
-const int ID_FileMenu = 10000;
-const int ID_TEST = 10001;
+const int ID_FileMenu = 10001;
+const int ID_TEST = 10002;
 wxMenuBar *MyMenuBarFunc();
 
 // Declare toolbar functions

@@ -31,7 +31,27 @@
     #endif
 #endif
 
+// Custom source
+#include "../wxGUI/LoggerPanel.h"
+
 // Implement window functions
+
+wxSizer *CreateTestDialog( wxWindow *parent, bool call_fit, bool set_sizer )
+{
+    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
+
+    LoggerPanel *item1 = new LoggerPanel( parent, ID_LOG_PANEL, wxDefaultPosition, wxSize(200,160), 0 );
+    item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    if (set_sizer)
+    {
+        parent->SetSizer( item0 );
+        if (call_fit)
+            item0->SetSizeHints( parent );
+    }
+    
+    return item0;
+}
 
 // Implement menubar functions
 

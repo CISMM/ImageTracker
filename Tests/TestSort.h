@@ -68,11 +68,12 @@ public:
 
         SortType::mergeSort(*intVec);
 
-        int i = 0;
+        int j = 0;
         for (SortType::VectorType::iterator it = intVec->begin();
-            it != intVec->end(); it++, i++)
+            it != intVec->end(); it++)
         {
-            test_((*it).getValue() == i);
+            test_((*it).getValue() == j);
+			j++;
         }
 
         delete intVec;
@@ -91,12 +92,13 @@ public:
 
         SortType::mergeSort(*intVec);
 
-        int i = 0;
+        int j = 0;
         for (SortType::VectorType::iterator it = intVec->begin();
             it != intVec->end();
-            it++, i++)
+            it++)
         {
-            test_(*it == i);
+            test_(*it == j);
+			j++;
         }
 
         delete intVec;

@@ -43,7 +43,6 @@ public:
 
 			// Files
 			Logger::logDebug("Choosing files...");
-			// std::string dir = "C:\\UNC_CS\\Research\\Nano\\data\\Fibrin\\Mucus\\";
 	        
 			std::string dir = "D:\\beastwoo\\UNC_CS\\Research\\Nano\\data\\test\\";
 			FileSet* filesIn = new FileSet(new FilePattern(dir, "RotateNoise-", ".png", 2, 3, 2));

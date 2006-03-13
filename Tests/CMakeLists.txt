@@ -16,12 +16,15 @@ SET (TestCases_SRCS
     TestGlobalRegistrationPipeline.cxx
     TestHarrisFeatureDetector.cxx
                                             TestImageMagick.h
+                                            TestImagePyramid.h
     TestImageRescale.cxx
     TestImageStatistics.cxx
     TestImageWindow.cxx
                                             TestItkMagickIO.h
     TestLogger.cxx
     TestMultiRegionRegistration.cxx
+                                            TestMultiResolutionRegistration.h
+                                            TestMultiResolutionRegistrationPipeline.h
                                             TestRandomVectorImage.h
     TestRegistrationOutput.cxx
                                             TestRegistrationMotionFilter.h

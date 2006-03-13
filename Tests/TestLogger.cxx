@@ -12,7 +12,6 @@ TestLogger::~TestLogger(void)
 void TestLogger::run()
 {
     this->testStreamLogger();
-    this->testDelete();
 }
 
 void TestLogger::testStreamLogger()
@@ -24,28 +23,16 @@ void TestLogger::testStreamLogger()
     Logger::logError("Error message");
     succeed_();
 
-    if (Logger::isVisible())
-    {
-        Logger::logInfo("Logger visible");
-    }
-    else
-    {
-        Logger::logInfo("Logger invisible");
-    }
-
-
     Logger::logInfo("Setting log level to warning");
-    Logger::setLevel(LOG_WARN);
+	LogLevel level = Logger::getLevel();
+	Logger::setLevel(Warning);
     Logger::logVerbose("Verbose message");
     Logger::logDebug("Debug message");
     Logger::logInfo("Info message");
     Logger::logWarn("Warn message");
     Logger::logError("Error message");
-}
 
-void TestLogger::testDelete()
-{
-    Logger::setLevel(LOG_INFO);
-    Logger::logInfo("Deleting logger....");
-    Logger::Destroy();
+	// Reset
+	Logger::setLevel(level);
+	succeed_();
 }

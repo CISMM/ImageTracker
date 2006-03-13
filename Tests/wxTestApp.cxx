@@ -9,7 +9,7 @@
 #include <iostream>
 #include "../TestSuite/Suite.h"
 
-#include "../wxGui/DialogLogger.h"
+#include "../wxGui/LoggerPanel.h"
 
 #include "TestBilateralVectorFilter.h"
 #include "TestCLGOpticFlowImageFilter.h"
@@ -19,12 +19,15 @@
 #include "TestGlobalRegistrationPipeline.h"
 #include "TestHarrisFeatureDetector.h"
 #include "TestImageMagick.h"
+#include "TestImagePyramid.h"
 #include "TestImageRescale.h"
 #include "TestImageStatistics.h"
 #include "TestImageWindow.h"
 #include "TestItkMagickIO.h"
 #include "TestLogger.h"
 #include "TestMultiRegionRegistration.h"
+#include "TestMultiResolutionRegistration.h"
+#include "TestMultiResolutionRegistrationPipeline.h"
 #include "TestRandomVectorImage.h"
 #include "TestRegistrationMotionFilter.h"
 #include "TestRegistrationOutput.h"
@@ -57,6 +60,7 @@ TestCaseFrame::TestCaseFrame( wxWindow *parent, wxWindowID id, const wxString &t
     wxFrame( parent, id, title, position, size, style )
 {
     CreateMyMenuBar();
+	CreateTestDialog(this, true);
 
     CreateStatusBar(1);
     SetStatusText( wxT("Welcome!") );
@@ -120,7 +124,6 @@ void TestCaseFrame::OnCloseWindow( wxCloseEvent &event )
     // if ! saved changes -> return
 
     ImageWindow::Destroy();
-    Logger::Destroy();
     this->Destroy();
 }
 
@@ -133,9 +136,14 @@ void TestCaseFrame::OnCloseWindow( wxCloseEvent &event )
 int main()
 {
     TestSuite::Suite suite("Video Registration Suite");
-    // suite.addTest(new TestLogStream);
-	suite.addTest(new TestRegistrationMotionFilter);
-    suite.addTest(new TestMultiRegionRegistration);
+	suite.addTest(new TestLogger);
+	suite.addTest(new TestItkMagickIO);
+	suite.addTest(new TestImagePyramid);
+	//suite.addTest(new TestMultiResolutionRegistration);
+	//suite.addTest(new TestMultiResolutionRegistrationPipeline);
+	// suite.addTest(new TestLogStream);
+	// suite.addTest(new TestRegistrationMotionFilter);
+    // suite.addTest(new TestMultiRegionRegistration);
     // suite.addTest(new TestVectorWrite);
     suite.run();
     long errs = suite.report();
@@ -160,7 +168,6 @@ bool TestCaseApp::OnInit()
     TestCaseFrame *frame = new TestCaseFrame( NULL, -1, wxT("TestCases"), wxDefaultPosition, wxSize(450, 320));
     frame->Show( TRUE );
 
-    Logger::SetLogger(new DialogLogger());
     Logger::logInfo("Ready to test.");
 
     return TRUE;
