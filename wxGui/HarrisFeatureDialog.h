@@ -10,9 +10,9 @@
 #include "DoubleSlider.h"
 #include "RegistrationDesign_wdr.h"
 
-#include "../FeatureTrackingPipeline.h"
-#include "../FileSet.h"
-#include "../vtkView/VtkCanvas.h"
+#include "FeatureTrackingPipeline.h"
+#include "FileSet.h"
+#include "VtkCanvas.h"
 
 // WDR: class declarations
 

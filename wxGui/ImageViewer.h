@@ -2,17 +2,18 @@
 #include <wx/wxprec.h>
 #include "RegistrationDesign_wdr.h"
 #include "CLGOpticFlowDialog.h"
-#include "DialogLogger.h"
+#include "LoggerPanel.h"
 #include "FileSetDialog.h"
 #include "GlobalRegistrationDialog.h"
 #include "HarrisFeatureDialog.h"
-#include "../vtkView/VtkCanvas.h"
+#include "MultiResolutionRegistrationDialog.h"
+#include "VtkCanvas.h"
 
 
 static const wxChar *TITLE = _T("ImageTracker");
-static const wxChar *VERSION = _T("v 2.01");
+static const wxChar *VERSION = _T("v 2.02");
 static const wxChar *AUTHOR = _T("Brian Eastwood");
-static const wxChar *INFO = _T("(c) 2005");
+static const wxChar *INFO = _T("(c) 2005 - 2006");
 
 static const wxChar *FILETYPES = _T("PNG Files|*.png");
 static const wxChar *ITK_FILETYPES = _T("All Files|*.*|"
@@ -49,7 +50,7 @@ public:
     
     // WDR: method declarations for ImageViewer
     FileSetDialog* GetFileSetPanel()  { return (FileSetDialog*) FindWindow( IT_IMAGE_FILES ); }
-    LoggerDialog* GetLoggerPanel()  { return (LoggerDialog*) FindWindow( IT_LOGGER ); }
+    LoggerPanel* GetLoggerPanel()  { return (LoggerPanel*) FindWindow( IT_LOGGER ); }
     VtkCanvas* GetCanvas()  { return (VtkCanvas*) FindWindow( IT_CANVAS ); }
     
 private:
@@ -57,9 +58,12 @@ private:
     GlobalRegistrationDialog* registrationDialog;
     HarrisFeatureDialog* featureDialog;
     CLGOpticFlowDialog* clgFlowDialog;
+    MultiResolutionRegistrationDialog* mrRegistrationDialog;
     
 private:
     // WDR: handler declarations for ImageViewer
+    void OnLogging( wxCommandEvent &event );
+    void OnRegisterMultiResolution( wxCommandEvent &event );
     void OnCLGOpticFlow( wxCommandEvent &event );
     void OnTrack( wxCommandEvent &event );
     void OnImageScale( wxCommandEvent &event );

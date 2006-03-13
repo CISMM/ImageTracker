@@ -10,8 +10,8 @@
 #include "DoubleSlider.h"
 #include "RegistrationDesign_wdr.h"
 
-#include "../CLGOpticFlowPipeline.h"
-#include "../FileSet.h"
+#include "CLGOpticFlowPipeline.h"
+#include "FileSet.h"
 
 // WDR: class declarations
 

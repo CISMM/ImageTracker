@@ -34,8 +34,10 @@
 
 // Custom source
 #include "DoubleSlider.h"
-#include "../vtkView/VtkCanvas.h"
-#include "DialogLogger.h"
+#include "wxDoubleSlider.h"
+#include "wxIntSlider.h"
+#include "VtkCanvas.h"
+#include "LoggerPanel.h"
 #include "FileSetDialog.h"
 
 // Implement window functions
@@ -210,24 +212,6 @@ wxSizer *CreateFileSetDialog( wxWindow *parent, bool call_fit, bool set_sizer )
     return item0;
 }
 
-wxSizer *CreateLoggerDialog( wxWindow *parent, bool call_fit, bool set_sizer )
-{
-    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
-
-    wxTextCtrl *item1 = new wxTextCtrl( parent, LOG_MESSAGES, wxT(""), wxDefaultPosition, wxSize(300,150), wxTE_MULTILINE|wxTE_READONLY );
-    item1->SetToolTip( _("Logger messages") );
-    item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_VERTICAL, 5 );
-
-    if (set_sizer)
-    {
-        parent->SetSizer( item0 );
-        if (call_fit)
-            item0->SetSizeHints( parent );
-    }
-    
-    return item0;
-}
-
 wxSizer *CreateViewerDialog( wxWindow *parent, bool call_fit, bool set_sizer )
 {
     wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
@@ -385,7 +369,7 @@ wxSizer *CreateImageTrackerApp( wxWindow *parent, bool call_fit, bool set_sizer 
 
     item1->Add( item2, 1, wxGROW|wxALL, 0 );
 
-    LoggerDialog *item7 = new LoggerDialog( parent, IT_LOGGER, wxDefaultPosition, wxSize(200,100), 0 );
+    LoggerPanel *item7 = new LoggerPanel( parent, IT_LOGGER, wxDefaultPosition, wxSize(200,100), 0 );
     item1->Add( item7, 1, wxGROW|wxALIGN_BOTTOM|wxALL, 5 );
 
     item0->Add( item1, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 0 );
@@ -508,15 +492,162 @@ wxSizer *CreateCLGOpticFlowDialog( wxWindow *parent, bool call_fit, bool set_siz
     return item0;
 }
 
-wxSizer *MyDialogFunc( wxWindow *parent, bool call_fit, bool set_sizer )
+wxSizer *CreateMultiResolutionRegistrationDialog( wxWindow *parent, bool call_fit, bool set_sizer )
 {
     wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
 
-    wxSlider *item1 = new wxSlider( parent, ID_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(100,-1), wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS );
-    item0->Add( item1, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+    wxFlexGridSizer *item1 = new wxFlexGridSizer( 1, 0, 0 );
+    item1->AddGrowableCol( 1 );
 
-    wxSlider *item2 = new wxSlider( parent, ID_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(100,-1), 0 );
-    item0->Add( item2, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+    wxStaticBox *item3 = new wxStaticBox( parent, -1, _("Threshold") );
+    wxStaticBoxSizer *item2 = new wxStaticBoxSizer( item3, wxHORIZONTAL );
+
+    wxFlexGridSizer *item4 = new wxFlexGridSizer( 2, 0, 0 );
+    item4->AddGrowableCol( 1 );
+
+    wxCheckBox *item5 = new wxCheckBox( parent, MR_CHECK_ABOVE, _("Above"), wxDefaultPosition, wxSize(80,-1), 0 );
+    item4->Add( item5, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    wxIntSlider *item6 = new wxIntSlider( parent, MR_SLIDER_ABOVE, wxDefaultPosition, wxSize(200,-1), 0 );
+    item4->Add( item6, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    wxCheckBox *item7 = new wxCheckBox( parent, MR_CHECK_BELOW, _("Below"), wxDefaultPosition, wxSize(80,-1), 0 );
+    item7->SetValue( TRUE );
+    item4->Add( item7, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    wxIntSlider *item8 = new wxIntSlider( parent, MR_SLIDER_BELOW, wxDefaultPosition, wxSize(200,-1), 0 );
+    item4->Add( item8, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    item2->Add( item4, 1, wxALIGN_CENTER|wxALL, 5 );
+
+    item1->Add( item2, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    wxStaticBox *item10 = new wxStaticBox( parent, -1, _("Image Pyramid") );
+    wxStaticBoxSizer *item9 = new wxStaticBoxSizer( item10, wxHORIZONTAL );
+
+    wxFlexGridSizer *item11 = new wxFlexGridSizer( 2, 0, 0 );
+    item11->AddGrowableCol( 1 );
+
+    wxStaticText *item12 = new wxStaticText( parent, ID_TEXT, 
+        _("Number of\n"
+          "Levels"),
+        wxDefaultPosition, wxSize(80,-1), 0 );
+    item11->Add( item12, 0, wxALIGN_CENTER|wxALL, 5 );
+
+    wxIntSlider *item13 = new wxIntSlider( parent, MR_SLIDER_LEVELS, wxDefaultPosition, wxSize(200,-1), 0 );
+    item11->Add( item13, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    wxStaticText *item14 = new wxStaticText( parent, ID_TEXT, 
+        _("Initial Shrink\n"
+          "Factor"),
+        wxDefaultPosition, wxSize(80,-1), 0 );
+    item11->Add( item14, 0, wxALIGN_CENTER|wxALL, 5 );
+
+    wxIntSlider *item15 = new wxIntSlider( parent, MR_SLIDER_SHRINK, wxDefaultPosition, wxSize(200,-1), 0 );
+    item11->Add( item15, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    item9->Add( item11, 1, wxALIGN_CENTER|wxALL, 5 );
+
+    item1->Add( item9, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    wxStaticBox *item17 = new wxStaticBox( parent, -1, _("Optimizer") );
+    wxStaticBoxSizer *item16 = new wxStaticBoxSizer( item17, wxHORIZONTAL );
+
+    wxFlexGridSizer *item18 = new wxFlexGridSizer( 2, 0, 0 );
+    item18->AddGrowableCol( 1 );
+
+    wxStaticText *item19 = new wxStaticText( parent, ID_TEXT, 
+        _("Number of\n"
+          "Iterations"),
+        wxDefaultPosition, wxSize(80,-1), 0 );
+    item18->Add( item19, 0, wxALIGN_CENTER|wxALL, 5 );
+
+    wxIntSlider *item20 = new wxIntSlider( parent, MR_SLIDER_ITERATIONS, wxDefaultPosition, wxSize(200,-1), 0 );
+    item18->Add( item20, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    wxStaticText *item21 = new wxStaticText( parent, ID_TEXT, 
+        _("Initial Maximum\n"
+          "Step Length"),
+        wxDefaultPosition, wxSize(80,-1), 0 );
+    item18->Add( item21, 0, wxALIGN_CENTER|wxALL, 5 );
+
+    wxDoubleSlider *item22 = new wxDoubleSlider( parent, MR_SLIDER_MAXSTEP, wxDefaultPosition, wxSize(200,-1), 0 );
+    item18->Add( item22, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    wxStaticText *item23 = new wxStaticText( parent, ID_TEXT, 
+        _("Initial Minimum\n"
+          "Step Length"),
+        wxDefaultPosition, wxSize(80,-1), 0 );
+    item18->Add( item23, 0, wxALIGN_CENTER|wxALL, 5 );
+
+    wxDoubleSlider *item24 = new wxDoubleSlider( parent, MR_SLIDER_MINSTEP, wxDefaultPosition, wxSize(200,-1), 0 );
+    item18->Add( item24, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    wxStaticText *item25 = new wxStaticText( parent, ID_TEXT, 
+        _("Inter-step\n"
+          "Scale"),
+        wxDefaultPosition, wxSize(80,-1), 0 );
+    item18->Add( item25, 0, wxALIGN_CENTER|wxALL, 5 );
+
+    wxDoubleSlider *item26 = new wxDoubleSlider( parent, MR_SLIDER_SCALE, wxDefaultPosition, wxDefaultSize, 0 );
+    item18->Add( item26, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    item16->Add( item18, 1, wxALIGN_CENTER|wxALL, 5 );
+
+    item1->Add( item16, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    wxStaticBox *item28 = new wxStaticBox( parent, -1, _("Output") );
+    wxStaticBoxSizer *item27 = new wxStaticBoxSizer( item28, wxHORIZONTAL );
+
+    wxFlexGridSizer *item29 = new wxFlexGridSizer( 3, 0, 0 );
+    item29->AddGrowableCol( 1 );
+
+    wxStaticText *item30 = new wxStaticText( parent, ID_TEXT, _("Transforms"), wxDefaultPosition, wxSize(80,-1), 0 );
+    item29->Add( item30, 0, wxALIGN_CENTER|wxALL, 5 );
+
+    wxTextCtrl *item31 = new wxTextCtrl( parent, MR_TEXT_TRANSFORM, wxT(""), wxDefaultPosition, wxSize(200,-1), 0 );
+    item29->Add( item31, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    wxButton *item32 = new wxButton( parent, MR_TRANSFORM_FILE, _("File"), wxDefaultPosition, wxDefaultSize, 0 );
+    item32->SetToolTip( _("Select the transform file") );
+    item29->Add( item32, 0, wxALIGN_CENTER|wxALL, 5 );
+
+    wxStaticText *item33 = new wxStaticText( parent, ID_TEXT, _("Images"), wxDefaultPosition, wxSize(80,-1), 0 );
+    item29->Add( item33, 0, wxALIGN_CENTER|wxALL, 5 );
+
+    wxTextCtrl *item34 = new wxTextCtrl( parent, MR_TEXT_OUTDIR, wxT(""), wxDefaultPosition, wxDefaultSize, 0 );
+    item29->Add( item34, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    wxButton *item35 = new wxButton( parent, MR_OUT_DIRECTORY, _("Directory"), wxDefaultPosition, wxDefaultSize, 0 );
+    item35->SetToolTip( _("Select the image output directory") );
+    item29->Add( item35, 0, wxALIGN_CENTER|wxALL, 5 );
+
+    wxStaticText *item36 = new wxStaticText( parent, ID_TEXT, _("Prefix"), wxDefaultPosition, wxSize(80,-1), 0 );
+    item29->Add( item36, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    wxTextCtrl *item37 = new wxTextCtrl( parent, MR_TEXT_PREFIX, wxT(""), wxDefaultPosition, wxDefaultSize, 0 );
+    item37->SetToolTip( _("The prefix to prepend to all image file names") );
+    item29->Add( item37, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    item29->Add( 20, 20, 0, wxALIGN_CENTER|wxALL, 5 );
+
+    item27->Add( item29, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    item1->Add( item27, 1, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+    item0->Add( item1, 0, wxALIGN_CENTER|wxALL, 5 );
+
+    wxBoxSizer *item38 = new wxBoxSizer( wxHORIZONTAL );
+
+    wxButton *item39 = new wxButton( parent, MR_BUTTON_RUN, _("&Run"), wxDefaultPosition, wxDefaultSize, 0 );
+    item39->SetToolTip( _("Run the registration on all images") );
+    item38->Add( item39, 0, wxALIGN_CENTER|wxALL, 5 );
+
+    wxButton *item40 = new wxButton( parent, MR_BUTTON_HIDE, _("Hide"), wxDefaultPosition, wxDefaultSize, 0 );
+    item40->SetToolTip( _("Hide this dialog") );
+    item38->Add( item40, 0, wxALIGN_CENTER|wxALL, 5 );
+
+    item0->Add( item38, 0, wxALIGN_CENTER|wxALL, 5 );
 
     if (set_sizer)
     {
@@ -541,18 +672,32 @@ wxMenuBar *CreateViewerMenu()
     item0->Append( item1, _("&File") );
     
     wxMenu* item2 = new wxMenu;
-    item2->Append( IV_REGISTER, _("&Register"), _("Align a sequence of image files") );
     
     wxMenu* item3 = new wxMenu;
-    item3->Append( IV_TRACK, _("&Track Features"), _("Track features in a sequence of images") );
-    item3->Append( IV_CLGOpticFlow, _("&Combined Local Global"), _("Compute optic flow using an iterative local and global algorithm") );
-    item2->Append( ID_MENU, _("&Optic Flow"), item3 );
+    item3->Append( IV_REGISTER, _("&Single Resolution"), _("Align a sequence of image files using one smoothing scale") );
+    item3->Append( IV_MULTI_RES, _("&Multiple Resolution"), _("Align a sequence of images using multi-resolution image pyramids") );
+    item2->Append( ID_MENU, _("&Registration"), item3 );
+
+    
+    wxMenu* item4 = new wxMenu;
+    item4->Append( IV_TRACK, _("&Track Features"), _("Track features in a sequence of images") );
+    item4->Append( IV_CLGOpticFlow, _("&Combined Local Global"), _("Compute optic flow using an iterative local and global algorithm") );
+    item2->Append( ID_MENU, _("&Optic Flow"), item4 );
 
     item0->Append( item2, _("&Actions") );
     
-    wxMenu* item4 = new wxMenu;
-    item4->Append( IV_ABOUT, _("A&bout"), _("About this application") );
-    item0->Append( item4, _("&Help") );
+    wxMenu* item5 = new wxMenu;
+    item5->Append( IV_ABOUT, _("A&bout"), _("About this application") );
+    
+    wxMenu* item6 = new wxMenu;
+    item6->Append( IV_LOG_ERROR, _("&Error"), wxT(""), wxITEM_RADIO );
+    item6->Append( IV_LOG_WARN, _("&Warning"), wxT(""), wxITEM_RADIO );
+    item6->Append( IV_LOG_INFO, _("&Information"), wxT(""), wxITEM_RADIO );
+    item6->Append( IV_LOG_DEBUG, _("&Debug"), wxT(""), wxITEM_RADIO );
+    item6->Append( IV_LOG_VERBOSE, _("&Verbose"), wxT(""), wxITEM_RADIO );
+    item5->Append( IV_LOGGING, _("&Logging"), item6 );
+
+    item0->Append( item5, _("&Help") );
     
     return item0;
 }

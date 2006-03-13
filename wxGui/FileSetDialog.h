@@ -2,8 +2,8 @@
 #include <vector>
 #include <wx/wxprec.h>
 #include "RegistrationDesign_wdr.h"
-#include "../vtkView/VtkCanvas.h"
-#include "../FileSet.h"
+#include "VtkCanvas.h"
+#include "FileSet.h"
 
 
 /* todo Consoldiate constants in one file? */

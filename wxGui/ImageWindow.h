@@ -9,10 +9,10 @@
 #include <wx/wxprec.h>
 #include <vector>
 
-#include "ImageCanvas.h"
-#include "../CommonTypes.h"
-#include "../Logger.h"
-#include "RegistrationDesign_wdr.h"
+#include "VtkCanvas.h"
+#include "CommonTypes.h"
+#include "Logger.h"
+#include "vtkViewer_wdr.h"
 
 // WDR: class declarations
 
@@ -31,7 +31,7 @@ public:
     virtual ~ImageWindow();
     
     // WDR: method declarations for ImageWindow
-    ImageCanvas* GetImageCanvas()  { return (ImageCanvas*) FindWindow( ID_SCROLLED ); }
+    VtkCanvas* GetImageCanvas()  { return (VtkCanvas*) FindWindow( ID_CANVAS ); }
 
     static void ImShow(CommonTypes::InternalImageType::Pointer image);
     static void ImShow(CommonTypes::InternalImageType::Pointer image, std::string title);

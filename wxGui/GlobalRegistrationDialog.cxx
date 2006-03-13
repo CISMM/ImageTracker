@@ -42,7 +42,7 @@ void GlobalRegistrationDialog::InitializeDialog()
     this->GetSliderBelow()->SetValue(0);
     this->GetSliderSmooth()->SetValue(1.0);
 
-    this->GetTextPrefix()->SetValue("Reg-");
+    this->GetTextPrefix()->SetValue("SRReg-");
 }
 
 void GlobalRegistrationDialog::UpdateDialog()
@@ -89,7 +89,7 @@ void GlobalRegistrationDialog::InitializeOutput()
 {
     wxString out(this->GetPipeline()->GetInput()->GetDirectory().c_str());
     this->GetTextOutdir()->SetValue(out);
-    this->GetTextTransform()->SetValue(out.append("Transforms.txt"));
+    this->GetTextTransform()->SetValue(out.append("SRTransforms.txt"));
 }
 
 void GlobalRegistrationDialog::SetCanvas(VtkCanvas *canvas)

@@ -57,55 +57,75 @@ const int FSD_ADD = 10022;
 const int FSD_REMOVE = 10023;
 wxSizer *CreateFileSetDialog( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
-const int LOG_MESSAGES = 10024;
-wxSizer *CreateLoggerDialog( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
-
-const int IV_CANVAS = 10025;
+const int IV_CANVAS = 10024;
 wxSizer *CreateViewerDialog( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
-const int ID_TEXT_COUNT = 10026;
-const int ID_SLIDER_COUNT = 10027;
-const int ID_TEXT_SCALE = 10028;
-const int ID_SLIDER_SCALE = 10029;
-const int ID_TEXT_DISTANCE = 10030;
-const int ID_SLIDER_DISTANCE = 10031;
-const int ID_TEXT_IMAGE_DIR = 10032;
-const int ID_BUTTON_DIRECTORY = 10033;
-const int ID_BUTTON_RUN = 10034;
-const int ID_BUTTON_HIDE = 10035;
+const int ID_TEXT_COUNT = 10025;
+const int ID_SLIDER_COUNT = 10026;
+const int ID_TEXT_SCALE = 10027;
+const int ID_SLIDER_SCALE = 10028;
+const int ID_TEXT_DISTANCE = 10029;
+const int ID_SLIDER_DISTANCE = 10030;
+const int ID_TEXT_IMAGE_DIR = 10031;
+const int ID_BUTTON_DIRECTORY = 10032;
+const int ID_BUTTON_RUN = 10033;
+const int ID_BUTTON_HIDE = 10034;
 wxSizer *CreateHLTrackerDialog( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
-const int IT_IMAGE_FILES = 10036;
-const int ID_PANEL = 10037;
-const int IT_CANVAS = 10038;
-const int IT_LOGGER = 10039;
+const int IT_IMAGE_FILES = 10035;
+const int ID_PANEL = 10036;
+const int IT_CANVAS = 10037;
+const int IT_LOGGER = 10038;
 wxSizer *CreateImageTrackerApp( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
-const int ID_TEXT_SIGMA = 10040;
-const int ID_SLIDER_SIGMA = 10041;
-const int ID_TEXT_REGULARIZATION = 10042;
-const int ID_SLIDER_REGULARIZATION = 10043;
-const int ID_TEXT_RELAXATION = 10044;
-const int ID_SLIDER_RELAXATION = 10045;
-const int ID_TEXT_ITERATIONS = 10046;
-const int ID_SLIDER_ITERATIONS = 10047;
+const int ID_TEXT_SIGMA = 10039;
+const int ID_SLIDER_SIGMA = 10040;
+const int ID_TEXT_REGULARIZATION = 10041;
+const int ID_SLIDER_REGULARIZATION = 10042;
+const int ID_TEXT_RELAXATION = 10043;
+const int ID_SLIDER_RELAXATION = 10044;
+const int ID_TEXT_ITERATIONS = 10045;
+const int ID_SLIDER_ITERATIONS = 10046;
 wxSizer *CreateCLGOpticFlowDialog( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
-const int ID_SLIDER = 10048;
-wxSizer *MyDialogFunc( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
+const int MR_CHECK_ABOVE = 10047;
+const int MR_SLIDER_ABOVE = 10048;
+const int MR_CHECK_BELOW = 10049;
+const int MR_SLIDER_BELOW = 10050;
+const int MR_SLIDER_LEVELS = 10051;
+const int MR_SLIDER_SHRINK = 10052;
+const int MR_SLIDER_ITERATIONS = 10053;
+const int MR_SLIDER_MAXSTEP = 10054;
+const int MR_SLIDER_MINSTEP = 10055;
+const int MR_SLIDER_SCALE = 10056;
+const int MR_TEXT_TRANSFORM = 10057;
+const int MR_TRANSFORM_FILE = 10058;
+const int MR_TEXT_OUTDIR = 10059;
+const int MR_OUT_DIRECTORY = 10060;
+const int MR_TEXT_PREFIX = 10061;
+const int MR_BUTTON_RUN = 10062;
+const int MR_BUTTON_HIDE = 10063;
+wxSizer *CreateMultiResolutionRegistrationDialog( wxWindow *parent, bool call_fit = TRUE, bool set_sizer = TRUE );
 
 // Declare menubar functions
 
-const int IV_MENU_FILE = 10049;
-const int IV_FILES = 10050;
-const int ID_MENU = 10051;
-const int IV_EXIT = 10052;
-const int IV_MENU_ACTIONS = 10053;
-const int IV_REGISTER = 10054;
-const int IV_TRACK = 10055;
-const int IV_CLGOpticFlow = 10056;
-const int IV_MENU_HELP = 10057;
-const int IV_ABOUT = 10058;
+const int IV_MENU_FILE = 10064;
+const int IV_FILES = 10065;
+const int ID_MENU = 10066;
+const int IV_EXIT = 10067;
+const int IV_MENU_ACTIONS = 10068;
+const int IV_REGISTER = 10069;
+const int IV_MULTI_RES = 10070;
+const int IV_TRACK = 10071;
+const int IV_CLGOpticFlow = 10072;
+const int IV_MENU_HELP = 10073;
+const int IV_ABOUT = 10074;
+const int IV_LOGGING = 10075;
+const int IV_LOG_ERROR = 10076;
+const int IV_LOG_WARN = 10077;
+const int IV_LOG_INFO = 10078;
+const int IV_LOG_DEBUG = 10079;
+const int IV_LOG_VERBOSE = 10080;
 wxMenuBar *CreateViewerMenu();
 
 // Declare toolbar functions
