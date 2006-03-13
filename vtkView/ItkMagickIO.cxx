@@ -1,6 +1,12 @@
 #include ".\ItkMagickIO.h"
 
 #include <Magick++.h>
+
+// We need constitute.h to define pixel types, and apparently it
+// doesn't get sucked in by Magick++.  Also, we need to
+// specify the directory due to the way Magick++ expects the
+// include directory to be set up.
+#include "magick/constitute.h"
 #include "../Logger.h"
 
 // Make sure we initialize ImageMagick the first time through
@@ -31,6 +37,11 @@ ItkMagickIO::InternalImageType::Pointer ItkMagickIO::Read(std::string filename)
         return NULL;
     }
 
+	Logger::verbose << "RGB Channel Depth: " << 
+		image.channelDepth(Magick::RedChannel) << ", " <<
+		image.channelDepth(Magick::GreenChannel) << ", " <<
+		image.channelDepth(Magick::BlueChannel) << std::endl;
+
     // Convert image data.  Based on ItkSoftwareGuide:
     // II. User's Guide / Data Representation / Image / 
     // Importing Image Data from a Buffer
@@ -53,14 +64,6 @@ ItkMagickIO::InternalImageType::Pointer ItkMagickIO::Read(std::string filename)
     origin.Fill(0.0);
     spacing.Fill(1.0);
 
-    //double origin[Dimension];
-    //double spacing[Dimension];
-    //for (int d = 0; d < Dimension; d++)
-    //{
-    //    origin[d] = 0.0;
-    //    spacing[d] = 1.0;
-    //}
-
     // Import filter
     this->importer = ImportType::New();    
     this->importer->SetRegion(region);
@@ -68,7 +71,7 @@ ItkMagickIO::InternalImageType::Pointer ItkMagickIO::Read(std::string filename)
     this->importer->SetSpacing(spacing);
 
     // Use a caster to convert from Magick pixels to our internal pixels
-    this->caster = CasterType::New();
+    this->caster = ImportCasterType::New();
     this->caster->SetInput(importer->GetOutput());
 
     // Read pixel buffer from Magick image
@@ -82,9 +85,6 @@ ItkMagickIO::InternalImageType::Pointer ItkMagickIO::Read(std::string filename)
         Logger::logError("ItkMagickIO::Read: Unable to obtain ImageMagick pixel cache.");
         return NULL;
     }
-    
-    double third = 1.0/3.0;
-    // long min = 1 << 16, max = 0;
 
     int shift = 0;
     // Check to see if all image data is in the high side of each byte
@@ -101,9 +101,15 @@ ItkMagickIO::InternalImageType::Pointer ItkMagickIO::Read(std::string filename)
     }
     
     // Import buffer into itk
-    // ITK will handle buffer memory
+    // ITK will handle buffer memory (last parameter = true)
     this->importer->SetImportPointer(buffer, pixelCount, true);
     this->caster->Update();
+
+	StatisticsType::Pointer stats = StatisticsType::New();
+	stats->SetInput(this->importer->GetOutput());
+	stats->Update();
+	Logger::verbose << "ItkMagickIO::Read() min: " << stats->GetMinimum() << std::endl;
+	Logger::verbose << "ItkMagickIO::Read() max: " << stats->GetMaximum() << std::endl;
 
     return this->caster->GetOutput();
 }
@@ -111,5 +117,128 @@ ItkMagickIO::InternalImageType::Pointer ItkMagickIO::Read(std::string filename)
 
 void ItkMagickIO::Write(std::string filename, InternalImageType::Pointer itkImage)
 {
-    return;
+    // Initialize ImageMagick, if needed
+    ItkMagickIO::Initialize("");
+
+	typedef itk::StatisticsImageFilter<InternalImageType> InternalStatsType;
+	InternalStatsType::Pointer internal = InternalStatsType::New();
+	internal->SetInput(itkImage);
+	internal->Update();
+	Logger::verbose << "Minimum (float): " << internal->GetMinimum() << std::endl;
+	Logger::verbose << "Maximum (float): " << internal->GetMaximum() << std::endl;
+
+	// Cast the given image to the Magick image type
+	ExportCasterType::Pointer caster = ExportCasterType::New();
+	StatisticsType::Pointer stats = StatisticsType::New();
+	caster->SetInput(itkImage);
+	stats->SetInput(caster->GetOutput());
+	stats->Update();
+
+	Logger::verbose << "ItkMagickIO::Write() min:\t" << stats->GetMinimum() << std::endl;
+	Logger::verbose << "ItkMagickIO::Write() max:\t" << stats->GetMaximum() << std::endl;
+
+	// Retrieve information about the image
+	InternalImageType::RegionType region = caster->GetOutput()->GetBufferedRegion();
+	InternalImageType::SizeType size = region.GetSize();
+
+	// Retrieve image data buffer
+	MagickImageType::PixelContainer* container = caster->GetOutput()->GetPixelContainer();
+	container->SetContainerManageMemory(false);
+	MagickPixelType* buffer = container->GetImportPointer();
+
+	// Create an ImageMagick image of the appropriate size
+	char geometry[40];
+	sprintf(geometry, "%dx%d", size[0], size[1]);
+	Logger::debug << "Creating Magick::Image of size: " << geometry << std::endl;
+	Magick::Image image(geometry, "black");
+	image.type(Magick::GrayscaleType);
+	Logger::verbose << "RGB Channel Depth: " << 
+		image.channelDepth(Magick::RedChannel) << ", " <<
+		image.channelDepth(Magick::GreenChannel) << ", " <<
+		image.channelDepth(Magick::BlueChannel) << std::endl;
+
+	// Grab the pixel packet from the ImageMagick image
+	Magick::PixelPacket* packet = image.getPixels(0, 0, size[0], size[1]);
+	if (!packet)
+	{
+		Logger::logError("ItkMagickIO::Write(): Unable to obtain ImageMagick pixel cache.");
+		return;
+	}
+
+    // Copy image data from buffer to Magick packet
+    const unsigned int pixelCount = size[0] * size[1];
+	unsigned short min = buffer[0] << 8;
+	unsigned short max = buffer[0] << 8;
+	for (int idx = 0; idx < pixelCount; idx++)
+    {
+		packet[idx].red = 
+			packet[idx].green =
+			packet[idx].blue =
+			buffer[idx];
+		min = packet[idx].red < min ? packet[idx].red : min;
+		max = packet[idx].red > max ? packet[idx].red : max;
+    }
+
+	// Synchronize pixels updates the underlying image
+	image.syncPixels();
+	Logger::verbose << "Magick min:\t" << min << std::endl;
+	Logger::verbose << "Magick max:\t" << max << std::endl;
+
+	Logger::verbose << "RGB Channel Depth: " << 
+		image.channelDepth(Magick::RedChannel) << ", " <<
+		image.channelDepth(Magick::GreenChannel) << ", " <<
+		image.channelDepth(Magick::BlueChannel) << std::endl;
+
+	// Write image
+	image.write(filename);
+
+	// Keeping all this for now--this is how you might try to save
+	// an ImageMagick image if you read their documentation.  Each
+	// run through an 8 bit image reduces the image range--the data
+	// are shifted slightly higher, I think when the image is
+	// quantized as grayscale.  Messed up.
+
+	//// We have to shift the data from ITK's low-order structure to ImageMagick's
+	//// default high-order structure.
+	//if (stats->GetMaximum() <= 255)
+	//{
+	//	unsigned short min = buffer[0] << 8;
+	//	unsigned short max = buffer[0] << 8;
+
+	//	for (int i = 0; i < size[0] * size[1]; i++)
+	//	{
+	//		buffer[i] = buffer[i] << 8;
+	//		min = buffer[i] < min ? buffer[i] : min;
+	//		max = buffer[i] > max ? buffer[i] : max;
+	//	}
+	//	Logger::debug << "post-shift min:\t" << min << std::endl;
+	//	Logger::debug << "post-shift max:\t" << max << std::endl;
+	//}
+
+	//// Create a new ImageMagick image
+	//Magick::Image image(size[0], size[1], "R", Magick::ShortPixel, buffer);
+
+	//Logger::debug << "RGB Channel Depth: " << 
+	//	image.channelDepth(Magick::RedChannel) << ", " <<
+	//	image.channelDepth(Magick::GreenChannel) << ", " <<
+	//	image.channelDepth(Magick::BlueChannel) << std::endl;
+
+	//image.type(Magick::GrayscaleType);
+	//Logger::debug << "RGB Channel Depth: " << 
+	//	image.channelDepth(Magick::RedChannel) << ", " <<
+	//	image.channelDepth(Magick::GreenChannel) << ", " <<
+	//	image.channelDepth(Magick::BlueChannel) << std::endl;
+
+	//if (stats->GetMaximum() <= 255)
+	//{
+	//	image.depth(8);
+	//	image.channelDepth(Magick::RedChannel, 8);
+	//	image.channelDepth(Magick::GreenChannel, 8);
+	//	image.channelDepth(Magick::BlueChannel, 8);
+	//}
+
+	//Logger::debug << "RGB Channel Depth: " << 
+	//	image.channelDepth(Magick::RedChannel) << ", " <<
+	//	image.channelDepth(Magick::GreenChannel) << ", " <<
+	//	image.channelDepth(Magick::BlueChannel) << std::endl;
 }

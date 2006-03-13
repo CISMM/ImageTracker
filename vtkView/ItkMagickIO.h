@@ -5,7 +5,8 @@
 #include "itkImage.h"
 #include "itkImportImageFilter.h"
 #include "itkLightObject.h"
-#include "../CommonTypes.h"
+#include "itkStatisticsImageFilter.h"
+#include "CommonTypes.h"
 
 /*
  * ItkMagickIO provides ITK image reading and writing through 
@@ -26,13 +27,16 @@ public:
     typedef itk::SmartPointer<const Self> ConstPointer;
 
     itkNewMacro(Self);
+	itkTypeMacro(ItkMagickIO, LightObject);
 
     typedef CommonTypes::InternalImageType InternalImageType;
     typedef unsigned short MagickPixelType; // for 16 bit image data
     enum {Dimension = CommonTypes::Dimension};
     typedef itk::Image<MagickPixelType, Dimension> MagickImageType;
     typedef itk::ImportImageFilter<MagickPixelType, Dimension> ImportType;
-    typedef itk::CastImageFilter<MagickImageType, InternalImageType> CasterType;
+    typedef itk::CastImageFilter<MagickImageType, InternalImageType> ImportCasterType;
+	typedef itk::CastImageFilter<InternalImageType, MagickImageType> ExportCasterType;
+	typedef itk::StatisticsImageFilter<MagickImageType> StatisticsType;
 
     /*
      * Read image data from a file using ImageMagick (which has good
@@ -65,5 +69,5 @@ private:
     static void Initialize(const char* magickDir);
 
     ImportType::Pointer importer;
-    CasterType::Pointer caster;
+    ImportCasterType::Pointer caster;
 };

@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "ImageWindow.h"
-#include "../Logger.h"
+#include "Logger.h"
 
 // WDR: class implementations
 

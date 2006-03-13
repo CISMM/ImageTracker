@@ -30,7 +30,7 @@ IF (WIN32)
 	ELSE (MAGICK_FROM_NSRG) # assume from source
 		# Find the program
 		SET (MAGICK_POSSIBLE_ROOT_PATHS
-			"C:\\ImageMagick-6.2.3" )
+			"C:\\ImageMagick-6.2.5" )
 
 		# Find root directory
 		FIND_PATH (MAGICK_ROOT_DIR magick\\magick.h
@@ -38,7 +38,7 @@ IF (WIN32)
 
 		# Find include files
 		FIND_PATH (MAGICK_INC_DIR magick\\magick.h
-			${MAGICK_ROOT_DIR} )
+			${MAGICK_ROOT_DIR})
 			
 		# Find Magick++ include files
 		FIND_PATH (MAGICKPP_INC_DIR	Magick++.h
