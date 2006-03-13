@@ -19,7 +19,7 @@
 		<a href="index.html" class="gutter-text">Home</a><br>
 		<a href="download.html" class="gutter-text">Download</a><br>
 		<a href="manual.html" class="gutter-text">Manual</a><br>
-		<a href="building.html" class="gutter-text">Building</a><br>		
+		<a href="building.html" class="gutter-text">Building</a><br>
 		<a href="about.html" class="gutter-text">About</a><br>
 	</p>
 	</td>
@@ -41,7 +41,7 @@
 		  <tr>
 		    <td>&nbsp;</td>
 		    <td><p class="section">CMAKE</p>
-		      <p>CMAKE is a cross-platform, compiler-independent make system. It is available from Kitware at <a href="http://www.cmake.org">www.cmake.org</a>. Download and install the latest stable release for Windows.</p>		      
+		      <p>CMAKE is a cross-platform, compiler-independent make system. It is available from Kitware at <a href="http://www.cmake.org">www.cmake.org</a>. Download and install the latest stable release for Windows.</p>
 		      </td>
 		    <td>&nbsp;</td>
 		    <td>&nbsp;</td>
@@ -57,6 +57,7 @@
 	          <li>Set &quot;TIFF_LIBRARY&quot; to the static ImageMagick tiff library (e.g. C:\ImageMagick-6.2.3\VisualMagick\lib\CORE_RL_tiff_.lib)</li>
 	          <li>Press &quot;Configure&quot; and &quot;OK&quot; to build the Visual Studio project file</li>
 	          </ul>
+	        <p class="warning">Note: the above steps are not needed for ITK 2.4.1 and up.</p>
 	        <p>Build &quot;Debug&quot; (if you plan to do any development) and &quot;Release&quot; versions of the ITK solution. </p></td>
 		    <td>&nbsp;</td>
 		    <td>&nbsp;</td>
@@ -71,7 +72,11 @@
 		  <tr>
 		    <td>&nbsp;</td>
 		    <td><p class="section">wxWidgets</p>
-	        <p>wxWidgets is a platform-independent graphical user interface (GUI) development library. Download and install the latest stable MSW version from <a href="http://www.wxWidgets.org">www.wxwidgets.org</a>. Build the wxWindows.dsw project (after converting to a .NET solution). Build both a &quot;Debug&quot; and &quot;Release&quot; version.</p></td>
+	        <p>wxWidgets is a platform-independent graphical user interface (GUI) development library. Download and install the latest stable MSW version from <a href="http://www.wxWidgets.org">www.wxwidgets.org</a>. ImageTracker uses a feature of wxWidgets that is disabled by default.  Open <em>both</em> versions of setup.h (/wxWidgets-2.6.2/lib/msw/wx/setup.h and /wxWidgets-2.6.2/lib/mswd/wx/setup.h) and find the line:</p>
+	        <p><code>
+	        #define wxUSE_STD_IOSTREAM 0
+	        </code></p>
+	        <p>Change the 0 to 1 to enable standard C++ streams.  Build the wxWindows.dsw project (after converting to a .NET solution). Build both a &quot;Debug&quot; and &quot;Release&quot; version.</p></td>
 		    <td>&nbsp;</td>
 		    <td>&nbsp;</td>
 	      </tr>
