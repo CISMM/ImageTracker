@@ -1,113 +1,41 @@
-#include ".\Logger.h"
+#include "Logger.h"
 
-Logger* Logger::s_instance = (Logger *) NULL;
-int Logger::s_level = LOG_LEVEL;
+LogLevel Logger::level(All);
+LogStream Logger::error(Error);
+LogStream Logger::warning(Warning);
+LogStream Logger::info(Info);
+LogStream Logger::debug(Debug);
+LogStream Logger::verbose(Verbose);
+StreamRedirector* Logger::redirector = NULL;
 
-Logger::Logger(int level)
+void Logger::logError(const std::string msg) { Logger::error << "ERROR:   " << msg << std::endl; }
+void Logger::logWarning(const std::string msg) { Logger::warning << "WARN:    " << msg << std::endl; }
+void Logger::logWarn(const std::string msg) { Logger::warning << "WARN:    " << msg << std::endl; }
+void Logger::logInfo(const std::string msg) { Logger::info << "INFO:    " << msg << std::endl; }
+void Logger::logDebug(const std::string msg) { Logger::debug << "DEBUG:   " << msg << std::endl; }
+void Logger::logVerbose(const std::string msg) { Logger::verbose << "VERBOSE: " << msg << std::endl; }
+
+Logger::Logger()
 {
-    this->theLogger = new StreamLogger();
-    Logger::setLevel(level);
 }
 
-Logger::~Logger(void)
+Logger::~Logger()
 {
-    if (this->theLogger)
-        delete theLogger;
+    if (Logger::redirector)
+        delete Logger::redirector;
 }
 
-void Logger::Destroy()
+void Logger::redirect(std::ostream& target)
 {
-    if (Logger::s_instance)
-    {
-        delete Logger::s_instance;
-        Logger::s_instance = NULL;
-    }
+    if (!Logger::redirector)
+        Logger::redirector = new StreamRedirector(std::cout, target);
+    else
+        Logger::redirector->setTarget(target);
 }
 
-Logger* Logger::Instance()
+void Logger::undirect()
 {
-    if (Logger::s_instance == NULL)
-    {
-        Logger::s_instance = new Logger();
-    }
-
-    return s_instance;
-}
-
-void Logger::SetLogger(ILog* logger)
-{
-    Logger::Instance()->SetILog(logger);
-}
-
-ILog* Logger::GetILog()
-{
-    return this->theLogger;
-}
-
-void Logger::SetILog(ILog* logger)
-{
-    ILog* old = this->theLogger;
-    this->theLogger = logger;
-    delete old;
-}
-
-void Logger::logVerbose(const std::string &msg)
-{
-    Logger::Instance()->theLogger->logVerbose(msg);
-}
-
-void Logger::logInfo(const std::string &msg)
-{
-    Logger::Instance()->theLogger->logInfo(msg);
-}
-
-void Logger::logDebug(const std::string &msg)
-{
-    Logger::Instance()->theLogger->logDebug(msg);
-}
-
-void Logger::logWarn(const std::string &msg)
-{
-    Logger::Instance()->theLogger->logWarn(msg);
-}
-
-void Logger::logError(const std::string &msg)
-{
-    Logger::Instance()->theLogger->logError(msg);
-}
-
-void Logger::setLevel(int level)
-{
-    Logger::s_level = level;
-}
-
-int Logger::getLevel()
-{
-    return Logger::s_level;
-}
-
-bool Logger::isVisible()
-{
-    return Logger::Instance()->theLogger->isVisible();
-}
-
-void Logger::setVisible(bool vis)
-{
-    Logger::Instance()->theLogger->setVisible(vis);
-}
-
-StreamLogger::StreamLogger(std::ostream* stream)
-{
-    this->stream = stream;
-    this->setVisible(true);
-}
-
-StreamLogger::~StreamLogger()
-{
-    this->stream = (std::ostream *) NULL;
-}
-
-void StreamLogger::doLog(const std::string &msg)
-{
-    (*this->stream) << msg << std::endl;
+    if (Logger::redirector)
+        delete Logger::redirector;
+    Logger::redirector = NULL;
 }

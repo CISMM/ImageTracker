@@ -49,8 +49,8 @@ public:
     typedef TransformType::Pointer TransformPointer;
     //Try some different metrics...
     //typedef itk::MattesMutualInformationImageToImageMetric<ImageType, ImageType> MetricType;
-    typedef itk::MeanSquaresImageToImageMetric<ImageType, ImageType> MetricType;
-    //typedef itk::NormalizedCorrelationImageToImageMetric<ImageType, ImageType> MetricType;
+    // typedef itk::MeanSquaresImageToImageMetric<ImageType, ImageType> MetricType;
+    typedef itk::NormalizedCorrelationImageToImageMetric<ImageType, ImageType> MetricType;
     typedef itk::RegularStepGradientDescentOptimizer OptimizerType;
     typedef itk::LinearInterpolateImageFunction<ImageType, TransformType::ScalarType> InterpolatorType;
     typedef itk::ImageRegistrationMethod<ImageType, ImageType> RegistrationType;

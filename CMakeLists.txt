@@ -1,5 +1,8 @@
 PROJECT(ImageTracker)
 
+SET (EXECUTABLE_OUTPUT_PATH "${ImageTracker_BINARY_DIR}/bin")
+SET (LIBRARY_OUTPUT_PATH "${ImageTracker_BINARY_DIR}/lib")
+
 #######################################
 # Include ITK
 #######################################
@@ -69,6 +72,8 @@ SET (Algorithms_SRCS
     MultiImageRegistrationProcessor.cxx         MultiImageRegistrationProcessor.h
     MultiRegionRegistration.cxx                 MultiRegionRegistration.h
     MultiRegionRegistrationPipeline.cxx         MultiRegionRegistrationPipeline.h
+                                                MultiResolutionRegistration.h
+    MultiResolutionRegistrationPipeline.cxx		MultiResolutionRegistrationPipeline.h
                                                 RegistrationMotionFilter.h
     RegistrationOutput.cxx                      RegistrationOutput.h
                                                 Sort.h
@@ -82,6 +87,12 @@ SET (CMAKE_VERBOSE_MAKEFILE ON)
 ADD_LIBRARY(ITCommon ${Common_SRCS})
 ADD_LIBRARY(ITAlgorithms ${Algorithms_SRCS})
 TARGET_LINK_LIBRARIES(ITAlgorithms ITCommon ITKCommon ITKBasicFilters ITKIO ITKAlgorithms )
+
+
+INCLUDE_DIRECTORIES(
+    ${ImageTracker_SOURCE_DIR}
+    ${ImageTracker_SOURCE_DIR}/vtkView 
+    ${ImageTracker_SOURCE_DIR}/wxGui )
 
 #######################################
 # Window components

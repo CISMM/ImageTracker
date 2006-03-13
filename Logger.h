@@ -1,162 +1,140 @@
 #pragma once
-#include <string>
-#include <iostream>
 
-enum
+#include <iostream>
+#include <string>
+
+enum LogLevel
 {
-    LOG_NONE = 1000,
-    LOG_ERROR,
-    LOG_WARN,
-    LOG_INFO,
-    LOG_DEBUG,
-    LOG_VERBOSE,
-    LOG_ALL
+    None    = 0,
+    Error   = 100,
+    Warning = 200,
+    Info    = 300,
+    Debug   = 400,
+    Verbose = 500,
+    All     = 600
 };
 
-const static int LOG_LEVEL = LOG_ALL;
+// Forward delcaration of LogStream
+class LogStream;
+class StreamRedirector;
 
-class ILog;
-
-/*
- * A singleton class that provides logging methods.  The class
- * forwards logging information to a single ILog instance.  Logging can
- * occur at multiple levels, based on importance of the message.
- * These levels include: errors, warnings, info, debug, and verbose.
+/**
+ * Logger provides access to the logging system. It allows you to write
+ * application messages of varying levels to output streams. The general
+ * format for messaging follows std c++ streaming:
+ * Logger::error << "Application error!" << std::endl;
  */
 class Logger
 {
 public:
-    ~Logger(void);
+    static LogLevel getLevel() { return Logger::level; }
+    static void setLevel(LogLevel level) { Logger::level = level; }
+
+    // Level of logging currently active.
+    static LogLevel level;
+
+    // LogStreams...use them, but don't mess with them.
+    static LogStream error;
+    static LogStream warning;
+    static LogStream info;
+    static LogStream debug;
+    static LogStream verbose;
+
+    // Logger functions
+    static void logError(const std::string msg);
+    static void logWarning(const std::string msg);
+    static void logWarn(const std::string msg);
+    static void logInfo(const std::string msg);
+    static void logDebug(const std::string msg);
+    static void logVerbose(const std::string msg);
 
     /*
-     * Log a verbose message.
+     * Redirect logger output.  Users must call undirect() before
+     * the target ostream is destroyed.
      */
-    static void logVerbose(const std::string &msg);
-    
-    /*
-     * Log a debug message.
-     */
-    static void logDebug(const std::string &msg);
+    static void redirect(std::ostream& target);
 
     /*
-     * Log an informational message.
+     * Stop redirection of output.
      */
-    static void logInfo(const std::string &msg);
-
-    /*
-     * Log a warning message.
-     */
-    static void logWarn(const std::string &msg);
-
-    /*
-     * Log an error message.
-     */
-    static void logError(const std::string &msg);
-
-    /*
-     * Get the current logging level.
-     */
-    static int getLevel();
-
-    /*
-     * Set the logging level to use.
-     */
-    static void setLevel(int level);
-
-    /*
-     * Determines whether the current logger is visible.  (Only applies to window-based loggers.)
-     */
-    static bool isVisible();
-
-    /*
-     * Sets whether the current logger is visible.  (Only applies to window-based loggers.)
-     */
-    static void setVisible(bool vis);
-    
-    /*
-     * Destroy the singleton Logger instance and the associated ILog instance.
-     */
-    static void Destroy();
-
-    /*
-     * Sets the ILog instance to use as a logging target.
-     */
-    static void SetLogger(ILog* logger);
+    static void undirect();
 
 protected:
-    /*
-     * Instance grabbing method--allows access to the singleton Logger.
-     */
-    static Logger* Instance();
+    Logger();
+    virtual ~Logger();
+
+    static StreamRedirector* redirector;
+};
+
+/**
+* LogStream handles streaming of data to output streams. A LogStream
+* has an associated LogLevel that controls whether output is generated.
+*/
+class LogStream
+{
+public:
+    LogStream(LogLevel level = Error) : level(level) {}
+    virtual ~LogStream() {}
 
     /*
-     * Logger constructor.  Protected so instances cannot be created.
-     */
-    Logger(int level=LOG_LEVEL);
-
-    /* 
-     * Retrieves the ILog instance that this Logger controls.
-     */
-    ILog* GetILog();
+    * Stream arbitrary types and values.
+    */
+    template <typename T>
+        LogStream& operator<<(const T& val)
+    {
+        if (this->level <= Logger::getLevel())
+            std::cout << val;
+        return *this;
+    }
 
     /*
-     * Sets the ILog instance that this Logger controls.
+     * Handle stream manipulators. Borrowed heavily from:
+     * Josuttis, Nicolai. The C++ Standard Library.
+     * Addison-Wesley, New York, 2005, p. 612.
      */
-    void SetILog(ILog* logger);
+    virtual LogStream& operator<<(std::ostream& (*op)(std::ostream&))
+    {
+        if (this->level <= Logger::getLevel())
+            (*op)(std::cout);
+        return *this;
+    }
 
-private:  
-    static Logger* s_instance;
-    static int s_level;
-    ILog* theLogger;
+protected:
+    LogLevel level;
+    // TODO: Add support for redirecting output to files or other streams...
 };
 
 /*
- * Interface which all logging classes must implement.  Allows for
- * logging at different levels, and controlling the output of the
- * logger.  This interface is easy to extend--one only needs to specify
- * how logging is performed and how an ILog is destroyed.
+ * Redirects a source ostream to a target ostream. Redirection continues
+ * until the StreamRedirector is destroyed.
  */
-class ILog
+class StreamRedirector
 {
 public:
-    virtual ~ILog() {}
-    void logVerbose(const std::string &msg) {this->doLog(LOG_VERBOSE, "VERBOSE: " + msg); }
-    void logDebug(const std::string &msg) { this->doLog(LOG_DEBUG, "DEBUG:   " + msg); }
-    void logInfo(const std::string &msg) { this->doLog(LOG_INFO, "INFO:    " + msg); }
-    void logWarn(const std::string &msg) { this->doLog(LOG_WARN, "WARN:    " + msg); }
-    void logError(const std::string &msg) { this->doLog(LOG_ERROR, "ERROR:   " + msg); }
-    bool isVisible() { return this->visible; }
-    void setVisible(bool vis) { this->visible = vis; }
-protected:
-    void doLog(int level, const std::string &msg) { if (level <= Logger::getLevel()) this->doLog(msg); }
+    StreamRedirector(std::ostream& source, std::ostream& target)
+    {
+        this->target = NULL;
+        this->originalStream = &source;
+        this->originalBuffer = source.rdbuf();
+        this->setTarget(target);
+    }
+    virtual ~StreamRedirector()
+    {
+        this->originalStream->rdbuf(this->originalBuffer);
+    }
 
-    /*
-     * Log a message.  Implementation classes must define this method to determine how messages are actually logged.
-     */
-    virtual void doLog(const std::string &msg) = 0;
-private:
-    bool visible;
-};
+    void setTarget(std::ostream& oTarget)
+    {
+        if (this->target)
+            this->target->flush();
 
-/*
- * A default logger that logs to an output stream.
- */
-class StreamLogger : public ILog
-{
-public:
-    /*
-     * Default constructor.  Specifies output to std::cout by default.
-     */
-    StreamLogger(std::ostream* stream = &std::cout);
-
-    /*
-     * Destructor.
-     */
-    ~StreamLogger();
+        this->target = &oTarget;
+        this->target->copyfmt(*this->originalStream);
+        this->originalStream->rdbuf(this->target->rdbuf());
+    }
 
 protected:
-    void doLog(const std::string &msg);
-
-private:
-    std::ostream* stream;
+    std::streambuf* originalBuffer;
+    std::ostream* originalStream;
+    std::ostream* target;
 };

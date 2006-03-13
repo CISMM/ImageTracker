@@ -58,37 +58,34 @@ void RegistrationOutput::Update(void)
     TransformGroup::TransformPointer transform = TransformGroup::TransformType::New();
     transform->SetIdentity();
 
-    FileSet::FileIterator sourceIt = source->GetFileNames()->begin();
     FileSet::FileIterator destIt = destination->GetFileNames()->begin();
 
-    ReaderType::Pointer reader = ReaderType::New();
+	FileSetImageReader reader(this->source);
     ResampleFilterType::Pointer resampler = ResampleFilterType::New();
     CastFilterType::Pointer caster = CastFilterType::New();
     WriterType::Pointer writer = WriterType::New();
 
-    resampler->SetInput(reader->GetOutput());
+	InputImageType::Pointer image = reader.FirstImage();
+    resampler->SetInput(image);
     caster->SetInput(resampler->GetOutput());
     writer->SetInput(caster->GetOutput());
 
     // Write the first image with no transformation
-    std::string inFile = *sourceIt;
     std::string outFile = *destIt;
-    reader->SetFileName(inFile.c_str());
-    reader->Update();
     resampler->SetTransform(transform);
-    resampler->SetSize(reader->GetOutput()->GetLargestPossibleRegion().GetSize());
-    resampler->SetOutputOrigin(reader->GetOutput()->GetOrigin());
-    resampler->SetOutputSpacing(reader->GetOutput()->GetSpacing());
+    resampler->SetSize(image->GetLargestPossibleRegion().GetSize());
+    resampler->SetOutputOrigin(image->GetOrigin());
+    resampler->SetOutputSpacing(image->GetSpacing());
     resampler->SetDefaultPixelValue(0);
     writer->SetFileName(outFile.c_str());
     writer->Update();
 
-    *sourceIt++; *destIt++;
+    *destIt++;
 
-    for ( ; sourceIt != source->GetFileNames()->end() &&
-            destIt != destination->GetFileNames()->end() &&
+    for ( ; reader.HasNext() &&
+			destIt != destination->GetFileNames()->end() &&
             tranIt != transforms->end() ; 
-            *sourceIt++, *destIt++, *tranIt++)
+            *destIt++, *tranIt++)
     {
         if (this->composeMode == RegistrationOutput::COMPOSE_POST) 
         {
@@ -103,15 +100,13 @@ void RegistrationOutput::Update(void)
             transform = *tranIt;
         }
 
-        // Write the first image with no transformation
-        inFile = *sourceIt;
         outFile = *destIt;
-        reader->SetFileName(inFile.c_str());
-        reader->Update();
+		image = reader.NextImage();
+		resampler->SetInput(image);
         resampler->SetTransform(transform);
-        resampler->SetSize(reader->GetOutput()->GetLargestPossibleRegion().GetSize());
-        resampler->SetOutputOrigin(reader->GetOutput()->GetOrigin());
-        resampler->SetOutputSpacing(reader->GetOutput()->GetSpacing());
+        resampler->SetSize(image->GetLargestPossibleRegion().GetSize());
+        resampler->SetOutputOrigin(image->GetOrigin());
+        resampler->SetOutputSpacing(image->GetSpacing());
         resampler->SetDefaultPixelValue(0);
         writer->SetFileName(outFile.c_str());
         writer->Update();

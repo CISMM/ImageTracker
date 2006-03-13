@@ -10,6 +10,7 @@
 
 #include "CommonTypes.h"
 #include "FileSet.h"
+#include "FileSetImageReader.h"
 #include "TransformGroup.h"
 
 /*
