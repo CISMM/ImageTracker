@@ -27,7 +27,7 @@ CompressionLevel=0
 AddSetupBackground=1
 SetupBackground3D=0
 TopLabel=1
-TopLabelVer=0
+TopLabelVer=1
 TopLabel2=0
 BottomLabel=0
 TopLabelText="ImageTracker"
@@ -107,7 +107,7 @@ ShowCopyrightWarning=0
 AddMainShortCut=1
 ForceRemoveShortcutFolder=0
 ProgramLinkFolder=NSRG/ImageTracker v2.02
-ProgramLinkName=ImageTracker 2.01
+ProgramLinkName=ImageTracker 2.02
 ProgramLinkParam=
 ProgramLinkWorkDir=
 ProgramLinkRun=Normal Window
@@ -153,7 +153,7 @@ BackgroundUpdate=0
 RestartProcess=0
 InformFinish=0
 UpdateProjectFName=
-DownloadURL_UPDATE=http:/
+DownloadURL_UPDATE=http:
 NameOfUpdateFile=
 RunningProcess=
 VersionOriginal=1
@@ -195,7 +195,7 @@ AutorunStartApp=0
 [Association]
 OpenWith=0
 OpenWithName=
-OpenWithMenuText=Open with 
+OpenWithMenuText=Open with
 OpenWithExtensions=
 
 [VerInfo]
