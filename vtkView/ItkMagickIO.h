@@ -16,6 +16,17 @@
  * produced by the NSRG, we've sort of standardized on reading
  * images with ImageMagick.  This class provides the link between
  * ImageMagick and ITK pipelines.
+ *
+ * Note: this class is deprecated! In the not too distant past ITK had
+ * image file readers that were not able to read as many image files
+ * (notably tiffs) as ImageMagick without crashing. This has been
+ * remedied with ITK now supporting the latest tiff libraries. Transferring
+ * data through ImageMagick was enough of a pain that we're phasing
+ * this link out, and relying solely on ITK.
+ *
+ * Although the logic behind loading images through this class has been changed
+ * to use ITK, use of this class is discouraged. At a minimum, its name no
+ * longer makes sense.
  */
 class ItkMagickIO : public itk::LightObject
 {

@@ -18,17 +18,19 @@
 
 #include "vtkViewer_wdr.h"
 
+#include "itkCastImageFilter.h"
+#include "itkImage.h"
+#include "itkImageFileReader.h"
 #include "itkRescaleIntensityImageFilter.h"
-#include "itkImageToVTKImageFilter.h"
+#include "itkVTKImageExport.h"
 
 #include "vtkImageActor.h"
 #include "vtkImageFlip.h"
+#include "vtkImageImport.h"
 #include "vtkInteractorStyle.h"
 #include "vtkInteractorStyleImage.h"
 #include "vtkRenderer.h"
 
-#include "../CommonTypes.h"
-#include "ItkMagickIO.h"
 #include "wxVTKRenderWindowInteractor.h"
 
 // WDR: class declarations
@@ -43,8 +45,9 @@
 class VtkCanvas : public wxPanel
 {
 public:
-    typedef CommonTypes::InternalImageType InputImageType;
-    typedef CommonTypes::DisplayImageType DisplayImageType;
+	typedef itk::Image<unsigned short, 2> ReadImageType;
+	typedef itk::Image<float, 2> InputImageType;
+	typedef itk::Image<unsigned char, 2> DisplayImageType;
 
     // constructors and destructors
     VtkCanvas( wxWindow *parent, wxWindowID id = -1,
@@ -76,13 +79,17 @@ private:
     void InitializePipeline();
     
     // WDR: member variable declarations for VtkCanvas
+	typedef itk::ImageFileReader<ReadImageType> ReaderType;
+	typedef itk::CastImageFilter<ReadImageType, InputImageType> CasterType;
     typedef itk::RescaleIntensityImageFilter<InputImageType, DisplayImageType> RescalerType;
-    typedef itk::ImageToVTKImageFilter<DisplayImageType> ConverterType;
+	typedef itk::VTKImageExport<DisplayImageType> ExporterType;
 
     bool firstTime;
-    ItkMagickIO::Pointer reader;
+    ReaderType::Pointer reader;
+	CasterType::Pointer caster;
     RescalerType::Pointer rescaler;
-    ConverterType::Pointer converter;
+	ExporterType::Pointer exporter;
+	vtkImageImport* importer;
     vtkImageFlip* flipper;
     vtkImageActor* actor;
     vtkRenderer* renderer;

@@ -1,13 +1,16 @@
 #include ".\ItkMagickIO.h"
 
-#include <Magick++.h>
+// #include <Magick++.h>
+
+#include "itkImageFileReader.h"
+#include "itkImageFileWriter.h"
 
 // We need constitute.h to define pixel types, and apparently it
 // doesn't get sucked in by Magick++.  Also, we need to
 // specify the directory due to the way Magick++ expects the
 // include directory to be set up.
-#include "magick/constitute.h"
-#include "../Logger.h"
+// #include "magick/constitute.h"
+#include "Logger.h"
 
 // Make sure we initialize ImageMagick the first time through
 bool ItkMagickIO::initialized = false;
@@ -17,7 +20,7 @@ void ItkMagickIO::Initialize(const char* magickDir)
     if (!ItkMagickIO::initialized)
     {
 #ifdef _WIN32
-        Magick::InitializeMagick(magickDir);
+        // Magick::InitializeMagick(magickDir);
 #endif
         ItkMagickIO::initialized = true;
     }
@@ -25,10 +28,23 @@ void ItkMagickIO::Initialize(const char* magickDir)
 
 ItkMagickIO::InternalImageType::Pointer ItkMagickIO::Read(std::string filename)
 {
+	Logger::warning << "ItkMagickIO: this class is deprecated and its use is discouraged." << std::endl;
+
+	typedef itk::ImageFileReader<MagickImageType> ReaderType;
+	ReaderType::Pointer reader = ReaderType::New();
+	ImportCasterType::Pointer caster = ImportCasterType::New();
+
+	reader->SetFileName(filename.c_str());
+	caster->SetInput(reader->GetOutput());
+	caster->Update();
+	return caster->GetOutput();
+
+// Old ImageMagick implementation:
+/*
     // Initialize ImageMagick, if needed
     ItkMagickIO::Initialize("");
 
-    // Read image data using ImageMagick
+	// Read image data using ImageMagick
     Magick::Image image(filename);
 
     if (!image.isValid())
@@ -112,11 +128,25 @@ ItkMagickIO::InternalImageType::Pointer ItkMagickIO::Read(std::string filename)
 	Logger::verbose << "ItkMagickIO::Read() max: " << stats->GetMaximum() << std::endl;
 
     return this->caster->GetOutput();
+*/
 }
 
 
 void ItkMagickIO::Write(std::string filename, InternalImageType::Pointer itkImage)
 {
+	Logger::warning << "ItkMagickIO: this class is deprecated and its use is discouraged." << std::endl;
+
+	typedef itk::ImageFileWriter<MagickImageType> WriterType;
+	WriterType::Pointer writer = WriterType::New();
+	ExportCasterType::Pointer caster = ExportCasterType::New();
+
+	caster->SetInput(itkImage);
+	writer->SetInput(caster->GetOutput());
+	writer->SetFileName(filename.c_str());
+	writer->Update();
+
+// Old ImageMagick implementation:
+/*
     // Initialize ImageMagick, if needed
     ItkMagickIO::Initialize("");
 
@@ -241,4 +271,5 @@ void ItkMagickIO::Write(std::string filename, InternalImageType::Pointer itkImag
 	//	image.channelDepth(Magick::RedChannel) << ", " <<
 	//	image.channelDepth(Magick::GreenChannel) << ", " <<
 	//	image.channelDepth(Magick::BlueChannel) << std::endl;
+*/
 }

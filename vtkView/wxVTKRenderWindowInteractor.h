@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: wxVTKRenderWindowInteractor.h,v $
   Language:  C++
-  Date:      $Date: 2005/09/02 16:26:27 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2006/06/01 20:13:48 $
+  Version:   $Revision: 1.2 $
 
   Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
   All rights reserved.

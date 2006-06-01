@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "VtkCanvas.h"
-#include "../CommonTypes.h"
+#include "CommonTypes.h"
 #include "vtkViewer_wdr.h"
 
 // WDR: class declarations

@@ -11,7 +11,6 @@ PROJECT (vtkView)
 # has some good features.
 #######################################
 
-
 #######################################
 # Include VTK
 #######################################
@@ -43,40 +42,48 @@ INCLUDE_DIRECTORIES(${ITK_INCLUDE_DIRS})
 LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
 
 #######################################
-# Include wx
+# Use wxWidgets
 #######################################
+SET (WXWINDOWS_USE_GL 1) 
+INCLUDE (${CMAKE_ROOT}/Modules/UsewxWidgets.cmake)
 
-SET(WXWINDOWS_USE_GL 1) 
-INCLUDE( ${CMAKE_ROOT}/Modules/Use_wxWindows.cmake )
+IF (WIN32)
+  FIND_PATH (WXWINDOWS_MSVC_DIR wx/setup.h
+  	${WXWINDOWS_ROOT_DIR}/include/msvc
+  )
+  IF (WXWINDOWS_MSVC_DIR)
+    INCLUDE_DIRECTORIES(${WXWINDOWS_MSVC_DIR})
+  ENDIF (WXWINDOWS_MSVC_DIR)
+  
+  MARK_AS_ADVANCED(WXWINDOWS_MSVC_DIR)
+ENDIF (WIN32)
 
-#######################################
-# Include ImageMagick
-#######################################
-INCLUDE (./Use_ImageMagick.cmake)
-
-SET (vtkView_SRCS
-	ImageWindow.cxx						ImageWindow.h
-										itkImageToVTKImageFilter.h
-	ItkMagickIO.cxx						ItkMagickIO.h
-	VtkCanvas.cxx                       VtkCanvas.h
-	VtkViewer.cxx                       VtkViewer.h
-	vtkViewer_wdr.cpp                   vtkViewer_wdr.h
-	wxVTKRenderWindowInteractor.cxx		wxVTKRenderWindowInteractor.h
+SET (ITView_SRCS
+							ConnectVTKITK.h
+	ImageWindow.cxx			ImageWindow.h
+	ItkMagickIO.cxx			ItkMagickIO.h
+	VtkCanvas.cxx			VtkCanvas.h
+	VtkViewer.cxx			VtkViewer.h
+	vtkViewer_wdr.cpp		vtkViewer_wdr.h
+	wxVTKRenderWindowInteractor.cxx	wxVTKRenderWindowInteractor.h
 )
 
-ADD_LIBRARY(vtkView ${vtkView_SRCS})
-TARGET_LINK_LIBRARIES(vtkView
+ADD_LIBRARY(ITView ${ITView_SRCS})
+TARGET_LINK_LIBRARIES(ITView
 	ITCommon
 	vtkIO
 	vtkCommon
 	vtkGraphics
 	vtkRendering
-	${MAGICK_LIB}
 	ITKCommon 
 	ITKBasicFilters 
 	ITKIO 
 	ITKAlgorithms
 )
 
-ADD_EXECUTABLE(vtkViewApp WIN32 VtkViewerApp.cxx)
-TARGET_LINK_LIBRARIES(vtkViewApp vtkView)
+IF (WIN32)
+    SET (GUI_EXE WIN32)
+ENDIF (WIN32)
+
+ADD_EXECUTABLE(viewer ${GUI_EXE} VtkViewerApp.cxx)
+TARGET_LINK_LIBRARIES(viewer ITView)
