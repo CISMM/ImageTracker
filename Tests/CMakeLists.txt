@@ -1,8 +1,9 @@
-# wxWindows Setup
-INCLUDE( ${CMAKE_ROOT}/Modules/Use_wxWindows.cmake )
+PROJECT(tests)
 
-# ImageMagick Setup
-# INCLUDE ( ../Use_ImageMagick.cmake )
+INCLUDE_DIRECTORIES (../TestSuite)
+
+# wxWindows Setup
+INCLUDE(../LocalUsewxWidgets.cmake)
 
 ###################################
 # Test Cases
@@ -15,7 +16,6 @@ SET (TestCases_SRCS
     TestFileSetImageReader.cxx
     TestGlobalRegistrationPipeline.cxx
     TestHarrisFeatureDetector.cxx
-                                            TestImageMagick.h
                                             TestImagePyramid.h
     TestImageRescale.cxx
     TestImageStatistics.cxx
@@ -25,6 +25,7 @@ SET (TestCases_SRCS
     TestMultiRegionRegistration.cxx
                                             TestMultiResolutionRegistration.h
                                             TestMultiResolutionRegistrationPipeline.h
+                                            TestNaryMeanImageFilter.h
                                             TestRandomVectorImage.h
     TestRegistrationOutput.cxx
                                             TestRegistrationMotionFilter.h
@@ -44,6 +45,6 @@ ADD_EXECUTABLE(TestCases ${TestCases_SRCS})
 # TODO: the logger window from the GUI-based test client causes crashing.  
 # Probably due to a change in the wx library: "can't crerate wxWindow without parent."
 # ADD_EXECUTABLE(TestCases WIN32 ${TestCases_SRCS})
-TARGET_LINK_LIBRARIES(TestCases TestSuite ITCommon vtkView ITAlgorithms ITGui )
+TARGET_LINK_LIBRARIES(TestCases TestSuite ITCommon ITAlgorithms ITImage ITView ITGui )
 
 

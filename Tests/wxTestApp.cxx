@@ -7,9 +7,9 @@
 
 #include "wxTestApp.h"
 #include <iostream>
-#include "../TestSuite/Suite.h"
+#include "Suite.h"
 
-#include "../wxGui/LoggerPanel.h"
+#include "LoggerPanel.h"
 
 #include "TestBilateralVectorFilter.h"
 #include "TestCLGOpticFlowImageFilter.h"
@@ -18,7 +18,6 @@
 #include "TestFileSetImageReader.h"
 #include "TestGlobalRegistrationPipeline.h"
 #include "TestHarrisFeatureDetector.h"
-#include "TestImageMagick.h"
 #include "TestImagePyramid.h"
 #include "TestImageRescale.h"
 #include "TestImageStatistics.h"
@@ -28,6 +27,7 @@
 #include "TestMultiRegionRegistration.h"
 #include "TestMultiResolutionRegistration.h"
 #include "TestMultiResolutionRegistrationPipeline.h"
+#include "TestNaryMeanImageFilter.h"
 #include "TestRandomVectorImage.h"
 #include "TestRegistrationMotionFilter.h"
 #include "TestRegistrationOutput.h"
@@ -39,7 +39,7 @@
 #include "TestVectorWrite.h"
 #include "TestVideoRegistration.h"
 
-#include "../vtkView/ImageWindow.h"
+#include "ImageWindow.h"
 
 // WDR: class implementations
 
@@ -84,7 +84,6 @@ void TestCaseFrame::OnRunTests( wxCommandEvent &event )
         // suite.addTest(new TestFileSetImageReader);
         // suite.addTest(new TestGlobalRegistrationPipeline);        
         // suite.addTest(new TestHarrisFeatureDetector);
-        // suite.addTest(new TestImageMagick);
         // suite.addTest(new TestImageRescale);
         // suite.addTest(new TestImageStatistics);
         // suite.addTest(new TestImageWindow);        
@@ -139,6 +138,7 @@ int main()
 	suite.addTest(new TestLogger);
 	suite.addTest(new TestItkMagickIO);
 	suite.addTest(new TestImagePyramid);
+	suite.addTest(new TestNaryMeanImageFilter);
 	//suite.addTest(new TestMultiResolutionRegistration);
 	//suite.addTest(new TestMultiResolutionRegistrationPipeline);
 	// suite.addTest(new TestLogStream);

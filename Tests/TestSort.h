@@ -1,9 +1,9 @@
 #pragma once
-#include "../TestSuite/Test.h"
+#include "Test.h"
 #include <vector>
 
-#include "../Logger.h"
-#include "../Sort.h"
+#include "Logger.h"
+#include "Sort.h"
 
 class Integer
 {

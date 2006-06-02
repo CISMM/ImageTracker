@@ -5,12 +5,12 @@
 
 #include "itkExceptionObject.h"
 
-#include "../BlurFilterSchedule.h"
-#include "../FileSet.h"
-#include "../ImageRegistration.h"
-#include "../MultiImageRegistrationProcessor.h"
-#include "../RegistrationOutput.h"
-#include "../TransformGroup.h"
+#include "BlurFilterSchedule.h"
+#include "FileSet.h"
+#include "ImageRegistration.h"
+#include "MultiImageRegistrationProcessor.h"
+#include "RegistrationOutput.h"
+#include "TransformGroup.h"
 
 TestVideoRegistration::TestVideoRegistration(void)
 {

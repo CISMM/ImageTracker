@@ -1,5 +1,5 @@
 #pragma once
-#include "../TestSuite/Test.h"
+#include "Test.h"
 #include <string>
 #include <vector>
 
@@ -11,7 +11,7 @@
 #include "itkImageRegionIterator.h"
 #include "itkVector.h"
 
-#include "../Logger.h"
+#include "Logger.h"
 
 class TestVectorWrite : public TestSuite::Test
 {

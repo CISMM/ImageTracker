@@ -5,7 +5,7 @@
 #include "itkExceptionObject.h"
 #include "itkImageFileReader.h"
 
-#include "..\ImageStatistics.h"
+#include "ImageStatistics.h"
 
 TestImageStatistics::TestImageStatistics(void)
 {

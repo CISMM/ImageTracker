@@ -1,7 +1,8 @@
-PROJECT(ImageTracker)
+PROJECT (ImageTracker)
 
 SET (EXECUTABLE_OUTPUT_PATH "${ImageTracker_BINARY_DIR}/bin")
 SET (LIBRARY_OUTPUT_PATH "${ImageTracker_BINARY_DIR}/lib")
+SET (CMAKE_VERBOSE_MAKEFILE ON)
 
 #######################################
 # Include ITK
@@ -33,38 +34,31 @@ ENDIF (VTK_FOUND)
 INCLUDE_DIRECTORIES(${VTK_INCLUDE_DIRS})
 LINK_DIRECTORIES(${VTK_LIBRARY_DIRS})
 
-# wxWindows Setup
-INCLUDE( ${CMAKE_ROOT}/Modules/Use_wxWindows.cmake )
-
 #######################################
 # Include ImageMagick
+# No longer needed from ITK 2.6.0
+# According to ITK, their tiff library is better.
 #######################################
-INCLUDE (./vtkView/Use_ImageMagick.cmake)
+# INCLUDE (./vtkView/Use_ImageMagick.cmake)
 
 #######################################
-# Common architecture library
+# Personal filter library
 #######################################
-SET (Common_SRCS
-                    CommonTypes.h
-    Logger.cxx      Logger.h
-    StopWatch.cxx   StopWatch.h
-)
+INCLUDE_DIRECTORIES (
+	${ImageTracker_SOURCE_DIR}/common
+	${ImageTracker_SOURCE_DIR}/image
+	${ImageTracker_SOURCE_DIR}/filters)
+SUBDIRS (common image filters)
 
 #######################################
 # Image processing library
 #######################################
 SET (Algorithms_SRCS
-                                                BilateralVectorImageFilter.h
     BlurFilterSchedule.cxx                      BlurFilterSchedule.h
-                                                CLGOpticFlowImageFilter.h
     CLGOpticFlowPipeline.cxx                    CLGOpticFlowPipeline.h
     DemonsPipeline.cxx                          DemonsPipeline.h
                                                 Feature.h
     FeatureTrackingPipeline.cxx                 FeatureTrackingPipeline.h                                                
-    FilePattern.cxx                             FilePattern.h
-    FileSet.cxx                                 FileSet.h
-    FileSetImageReader.cxx                      FileSetImageReader.h
-                                                Gaussian2DVectorFilter.h
     GlobalRegistrationPipeline.cxx              GlobalRegistrationPipeline.h
     HarrisFeatureDetector.cxx                   HarrisFeatureDetector.h
     ImageRegistration.cxx                       ImageRegistration.h
@@ -74,30 +68,23 @@ SET (Algorithms_SRCS
     MultiRegionRegistrationPipeline.cxx         MultiRegionRegistrationPipeline.h
                                                 MultiResolutionRegistration.h
     MultiResolutionRegistrationPipeline.cxx		MultiResolutionRegistrationPipeline.h
-                                                RegistrationMotionFilter.h
     RegistrationOutput.cxx                      RegistrationOutput.h
-                                                Sort.h
     ThresholdPipeline.cxx                       ThresholdPipeline.h
-    TransformGroup.cxx                          TransformGroup.h
-    Use_ImageMagick.cmake
 )
-    
-SET (CMAKE_VERBOSE_MAKEFILE ON)
 
-ADD_LIBRARY(ITCommon ${Common_SRCS})
 ADD_LIBRARY(ITAlgorithms ${Algorithms_SRCS})
 TARGET_LINK_LIBRARIES(ITAlgorithms ITCommon ITKCommon ITKBasicFilters ITKIO ITKAlgorithms )
 
-
 INCLUDE_DIRECTORIES(
     ${ImageTracker_SOURCE_DIR}
+    ${ImageTracker_SOURCE_DIR}/apps
     ${ImageTracker_SOURCE_DIR}/vtkView 
     ${ImageTracker_SOURCE_DIR}/wxGui )
 
 #######################################
 # Window components
 #######################################
-SUBDIRS(vtkView wxGui)
+SUBDIRS(apps vtkView wxGui)
 
 #######################################
 # Testing components

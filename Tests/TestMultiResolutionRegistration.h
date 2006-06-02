@@ -6,15 +6,15 @@
 #include "itkExceptionObject.h"
 #include "itkCenteredRigid2DTransform.h"
 
-#include "../TestSuite/Test.h"
+#include "Test.h"
 
-#include "../FilePattern.h"
-#include "../FileSet.h"
-#include "../FileSetImageReader.h"
-#include "../Logger.h"
-#include "../MultiResolutionRegistration.h"
-#include "../RegistrationOutput.h"
-#include "../StopWatch.h"
+#include "FilePattern.h"
+#include "FileSet.h"
+#include "FileSetImageReader.h"
+#include "Logger.h"
+#include "MultiResolutionRegistration.h"
+#include "RegistrationOutput.h"
+#include "StopWatch.h"
 
 class TestMultiResolutionRegistration :
 	public TestSuite::Test

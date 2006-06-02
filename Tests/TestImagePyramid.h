@@ -8,8 +8,8 @@
 #include "itkImageFileWriter.h"
 #include "itkMultiResolutionPyramidImageFilter.h"
 
-#include "..\Logger.h"
-#include "..\TestSuite\Test.h"
+#include "Logger.h"
+#include "Test.h"
 
 class TestImagePyramid :
     public TestSuite::Test

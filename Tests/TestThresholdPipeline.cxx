@@ -3,9 +3,9 @@
 #include <string>
 #include "itkExceptionObject.h"
 
-#include "../FilePattern.h"
-#include "../FileSet.h"
-#include "../ThresholdPipeline.h"
+#include "FilePattern.h"
+#include "FileSet.h"
+#include "ThresholdPipeline.h"
 
 TestThresholdPipeline::TestThresholdPipeline(void)
 {

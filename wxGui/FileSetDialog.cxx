@@ -1,5 +1,5 @@
-#include ".\FileSetDialog.h"
-#include "..\Logger.h"
+#include "FileSetDialog.h"
+#include "Logger.h"
 
 // WDR: class implementations
 

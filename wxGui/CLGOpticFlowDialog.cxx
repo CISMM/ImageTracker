@@ -7,7 +7,7 @@
 
 #include "CLGOpticFlowDialog.h"
 #include <math.h>
-#include "../Logger.h"
+#include "Logger.h"
 
 // WDR: class implementations
 

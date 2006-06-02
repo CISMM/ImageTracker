@@ -1,4 +1,4 @@
-PROJECT (vtkView)
+PROJECT (view)
 
 #######################################
 # This project brings several open-source packages together
@@ -44,19 +44,7 @@ LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
 #######################################
 # Use wxWidgets
 #######################################
-SET (WXWINDOWS_USE_GL 1) 
-INCLUDE (${CMAKE_ROOT}/Modules/UsewxWidgets.cmake)
-
-IF (WIN32)
-  FIND_PATH (WXWINDOWS_MSVC_DIR wx/setup.h
-  	${WXWINDOWS_ROOT_DIR}/include/msvc
-  )
-  IF (WXWINDOWS_MSVC_DIR)
-    INCLUDE_DIRECTORIES(${WXWINDOWS_MSVC_DIR})
-  ENDIF (WXWINDOWS_MSVC_DIR)
-  
-  MARK_AS_ADVANCED(WXWINDOWS_MSVC_DIR)
-ENDIF (WIN32)
+INCLUDE (../LocalUsewxWidgets.cmake)
 
 SET (ITView_SRCS
 							ConnectVTKITK.h
@@ -81,9 +69,4 @@ TARGET_LINK_LIBRARIES(ITView
 	ITKAlgorithms
 )
 
-IF (WIN32)
-    SET (GUI_EXE WIN32)
-ENDIF (WIN32)
 
-ADD_EXECUTABLE(viewer ${GUI_EXE} VtkViewerApp.cxx)
-TARGET_LINK_LIBRARIES(viewer ITView)

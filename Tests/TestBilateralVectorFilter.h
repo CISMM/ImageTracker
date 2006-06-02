@@ -7,11 +7,11 @@
 #include "itkImageFileWriter.h"
 #include "itkVector.h"
 
-#include "../TestSuite/Test.h"
+#include "Test.h"
 
-#include "../BilateralVectorImageFilter.h"
-#include "../Gaussian2DVectorFilter.h"
-#include "../Logger.h"
+#include "BilateralVectorImageFilter.h"
+#include "Gaussian2DVectorFilter.h"
+#include "Logger.h"
 
 /**
  * \class TestBilateralVectorFilter

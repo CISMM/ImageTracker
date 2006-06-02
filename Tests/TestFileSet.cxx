@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "../FileSet.h"
-#include "../FilePattern.h"
+#include "FileSet.h"
+#include "FilePattern.h"
 
 TestFileSet::TestFileSet(void)
 {

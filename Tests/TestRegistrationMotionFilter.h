@@ -8,13 +8,13 @@
 #include "itkImageFileWriter.h"
 #include "itkVector.h"
 
-#include "../FilePattern.h"
-#include "../FileSet.h"
-#include "../FileSetImageReader.h"
-#include "../Logger.h"
-#include "../RegistrationMotionFilter.h"
-#include "../StopWatch.h"
-#include "../TestSuite/Test.h"
+#include "FilePattern.h"
+#include "FileSet.h"
+#include "FileSetImageReader.h"
+#include "Logger.h"
+#include "RegistrationMotionFilter.h"
+#include "StopWatch.h"
+#include "Test.h"
 
 class TestRegistrationMotionFilter :
     public TestSuite::Test

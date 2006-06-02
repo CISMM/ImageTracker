@@ -1,8 +1,8 @@
 #include ".\TestImageWindow.h"
 
-#include "../Logger.h"
-#include "../CommonTypes.h"
-#include "../vtkView/ImageWindow.h"
+#include "Logger.h"
+#include "CommonTypes.h"
+#include "ImageWindow.h"
 #include <string>
 #include "itkImageFileReader.h"
 

@@ -3,8 +3,8 @@
 #include <time.h>
 #include <string>
 
-#include "..\Logger.h"
-#include "..\StopWatch.h"
+#include "Logger.h"
+#include "StopWatch.h"
 
 TestStopWatch::TestStopWatch(void)
 {

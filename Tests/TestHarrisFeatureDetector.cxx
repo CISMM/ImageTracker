@@ -1,8 +1,8 @@
-#include "./TestHarrisFeatureDetector.h"
+#include "TestHarrisFeatureDetector.h"
 #include "itkImageFileReader.h"
-#include "../CommonTypes.h"
-#include "../HarrisFeatureDetector.h"
-#include "../Logger.h"
+#include "CommonTypes.h"
+#include "HarrisFeatureDetector.h"
+#include "Logger.h"
 
 TestHarrisFeatureDetector::TestHarrisFeatureDetector(void)
 {

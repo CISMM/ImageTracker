@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "../TestSuite/Test.h"
+#include "Test.h"
 
 #include "FilePattern.h"
 #include "FileSet.h"

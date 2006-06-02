@@ -1,8 +1,8 @@
 #include "TestRegistrationOutput.h"
 
-#include "../FileSet.h"
-#include "../RegistrationOutput.h"
-#include "../TransformGroup.h"
+#include "FileSet.h"
+#include "RegistrationOutput.h"
+#include "TransformGroup.h"
 
 TestRegistrationOutput::TestRegistrationOutput(void)
 {

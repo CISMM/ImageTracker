@@ -7,12 +7,12 @@
 #include "itkImageFileWriter.h"
 #include "itkVector.h"
 
-#include "../TestSuite/Test.h"
-#include "../CLGOpticFlowImageFilter.h"
-#include "../FilePattern.h"
-#include "../FileSet.h"
-#include "../FileSetImageReader.h"
-#include "../Logger.h"
+#include "Test.h"
+#include "CLGOpticFlowImageFilter.h"
+#include "FilePattern.h"
+#include "FileSet.h"
+#include "FileSetImageReader.h"
+#include "Logger.h"
 
 class TestCLGOpticFlowImageFilter :
     public TestSuite::Test

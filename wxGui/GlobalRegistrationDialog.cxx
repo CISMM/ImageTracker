@@ -1,9 +1,9 @@
 #include "./GlobalRegistrationDialog.h"
 
 #include <limits>
-#include "../CommonTypes.h"
-#include "../Logger.h"
-#include "../TransformGroup.h"
+#include "CommonTypes.h"
+#include "Logger.h"
+#include "TransformGroup.h"
 #include "itkExceptionObject.h"
 
 GlobalRegistrationDialog::GlobalRegistrationDialog(wxWindow *parent, wxWindowID id,

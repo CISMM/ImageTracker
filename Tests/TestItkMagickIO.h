@@ -8,7 +8,7 @@
 
 #include "ItkMagickIO.h"
 #include "Logger.h"
-#include "..\TestSuite\Test.h"
+#include "Test.h"
 #include "ImageWindow.h"
 
 class TestItkMagickIO : public TestSuite::Test
@@ -19,18 +19,19 @@ public:
 
     void run()
     {
-		this->CreateTestImage();
-        this->testMagickReadWriteTiff();
-		this->testMagickReadWrite8Bit();
-		this->testMagickReadWrite16bit();
+		// this->CreateTestImage();
+        // this->testMagickReadWriteTiff();
+		// this->testMagickReadWrite8Bit();
+		// this->testMagickReadWrite16bit();
 		// ITK cannot read and write certain TIFF images.
 		this->testItkReadWrite();
-		this->testMagickAPIReadWrite();
+		// this->testMagickAPIReadWrite();
     }
 
     void testMagickReadWriteTiff()
     {
-        std::string dir = "D:/Nano/data/Fibrin/lolo-2004-05-14-2narea/";
+/*
+		std::string dir = "D:/Nano/data/Fibrin/lolo-2004-05-14-2narea/";
         std::string name = "mani415.tif";
 		std::string inName = dir + name;
 		std::string outName = dir + "magickIO-" + name;
@@ -50,10 +51,12 @@ public:
 		succeed_();
         // Logger::logDebug("Displaying image...");
         // ImageWindow::ImShow(img, name);
+*/
     }
 
 	void testMagickReadWrite8Bit()
 	{
+/*
         std::string dir = "D:/Nano/data/Lisa/WH200311/";
         std::string name = "GoodfromWHrh01.png";
         //std::string dir = "D:/Nano/data/test/Quenot/";
@@ -70,10 +73,12 @@ public:
 		io->Write(outName, img);
 		Logger::debug << "Wrote." << std::endl;
 		succeed_();
+*/
 	}
 
 	void testMagickReadWrite16bit()
 	{
+/*
         //std::string dir = "D:/Nano/data/Lisa/WH200311/";
         //std::string name = "GoodfromWHrh01.png";
         std::string dir = "D:/Nano/data/test/Quenot/";
@@ -95,6 +100,7 @@ public:
 		Logger::debug << "Writing: " << outName << " using ImageMagick..." << std::endl;
 		io->Write(outName, rescaler->GetOutput());
 		succeed_();
+*/
 	}
 
 	void testItkReadWrite()
@@ -127,6 +133,7 @@ public:
 
 	void testMagickAPIReadWrite()
 	{
+/*
         std::string dir = "D:/Nano/data/Lisa/WH200311/";
         std::string name = "GoodfromWHrh01.png";
 		std::string inName = dir + name;
@@ -193,10 +200,12 @@ public:
 
 		Logger::debug << "Writing " << outName << " using Magick API." << std::endl;
 		image.write(outName);
+*/
 	}
 
 	void CreateTestImage()
 	{
+/*
 		std::string dir = "D:/Nano/data/test/";
 		std::string file = "gradient.tif";
 		std::string out = dir + file;
@@ -235,5 +244,6 @@ public:
 		Logger::debug << "Synching pixels and writing: " << out << std::endl;
 		image.syncPixels();
 		image.write(out);
+*/
 	}
 };

@@ -8,8 +8,8 @@
 #include "itkRandomImageSource.h"
 #include "itkVector.h"
 
-#include "../TestSuite/Test.h"
-#include "../Logger.h"
+#include "Test.h"
+#include "Logger.h"
 
 class TestRandomVectorImage : public TestSuite::Test
 {

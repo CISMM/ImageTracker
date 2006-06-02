@@ -5,8 +5,8 @@
 
 #include "itkCenteredRigid2DTransform.h"
 
-#include "../TestSuite/Test.h"
-#include "../TransformGroup.h"
+#include "Test.h"
+#include "TransformGroup.h"
 
 class TestTransformGroup : public TestSuite::Test
 {

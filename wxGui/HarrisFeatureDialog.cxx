@@ -1,6 +1,6 @@
 
 #include "HarrisFeatureDialog.h"
-#include "../Logger.h"
+#include "Logger.h"
 
 // WDR: class implementations
 

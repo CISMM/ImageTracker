@@ -5,12 +5,12 @@
 #include "itkImageFileWriter.h"
 #include "itkExceptionObject.h"
 
-#include "../FileSet.h"
-#include "../ImageRegistration.h"
-#include "../Logger.h"
-#include "../MultiRegionRegistration.h"
-#include "../MultiRegionRegistrationPipeline.h"
-#include "../StopWatch.h"
+#include "FileSet.h"
+#include "ImageRegistration.h"
+#include "Logger.h"
+#include "MultiRegionRegistration.h"
+#include "MultiRegionRegistrationPipeline.h"
+#include "StopWatch.h"
 
 TestMultiRegionRegistration::TestMultiRegionRegistration()
 {

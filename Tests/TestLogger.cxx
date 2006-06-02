@@ -1,5 +1,5 @@
-#include ".\TestLogger.h"
-#include "..\Logger.h"
+#include "TestLogger.h"
+#include "Logger.h"
 
 TestLogger::TestLogger(void)
 {

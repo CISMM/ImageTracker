@@ -2,9 +2,9 @@
 
 #include "itkExceptionObject.h"
 
-#include "..\DemonsPipeline.h"
-#include "..\FileSet.h"
-#include "..\Logger.h"
+#include "DemonsPipeline.h"
+#include "FileSet.h"
+#include "Logger.h"
 
 TestDemonsPipeline::TestDemonsPipeline(void)
 {

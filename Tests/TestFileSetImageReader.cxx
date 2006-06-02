@@ -1,8 +1,8 @@
 #include "TestFileSetImageReader.h"
 
-#include "..\FilePattern.h"
-#include "..\FileSet.h"
-#include "..\FileSetImageReader.h"
+#include "FilePattern.h"
+#include "FileSet.h"
+#include "FileSetImageReader.h"
 
 TestFileSetImageReader::TestFileSetImageReader(void)
 {

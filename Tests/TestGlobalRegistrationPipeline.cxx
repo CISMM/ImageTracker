@@ -3,11 +3,11 @@
 #include <iostream>
 
 #include "itkExceptionObject.h"
-#include "../FilePattern.h"
-#include "../FileSet.h"
-#include "../GlobalRegistrationPipeline.h"
-#include "../TransformGroup.h"
-#include "../Logger.h"
+#include "FilePattern.h"
+#include "FileSet.h"
+#include "GlobalRegistrationPipeline.h"
+#include "TransformGroup.h"
+#include "Logger.h"
 
 TestGlobalRegistrationPipeline::TestGlobalRegistrationPipeline(void)
 {

@@ -1,5 +1,5 @@
 #include "CLGOpticFlowPipeline.h"
-#include "./vtkView/ImageWindow.h"
+// #include "ImageWindow.h"
 
 #include "Logger.h"
 
