@@ -2,25 +2,22 @@
 #include <vector>
 
 #include "itkDivideImageFilter.h"
-#include "itkExpNegativeImageFilter.h"
 #include "itkImage.h"
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
-#include "itkMeanImageFilter.h"
 #include "itkMedianImageFilter.h"
+#include "itkMultiplyImageFilter.h"
 #include "itkRescaleIntensityImageFilter.h"
-#include "itkSubtractImageFilter.h"
 
-#include "GaussianFunctionImageFilter.h"
 #include "ImageUtils.h"
 #include "NaryMeanImageFilter.h"
 
 int main(int argc, char** argv)
 {
     // check usage
-    if (argc < 10)
+    if (argc < 9)
     {
-        std::cout << "Usage: " << argv[0] << " dir formatIn start stop formatOut meanImg localImg diffImg metricImg" << std::endl;
+        std::cout << "Usage: " << argv[0] << " dir formatIn start stop formatOut meanImg localImg ratioImg" << std::endl;
         exit(1);
     }
 
@@ -35,16 +32,10 @@ int main(int argc, char** argv)
     typedef itk::ImageFileWriter< FloatImageType > FloatWriterType;
 
     typedef NaryMeanImageFilter< ImageType, FloatImageType > MeanType;
-
     typedef itk::MedianImageFilter< FloatImageType, FloatImageType > LocalType;
-    // typedef itk::MeanImageFilter< FloatImageType, FloatImageType > LocalType;
-    typedef itk::SubtractImageFilter< FloatImageType, FloatImageType, FloatImageType > DifferenceType;
+    typedef itk::DivideImageFilter< FloatImageType, FloatImageType, FloatImageType > DivideType;
+    typedef itk::MultiplyImageFilter< ImageType, FloatImageType, FloatImageType > MultiplyType;
 
-    typedef GaussianFunctionImageFilter< FloatImageType, FloatImageType > MetricType;
-    // typedef itk::DivideImageFilter< FloatImageType, FloatImageType, FloatImageType > MetricType;
-    // typedef itk::ExpNegativeImageFilter< FloatImageType, FloatImageType > MetricType;
-
-    typedef itk::DivideImageFilter< ImageType, FloatImageType, FloatImageType> DivideType;
     typedef itk::RescaleIntensityImageFilter< FloatImageType, ImageType > RescaleType;
     typedef std::vector< ReaderType::Pointer > ReaderVector;
 
@@ -60,8 +51,7 @@ int main(int argc, char** argv)
     std::string formatOut = dir + argv[5];
     std::string meanFile = dir + argv[6];
     std::string localFile = dir + argv[7];
-    std::string diffFile = dir + argv[8];
-    std::string metricFile = dir + argv[9];
+    std::string ratioFile = dir + argv[8];
 
     char cName[256];
 
@@ -77,10 +67,9 @@ int main(int argc, char** argv)
     // Create pipeline objects
     MeanType::Pointer mean = MeanType::New();
     LocalType::Pointer local = LocalType::New();
-    DifferenceType::Pointer difference = DifferenceType::New();
-    MetricType::Pointer metric = MetricType::New();
-
     DivideType::Pointer divide = DivideType::New();
+
+    MultiplyType::Pointer multiply = MultiplyType::New();
     RescaleType::Pointer rescale = RescaleType::New();
     WriterType::Pointer writer = WriterType::New();
     FloatWriterType::Pointer writerF = FloatWriterType::New();
@@ -116,13 +105,8 @@ int main(int argc, char** argv)
     LocalType::InputSizeType radius;
     radius.Fill(5);
     local->SetRadius(radius);
-    difference->SetInput1(mean->GetOutput());
-    difference->SetInput2(local->GetOutput());
-
-    metric->SetInput(difference->GetOutput());
-    metric->SetSigma(15000);
-    // metric->SetInput1(mean->GetOutput());
-    // metric->SetInput2(local->GetOutput());
+    divide->SetInput1(local->GetOutput()); // what the mean intensity should be at each point
+    divide->SetInput2(mean->GetOutput());  // what the mean intensity is
 
     // Output intermediate images
     std::cout << "Writing local metric image: " << localFile << std::endl;
@@ -133,37 +117,25 @@ int main(int argc, char** argv)
     PrintImageInfo< FloatImageType >(local->GetOutput(), "Local metric image");
 
     std::string extF = ".vtk";
-    std::string localFileF = dir + "atten-local" + extF;
+    std::string localFileF = dir + "float-local" + extF;
     writerF->SetInput(local->GetOutput());
     writerF->SetFileName(localFileF.c_str());
     writerF->Update();
 
-    std::cout << "Writing difference image (mean - local): " << diffFile << std::endl;
-    rescale->SetInput(difference->GetOutput());
-    writer->SetFileName(diffFile.c_str());
+    std::cout << "Writing ratio image (local / mean): " << ratioFile << std::endl;
+    rescale->SetInput(divide->GetOutput());
+    writer->SetFileName(ratioFile.c_str());
     writer->Update();
 
-    PrintImageInfo< FloatImageType >(difference->GetOutput(), "Difference image");
+    PrintImageInfo< FloatImageType >(divide->GetOutput(), "Ratio image");
 
-    std::string diffFileF = dir + "atten-diff" + extF;
-    writerF->SetInput(difference->GetOutput());
-    writerF->SetFileName(diffFileF.c_str());
-    writerF->Update();
-
-    std::cout << "Writing attenuation metric image: " << metricFile << std::endl;
-    rescale->SetInput(metric->GetOutput());
-    writer->SetFileName(metricFile.c_str());
-    writer->Update();
-
-    PrintImageInfo< FloatImageType >(metric->GetOutput(), "Attenuation metric image");
-
-    std::string metricFileF = dir + "atten-metric" + extF;
-    writerF->SetInput(metric->GetOutput());
-    writerF->SetFileName(metricFileF.c_str());
+    std::string ratioFileF = dir + "float-ratio" + extF;
+    writerF->SetInput(divide->GetOutput());
+    writerF->SetFileName(ratioFileF.c_str());
     writerF->Update();
 
     // Repair video
-    divide->SetInput2(metric->GetOutput());
+    multiply->SetInput2(divide->GetOutput());
     rescale->SetInput(divide->GetOutput());
     std::cout << "Repairing image sequence..." << std::endl;
     StringVector::iterator sit;
@@ -173,13 +145,13 @@ int main(int argc, char** argv)
          ++sit, ++rit)
     {
         std::cout << "\t" << *sit << std::endl;
-        divide->SetInput1((*rit)->GetOutput());
+        multiply->SetInput1((*rit)->GetOutput());
         writer->SetFileName(sit->c_str());
         writer->Update();
     }
 
     PrintImageInfo< ImageType >(video[0]->GetOutput(), "First original frame");
-    divide->SetInput1(video[0]->GetOutput());
-    divide->Update();
-    PrintImageInfo< FloatImageType >(divide->GetOutput(), "First repared frame");
+    multiply->SetInput1(video[0]->GetOutput());
+    multiply->Update();
+    PrintImageInfo< FloatImageType >(multiply->GetOutput(), "First repared frame");
 }

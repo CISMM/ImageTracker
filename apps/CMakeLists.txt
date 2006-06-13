@@ -35,11 +35,11 @@ INCLUDE (../LocalUsewxWidgets.cmake)
 ###################################
 IF (WIN32)
     SET (GUI_EXE WIN32)
+    # This seems to be necessary for debug builds...for some reason, though, we
+    # can't just use CMAKE_DEBUG_EXE_LINKER_FLAGS
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:msvcrt")
 ENDIF (WIN32)
 
-# This seems to be necessary for debug builds...for some reason, though, we
-# can't just use CMAKE_DEBUG_EXE_LINKER_FLAGS
-SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:msvcrt")
 
 ADD_EXECUTABLE(viewer ${GUI_EXE} VtkViewerApp.cxx)
 TARGET_LINK_LIBRARIES(viewer ITView)
