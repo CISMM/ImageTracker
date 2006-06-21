@@ -203,10 +203,10 @@ void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
     Superclass::GenerateInputRequestedRegion();
 
     // Get pointer to the input images:
-    Input1ImageType::Pointer ptr1 = this->GetInput1();
-    Input2ImageType::Pointer ptr2 = this->GetInput2();
+    typename Input1ImageType::Pointer ptr1 = this->GetInput1();
+    typename Input2ImageType::Pointer ptr2 = this->GetInput2();
 
-    OutputImageType::Pointer outputPtr;
+    typename OutputImageType::Pointer outputPtr;
 
     // Make sure we can procede
     if (!ptr1 || !ptr2)
@@ -216,7 +216,7 @@ void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
     }
 
     // Get a copy of the input requested region
-    Input1ImageType::RegionType region = ptr1->GetRequestedRegion();
+    typename Input1ImageType::RegionType region = ptr1->GetRequestedRegion();
     
     // Pad by one
     region.PadByRadius(1);
@@ -259,10 +259,10 @@ void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
 
     Logger::logDebug("\tSetting up derivative filters...");    
     // Setup Derivative filters
-    GaussianFilterType::Pointer dGx = GaussianFilterType::New();
-    GaussianFilterType::Pointer dGy = GaussianFilterType::New();
-    DuplicatorType::Pointer copier = DuplicatorType::New();
-    DifferenceFilterType::Pointer dIt = DifferenceFilterType::New();
+    typename GaussianFilterType::Pointer dGx = GaussianFilterType::New();
+    typename GaussianFilterType::Pointer dGy = GaussianFilterType::New();
+    typename DuplicatorType::Pointer copier = DuplicatorType::New();
+    typename DifferenceFilterType::Pointer dIt = DifferenceFilterType::New();
 
     dGx->SetDirection(0);
     dGy->SetDirection(1);
@@ -276,7 +276,7 @@ void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
 
     // Compute derivatives
     Logger::logDebug("\tComputing derivatives...");
-    DerivativeImageType::Pointer dx, dy, dt;
+    typename DerivativeImageType::Pointer dx, dy, dt;
     // dx = dGx * I1; derivative in x, smooth in y
     dGx->SetFirstOrder();
     dGy->SetZeroOrder();
@@ -310,7 +310,7 @@ void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
 
     // Compute the scaling factor for the structure tensor.
     // pixel area / regularization
-    Input1ImageType::SpacingType spacing = this->GetInput1()->GetSpacing();
+    typename Input1ImageType::SpacingType spacing = this->GetInput1()->GetSpacing();
     double area = 1;
     for (int i = 0; i < ImageDimension; i++)
     {
@@ -322,9 +322,9 @@ void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
     // Compose the structure tensor from the image gradient.
     Logger::logDebug("\tCreating structure tensor...");
     this->m_J = TensorImageType::New();
-    TensorImageType::RegionType region;
-    TensorImageType::RegionType::SizeType size;
-    TensorImageType::RegionType::IndexType idx;
+    typename TensorImageType::RegionType region;
+    typename TensorImageType::RegionType::SizeType size;
+    typename TensorImageType::RegionType::IndexType idx;
     for (int d = 0; d < ImageDimension; d++)
     {
         size[d] = this->GetInput1()->GetLargestPossibleRegion().GetSize()[d];
@@ -375,8 +375,8 @@ void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
     // Allocate the output buffer
     Logger::logDebug("\tAllocating output buffer...");
     Superclass::AllocateOutputs();
-    OutputImageType::Pointer output = this->GetOutput();
-    OutputImageType::RegionType outRegion = output->GetRequestedRegion();
+    typename OutputImageType::Pointer output = this->GetOutput();
+    typename OutputImageType::RegionType outRegion = output->GetRequestedRegion();
 
     // Initialize output to zero flow field
     Logger::logDebug("\tInitializing flow field...");
@@ -395,20 +395,20 @@ void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
     Logger::logDebug("\tSetting up iterators...");
     // Setup neighborhood iterator
     typedef itk::NeighborhoodIterator<OutputImageType> NeighborhoodIteratorType;
-    NeighborhoodIteratorType::RadiusType radius;
+    typename NeighborhoodIteratorType::RadiusType radius;
     radius.Fill(1);
     NeighborhoodIteratorType nIt(radius, output, outRegion);
-    NeighborhoodIteratorType::OffsetType left =  {{-1, 0}};
-    NeighborhoodIteratorType::OffsetType right = {{+1, 0}};
-    NeighborhoodIteratorType::OffsetType above = {{0, -1}};
-    NeighborhoodIteratorType::OffsetType below = {{0, +1}};
+    typename NeighborhoodIteratorType::OffsetType left =  {{-1, 0}};
+    typename NeighborhoodIteratorType::OffsetType right = {{+1, 0}};
+    typename NeighborhoodIteratorType::OffsetType above = {{0, -1}};
+    typename NeighborhoodIteratorType::OffsetType below = {{0, +1}};
     const unsigned int nCount = 4; // number of neighbors
 
     // Setup structure tensor iterator
     typedef itk::ImageRegionConstIterator<TensorImageType> TensorIterator;
-    TensorImageType::RegionType tensorRegion;
-    TensorImageType::RegionType::SizeType size;
-    TensorImageType::RegionType::IndexType index;
+    typename TensorImageType::RegionType tensorRegion;
+    typename TensorImageType::RegionType::SizeType size;
+    typename TensorImageType::RegionType::IndexType index;
     for (int d = 0; d < ImageDimension; d++)
     {
         size[d] = outRegion.GetSize()[d];

@@ -24,6 +24,7 @@ SET (Filters_SRCS
                             Gaussian2DVectorFilter.h
                             GaussianFunctionImageFilter.h
                             NaryMeanImageFilter.h
+                            NaryMeanVectorImageFilter.h
                             NaryVarianceImageFilter.h
                             RegistrationMotionFilter.h
                             WarpImageErrorFilter.h
