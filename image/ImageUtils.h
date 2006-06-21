@@ -2,11 +2,14 @@
 
 #include <string>
 
-#include "itkStatisticsImageFilter.h"
+#include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
+#include "itkStatisticsImageFilter.h"
+
+#include "Logger.h"
 
 template < class TImage >
-void PrintImageInfo( const TImage* image, const std::string& label = "")
+void PrintImageInfo(const TImage* image, const std::string& label = "")
 {
     typedef itk::StatisticsImageFilter< TImage> StatsType;
 
@@ -26,13 +29,42 @@ void PrintImageInfo( const TImage* image, const std::string& label = "")
     std::cout << "\tstd:   " << (float) stats->GetSigma() << std::endl;
 }
 
-template < class TImage>
-void SaveImage( const TImage* image, const std::string& filename)
+template < class TImage >
+void WriteImage(const TImage* image, const std::string& filename)
 {
-	typedef itk::ImageFileWriter< TImage > WriterType;
-	typename WriterType::Pointer writer = WriterType::New();
-	writer->SetInput(image);
-	writer->SetFileName(filename.c_str());
-	writer->Update();
-	std::cout << "Wrote: " << filename << std::endl;
+    typedef itk::ImageFileWriter< TImage > WriterType;
+    typename WriterType::Pointer writer = WriterType::New();
+    writer->SetInput(image);
+    writer->SetFileName(filename.c_str());
+    writer->Update();
+    Logger::verbose << "Wrote:\t" << filename << std::endl;
+}
+
+template < class TImage >
+typename TImage::Pointer ReadImage(const std::string& filename)
+{
+    typedef itk::ImageFileReader< TImage > ReaderType;
+    typename ReaderType::Pointer reader = ReaderType::New();
+    reader->SetFileName(filename.c_str());
+    reader->Update();
+    Logger::verbose << "Read:\t" << filename << std::endl;
+    return reader->GetOutput();
+}
+
+template <class TSourceImage, class TDestImage >
+void CopyRegion(const typename TSourceImage::RegionType& source, typename TDestImage::RegionType& destination)
+{
+    const unsigned int dimension = TSourceImage::ImageDimension;
+
+    typename TDestImage::RegionType::SizeType size;
+    typename TDestImage::RegionType::IndexType index;
+
+    for (unsigned int d = 0; d < dimension; d++)
+    {
+        size[d] = source.GetSize()[d];
+        index[d] = source.GetIndex()[d];
+    }
+
+    destination.SetSize(size);
+    destination.SetIndex(index);
 }

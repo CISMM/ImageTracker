@@ -6,9 +6,11 @@ PROJECT (image)
 ##############################
 
 SET (image_SRCS
-	FileSetImageReader.cxx	FileSetImageReader.h
-							ImageUtils.h
-	TransformGroup.cxx		TransformGroup.h
+    FileSetImageReader.cxx          FileSetImageReader.h
+                                    ImageSetReader.h
+                                    ImageUtils.h
+    TransformGroup.cxx              TransformGroup.h
 )
 
 ADD_LIBRARY (ITImage ${image_SRCS})
+TARGET_LINK_LIBRARIES(ITImage ITCommon)

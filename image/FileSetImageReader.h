@@ -75,7 +75,7 @@ public:
 
 private:
     FileSet* fileSet;
-    FileSet::FileIterator fileIt;
+    FileSet::FileVector::const_iterator fileIt;
     ItkMagickIO::Pointer reader;
 
     /**

@@ -19,7 +19,7 @@ void FileSetImageReader::SetFileSet(FileSet* fileSet)
     
     if (this->fileSet)
     {
-        this->fileIt = this->fileSet->GetFileNames()->begin();
+        this->fileIt = this->fileSet->GetFileNames().begin();
     }
 }
 
@@ -30,15 +30,13 @@ FileSet* FileSetImageReader::GetFileSet()
 
 bool FileSetImageReader::HasNext()
 {
-    bool next = 
-        this->fileSet != NULL &&
-        this->fileIt != NULL;
+    bool next = this->fileSet != NULL;
 
     if (next)
     {
-        *(this->fileIt)++;
-        next = this->fileIt != this->fileSet->GetFileNames()->end();
-        *(this->fileIt)--;
+        ++this->fileIt;
+        next = this->fileIt != this->fileSet->GetFileNames().end();
+        --this->fileIt;
     }
 
     return next;
@@ -63,7 +61,7 @@ std::string FileSetImageReader::NextFileName()
 
 FileSetImageReader::InternalImageType::Pointer FileSetImageReader::FirstImage()
 {
-    this->fileIt = this->fileSet->GetFileNames()->begin();
+    this->fileIt = this->fileSet->GetFileNames().begin();
     return this->CurrentImage();
 }
 
