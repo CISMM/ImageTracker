@@ -21,7 +21,13 @@ ADD_EXECUTABLE(meanrepair TestMeanAttenuationRepair.cxx)
 TARGET_LINK_LIBRARIES(meanrepair ITFilters)
 
 ADD_EXECUTABLE(localrepair TestNeighborhoodAttenuationRepair.cxx)
-TARGET_LINK_LIBRARIES(localrepair ITFilters)
+TARGET_LINK_LIBRARIES(localrepair ITFilters ITImage)
+
+ADD_EXECUTABLE(meanvector AverageVectorImages.cxx)
+TARGET_LINK_LIBRARIES(meanvector ITCommon ITImage ITFilters)
+
+ADD_EXECUTABLE(clgflow ComputeCLGOpticFlow.cxx)
+TARGET_LINK_LIBRARIES(clgflow ITCommon ITImage ITFilters)
 
 INCLUDE (../LocalUsewxWidgets.cmake)
 
