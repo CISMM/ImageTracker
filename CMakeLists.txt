@@ -42,7 +42,7 @@ LINK_DIRECTORIES(${VTK_LIBRARY_DIRS})
 # INCLUDE (./vtkView/Use_ImageMagick.cmake)
 
 #######################################
-# Personal filter library
+# Personal filter library and support classes.
 #######################################
 INCLUDE_DIRECTORIES (
 	${ImageTracker_SOURCE_DIR}/common
@@ -73,7 +73,7 @@ SET (Algorithms_SRCS
 )
 
 ADD_LIBRARY(ITAlgorithms ${Algorithms_SRCS})
-TARGET_LINK_LIBRARIES(ITAlgorithms ITCommon ITKCommon ITKBasicFilters ITKIO ITKAlgorithms )
+TARGET_LINK_LIBRARIES(ITAlgorithms ITCommon ITImage ITFilters ITKCommon ITKBasicFilters ITKIO ITKAlgorithms )
 
 INCLUDE_DIRECTORIES(
     ${ImageTracker_SOURCE_DIR}
@@ -82,9 +82,9 @@ INCLUDE_DIRECTORIES(
     ${ImageTracker_SOURCE_DIR}/wxGui )
 
 #######################################
-# Window components
+# Windowing components and executables
 #######################################
-SUBDIRS(apps vtkView wxGui)
+SUBDIRS(vtkView wxGui apps)
 
 #######################################
 # Testing components
