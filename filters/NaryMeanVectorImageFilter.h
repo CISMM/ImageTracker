@@ -65,8 +65,10 @@ public:
      */
     void AddInput(const TInput* image)
     {
+        // Logger::verbose << "AddInput begin." << std::endl;
         Superclass::SetInput(this->inputIdx, const_cast< TInput* >(image));
         this->inputIdx++;
+        // Logger::verbose << "AddInput end." << std::endl;
     }
 
 protected:

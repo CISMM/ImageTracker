@@ -1,3 +1,4 @@
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -8,7 +9,7 @@
 #include "itkImageFileWriter.h"
 #include "itkMedianImageFilter.h"
 #include "itkMultiplyImageFilter.h"
-#include "itkRescaleIntensityImageFilter.h"
+#include "itkThresholdImageFilter.h"
 
 #include "FilePattern.h"
 #include "FileSet.h"
@@ -27,15 +28,15 @@ int main(int argc, char** argv)
 
     // Typedefs
     enum { Dimension = 2 };
-    typedef itk::Image< unsigned short, Dimension > ImageType;
+    typedef unsigned short PixelType;
+    typedef itk::Image< PixelType, Dimension > ImageType;
     typedef itk::Image< float, Dimension > FloatImageType;
 
     typedef NaryMeanImageFilter< ImageType, FloatImageType > MeanType;
     typedef itk::MedianImageFilter< FloatImageType, FloatImageType > LocalType;
     typedef itk::DivideImageFilter< FloatImageType, FloatImageType, FloatImageType > DivideType;
     typedef itk::MultiplyImageFilter< ImageType, FloatImageType, FloatImageType > MultiplyType;
-
-    typedef itk::RescaleIntensityImageFilter< FloatImageType, ImageType > RescaleType;
+    typedef itk::ThresholdImageFilter< FloatImageType > ThresholdType;
     typedef itk::CastImageFilter< FloatImageType, ImageType > CastType;
 
     // Set up file handling
@@ -60,7 +61,7 @@ int main(int argc, char** argv)
     DivideType::Pointer divide = DivideType::New();
 
     MultiplyType::Pointer multiply = MultiplyType::New();
-    // RescaleType::Pointer rescale = RescaleType::New();
+    ThresholdType::Pointer threshold = ThresholdType::New();
     CastType::Pointer cast = CastType::New();
 
     ImageSetReader<ImageType> video(filesIn);
@@ -75,13 +76,13 @@ int main(int argc, char** argv)
     // Output mean image
     std::cout << "Writing mean image: " << meanFile << std::endl;
     cast->SetInput(mean->GetOutput());
-    WriteImage< ImageType >(cast->GetOutput(), meanFile);
+    WriteImage(cast->GetOutput(), meanFile);
 
     PrintImageInfo< FloatImageType >(mean->GetOutput(), "Mean image");
 
     std::string extF = ".vtk";
     std::string meanFileF = dir + "float-mean" + extF;
-    WriteImage< FloatImageType >(mean->GetOutput(), meanFileF);
+    WriteImage(mean->GetOutput(), meanFileF);
 
     // Set up rest of pipeline
     local->SetInput(mean->GetOutput());
@@ -94,25 +95,32 @@ int main(int argc, char** argv)
     // Output intermediate images
     std::cout << "Writing local metric image: " << localFile << std::endl;
     cast->SetInput(local->GetOutput());
-    WriteImage< ImageType >(cast->GetOutput(), localFile);
+    WriteImage(cast->GetOutput(), localFile);
 
-    PrintImageInfo< FloatImageType >(local->GetOutput(), "Local metric image");
+    PrintImageInfo(local->GetOutput(), "Local metric image");
 
     std::string localFileF = dir + "float-local" + extF;
-    WriteImage< FloatImageType >(local->GetOutput(), localFileF);
+    WriteImage(local->GetOutput(), localFileF);
 
     std::cout << "Writing ratio image (local / mean): " << ratioFile << std::endl;
     cast->SetInput(divide->GetOutput());
-    WriteImage< ImageType >(cast->GetOutput(), ratioFile);
+    WriteImage(cast->GetOutput(), ratioFile);
 
-    PrintImageInfo< FloatImageType >(divide->GetOutput(), "Ratio image");
+    PrintImageInfo(divide->GetOutput(), "Ratio image");
 
     std::string ratioFileF = dir + "float-ratio" + extF;
-    WriteImage< FloatImageType >(divide->GetOutput(), ratioFileF);
+    WriteImage(divide->GetOutput(), ratioFileF);
+
+    // It is possible that a repaired pixel will have intensity over that
+    // allowed by the pixel type.  So, we must threshold to avoid wrap-around
+    // when casting to the output image type.
+    threshold->SetOutsideValue(std::numeric_limits<PixelType>::max());
+    threshold->ThresholdAbove(std::numeric_limits<PixelType>::max());
 
     // Repair video
     multiply->SetInput2(divide->GetOutput());
-    cast->SetInput(multiply->GetOutput());
+    threshold->SetInput(multiply->GetOutput());
+    cast->SetInput(threshold->GetOutput());
     std::cout << "Repairing image sequence..." << std::endl;
     for (unsigned int i = 0; i < video.size(); i++)
     {
@@ -123,7 +131,8 @@ int main(int argc, char** argv)
     PrintImageInfo< ImageType >(video[0], "First original frame");
     multiply->SetInput1(video[0]);
     multiply->Update();
-    PrintImageInfo< FloatImageType >(multiply->GetOutput(), "First repared frame");
+    PrintImageInfo(multiply->GetOutput(), "First repared frame");
+    // WriteImage< FloatImageType >(multiply->GetOutput(), dir + "float-repair-01.vtk");
 
     video.LogStatistics();
 }

@@ -93,9 +93,10 @@ private:
 // Implementation //
 
 template < class TInput, class TOutput >
-typename ImageSetReader<TInput, TOutput>::OutputImagePointer 
+typename ImageSetReader<TInput, TOutput>::OutputImagePointer
 ImageSetReader<TInput, TOutput>::operator[](unsigned int index)
 {
+    // Logger::verbose << "ImageSetReader[" << index << "] begin." << std::endl;
     this->requestCount++;
     // See if the index is in the loaded image list
     IndexList::iterator idx = find(this->indices.begin(), this->indices.end(), index);
@@ -113,5 +114,6 @@ ImageSetReader<TInput, TOutput>::operator[](unsigned int index)
     typename CasterType::Pointer caster = CasterType::New();
     caster->SetInput(this->images[index]);
     caster->Update();
+    // Logger::verbose << "ImageSetReader[" << index << "] end." << std::endl;
     return caster->GetOutput();
 }
