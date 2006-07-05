@@ -61,7 +61,7 @@ int main(int argc, char** argv)
         difference->Update();
         mean->AddInput(difference->GetOutput());
         WriteImage(difference->GetOutput(), filesOut[i]);
-        sprintf(label, "Frame %03d", i);
+        sprintf(label, "Frame %03d difference", i);
         PrintImageInfo(difference->GetOutput(), std::string(label));
     }
     

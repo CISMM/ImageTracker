@@ -59,7 +59,8 @@ int main(int argc, char** argv)
     MeanType::Pointer mean = MeanType::New();
     LocalType::Pointer local = LocalType::New();
     DivideType::Pointer divide = DivideType::New();
-
+    ThresholdType::Pointer ratioClamp = ThresholdType::New();
+    
     MultiplyType::Pointer multiply = MultiplyType::New();
     ThresholdType::Pointer threshold = ThresholdType::New();
     CastType::Pointer cast = CastType::New();
@@ -91,6 +92,11 @@ int main(int argc, char** argv)
     local->SetRadius(radius);
     divide->SetInput1(local->GetOutput()); // what the mean intensity should be at each point
     divide->SetInput2(mean->GetOutput());  // what the mean intensity is
+    // Occluders should only reduce image intensities.
+    // Any attenuation ratios below 1.0 should be clamped.
+    ratioClamp->ThresholdBelow(1.0);
+    ratioClamp->SetOutsideValue(1.0);
+    ratioClamp->SetInput(divide->GetOutput());
 
     // Output intermediate images
     std::cout << "Writing local metric image: " << localFile << std::endl;
@@ -103,13 +109,13 @@ int main(int argc, char** argv)
     WriteImage(local->GetOutput(), localFileF);
 
     std::cout << "Writing ratio image (local / mean): " << ratioFile << std::endl;
-    cast->SetInput(divide->GetOutput());
+    cast->SetInput(ratioClamp->GetOutput());
     WriteImage(cast->GetOutput(), ratioFile);
 
-    PrintImageInfo(divide->GetOutput(), "Ratio image");
+    PrintImageInfo(ratioClamp->GetOutput(), "Ratio image");
 
     std::string ratioFileF = dir + "float-ratio" + extF;
-    WriteImage(divide->GetOutput(), ratioFileF);
+    WriteImage(ratioClamp->GetOutput(), ratioFileF);
 
     // It is possible that a repaired pixel will have intensity over that
     // allowed by the pixel type.  So, we must threshold to avoid wrap-around
@@ -118,7 +124,7 @@ int main(int argc, char** argv)
     threshold->ThresholdAbove(std::numeric_limits<PixelType>::max());
 
     // Repair video
-    multiply->SetInput2(divide->GetOutput());
+    multiply->SetInput2(ratioClamp->GetOutput());
     threshold->SetInput(multiply->GetOutput());
     cast->SetInput(threshold->GetOutput());
     std::cout << "Repairing image sequence..." << std::endl;
@@ -131,7 +137,7 @@ int main(int argc, char** argv)
     PrintImageInfo< ImageType >(video[0], "First original frame");
     multiply->SetInput1(video[0]);
     multiply->Update();
-    PrintImageInfo(multiply->GetOutput(), "First repared frame");
+    PrintImageInfo(multiply->GetOutput(), "First repaired frame");
     // WriteImage< FloatImageType >(multiply->GetOutput(), dir + "float-repair-01.vtk");
 
     video.LogStatistics();

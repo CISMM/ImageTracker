@@ -32,7 +32,10 @@ int main(int argc, char** argv)
     int start = atoi(argv[3]);
     int end = atoi(argv[4]);
     std::string formatOut = argv[5];
-    std::string type = argv[6];
+    
+    std::string type("size"); // default
+    if (argc > 6)
+        type = argv[6];
     
     FileSet filesIn(FilePattern(dir, formatIn, start, end));
     FileSet filesOut(FilePattern(dir, formatOut, start, end));
@@ -74,27 +77,27 @@ int main(int argc, char** argv)
     {
         Logger::verbose << "Setting up modulation regions, varying modulation." << std::endl;
         point.Fill(100);
-        modulate->AddRegion(point, 5.0, 1.0);
+        modulate->AddRegion(point, 3.0, 1.0);
         point.Fill(130);
-        modulate->AddRegion(point, 5.0, 0.9);
+        modulate->AddRegion(point, 3.0, 0.9);
         point.Fill(160);
-        modulate->AddRegion(point, 5.0, 0.8);
+        modulate->AddRegion(point, 3.0, 0.8);
         point.Fill(190);
-        modulate->AddRegion(point, 5.0, 0.7);
+        modulate->AddRegion(point, 3.0, 0.7);
         point.Fill(220);
-        modulate->AddRegion(point, 5.0, 0.6);
+        modulate->AddRegion(point, 3.0, 0.6);
         point.Fill(250);
-        modulate->AddRegion(point, 5.0, 0.5);
+        modulate->AddRegion(point, 3.0, 0.5);
         point.Fill(280);
-        modulate->AddRegion(point, 5.0, 0.4);
+        modulate->AddRegion(point, 3.0, 0.4);
         point.Fill(310);
-        modulate->AddRegion(point, 5.0, 0.3);
+        modulate->AddRegion(point, 3.0, 0.3);
         point.Fill(340);
-        modulate->AddRegion(point, 5.0, 0.2);
+        modulate->AddRegion(point, 3.0, 0.2);
         point.Fill(370);
-        modulate->AddRegion(point, 5.0, 0.1);
-        point.Fill(400);
-        modulate->AddRegion(point, 5.0, 0.0);
+        modulate->AddRegion(point, 3.0, 0.1);
+        // point.Fill(400);
+        // modulate->AddRegion(point, 3.0, 0.0);
     }
     
     Logger::verbose << "Processing video..." << std::endl;
@@ -103,6 +106,10 @@ int main(int argc, char** argv)
         modulate->SetInput(video[i]);
         WriteImage(modulate->GetOutput(), filesOut[i]);
     }
+    
+    PrintImageInfo<ImageType>(video[0], "First original frame");
+    modulate->SetInput(video[0]);
+    PrintImageInfo(modulate->GetOutput(), "First modified frame");
     
     Logger::verbose << "Done." << std::endl;
     video.LogStatistics();

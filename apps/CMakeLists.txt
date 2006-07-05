@@ -15,7 +15,7 @@ ADD_EXECUTABLE(attenuate TestAttenuation.cxx)
 TARGET_LINK_LIBRARIES(attenuate ITFilters)
 
 ADD_EXECUTABLE(variance TestVariance.cxx)
-TARGET_LINK_LIBRARIES(variance ITFilters)
+TARGET_LINK_LIBRARIES(variance ITFilters ITImage)
 
 ADD_EXECUTABLE(meanrepair TestMeanAttenuationRepair.cxx)
 TARGET_LINK_LIBRARIES(meanrepair ITFilters)
