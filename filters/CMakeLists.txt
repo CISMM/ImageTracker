@@ -23,6 +23,7 @@ SET (Filters_SRCS
                             CLGOpticFlowImageFilter.h
                             Gaussian2DVectorFilter.h
                             GaussianFunctionImageFilter.h
+                            ModulateRegionImageFilter.h
                             NaryMeanImageFilter.h
                             NaryMeanVectorImageFilter.h
                             NaryVarianceImageFilter.h

@@ -23,6 +23,12 @@ TARGET_LINK_LIBRARIES(meanrepair ITFilters)
 ADD_EXECUTABLE(localrepair TestNeighborhoodAttenuationRepair.cxx)
 TARGET_LINK_LIBRARIES(localrepair ITFilters ITImage)
 
+ADD_EXECUTABLE(modulate ModulateImages.cxx)
+TARGET_LINK_LIBRARIES(modulate ITFilters ITImage)
+
+ADD_EXECUTABLE(compare CompareVideos.cxx)
+TARGET_LINK_LIBRARIES(compare ITFilters ITImage)
+
 ADD_EXECUTABLE(meanvector AverageVectorImages.cxx)
 TARGET_LINK_LIBRARIES(meanvector ITCommon ITImage ITFilters)
 
