@@ -92,8 +92,8 @@ HarrisFeatureDetector::PointSetType::Pointer
 
     // Log results
     char pointCount[16], featCount[16];
-    itoa(featurePoints->GetNumberOfPoints(), pointCount, 10);
-    itoa(features->size(), featCount, 10);
+    sprintf(pointCount, "%d", featurePoints->GetNumberOfPoints());
+    sprintf(featCount, "%d", features->size());
 
     std::string msg = "Selected maxima: ";
     msg.append(pointCount).append("/").append(featCount);

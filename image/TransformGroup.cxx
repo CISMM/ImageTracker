@@ -10,11 +10,11 @@
 
 #include "Logger.h"
 
-void TransformGroup::LogTransforms(TransformVector* transforms)
+void TransformGroup::LogTransforms(TransformVector& transforms)
 {
-    if (!transforms)
+    if (transforms.size() == 0)
     {
-        Logger::logWarn("LogTransforms(): The transform group was NULL.");
+        Logger::logWarn("LogTransforms(): The transform group was empty.");
     }
     else
     {
@@ -23,9 +23,9 @@ void TransformGroup::LogTransforms(TransformVector* transforms)
         TransformGroup::TransformPointer transform;
         Logger::logInfo("LogTransforms(): ");
         
-        for (TransformGroup::TransformVector::iterator tranIt = transforms->begin();
-            tranIt != transforms->end();
-            tranIt++)
+        for (TransformGroup::TransformVector::iterator tranIt = transforms.begin();
+            tranIt != transforms.end();
+            ++tranIt)
         {
             transform = *tranIt;
             const TransformType::ParametersType params = transform->GetParameters();

@@ -59,7 +59,7 @@ int main(int argc, char** argv)
         difference->SetInput1(video1[i]);
         difference->SetInput2(video2[i]);
         difference->Update();
-        mean->AddInput(difference->GetOutput());
+        mean->PushBackInput(difference->GetOutput());
         WriteImage(difference->GetOutput(), filesOut[i]);
         sprintf(label, "Frame %03d difference", i);
         PrintImageInfo(difference->GetOutput(), std::string(label));

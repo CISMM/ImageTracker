@@ -47,12 +47,12 @@ LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
 INCLUDE (../LocalUsewxWidgets.cmake)
 
 SET (ITView_SRCS
-							ConnectVTKITK.h
+					ConnectVTKITK.h
 	ImageWindow.cxx			ImageWindow.h
-	ItkMagickIO.cxx			ItkMagickIO.h
 	VtkCanvas.cxx			VtkCanvas.h
 	VtkViewer.cxx			VtkViewer.h
 	vtkViewer_wdr.cpp		vtkViewer_wdr.h
+	wxUtils.cxx                     wxUtils.h
 	wxVTKRenderWindowInteractor.cxx	wxVTKRenderWindowInteractor.h
 )
 
@@ -69,4 +69,5 @@ TARGET_LINK_LIBRARIES(ITView
 	ITKAlgorithms
 )
 
-
+ADD_EXECUTABLE(vtk TestVtk.cxx)
+TARGET_LINK_LIBRARIES(vtk ITCommon vtkIO vtkCommon vtkGraphics vtkRendering)

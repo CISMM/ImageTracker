@@ -16,6 +16,7 @@
     #pragma hdrstop
 #endif
 
+#include "wxUtils.h"
 #include "MultiResolutionRegistrationDialog.h"
 
 // WDR: class implementations
@@ -91,21 +92,21 @@ void MultiResolutionRegistrationDialog::UpdateCanvas()
     }
 }
 
-void MultiResolutionRegistrationDialog::SetInputFiles(FileSet& inputFiles)
+void MultiResolutionRegistrationDialog::SetInputFiles(const FileSet& inputFiles)
 { 
     this->pipeline->SetInputFiles(inputFiles);
-    if (this->GetTextOutDirectory()->GetValue().IsSameAs(""))
-        this->GetTextOutDirectory()->SetValue(this->pipeline->GetInputFiles()->GetDirectory().c_str());
-    if (this->GetTextTransform()->GetValue().IsSameAs(""))
+    if (this->GetTextOutDirectory()->GetValue().IsSameAs(_("")))
+        this->GetTextOutDirectory()->SetValue(std2wx(this->pipeline->GetInputFiles().GetDirectory()));
+    if (this->GetTextTransform()->GetValue().IsSameAs(_("")))
     {
-        wxString file(this->pipeline->GetInputFiles()->GetDirectory().c_str());
-        file.append("MRTransforms.txt"); // wx treats back slashes ok
+        wxString file(std2wx(this->pipeline->GetInputFiles().GetDirectory()));
+        file.append(_("MRTransforms.txt")); // wx treats back slashes ok
         this->GetTextTransform()->SetValue(file);
     }
-    if (this->GetTextPrefix()->GetValue().IsSameAs(""))
-        this->GetTextPrefix()->SetValue("MRReg-");
+    if (this->GetTextPrefix()->GetValue().IsSameAs(_("")))
+        this->GetTextPrefix()->SetValue(_("MRReg-"));
 
-	this->UpdateCanvas();
+    this->UpdateCanvas();
 }
 
 // WDR: handler implementations for MultiResolutionRegistrationDialog
@@ -141,8 +142,8 @@ void MultiResolutionRegistrationDialog::OnButtonHide( wxCommandEvent &event )
 
 void MultiResolutionRegistrationDialog::OnButtonRun( wxCommandEvent &event )
 {    
-    if (this->GetTextOutDirectory()->GetValue().IsSameAs("") ||
-        this->GetTextTransform()->GetValue().IsSameAs(""))
+    if (this->GetTextOutDirectory()->GetValue().IsSameAs(_("")) ||
+        this->GetTextTransform()->GetValue().IsSameAs(_("")))
     {
         wxMessageDialog alert(this, _("You must specify an output directory and transform file."), _("Output unspecified"), wxOK);
         alert.ShowModal();
@@ -150,24 +151,24 @@ void MultiResolutionRegistrationDialog::OnButtonRun( wxCommandEvent &event )
     }
 
     // Determine the output info
-    this->pipeline->SetTransformFile(this->GetTextTransform()->GetValue().c_str());
-    FileSet files(this->pipeline->GetInputFiles(), this->GetTextPrefix()->GetValue().c_str());
-    files.SetDirectory(this->GetTextOutDirectory()->GetValue().c_str());
+    this->pipeline->SetTransformFile(wx2std(this->GetTextTransform()->GetValue()));
+    FileSet files(this->pipeline->GetInputFiles(), wx2std(this->GetTextPrefix()->GetValue()));
+    files.SetDirectory(wx2std(this->GetTextOutDirectory()->GetValue()));
     this->pipeline->SetOutputFiles(files);
 
     // Run pipeline
-	Logger::info << "Running MultiResolutionRegistration...." << std::endl;
+    Logger::info << "Running MultiResolutionRegistration...." << std::endl;
     this->pipeline->Update();
-	Logger::info << "Finished." << std::endl;
+    Logger::info << "Finished." << std::endl;
 }
 
 void MultiResolutionRegistrationDialog::OnButtonOutDirectory( wxCommandEvent &event )
 {
-    wxDirDialog dir(this, _("Choose a directory"), wxString(this->pipeline->GetInputFiles()->GetDirectory().c_str()), wxDD_NEW_DIR_BUTTON);
+    wxDirDialog dir(this, _("Choose a directory"), std2wx(this->pipeline->GetInputFiles().GetDirectory()), wxDD_NEW_DIR_BUTTON);
     if (dir.ShowModal() == wxID_OK)
     {
         wxString outDir(dir.GetPath());
-        outDir.append("\\");
+        outDir.append(_("\\"));
         this->GetTextOutDirectory()->SetValue(outDir);
     }
 }
@@ -179,8 +180,8 @@ void MultiResolutionRegistrationDialog::OnButtonTransformFile( wxCommandEvent &e
     {
         this->GetTextTransform()->SetValue(save.GetPath());
 
-        if (this->GetTextOutDirectory()->GetValue().IsSameAs(""))
-            this->GetTextOutDirectory()->SetValue(save.GetDirectory() + "\\");
+        if (this->GetTextOutDirectory()->GetValue().IsSameAs(_("")))
+            this->GetTextOutDirectory()->SetValue(save.GetDirectory() + _("\\"));
     }
 }
 

@@ -2,10 +2,10 @@
 #include "itkStatisticsImageFilter.h"
 
 #include "Logger.h"
+#include "ImageUtils.h"
 
 FileSetImageReader::FileSetImageReader(FileSet* fileSet)
 {
-    this->reader = ItkMagickIO::New();
     this->SetFileSet(fileSet);
 }
 
@@ -67,19 +67,7 @@ FileSetImageReader::InternalImageType::Pointer FileSetImageReader::FirstImage()
 
 FileSetImageReader::InternalImageType::Pointer FileSetImageReader::CurrentImage()
 {
-    return this->reader->Read(this->CurrentFileName());
-
-    // typedef itk::StatisticsImageFilter<InternalImageType> StatsType;
-    // Compute and print max/min for image
-    //StatsType::Pointer stats = StatsType::New();
-    //stats->SetInput(this->reader->Read(this->CurrentFileName()));
-    //stats->Update();
-    //char text[80];
-    //sprintf(text, "Min: %5.2f", stats->GetMinimum());
-    //Logger::logDebug(text);
-    //sprintf(text, "Max: %5.2f", stats->GetMaximum());
-    //Logger::logDebug(text);
-    //return stats->GetOutput();
+    return ReadImage<InternalImageType>(this->CurrentFileName());
 }
 
 FileSetImageReader::InternalImageType::Pointer FileSetImageReader::NextImage()

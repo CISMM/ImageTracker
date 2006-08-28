@@ -11,9 +11,9 @@ public:
     DemonsPipeline(void);
     ~DemonsPipeline(void);
     void Update(void);
-    void SetInputFiles(FileSet* files);
-    void SetOutputFiles(FileSet* files);
+    void SetInputFiles(const FileSet& files);
+    void SetOutputFiles(const FileSet& files);
 private:
-    FileSet* inFiles;
-    FileSet* outFiles;
+    FileSet inFiles;
+    FileSet outFiles;
 };

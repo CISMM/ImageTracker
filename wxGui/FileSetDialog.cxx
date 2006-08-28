@@ -1,5 +1,8 @@
-#include "FileSetDialog.h"
+
 #include "Logger.h"
+#include "wxUtils.h"
+
+#include "FileSetDialog.h"
 
 // WDR: class implementations
 
@@ -37,19 +40,19 @@ VtkCanvas* FileSetDialog::GetCanvas()
     return this->canvas;
 }
 
-FileSet* FileSetDialog::GetFileSet()
+const FileSet& FileSetDialog::GetFileSet()
 {
-    FileSet* files = new FileSet();
+    this->files = FileSet();
 
-    FileSet::FileVector* vFiles = new FileSet::FileVector();
+    FileSet::FileVector vFiles;
     wxString* pFile = NULL;
     for (int i = 0; i < this->GetListFiles()->GetCount(); i++)
     {
-        pFile = (wxString*) this->GetListFiles()->GetClientData(i);
-        vFiles->push_back(pFile->c_str());
+        pFile = static_cast<wxString*>(this->GetListFiles()->GetClientData(i));
+        vFiles.push_back(wx2std(*pFile));
     }
 
-    files->SetFileNames(vFiles);
+    files.SetFileNames(vFiles);
     return files;
 }
 
@@ -62,14 +65,14 @@ void FileSetDialog::OnListFilesDoubleClick( wxCommandEvent &event )
     if (count > 0)
     {
         int sel = (int) sels.Last();
-        wxString* filename = (wxString *) this->GetListFiles()->GetClientData(sel);
-        this->GetCanvas()->SetFileName(filename->c_str());
+        wxString* filename = static_cast<wxString*>(this->GetListFiles()->GetClientData(sel));
+        this->GetCanvas()->SetFileName(wx2std(*filename));
     }
 }
 
 void FileSetDialog::OnAdd( wxCommandEvent &event )
 {
-    wxFileDialog addFiles(this, "Open files", 
+    wxFileDialog addFiles(this, _("Open files"), 
         wxEmptyString, wxEmptyString, 
         FSD_FILETYPES, wxOPEN | wxMULTIPLE);
 
@@ -104,8 +107,8 @@ void FileSetDialog::OnRemove( wxCommandEvent &event )
         int count = selections.GetCount();
         int total = this->GetListFiles()->GetCount();
         wxString msg;
-        msg.Printf("%d of %d files selected for deletion.", count, total);
-        Logger::logDebug(msg.c_str());
+        msg.Printf(_("%d of %d files selected for deletion."), count, total);
+        Logger::debug << wx2std(msg) << std::endl;
 
         for (unsigned int i = 0; i < selections.GetCount(); i++)
         {

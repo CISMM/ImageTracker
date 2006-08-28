@@ -6,7 +6,9 @@
 #include "itkHistogramMatchingImageFilter.h"
 #include "itkVector.h"
 
-#include "FileSetImageReader.h"
+#include "CommonTypes.h"
+#include "ImageSetReader.h"
+#include "ImageUtils.h"
 
 DemonsPipeline::DemonsPipeline(void)
 {
@@ -18,38 +20,36 @@ DemonsPipeline::~DemonsPipeline(void)
 
 void DemonsPipeline::Update()
 {
-    if (this->inFiles == NULL ||
-        this->outFiles == NULL ||
-        this->inFiles->GetFileNames()->size() < 2)
+    if (this->inFiles.size() < 2 ||
+        this->outFiles.size() == 0)
     {
         std::cerr << "DemonsPipeline::Update() Warning: input or output files improperly configured." << std::endl;
         return;
     }
 
     // Define types used
+    typedef CommonTypes::InputImageType InputImageType;
+    typedef CommonTypes::InternalImageType InternalImageType;
+    typedef ImageSetReader<InputImageType, InternalImageType> ReaderType;
     typedef itk::HistogramMatchingImageFilter<ImageType, ImageType> MatchingFilterType;
     typedef itk::Vector<float, 2> VectorType;
     typedef itk::Image<VectorType, 2> VectorImageType;
     typedef itk::DemonsRegistrationFilter<ImageType, ImageType, VectorImageType> RegistrationType;
-    typedef itk::ImageFileWriter<VectorImageType> WriterType;
     
     // Instantiate processing objects
     MatchingFilterType::Pointer matcher = MatchingFilterType::New();
     RegistrationType::Pointer demons = RegistrationType::New();
 
-    FileSetImageReader* pReader = new FileSetImageReader(this->inFiles);
-    std::cout << "Reading => " << pReader->CurrentFileName() << std::endl;
-    ImageType::Pointer movingImage = pReader->CurrentImage();
+    ReaderType reader(this->inFiles);
+    std::cout << "Reading => " << this->inFiles[0] << std::endl;
+    ImageType::Pointer movingImage = reader[0];
     ImageType::Pointer fixedImage;
 
-    WriterType::Pointer writer = WriterType::New();
-    FileSet::FileIterator outIt = this->outFiles->GetFileNames()->begin();
-
     // Process each image
-    while (pReader->HasNext())
+    for (unsigned int i = 0; i < reader.size()-1; i++)
     {
-        fixedImage = pReader->NextImage();
-        std::cout << "Reading => " << pReader->CurrentFileName() << std::endl;
+        fixedImage = reader[i+1];
+        std::cout << "Reading => " << this->inFiles[i+1] << std::endl;
         
         // Histogram match (required for Demons)
         matcher->SetInput(movingImage);
@@ -67,25 +67,19 @@ void DemonsPipeline::Update()
         demons->Update();
 
         // Write vector field output
-        std::string outFile = *outIt;
-        std::cout << "Writing => " << outFile << std::endl;
-        writer->SetFileName(outFile.c_str());
-        *outIt++;
-        writer->SetInput(demons->GetOutput());
-        writer->Update();
+        std::cout << "Writing => " << this->outFiles[i] << std::endl;
+        WriteImage(demons->GetOutput(), this->outFiles[i]);
 
         movingImage = fixedImage;
     }
-
-    delete pReader;
 }
 
-void DemonsPipeline::SetInputFiles(FileSet* files)
+void DemonsPipeline::SetInputFiles(const FileSet& files)
 {
     this->inFiles = files;
 }
 
-void DemonsPipeline::SetOutputFiles(FileSet* files)
+void DemonsPipeline::SetOutputFiles(const FileSet& files)
 {
     this->outFiles = files;
 }

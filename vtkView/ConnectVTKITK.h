@@ -1,5 +1,4 @@
-#ifndef __ConnectVTKITK_h
-#define __ConnectVTKITK_h
+#pragma once
 
 #include "itkVTKImageExport.h"
 #include "itkVTKImageImport.h"
@@ -41,5 +40,3 @@ void ConnectVTKToITK(vtkImageExport* in, itk::VTKImageImport<ImageType>* out)
   out->SetBufferPointerCallback(in->GetBufferPointerCallback());
   out->SetCallbackUserData(in->GetCallbackUserData());
 };
-
-#endif

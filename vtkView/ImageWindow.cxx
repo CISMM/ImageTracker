@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "ImageWindow.h"
-#include "Logger.h"
+#include "wxUtils.h"
 
 // WDR: class implementations
 
@@ -28,7 +28,6 @@ ImageWindow::ImageWindow( wxWindow *parent, wxWindowID id, const wxString &title
 {
     // WDR: dialog function ImageWindowDialog for ImageWindow
     CreateVtkViewer(this, true);
-    Logger::logDebug("ImageWindow::constructor");
 }
 
 ImageWindow::~ImageWindow()
@@ -40,23 +39,22 @@ void ImageWindow::ImShow(CommonTypes::InternalImageType::Pointer image)
 {
     ImageWindow::s_windowCount++;
     wxString title;
-    title.Printf("Image %d", ImageWindow::s_windowCount);
+    title.Printf(_("Image %d"), ImageWindow::s_windowCount);
 
-    ImageWindow::ImShow(image, std::string(title.c_str()));
+    ImageWindow::ImShow(image, wx2std(title.c_str()));
 }
 
 void ImageWindow::ImShow(CommonTypes::InternalImageType::Pointer image, std::string title)
 {
     ImageWindow::s_windowCount++;
-    wxString wxtitle = _(title.c_str());
 
-    ImageWindow* wind = new ImageWindow((wxWindow*) NULL, -1, wxtitle);
+    ImageWindow* wind = new ImageWindow((wxWindow*) NULL, -1, std2wx(title));
     wind->GetCanvas()->SetItkImage(image);
     wind->Show(true);
     ImageWindow::s_windowList->push_back(wind);
 }
 
-void ImageWindow::Destroy()
+void ImageWindow::DestroyWindows()
 {
     std::vector<ImageWindow*>::iterator it = ImageWindow::s_windowList->begin();
     while (it != ImageWindow::s_windowList->end())
@@ -67,7 +65,3 @@ void ImageWindow::Destroy()
 }
 
 // WDR: handler implementations for ImageWindow
-
-
-
-

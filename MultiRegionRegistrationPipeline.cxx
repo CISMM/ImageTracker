@@ -1,8 +1,7 @@
 #include "MultiRegionRegistrationPipeline.h"
 
-#include "itkImageFileWriter.h"
-
-#include "FileSetImageReader.h"
+#include "ImageSetReader.h"
+#include "ImageUtils.h"
 #include "HarrisFeatureDetector.h"
 #include "Logger.h"
 
@@ -12,26 +11,6 @@ MultiRegionRegistrationPipeline::MultiRegionRegistrationPipeline(void)
 
 MultiRegionRegistrationPipeline::~MultiRegionRegistrationPipeline(void)
 {
-}
-
-void MultiRegionRegistrationPipeline::SetSource(FileSet* source)
-{
-    this->source = source;
-}
-
-void MultiRegionRegistrationPipeline::SetDestination(FileSet* destination)
-{
-    this->destination = destination;
-}
-
-FileSet* MultiRegionRegistrationPipeline::GetSource()
-{
-    return this->source;
-}
-
-FileSet* MultiRegionRegistrationPipeline::GetDestination()
-{
-    return this->destination;
 }
 
 void MultiRegionRegistrationPipeline::SetRegistrar(MultiRegionRegistration* registrar)
@@ -50,36 +29,28 @@ MultiRegionRegistration* MultiRegionRegistrationPipeline::GetRegistrar()
 
 void MultiRegionRegistrationPipeline::Update(bool findFeatures)
 {
-    if (this->source == NULL ||
-        this->destination == NULL)
+    if (!(this->source.size() == 0 ||
+          this->destination.size() == 0))
     {
         std::cerr << "MultiRegionRegistrationPipeline::Update() Warning: source or destination not configured." << std::endl;
+        return;
     }
 
-    FileSetImageReader* pReader = new FileSetImageReader(this->source);
-    FileSetImageReader::InternalImageType::Pointer pCurrent = pReader->CurrentImage();
-
-    typedef itk::ImageFileWriter<MultiRegionRegistration::OutputImageType> WriterType;
-    WriterType::Pointer writer = WriterType::New();
-    FileSet::FileIterator outIt = this->destination->GetFileNames()->begin();
-
-    FileSetImageReader::InternalImageType::Pointer pNext = NULL;
-    MultiRegionRegistration::OutputImageType::Pointer outImage = NULL;
+    ReaderType reader(this->source);
     HarrisFeatureDetector* detector = new HarrisFeatureDetector(2000, 1.2);
-
-    for ( ; pReader->HasNext() &&
-            outIt != this->destination->GetFileNames()->end(); 
-            *outIt++)
+    MultiRegionRegistration::OutputImageType::Pointer outImage;
+    
+    for (unsigned int i = 0; 
+        i < this->source.size() - 1 && i < this->destination.size(); 
+        i++)
     {
-        pNext = pReader->NextImage();
-
-        registrar->SetFixedImage(pNext);
-        registrar->SetMovingImage(pCurrent);
+        registrar->SetFixedImage(reader[i+1]);
+        registrar->SetMovingImage(reader[i]);
 
         if (findFeatures) // Only compute motion where there is enough information
         {
             HarrisFeatureDetector::PointSetType::Pointer features = 
-                detector->findFeatures(pCurrent);
+                detector->findFeatures(reader[i]);
             outImage = registrar->Update(features);
         }
         else
@@ -88,15 +59,9 @@ void MultiRegionRegistrationPipeline::Update(bool findFeatures)
         }
         
         // Write image to file
-        std::string filename = *outIt;
-        Logger::logInfo("Writing vector image: " + filename);
-        writer->SetFileName(filename.c_str());
-        writer->SetInput(outImage);
-        writer->Update();
-        
-        pCurrent = pNext;
+        Logger::logInfo("Writing vector image: " + this->destination[i]);
+        WriteImage<MultiRegionRegistration::OutputImageType>(outImage, this->destination[i]);
     }
 
-    delete(pReader);
     delete(detector);
 }

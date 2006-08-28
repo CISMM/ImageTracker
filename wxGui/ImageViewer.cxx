@@ -54,7 +54,7 @@ ImageViewer::ImageViewer( wxWindow *parent, wxWindowID id, const wxString &title
     this->GetFileSetPanel()->SetCanvas(this->GetCanvas());
 
 	// Choose an initial log level
-	Logger::setLevel(Info);
+	Logger::setLevel(Verbose);
 	wxMenuItem* item = this->GetMenuBar()->FindItem(IV_LOG_INFO);
 	if (item)
 		item->Check(true);
@@ -92,7 +92,7 @@ void ImageViewer::OnLogging( wxCommandEvent &event )
 
 void ImageViewer::OnRegisterMultiResolution( wxCommandEvent &event )
 {
-    if (this->GetFileSetPanel()->GetFileSet()->GetFileNames()->size() == 0)
+    if (this->GetFileSetPanel()->GetFileSet().size() == 0)
     {
         Logger::logWarn("Please open image files first.");
         this->OnOpenFiles(event);
@@ -106,14 +106,14 @@ void ImageViewer::OnRegisterMultiResolution( wxCommandEvent &event )
     }
 
     Logger::logVerbose("Showing multi-resolution registration dialog.");
-    this->mrRegistrationDialog->SetInputFiles(*(this->GetFileSetPanel()->GetFileSet()));
+    this->mrRegistrationDialog->SetInputFiles(this->GetFileSetPanel()->GetFileSet());
     this->mrRegistrationDialog->Show(true);
 }
 
 void ImageViewer::OnCLGOpticFlow( wxCommandEvent &event )
 {
     // Ensure we have image files to use
-    if (this->GetFileSetPanel()->GetFileSet()->GetFileNames()->size() == 0)
+    if (this->GetFileSetPanel()->GetFileSet().size() == 0)
     {
         Logger::logWarn("Please open image files first.");
         this->OnOpenFiles(event);
@@ -128,7 +128,7 @@ void ImageViewer::OnCLGOpticFlow( wxCommandEvent &event )
 
     Logger::logVerbose("Showing CLG optic flow dialog.");
     this->clgFlowDialog->SetInput(this->GetFileSetPanel()->GetFileSet());
-    this->clgFlowDialog->Show(true);    
+    this->clgFlowDialog->Show(true);
 }
 
 void ImageViewer::OnAbout( wxCommandEvent &event )
@@ -145,7 +145,7 @@ void ImageViewer::OnAbout( wxCommandEvent &event )
 
 void ImageViewer::OnRegister( wxCommandEvent &event )
 {
-    if (this->GetFileSetPanel()->GetFileSet()->GetFileNames()->size() == 0)
+    if (this->GetFileSetPanel()->GetFileSet().size() == 0)
     {
         Logger::logWarn("Please open image files first.");
         this->OnOpenFiles(event);
@@ -166,7 +166,7 @@ void ImageViewer::OnRegister( wxCommandEvent &event )
 
 void ImageViewer::OnTrack( wxCommandEvent &event )
 {
-    if (this->GetFileSetPanel()->GetFileSet()->GetFileNames()->size() == 0)
+    if (this->GetFileSetPanel()->GetFileSet().size() == 0)
     {
         Logger::logWarn("Please open image files first.");
         this->OnOpenFiles(event);

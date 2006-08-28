@@ -1,10 +1,16 @@
 #pragma once
+
 #include <vector>
-#include <wx/wxprec.h>
+
+// For compilers that support precompilation, includes "wx/wx.h".
+#include "wx/wxprec.h"
+#ifndef WX_PRECOMP
+    #include "wx/wx.h"
+#endif
+
 #include "RegistrationDesign_wdr.h"
 #include "VtkCanvas.h"
 #include "FileSet.h"
-
 
 /* todo Consoldiate constants in one file? */
 static const wxChar *FSD_FILETYPES = _T("All Files|*.*|"
@@ -30,7 +36,7 @@ public:
     
     void SetCanvas(VtkCanvas *canvas);
     VtkCanvas* GetCanvas();
-    FileSet* GetFileSet();
+    const FileSet& GetFileSet();
 
     // WDR: method declarations for FileSetDialog
     wxListBox* GetListFiles()  { return (wxListBox*) FindWindow( ID_LIST_FILES ); }
@@ -46,6 +52,7 @@ private:
     void OnRemove( wxCommandEvent &event );
 
     VtkCanvas *canvas;
+    FileSet files;
 
 private:
     DECLARE_EVENT_TABLE()

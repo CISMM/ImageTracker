@@ -16,8 +16,10 @@
     #pragma hdrstop
 #endif
 
-#include "wxDoubleSlider.h"
 #include "Logger.h"
+#include "wxUtils.h"
+#include "wxDoubleSlider.h"
+
 
 // WDR: class implementations
 
@@ -59,7 +61,7 @@ void wxDoubleSlider::SetRange(double min, double max, double interval)
     this->interval = interval;
 
     // Compute number of ticks to use for an integer-based slider
-    int ticks = (this->maximum - this->minimum) / this->interval;
+    int ticks = static_cast<int>((this->maximum - this->minimum) / this->interval);
     this->GetSlider()->SetRange(0, ticks);
 
     // Create min and max labels
@@ -103,7 +105,7 @@ int wxDoubleSlider::GetValueAsInt()
 
 void wxDoubleSlider::SetFormat(const std::string& format)
 {
-    this->format = format.c_str();
+    this->format = std2wx(format);
 
     // Create min and max labels and value
     this->GetLabelLeft()->SetLabel(wxString::Format(this->format, this->minimum));

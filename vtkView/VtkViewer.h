@@ -5,13 +5,10 @@
 // Copyright:   XX
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __vtkViewer_H__
-#define __vtkViewer_H__
+#pragma once
 
-#if defined(__GNUG__) && !defined(NO_GCC_PRAGMA)
-    #pragma interface "vtkViewer.cxx"
-#endif
-
+// For compilers that support precompilation, includes "wx/wx.h".
+#include "wx/wxprec.h"
 #ifndef WX_PRECOMP
     #include "wx/wx.h"
 #endif
@@ -56,5 +53,3 @@ private:
 private:
     DECLARE_EVENT_TABLE()
 };
-
-#endif

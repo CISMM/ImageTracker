@@ -1,5 +1,11 @@
 #pragma once
-#include <wx/wxprec.h>
+
+// For compilers that support precompilation, includes "wx/wx.h".
+#include "wx/wxprec.h"
+#ifndef WX_PRECOMP
+    #include "wx/wx.h"
+#endif
+
 #include "RegistrationDesign_wdr.h"
 #include "CLGOpticFlowDialog.h"
 #include "LoggerPanel.h"
@@ -20,7 +26,6 @@ static const wxChar *ITK_FILETYPES = _T("All Files|*.*|"
                                         "TIFF Files|*.tif;*.tiff|"
                                         "PNG Files|*.png|"
                                         "JPG Files|*.jpg");
-
 
 class TrackerApp : public wxApp
 {

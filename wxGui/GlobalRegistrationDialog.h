@@ -1,11 +1,17 @@
 #pragma once
-#include <wx/wxprec.h>
+
+// For compilers that support precompilation, includes "wx/wx.h".
+#include "wx/wxprec.h"
+#ifndef WX_PRECOMP
+    #include "wx/wx.h"
+#endif
+
 #include "DoubleSlider.h"
 #include "FileSetDialog.h"
 #include "RegistrationDesign_wdr.h"
 
-#include "../GlobalRegistrationPipeline.h"
-#include "../vtkView/VtkCanvas.h"
+#include "GlobalRegistrationPipeline.h"
+#include "VtkCanvas.h"
 
 /*
  * A dialog control that allows for configuration of registration.

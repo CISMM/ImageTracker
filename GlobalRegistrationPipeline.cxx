@@ -4,11 +4,10 @@
 #include "RegistrationOutput.h"
 #include "TransformGroup.h"
 
-GlobalRegistrationPipeline::GlobalRegistrationPipeline(void)
+GlobalRegistrationPipeline::GlobalRegistrationPipeline(void) :
+    init(false),
+    index(0)
 {
-    this->init = false;
-    this->inputFiles = NULL;
-    this->reader = NULL;
     this->thresholderF = NULL;
     this->thresholderM = NULL;
     this->smootherFx = NULL;
@@ -19,22 +18,19 @@ GlobalRegistrationPipeline::GlobalRegistrationPipeline(void)
     this->below = NULL;
     this->sigma = 0.5;
     this->registrar = NULL;
-    this->transforms = NULL;
-    this->outputFiles = NULL;
 }
 
 GlobalRegistrationPipeline::~GlobalRegistrationPipeline(void)
 {
-    delete this->transforms;
-    delete this->reader;
     delete this->registrar;
 }
 
 void GlobalRegistrationPipeline::InitializePipeline()
 {
-    if (this->inputFiles)
+    if (this->inputFiles.size() != 0)
     {
-        this->reader = new FileSetImageReader(this->inputFiles);
+        this->reader = ReaderType(this->inputFiles);
+        this->index = 0;
 
         this->thresholderF = ThresholdType::New();
         this->thresholderM = ThresholdType::New();
@@ -48,16 +44,15 @@ void GlobalRegistrationPipeline::InitializePipeline()
         this->smootherFx->SetDirection(1);
         this->smootherMx->SetDirection(1);
 
-        this->thresholderF->SetInput(this->reader->CurrentImage());
-        this->thresholderM->SetInput(this->reader->NextImage());
-        this->reader->FirstImage();
+        this->thresholderF->SetInput(this->reader[this->index]);
+        this->thresholderM->SetInput(this->reader[this->index+1]);
 
         this->smootherFx->SetInput(this->thresholderF->GetOutput());
         this->smootherFy->SetInput(this->smootherFx->GetOutput());
         this->smootherMx->SetInput(this->thresholderM->GetOutput());
         this->smootherMy->SetInput(this->smootherMx->GetOutput());
         
-        this->transforms = new TransformVector();
+        this->transforms = TransformVector();
         this->registrar = new RegistrationHelper();
 
         this->init = true;
@@ -115,16 +110,16 @@ GlobalRegistrationPipeline::TransformType::Pointer GlobalRegistrationPipeline::U
         this->InitializePipeline();
     }
 
-    if (this->init && this->reader->HasNext())
+    if (this->init && this->index < (this->reader.size()-1))
     {
-        this->thresholderF->SetInput(this->reader->CurrentImage());
-        this->thresholderM->SetInput(this->reader->NextImage());
+        this->thresholderF->SetInput(this->reader[this->index]);
+        this->thresholderM->SetInput(this->reader[this->index+1]);
 
         result = this->registrar->Register(
             this->GetCurrentFixedImage(), 
             this->GetCurrentMovingImage());
 
-        this->transforms->push_back(result);
+        this->transforms.push_back(result);
     }
 
     return result;
@@ -134,33 +129,32 @@ GlobalRegistrationPipeline::TransformVector * GlobalRegistrationPipeline::Update
 {
     while (this->UpdateOne()); // Repeat until a NULL result is returned
 
-    return this->transforms;
+    return &this->transforms;
 }
 
 bool GlobalRegistrationPipeline::IsRegistrationFinished()
 {
-    return (this->init && !this->reader->HasNext());
+    return (this->init && !(this->index < this->reader.size()-1));
 }
 
 void GlobalRegistrationPipeline::SaveTransforms()
 {
-    if (this->transforms != NULL)
+    if (this->transforms.size() != 0)
     {
-        TransformGroup::SaveTransforms(this->transforms, this->transformFile);
+        TransformGroup::SaveTransforms(&this->transforms, this->transformFile);
     }
 }
 
 void GlobalRegistrationPipeline::SaveImages()
 {
-    if (this->transforms && this->inputFiles && this->outputFiles)
+    if (!(this->transforms.size() == 0 || this->inputFiles.size() == 0 || this->outputFiles.size() == 0))
     {
-        RegistrationOutput *regOut = 
-            new RegistrationOutput(
+        RegistrationOutput regOut(
             this->inputFiles, 
             this->transforms, 
             this->outputFiles, 
             RegistrationOutput::COMPOSE_PRE);
-        regOut->Update();
+        regOut.Update();
     }
 }
 
@@ -182,13 +176,13 @@ void GlobalRegistrationPipeline::SetSmoothSigma(double sigma)
     this->UpdatePipeline();
 }
 
-void GlobalRegistrationPipeline::SetInput(FileSet * input)
+void GlobalRegistrationPipeline::SetInput(const FileSet& input)
 {
     this->inputFiles = input;
     this->InitializePipeline();
 }
 
-void GlobalRegistrationPipeline::SetOutput(FileSet * output)
+void GlobalRegistrationPipeline::SetOutput(const FileSet& output)
 {
     this->outputFiles = output;
 }
@@ -198,12 +192,12 @@ void GlobalRegistrationPipeline::SetTransformFile(std::string transformFile)
     this->transformFile = transformFile;
 }
 
-FileSet* GlobalRegistrationPipeline::GetInput()
+const FileSet& GlobalRegistrationPipeline::GetInput()
 {
     return this->inputFiles;
 }
 
-FileSet* GlobalRegistrationPipeline::GetOutput()
+const FileSet& GlobalRegistrationPipeline::GetOutput()
 {
     return this->outputFiles;
 }
@@ -225,7 +219,7 @@ GlobalRegistrationPipeline::ImageType::Pointer GlobalRegistrationPipeline::GetCu
     return this->smootherMy->GetOutput();
 }
 
-GlobalRegistrationPipeline::TransformVector * GlobalRegistrationPipeline::GetTransforms()
+const GlobalRegistrationPipeline::TransformVector& GlobalRegistrationPipeline::GetTransforms()
 {
     return this->transforms;
 }

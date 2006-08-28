@@ -1,6 +1,6 @@
 #include "MultiRegionRegistration.h"
+#include <exception>
 #include <iostream>
-#include <stdio.h>
 
 #include "itkExceptionObject.h"
 #include "itkImageRegionIterator.h"
@@ -11,7 +11,7 @@ MultiRegionRegistration::OutputImageType::Pointer MultiRegionRegistration::Updat
 {
     if (this->movingImage.IsNull() || this->fixedImage.IsNull())
     {
-        throw exception("Fixed or moving image not setup.");
+        throw std::invalid_argument("Fixed or moving image not setup.");
     }
 
     OutputImageType::Pointer output = this->CreateVectorImage(this->movingImage);
@@ -26,7 +26,7 @@ MultiRegionRegistration::OutputImageType::Pointer MultiRegionRegistration::Updat
 
     pTransform = NULL;
 
-    int fixRad = this->radiusOfInterest * this->roiRatio;
+    int fixRad = static_cast<int>(this->radiusOfInterest * this->roiRatio);
     int movRad = this->radiusOfInterest;
 
     // Run registration on each sub-image
@@ -87,7 +87,7 @@ MultiRegionRegistration::OutputImageType::Pointer MultiRegionRegistration::Updat
 {
     if (this->movingImage.IsNull() || this->fixedImage.IsNull())
     {
-        throw exception("Fixed or moving image not setup.");
+        throw std::invalid_argument("Fixed or moving image not setup.");
     }
 
     //Logger::logDebug("Creating vector image");
@@ -100,7 +100,7 @@ MultiRegionRegistration::OutputImageType::Pointer MultiRegionRegistration::Updat
 
     pTransform = NULL;
 
-    int fixRad = this->radiusOfInterest * this->roiRatio;
+    int fixRad = static_cast<int>(this->radiusOfInterest * this->roiRatio);
     int movRad = this->radiusOfInterest;
 
     // Run registration on each feature

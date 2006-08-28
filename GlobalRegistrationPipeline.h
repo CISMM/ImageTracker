@@ -1,18 +1,18 @@
 #pragma once
 #include "CommonTypes.h"
 #include "FileSet.h"
-#include "FileSetImageReader.h"
+#include "ImageSetReader.h"
 #include "ImageRegistration.h"
 
 #include "itkDiscreteGaussianImageFilter.h"
 #include "itkExceptionObject.h"
-#include "itkImageFileReader.h"
 #include "itkImageRegistrationMethod.h"
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkMeanSquaresImageToImageMetric.h"
 #include "itkProcessObject.h"
 #include "itkRecursiveGaussianImageFilter.h"
 #include "itkRegularStepGradientDescentOptimizer.h"
+#include "itkStatisticsImageFilter.h"
 #include "itkThresholdImageFilter.h"
 
 class RegistrationHelper;
@@ -26,13 +26,15 @@ class RegistrationHelper;
 class GlobalRegistrationPipeline
 {
 public:
+    typedef CommonTypes::InputImageType InputImageType;
     typedef CommonTypes::InternalImageType ImageType;
+    typedef ImageSetReader<InputImageType, ImageType> ReaderType;
     typedef CommonTypes::TransformType TransformType;
     typedef std::vector<TransformType::Pointer> TransformVector;
-    typedef itk::ImageFileReader<ImageType> ReaderType;
     typedef itk::RecursiveGaussianImageFilter<ImageType, ImageType> SmoothType;
     typedef itk::ThresholdImageFilter<ImageType> ThresholdType;
     typedef itk::ImageRegistrationMethod<ImageType, ImageType> RegistrationType;
+    typedef itk::StatisticsImageFilter<ImageType> StatsType;
     
     /*
      * Default constructor.
@@ -99,20 +101,20 @@ public:
     /*
      * Sets the list of image files to use for registration.
      */
-    void SetInput(FileSet * input);
+    void SetInput(const FileSet& input);
 
     /*
      * Sets the output image list.
      */
-    void SetOutput(FileSet * output);
+    void SetOutput(const FileSet& output);
 
     /*
      * Sets the name of the file in which to save transform information.
      */
     void SetTransformFile(std::string transformFile);
 
-    FileSet* GetInput();
-    FileSet* GetOutput();
+    const FileSet& GetInput();
+    const FileSet& GetOutput();
     std::string GetTransformFile();
 
     /*
@@ -130,17 +132,21 @@ public:
     /*
      * Gets the list of all transforms performed to date.
      */
-    TransformVector * GetTransforms();
+    const TransformVector& GetTransforms();
 
     void GetMinMax(ImageType::PixelType &min, ImageType::PixelType &max)
     {
-        this->reader->GetMinMax(min, max);
+        StatsType::Pointer stats = StatsType::New();
+        stats->SetInput(this->reader[this->index]);
+        min = stats->GetMinimum();
+        max = stats->GetMaximum();
     }
 
 private:
     bool init;
-    FileSet * inputFiles;
-    FileSetImageReader * reader;
+    unsigned int index;
+    FileSet inputFiles;
+    ReaderType reader;
 
     ThresholdType::Pointer thresholderF;
     ThresholdType::Pointer thresholderM;
@@ -155,8 +161,8 @@ private:
 
     RegistrationHelper * registrar;
     
-    TransformVector * transforms;
-    FileSet * outputFiles;
+    TransformVector transforms;
+    FileSet outputFiles;
     std::string transformFile;
 };
 

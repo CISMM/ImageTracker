@@ -1,5 +1,7 @@
 #include "DoubleSlider.h"
-#include "wx/msw/subwin.h"
+#ifdef __WXMSW__
+    #include "wx/msw/subwin.h"
+#endif
 
 // Copied from slider95.cpp
 // indices of labels in wxSlider::m_labels
@@ -35,14 +37,16 @@ void DoubleSlider::SetRange(double min, double max, double interval)
         this->max = max;
         this->interval = interval;
 
-        int count = (int) (max - min) / interval + 1;
+        int count = static_cast<int>((max - min) / interval + 1);
         ((wxSlider *) this)->SetRange(0, count);
     
-		if ( wxSlider::m_labels )
-		{
-			SetWindowText((*m_labels)[SliderLabel_Min], wxString::Format("%4.2f", min));
-			SetWindowText((*m_labels)[SliderLabel_Max], wxString::Format("%4.2f", max));
-		}
+#ifdef __WXMSW__
+        if ( wxSlider::m_labels )
+        {
+                SetWindowText((*m_labels)[SliderLabel_Min], wxString::Format(_("%4.2f"), min));
+                SetWindowText((*m_labels)[SliderLabel_Max], wxString::Format(_("%4.2f"), max));
+        }
+#endif
     }
 }
 
@@ -59,9 +63,11 @@ void DoubleSlider::SetValue(double value)
         int ticks = (int) ((value - this->min) / this->interval);
         ((wxSlider *) this)->SetValue(ticks);
 
-		if ( wxSlider::m_labels )
-		{
-			SetWindowText((*m_labels)[SliderLabel_Value], wxString::Format("%4.2f", value));
-		}
+#ifdef __MXMSW__
+        if ( wxSlider::m_labels )
+        {
+                SetWindowText((*m_labels)[SliderLabel_Value], wxString::Format("%4.2f", value));
+        }
+#endif
     }
 }

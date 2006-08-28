@@ -14,6 +14,7 @@ public:
      * A vector of file names.
      */
     typedef std::vector<std::string> FileVector;
+    typedef FileVector::iterator FileIterator;
 
     /*
      * Default constructor.

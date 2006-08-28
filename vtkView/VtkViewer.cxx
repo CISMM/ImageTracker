@@ -5,18 +5,8 @@
 // Copyright:   XX
 /////////////////////////////////////////////////////////////////////////////
 
-#if defined(__GNUG__) && !defined(NO_GCC_PRAGMA)
-    #pragma implementation "vtkViewer.cxx"
-#endif
-
-// For compilers that support precompilation, includes "wx/wx.h".
-#include "wx/wxprec.h"
-
-#ifdef __BORLANDC__
-    #pragma hdrstop
-#endif
-
-#include "vtkViewer.h"
+#include "VtkViewer.h"
+#include "wxUtils.h"
 
 bool ViewerApp::OnInit()
 {
@@ -64,6 +54,8 @@ void vtkViewer::OnFileOpen( wxCommandEvent &event )
     wxFileDialog open(this, _T("Open a file"));
     if (open.ShowModal() == wxID_OK)
     {
-        this->GetCanvas()->SetFileName(open.GetPath().c_str());
+        // You've got to be kidding me. Isn't there an easier way to get a 
+        // std::string from a wxString?  Please.
+        this->GetCanvas()->SetFileName(wx2std(open.GetPath()));
     }
 }

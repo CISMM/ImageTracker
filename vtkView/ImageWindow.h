@@ -6,12 +6,17 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include <wx/wxprec.h>
+
+// For compilers that support precompilation, includes "wx/wx.h".
+#include "wx/wxprec.h"
+#ifndef WX_PRECOMP
+    #include "wx/wx.h"
+#endif
+
 #include <vector>
 
 #include "VtkCanvas.h"
 #include "CommonTypes.h"
-#include "vtkViewer_wdr.h"
 
 // WDR: class declarations
 
@@ -34,7 +39,7 @@ public:
 
     static void ImShow(CommonTypes::InternalImageType::Pointer image);
     static void ImShow(CommonTypes::InternalImageType::Pointer image, std::string title);
-    static void Destroy();
+    static void DestroyWindows();
     
 private:
     // WDR: member variable declarations for ImageWindow
@@ -47,4 +52,3 @@ private:
     static std::vector<ImageWindow*>* s_windowList;
     DECLARE_EVENT_TABLE()
 };
-

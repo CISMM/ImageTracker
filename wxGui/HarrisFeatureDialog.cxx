@@ -1,6 +1,6 @@
 
-#include "HarrisFeatureDialog.h"
 #include "Logger.h"
+#include "HarrisFeatureDialog.h"
 
 // WDR: class implementations
 
@@ -22,13 +22,13 @@ END_EVENT_TABLE()
 
 HarrisFeatureDialog::HarrisFeatureDialog( wxWindow *parent, wxWindowID id, const wxString &title,
     const wxPoint &position, const wxSize& size, long style ) :
-    wxDialog( parent, id, title, position, size, style )
+    wxDialog( parent, id, title, position, size, style ),
+    outFileDir(_("")),
+    outFilePrefix(_("Track-"))
 {
 
     this->canvas = NULL;
     this->trackingPipe = NULL;
-    this->outFileDir = "";
-    this->outFilePrefix = "Track-";
 
     // WDR: dialog function CreateHLTrackerDialog for HarrisFeatureDialog
     CreateHLTrackerDialog( this, TRUE ); 
@@ -64,19 +64,16 @@ void HarrisFeatureDialog::UpdateDialog()
     this->GetTextPrefix()->SetValue(this->outFilePrefix);
     this->GetTextImageDir()->SetValue(this->outFileDir);
 
-    wxString text;
-    text = "";
-    text.Printf("%i", this->GetPipeline()->GetMaxFeatures());
+    wxString text(_(""));
+    text.Printf(_("%i"), this->GetPipeline()->GetMaxFeatures());
     this->GetTextCount()->SetValue(text);
     this->GetSliderCount()->SetValue(this->GetPipeline()->GetMaxFeatures());
     
-    text = "";
-    text.Printf("%5.2f", this->GetPipeline()->GetScale());
+    text.Printf(_("%5.2f"), this->GetPipeline()->GetScale());
     this->GetTextScale()->SetValue(text);
     this->GetSliderScale()->SetValue(this->GetPipeline()->GetScale());
 
-    text = "";
-    text.Printf("%i", this->GetPipeline()->GetMaxDistance());
+    text.Printf(_("%i"), this->GetPipeline()->GetMaxDistance());
     this->GetTextDistance()->SetValue(text);
     this->GetSliderDistance()->SetValue(this->GetPipeline()->GetMaxDistance());
 }
@@ -87,8 +84,8 @@ void HarrisFeatureDialog::UpdatePipeline()
     this->GetPipeline()->SetScale(this->GetSliderScale()->GetDoubleValue());
     this->GetPipeline()->SetMaxDistance(this->GetSliderDistance()->GetValue());
     this->GetPipeline()->SetDestination(
-        new FileSet(this->GetPipeline()->GetSource(), 
-        this->GetTextPrefix()->GetValue().c_str(), "mha"));
+        FileSet(this->GetPipeline()->GetSource(), 
+        wx2std(this->GetTextPrefix()->GetValue()), "mha"));
 }
 
 // WDR: handler implementations for HarrisFeatureDialog
@@ -117,7 +114,7 @@ void HarrisFeatureDialog::OnDirectory( wxCommandEvent &event )
         if (dir.ShowModal() == wxID_OK)
         {
             this->outFileDir = wxString(dir.GetPath());
-            this->outFileDir.append("\\");
+            this->outFileDir.append(_("\\"));
             this->GetTextImageDir()->SetValue(this->outFileDir);
         }
     }
@@ -126,24 +123,24 @@ void HarrisFeatureDialog::OnDirectory( wxCommandEvent &event )
 void HarrisFeatureDialog::OnDistanceSlider( wxCommandEvent &event )
 {
     this->GetPipeline()->SetMaxDistance(this->GetSliderDistance()->GetValue());
-    wxString text = "";
-    text.Printf("%i", this->GetPipeline()->GetMaxDistance());
+    wxString text(_(""));
+    text.Printf(_("%i"), this->GetPipeline()->GetMaxDistance());
     this->GetTextDistance()->SetValue(text);
 }
 
 void HarrisFeatureDialog::OnCountSlider( wxCommandEvent &event )
 {
     this->GetPipeline()->SetMaxFeatures(this->GetSliderCount()->GetValue());
-    wxString text = "";
-    text.Printf("%i", this->GetPipeline()->GetMaxFeatures());
+    wxString text(_(""));
+    text.Printf(_("%i"), this->GetPipeline()->GetMaxFeatures());
     this->GetTextCount()->SetValue(text);    
 }
 
 void HarrisFeatureDialog::OnScaleSlider( wxCommandEvent &event )
 {
     this->GetPipeline()->SetScale(this->GetSliderScale()->GetDoubleValue());
-    wxString text = "";
-    text.Printf("%5.2f", this->GetPipeline()->GetScale());
+    wxString text(_(""));
+    text.Printf(_("%5.2f"), this->GetPipeline()->GetScale());
     this->GetTextScale()->SetValue(text);
     this->UpdateCanvas();
 }

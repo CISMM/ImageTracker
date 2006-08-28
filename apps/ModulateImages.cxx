@@ -1,4 +1,5 @@
 
+#include <cmath>
 #include <string>
 
 #include "itkImage.h"
@@ -41,63 +42,41 @@ int main(int argc, char** argv)
     FileSet filesOut(FilePattern(dir, formatOut, start, end));
     
     typedef itk::Image<unsigned short, 2> ImageType;
+    typedef ImageType::PointType PointType;
     typedef ModulateRegionImageFilter<ImageType> ModulateType;
     
     Logger::verbose << "Setting up input video." << std::endl;
     ImageSetReader<ImageType> video(filesIn);
     ModulateType::Pointer modulate = ModulateType::New();
     
-    ImageType::PointType point;
+    const double PI = 3.14159265;
+    PointType center;
+    center[0] = 128; center[1] = 128;
+    double radius = 100.0;
+    PointType point;
+    const unsigned int steps = 10;    
     
     if (type == "size") // vary size
     {
         Logger::verbose << "Setting up modulation regions, varying size." << std::endl;
-        point.Fill(100);
-        modulate->AddRegion(point, 1.0, 0.8);
-        point.Fill(130);
-        modulate->AddRegion(point, 2.0, 0.8);
-        point.Fill(170);
-        modulate->AddRegion(point, 4.0, 0.8);
-        point.Fill(220);
-        modulate->AddRegion(point, 6.0, 0.8);
-        point.Fill(300);
-        modulate->AddRegion(point, 8.0, 0.8);
-        point.Fill(400);
-        modulate->AddRegion(point, 10.0, 0.8);
-        point[0] = 90; point[1] = 300;
-        modulate->AddRegion(point, 12.0, 0.8);
-        point[0] = 200; point[1] = 400;
-        modulate->AddRegion(point, 14.0, 0.8);
-        point[0] = 280; point[1] = 80;
-        modulate->AddRegion(point, 16.0, 0.8);
-        point[0] = 420; point[1] = 200;
-        modulate->AddRegion(point, 20.0, 0.8);
+        for (unsigned int i = 0; i < steps; i++)
+        {
+            double angle(i*2*PI / steps);
+            point[0] = static_cast<PointType::ValueType>(center[0] + radius * std::cos(angle));
+            point[1] = static_cast<PointType::ValueType>(center[1] + radius * std::sin(angle));
+            modulate->AddRegion(point, 2*i + 1.0, 0.7);
+        }
     }
     else                // vary modulation
     {
         Logger::verbose << "Setting up modulation regions, varying modulation." << std::endl;
-        point.Fill(100);
-        modulate->AddRegion(point, 3.0, 1.0);
-        point.Fill(130);
-        modulate->AddRegion(point, 3.0, 0.9);
-        point.Fill(160);
-        modulate->AddRegion(point, 3.0, 0.8);
-        point.Fill(190);
-        modulate->AddRegion(point, 3.0, 0.7);
-        point.Fill(220);
-        modulate->AddRegion(point, 3.0, 0.6);
-        point.Fill(250);
-        modulate->AddRegion(point, 3.0, 0.5);
-        point.Fill(280);
-        modulate->AddRegion(point, 3.0, 0.4);
-        point.Fill(310);
-        modulate->AddRegion(point, 3.0, 0.3);
-        point.Fill(340);
-        modulate->AddRegion(point, 3.0, 0.2);
-        point.Fill(370);
-        modulate->AddRegion(point, 3.0, 0.1);
-        // point.Fill(400);
-        // modulate->AddRegion(point, 3.0, 0.0);
+        for (unsigned int i = 0; i < steps; i++)
+        {
+            double angle(i*2*PI / steps);
+            point[0] = static_cast<PointType::ValueType>(center[0] + radius * std::cos(angle));
+            point[1] = static_cast<PointType::ValueType>(center[1] + radius * std::sin(angle));
+            modulate->AddRegion(point, 4.0, (double) i / steps);
+        }
     }
     
     Logger::verbose << "Processing video..." << std::endl;

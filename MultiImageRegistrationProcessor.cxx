@@ -1,7 +1,5 @@
 #include "MultiImageRegistrationProcessor.h"
 
-#include "FileSetImageReader.h"
-
 MultiImageRegistrationProcessor::MultiImageRegistrationProcessor(void)
 {
     this->transforms = new TransformVector();
@@ -41,7 +39,7 @@ MultiImageRegistrationProcessor::TransformVector* MultiImageRegistrationProcesso
 
     if (this->source == NULL || 
         this->registrar == NULL ||
-        this->source->GetFileNames()->size() < 2)
+        this->source.size() < 2)
     {
         //todo: probably want to throw an exception here.
         std::cerr << "MultiImageRegistrationProcessor::Update() Warning: source or registrar improperly configured." << std::endl;
@@ -55,7 +53,7 @@ MultiImageRegistrationProcessor::TransformVector* MultiImageRegistrationProcesso
     // method makes play back more difficult--each transform must be combined with all 
     // previous transforms.
 
-    FileSetImageReader* pReader = new FileSetImageReader(this->source);
+    ReaderType reader(this->source);
 
     //First transform
     std::cout << "Reading => " << pReader->CurrentFileName() << std::endl;

@@ -4,6 +4,7 @@
 
 #include "CommonTypes.h"
 #include "FileSet.h"
+#include "ImageSetReader.h"
 #include "ImageRegistration.h"
 
 /**
@@ -17,12 +18,16 @@ public:
     ~MultiImageRegistrationProcessor(void);
 
     enum{ALIGN_WITH_FIRST       = 1000,  ALIGN_WITH_PREVIOUS    = 1001};
+    
+    typedef CommonTypes::InputImageType InputImageType;
+    typedef CommonTypes::InternalImageType InternalImageType;
+    typedef ImageSetReader<InputImageType, InternalImageType> ReaderType;
     typedef std::vector<CommonTypes::TransformPointer> TransformVector;
 
     /*
      * Sets up this registration processor's image source.
      */
-    void SetSource(FileSet* source);
+    void SetSource(const FileSet& source);
 
     /*
      * Sets up the object used for image registration for this registration
@@ -53,7 +58,7 @@ public:
     void SetAlignmentMode(int mode);
 
 private:
-    FileSet* source;
+    FileSet source;
     ImageRegistration* registrar;
     TransformVector* transforms;
     bool registrationComplete;

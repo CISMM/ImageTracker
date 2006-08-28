@@ -6,13 +6,20 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include <wx/wxprec.h>
+
+// For compilers that support precompilation, includes "wx/wx.h".
+#include "wx/wxprec.h"
+#ifndef WX_PRECOMP
+    #include "wx/wx.h"
+#endif
+
 #include "DoubleSlider.h"
 #include "RegistrationDesign_wdr.h"
 
 #include "FeatureTrackingPipeline.h"
 #include "FileSet.h"
 #include "VtkCanvas.h"
+#include "wxUtils.h"
 
 // WDR: class declarations
 
@@ -46,16 +53,16 @@ public:
     wxTextCtrl* GetTextScale()  { return (wxTextCtrl*) FindWindow( ID_TEXT_SCALE ); }
 
     void SetCanvas(VtkCanvas* canvas) { this->canvas = canvas; }
-    void SetInput(FileSet* files) 
+    void SetInput(const FileSet& files) 
     { 
         this->GetPipeline()->SetSource(files);
-        if (!this->GetPipeline()->GetDestination())
+        if (this->GetPipeline()->GetDestination().size() == 0)
         {
-            this->GetPipeline()->SetDestination(new FileSet(files, this->outFilePrefix.c_str(), "mha"));
+            this->GetPipeline()->SetDestination(FileSet(files, wx2std(this->outFilePrefix), "mha"));
         }
-        if (this->outFileDir.compare("") == 0)
+        if (this->outFileDir.compare(_("")) == 0)
         {
-            this->outFileDir = wxString(this->GetPipeline()->GetSource()->GetDirectory().c_str());
+            this->outFileDir = std2wx(this->GetPipeline()->GetSource().GetDirectory());
             this->GetTextImageDir()->SetValue(this->outFileDir);
         }
     }

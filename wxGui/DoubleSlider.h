@@ -12,7 +12,7 @@ public:
     /*
      * Constructor; resembles that of wxSlider.
      */
-    DoubleSlider(wxWindow* parent, wxWindowID id, int value, int minValue, int maxValue, const wxPoint& point=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxSL_HORIZONTAL, const wxValidator& validator=wxDefaultValidator, const wxString& name="slider");
+    DoubleSlider(wxWindow* parent, wxWindowID id, int value, int minValue, int maxValue, const wxPoint& point=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxSL_HORIZONTAL, const wxValidator& validator=wxDefaultValidator, const wxString& name=wxT("slider"));
     
     /*
      * Destructor.

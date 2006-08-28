@@ -5,14 +5,11 @@
 
 void CLGOpticFlowPipeline::InitializePipeline()
 {
-    if (this->source && this->destination)
+    if ((!this->source.size() == 0 || this->destination.size() == 0))
     {
-        this->reader = new FileSetImageReader(this->source);
-        this->writer = WriterType::New();
-        this->writer->SetInput(this->flowFilter->GetOutput());
+        this->reader = ReaderType(this->source);
+        this->index = 0;
 
-        this->destinationIt = this->destination->GetFileNames()->begin();
-        
         this->init = true;
     }
     else
@@ -30,21 +27,16 @@ bool CLGOpticFlowPipeline::UpdateOne()
     }
 
     if (this->init &&
-        this->reader->HasNext() &&
-        this->destinationIt != this->destination->GetFileNames()->end())
+        this->index < (this->source.size() - 1) &&
+        this->index < this->destination.size())
     {
-        // ImageWindow::ImShow(this->reader->CurrentImage(), "Current");
-        this->flowFilter->SetInput1((ImageType::ConstPointer) (this->reader->CurrentImage()));
-        this->flowFilter->SetInput2((ImageType::ConstPointer) (this->reader->NextImage()));
-        // ImageWindow::ImShow(this->reader->CurrentImage(), "Next");
+        this->flowFilter->SetInput1(this->reader[this->index]);
+        this->flowFilter->SetInput2(this->reader[this->index+1]);
 
-        std::string filename = *(this->destinationIt);
-        this->writer->SetFileName(filename.c_str());
-        Logger::logInfo("Writing vector image: " + filename);
-        writer->Update();
+        Logger::logInfo("Writing vector image: " + this->destination[this->index]);
+        WriteImage(this->flowFilter->GetOutput(), this->destination[this->index]);
 
-        *(this->destinationIt)++;
-
+        this->index++;
         return true;
     }
 

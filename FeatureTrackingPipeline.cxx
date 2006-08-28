@@ -1,15 +1,12 @@
-#include ".\FeatureTrackingPipeline.h"
+#include "FeatureTrackingPipeline.h"
 #include "Logger.h"
 
 void FeatureTrackingPipeline::InitializePipeline()
 {
-    if (this->source && this->destination)
+    if (!(this->source.size() == 0 || this->destination.size() == 0))
     {
-        this->reader = new FileSetImageReader(this->source);
-        this->pCurrentImg = this->reader->FirstImage();
-        this->writer = WriterType::New();
-        this->destinationIt = this->destination->GetFileNames()->begin();
-
+        this->reader = ReaderType(this->source);
+        this->index = 0;
         this->init = true;
     }
     else
@@ -27,23 +24,19 @@ bool FeatureTrackingPipeline::UpdateOne()
     }
 
     if (this->init && 
-        this->reader->HasNext() &&
-        this->destinationIt != this->destination->GetFileNames()->end())
+        this->index < this->reader.size() - 1 &&
+        this->index < this->destination.size())
     {
-        this->pCurrentImg = this->reader->CurrentImage();
-        this->pNextImg = this->reader->NextImage();
-
-        this->registrar->SetMovingImage(this->pCurrentImg);
-        this->registrar->SetFixedImage(this->pNextImg);
+        this->registrar->SetMovingImage(this->reader[this->index]);
+        this->registrar->SetFixedImage(this->reader[this->index+1]);
         
-        std::string filename = *(this->destinationIt);
-        this->writer->SetFileName(filename.c_str());
-        this->writer->SetInput(
-            this->registrar->Update(this->detector->findFeatures(this->pCurrentImg)));
-        Logger::logInfo("Writing vector image: " + filename);
-        writer->Update();
+        Logger::logInfo("Writing vector image: " + this->destination[this->index]);
+        WriteImage<MultiRegionRegistration::OutputImageType>(
+            this->registrar->Update(
+                this->detector->findFeatures(this->reader[this->index])),
+            this->destination[this->index]);
 
-        *(this->destinationIt)++;
+        this->index++;
 
         return true;
     }

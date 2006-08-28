@@ -536,8 +536,8 @@ void MultiResolutionRegistration<TImage, TTransform>
 	{
 		Logger::error << "MultiResolutionRegistration::StartRegistration: Exception caught!" << std::endl;
 		std::cerr << error << std::endl;
-		TransformType::Pointer xform = TransformType::New();
-		OptimizerType::ParametersType finalParams;
+		typename TransformType::Pointer xform = TransformType::New();
+		typename OptimizerType::ParametersType finalParams;
 		finalParams.fill(0.0f);
 		xform->SetParameters(finalParams);
 		this->SetLastTransform(xform);
@@ -548,8 +548,8 @@ void MultiResolutionRegistration<TImage, TTransform>
 	Logger::info << "MutliResolutionRegistration: optimizer metric:  " << this->optimizer->GetValue() << std::endl;
 
 	// Grab results
-	TransformType::Pointer xform = TransformType::New();
-	OptimizerType::ParametersType finalParams = this->registration->GetLastTransformParameters();
+	typename TransformType::Pointer xform = TransformType::New();
+	typename OptimizerType::ParametersType finalParams = this->registration->GetLastTransformParameters();
 	xform->SetParameters(finalParams);
 	this->SetLastTransform(xform);
 
@@ -563,12 +563,12 @@ MultiResolutionRegistration<TImage, TTransform>
 ::FindImageCenter(ImagePointer image)
 {
 	// Get image parameters
-	const ImageType::SpacingType& spacing = image->GetSpacing();
-	const ImageType::PointType& origin = image->GetOrigin();
-	ImageType::SizeType size = image->GetLargestPossibleRegion().GetSize();
+	const typename ImageType::SpacingType& spacing = image->GetSpacing();
+	const typename ImageType::PointType& origin = image->GetOrigin();
+	typename ImageType::SizeType size = image->GetLargestPossibleRegion().GetSize();
 
 	// Compute center of image
-	TransformType::InputPointType center;
+	typename TransformType::InputPointType center;
 	for (int d = 0; d < itk::GetImageDimension<ImageType>::ImageDimension; d++)
 		center[d] = origin[d] + spacing[d] * (size[d] * 0.5);
 
@@ -589,13 +589,13 @@ MultiResolutionRegistration<TImage, TTransform>::DefaultInitialTransform()
 		this->movingImage->Update();
 
 		// Find centers of the images
-		TransformType::InputPointType centerFixed =	
+		typename TransformType::InputPointType centerFixed =	
 			this->FindImageCenter(this->fixedImage);
-		TransformType::InputPointType centerMoving =
+		typename TransformType::InputPointType centerMoving =
 			this->FindImageCenter(this->movingImage);
 
 		// Compute transform that aligns image centers
-		TransformType::ParametersType params = xform->GetParameters();
+		typename TransformType::ParametersType params = xform->GetParameters();
 		params[0] = 0.0;				// angle
 		params[1] = centerFixed[0];		// center
 		params[2] = centerFixed[1];
@@ -607,7 +607,7 @@ MultiResolutionRegistration<TImage, TTransform>::DefaultInitialTransform()
 	{
 		// If we're not using a centered rigid transform, our initial parameters
 		// can be all zero. (Regular translation.)
-		TransformType::ParametersType params = xform->GetParameters();
+		typename TransformType::ParametersType params = xform->GetParameters();
 		params.fill(0.0f);
 		xform->SetParameters(params);
 	}

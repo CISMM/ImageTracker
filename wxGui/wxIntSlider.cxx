@@ -16,8 +16,10 @@
     #pragma hdrstop
 #endif
 
-#include "wxIntSlider.h"
 #include "Logger.h"
+#include "wxUtils.h"
+#include "wxIntSlider.h"
+
 
 // WDR: class implementations
 
@@ -90,7 +92,7 @@ int wxIntSlider::GetValue()
 
 void wxIntSlider::SetFormat(const std::string& format)
 {
-	this->format = format.c_str();
+	this->format = std2wx(format);
 
 	// change labels
 	this->GetLabelLeft()->SetLabel(wxString::Format(this->format, this->minimum));

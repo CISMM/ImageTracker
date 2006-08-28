@@ -67,21 +67,11 @@ public:
 
     itkNewMacro(Self);
 
-    void AddInput(const TInputImage* input)
-    {
-        Superclass::SetInput(this->inputIdx, const_cast<TInputImage *>(input));
-        this->inputIdx++;
-    }
-
 protected:
-    NaryVarianceImageFilter()
-    {
-        this->inputIdx = 0;
-    }
+    NaryVarianceImageFilter() {}
     virtual ~NaryVarianceImageFilter() {}
 
 private:
     NaryVarianceImageFilter(const Self&);   // not implemented
     void operator=(const Self&);            // not implemented
-    unsigned int inputIdx;
 };

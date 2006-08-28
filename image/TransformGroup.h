@@ -37,7 +37,7 @@ public:
     /*
      * Logs the data stored in a group of transforms to the Logger.
      */
-    static void LogTransforms(TransformVector* transforms);
+    static void LogTransforms(TransformVector& transforms);
 
 private:
     static const std::string objectDelim;

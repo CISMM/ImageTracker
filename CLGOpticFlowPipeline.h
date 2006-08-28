@@ -4,8 +4,9 @@
 #include "itkLightObject.h"
 
 #include "CLGOpticFlowImageFilter.h"
+#include "CommonTypes.h"
 #include "FileSet.h"
-#include "FileSetImageReader.h"
+#include "ImageSetReader.h"
 
 class CLGOpticFlowPipeline : public itk::LightObject
 {
@@ -17,9 +18,10 @@ public:
     typedef itk::LightObject Superclass;
 
     /** Some helpful typedefs */
-    typedef FileSetImageReader::InternalImageType ImageType;
+    typedef CommonTypes::InputImageType InputImageType;
+    typedef CommonTypes::InternalImageType ImageType;
+    typedef ImageSetReader<InputImageType, ImageType> ReaderType;
     typedef CLGOpticFlowImageFilter<ImageType, ImageType> FlowFilterType;
-    typedef itk::ImageFileWriter<FlowFilterType::OutputImageType> WriterType;
 
     /** itk object macros */
     itkNewMacro(Self);
@@ -29,8 +31,8 @@ public:
     double GetRegularization() { return this->flowFilter->GetRegularization(); }
     double GetRelaxation() { return this->flowFilter->GetRelaxation(); }
     unsigned int GetIterations() { return this->flowFilter->GetIterations(); }
-    FileSet* GetSource() { return this->source; }
-    FileSet* GetDestination() { return this->destination; }
+    const FileSet& GetSource() { return this->source; }
+    const FileSet& GetDestination() { return this->destination; }
 
     void SetSpatialSigma(double sigma) 
     { 
@@ -52,12 +54,12 @@ public:
         this->flowFilter->SetIterations(iter);
         this->init = false;
     }
-    void SetSource(FileSet* source)
+    void SetSource(const FileSet& source)
     {
         this->source = source;
         this->init = false;
     }
-    void SetDestination(FileSet* dest)
+    void SetDestination(const FileSet& dest)
     {
         this->destination = dest;
         this->init = false;
@@ -67,33 +69,26 @@ public:
     void UpdateAll();
 
 protected:
-    CLGOpticFlowPipeline(void)
+    CLGOpticFlowPipeline(void) :
+        init(false),
+        index(0)
     {
         this->flowFilter = FlowFilterType::New();
-        this->source = NULL;
-        this->destination = NULL;
-        this->reader = NULL;
         this->init = false;
     }
 
     virtual ~CLGOpticFlowPipeline(void) 
     {
-        if (this->reader)
-            delete reader;
-
-        this->source = NULL;
-        this->destination = NULL;
     }
 
 private:
     void InitializePipeline();
 
     bool init;
-    FileSet* source;
-    FileSet* destination;
-
-    FileSetImageReader* reader;
+    unsigned int index;
+    FileSet source;
+    FileSet destination;
+    ReaderType reader;
+    
     FlowFilterType::Pointer flowFilter;
-    WriterType::Pointer writer;
-    FileSet::FileIterator destinationIt;
 };

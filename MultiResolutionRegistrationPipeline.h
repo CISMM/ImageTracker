@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+
+#include "itkCastImageFilter.h"
 #include "itkCenteredRigid2DTransform.h"
 #include "itkTranslationTransform.h"
 #include "itkDiscreteGaussianImageFilter.h"
@@ -8,9 +10,9 @@
 #include "itkResampleImageFilter.h"
 #include "itkThresholdImageFilter.h"
 
+#include "CommonTypes.h"
 #include "FileSet.h"
-#include "FileSetImageReader.h"
-#include "ItkMagickIO.h"
+#include "ImageSetReader.h"
 #include "MultiResolutionRegistration.h"
 
 /**
@@ -31,10 +33,13 @@ public:
 	// Pipeline typedefs
 	typedef itk::CenteredRigid2DTransform<double> TransformType;
 	// typedef itk::TranslationTransform<double, 2> TransformType;
+	typedef CommonTypes::InputImageType InputImageType;
 	typedef CommonTypes::InternalImageType ImageType;
+	typedef ImageSetReader<InputImageType, ImageType> ReaderType;
 	typedef itk::ThresholdImageFilter<ImageType> ThresholdType;
 	typedef MultiResolutionRegistration<ImageType, TransformType> RegistrationType;
 	typedef itk::ResampleImageFilter<ImageType, ImageType> ResampleType;
+	typedef itk::CastImageFilter<ImageType, InputImageType> CasterType;
 
 	// For image preview
 	typedef itk::DiscreteGaussianImageFilter<ImageType, ImageType> SmoothType;
@@ -80,10 +85,10 @@ public:
 	void SetOptimizerNumberOfIterations(unsigned long iters)
 	{ this->registration->SetOptimizerNumberOfIterations(iters); }
 	
-	FileSet* GetInputFiles();
-	FileSet* GetOutputFiles();
-	void SetInputFiles(FileSet& files);
-	void SetOutputFiles(FileSet& files);
+	const FileSet& GetInputFiles() { return this->inputFiles; }
+	const FileSet& GetOutputFiles() { return this->outputFiles; }
+	void SetInputFiles(const FileSet& files);
+	void SetOutputFiles(const FileSet& files) { this->outputFiles = files; }
 
 	ImageType::Pointer GetPreviewImage();
 
@@ -102,7 +107,8 @@ private:
 	ThresholdType::Pointer threshold[2];
 	RegistrationType::Pointer registration;
 	ResampleType::Pointer resample;
+	CasterType::Pointer caster;
 	SmoothType::Pointer smooth;
 
-	FileSetImageReader inputReader;
+	ReaderType inputReader;
 };

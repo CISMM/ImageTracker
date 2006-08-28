@@ -11,6 +11,12 @@ ENDIF (WIN32)
 ADD_EXECUTABLE(translate TranslationGenerator.cxx)
 TARGET_LINK_LIBRARIES(translate ITFilters)
 
+ADD_EXECUTABLE(modulate ModulateImages.cxx)
+TARGET_LINK_LIBRARIES(modulate ITFilters ITImage)
+
+ADD_EXECUTABLE(pan PanRegion.cxx)
+TARGET_LINK_LIBRARIES(pan ITFilters ITImage)
+
 ADD_EXECUTABLE(attenuate TestAttenuation.cxx)
 TARGET_LINK_LIBRARIES(attenuate ITFilters)
 
@@ -23,9 +29,6 @@ TARGET_LINK_LIBRARIES(meanrepair ITFilters)
 ADD_EXECUTABLE(localrepair TestNeighborhoodAttenuationRepair.cxx)
 TARGET_LINK_LIBRARIES(localrepair ITFilters ITImage)
 
-ADD_EXECUTABLE(modulate ModulateImages.cxx)
-TARGET_LINK_LIBRARIES(modulate ITFilters ITImage)
-
 ADD_EXECUTABLE(compare CompareVideos.cxx)
 TARGET_LINK_LIBRARIES(compare ITFilters ITImage)
 
@@ -34,6 +37,21 @@ TARGET_LINK_LIBRARIES(meanvector ITCommon ITImage ITFilters)
 
 ADD_EXECUTABLE(clgflow ComputeCLGOpticFlow.cxx)
 TARGET_LINK_LIBRARIES(clgflow ITCommon ITImage ITFilters)
+
+ADD_EXECUTABLE(findback FindBackground.cxx)
+TARGET_LINK_LIBRARIES(findback ITCommon ITImage ITFilters)
+
+ADD_EXECUTABLE(gradocc GradientOcclusion.cxx)
+TARGET_LINK_LIBRARIES(gradocc ITCommon ITImage ITFilters)
+
+ADD_EXECUTABLE(compgrad CompareMeanGradientLog.cxx)
+TARGET_LINK_LIBRARIES(compgrad ITCommon ITImage ITFilters)
+
+ADD_EXECUTABLE(avgcontrast ComputeAverageLocalContrast.cxx)
+TARGET_LINK_LIBRARIES(avgcontrast ITCommon ITImage ITFilters)
+
+ADD_EXECUTABLE(findsurface FindSurface.cxx)
+TARGET_LINK_LIBRARIES(findsurface ITCommon ITImage ITFilters)
 
 INCLUDE (../LocalUsewxWidgets.cmake)
 

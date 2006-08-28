@@ -5,9 +5,8 @@
 // Copyright:   XX
 /////////////////////////////////////////////////////////////////////////////
 
-#include "CLGOpticFlowDialog.h"
 #include <math.h>
-#include "Logger.h"
+#include "CLGOpticFlowDialog.h"
 
 // WDR: class implementations
 
@@ -33,8 +32,8 @@ CLGOpticFlowDialog::CLGOpticFlowDialog( wxWindow *parent, wxWindowID id, const w
     wxDialog( parent, id, title, position, size, style )
 {
     this->flowPipeline = NULL;
-    this->outFileDir = "";
-    this->outFilePrefix = "Flow-";
+    this->outFileDir = _("");
+    this->outFilePrefix = _("Flow-");
 
     // WDR: dialog function CreateCLGOpticFlowDialog for CLGOpticFlowDialog
     CreateCLGOpticFlowDialog( this, TRUE );
@@ -63,25 +62,24 @@ void CLGOpticFlowDialog::UpdateDialog()
     this->GetTextPrefix()->SetValue(this->outFilePrefix);
     this->GetTextImageDir()->SetValue(this->outFileDir);
 
-    wxString text;
-    text = "";
-    text.Printf("%5.2f", this->GetPipeline()->GetSpatialSigma());
+    wxString text(_(""));
+    text.Printf(_("%5.2f"), this->GetPipeline()->GetSpatialSigma());
     this->GetTextSigma()->SetValue(text);
     this->GetSliderSigma()->SetValue(this->GetPipeline()->GetSpatialSigma());
 
-    text = "";
+    text = _("");
     double logReg = log10(this->GetPipeline()->GetRegularization());
-    text.Printf("%5.2f", logReg);
+    text.Printf(_("%5.2f"), logReg);
     this->GetTextRegularization()->SetValue(text);
     this->GetSliderRegularization()->SetValue(logReg);
 
-    text = "";
-    text.Printf("%5.2f", this->GetPipeline()->GetRelaxation());
+    text = _("");
+    text.Printf(_("%5.2f"), this->GetPipeline()->GetRelaxation());
     this->GetTextRelaxation()->SetValue(text);
     this->GetSliderRelaxation()->SetValue(this->GetPipeline()->GetRelaxation());
 
-    text = "";
-    text.Printf("%i", this->GetPipeline()->GetIterations());
+    text = _("");
+    text.Printf(_("%i"), this->GetPipeline()->GetIterations());
     this->GetTextIterations()->SetValue(text);
     this->GetSliderIterations()->SetValue(this->GetPipeline()->GetIterations());
 }
@@ -94,8 +92,8 @@ void CLGOpticFlowDialog::UpdatePipeline()
     this->GetPipeline()->SetRelaxation(this->GetSliderRelaxation()->GetDoubleValue());
     this->GetPipeline()->SetIterations(this->GetSliderIterations()->GetValue());
     this->GetPipeline()->SetDestination(
-        new FileSet(this->GetPipeline()->GetSource(),
-        this->GetTextPrefix()->GetValue().c_str(), "mha"));
+        FileSet(this->GetPipeline()->GetSource(),
+        wx2std(this->GetTextPrefix()->GetValue()), "mha"));
 }
 
 // WDR: handler implementations for CLGOpticFlowDialog
@@ -124,7 +122,7 @@ void CLGOpticFlowDialog::OnDirectory( wxCommandEvent &event )
         if (dir.ShowModal() == wxID_OK)
         {
             this->outFileDir = wxString(dir.GetPath());
-            this->outFileDir.append("\\");
+            this->outFileDir.append(_("\\"));
             this->GetTextImageDir()->SetValue(this->outFileDir);
         }
     }
@@ -133,25 +131,25 @@ void CLGOpticFlowDialog::OnDirectory( wxCommandEvent &event )
 void CLGOpticFlowDialog::OnIterationSlider( wxCommandEvent &event )
 {
     this->GetPipeline()->SetIterations(this->GetSliderIterations()->GetValue());
-    wxString text = "";
-    text.Printf("%i", this->GetPipeline()->GetIterations());
+    wxString text(_(""));
+    text.Printf(_("%i"), this->GetPipeline()->GetIterations());
     this->GetTextIterations()->SetValue(text);
 }
 
 void CLGOpticFlowDialog::OnRelaxationSlider( wxCommandEvent &event )
 {
     this->GetPipeline()->SetRelaxation(this->GetSliderRelaxation()->GetDoubleValue());
-    wxString text = "";
-    text.Printf("%5.2f", this->GetPipeline()->GetRelaxation());
+    wxString text(_(""));
+    text.Printf(_("%5.2f"), this->GetPipeline()->GetRelaxation());
     this->GetTextRelaxation()->SetValue(text);    
 }
 
 void CLGOpticFlowDialog::OnRegularizationSlider( wxCommandEvent &event )
 {
-    wxString text = "";
+    wxString text(_(""));
     double logReg = this->GetSliderRegularization()->GetDoubleValue();
     double reg = pow(10.0, logReg);
-    text.Printf("%5.2f", logReg);
+    text.Printf(_("%5.2f"), logReg);
     this->GetTextRegularization()->SetValue(text);
     this->GetSliderRegularization()->SetValue(reg);
 }
@@ -159,11 +157,7 @@ void CLGOpticFlowDialog::OnRegularizationSlider( wxCommandEvent &event )
 void CLGOpticFlowDialog::OnSigmaSlider( wxCommandEvent &event )
 {
     this->GetPipeline()->SetSpatialSigma(this->GetSliderSigma()->GetDoubleValue());
-    wxString text = "";
-    text.Printf("%5.2f", this->GetPipeline()->GetSpatialSigma());
+    wxString text = (_(""));
+    text.Printf(_("%5.2f"), this->GetPipeline()->GetSpatialSigma());
     this->GetTextSigma()->SetValue(text);
 }
-
-
-
-

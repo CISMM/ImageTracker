@@ -86,9 +86,9 @@ void StopWatch::Print()
 
 std::string StopWatch::HMS(double secs)
 {
-    int hours = secs / 3600;
+    int hours = static_cast<int>(secs / 3600);
     double remain = secs - (3600 * hours);
-    int mins = remain / 60;
+    int mins = static_cast<int>(remain / 60);
     remain = remain - (60 * mins);
 
     char buffer[50];

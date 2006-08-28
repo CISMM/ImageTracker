@@ -5,17 +5,6 @@
 // Copyright:   XX
 /////////////////////////////////////////////////////////////////////////////
 
-#if defined(__GNUG__) && !defined(NO_GCC_PRAGMA)
-    #pragma implementation "VtkCanvas.cxx"
-#endif
-
-// For compilers that support precompilation, includes "wx/wx.h".
-#include "wx/wxprec.h"
-
-#ifdef __BORLANDC__
-    #pragma hdrstop
-#endif
-
 #include "VtkCanvas.h"
 #include "ConnectVTKITK.h"
 
@@ -99,18 +88,18 @@ void VtkCanvas::InitializePipeline()
 
     // Create all the pipeline components
     this->reader = ReaderType::New();
-	this->caster = CasterType::New();
+    this->caster = CasterType::New();
     this->rescaler = RescalerType::New();
-	this->exporter = ExporterType::New();
+    this->exporter = ExporterType::New();
 
-	this->importer = vtkImageImport::New();
-	this->flipper = vtkImageFlip::New();
+    this->importer = vtkImageImport::New();
+    this->flipper = vtkImageFlip::New();
     this->actor = vtkImageActor::New();
     this->renderer = vtkRenderer::New();
     this->style = vtkInteractorStyleImage::New(); // restricts motion to xy plane
 
-	// Set up the read image part of the pipeline
-	this->caster->SetInput(reader->GetOutput());
+    // Set up the read image part of the pipeline
+    this->caster->SetInput(reader->GetOutput());
 
     // Rescale intensities for max contrast on 8-bit displays
     this->rescaler->SetOutputMinimum(0);
@@ -121,10 +110,10 @@ void VtkCanvas::InitializePipeline()
     // whether we are using a file name or an itk image.  But, after
     // we have itk image data, we need to convert it to vtk data, 
     // flip the axis, create an actor, and add it to the renderer.
-	this->exporter->SetInput(this->rescaler->GetOutput());
-	ConnectITKToVTK<DisplayImageType>(this->exporter, this->importer);
+    this->exporter->SetInput(this->rescaler->GetOutput());
+    ConnectITKToVTK<DisplayImageType>(this->exporter, this->importer);
     
-	this->flipper->SetInput(this->importer->GetOutput());
+    this->flipper->SetInput(this->importer->GetOutput());
     this->actor->SetInput(this->flipper->GetOutput());
     this->renderer->AddActor(this->actor);
     this->GetVtkInteractor()->GetRenderWindow()->AddRenderer(this->renderer);
@@ -136,17 +125,17 @@ void VtkCanvas::SetFileName(std::string filename)
     if (this->firstTime)
     {
         this->InitializePipeline();
-		this->reader->SetFileName(filename.c_str());
-		this->rescaler->SetInput(this->caster->GetOutput());
+        this->reader->SetFileName(filename.c_str());
+        this->rescaler->SetInput(this->caster->GetOutput());
     }
     else
     {
         // Read the image data into the pipeline
-		reader->SetFileName(filename.c_str());
-		this->rescaler->SetInput(this->caster->GetOutput());
+        reader->SetFileName(filename.c_str());
+        this->rescaler->SetInput(this->caster->GetOutput());
 
-		// The importer needs to be updated to refresh the image
-		this->importer->Update();
+        // The importer needs to be updated to refresh the image
+        this->importer->Update();
 
         // Removing the existing actor and creating a new one
         // ensures we see the whole image if the new image is
@@ -175,8 +164,8 @@ void VtkCanvas::SetItkImage(InputImageType::Pointer image)
     {
         // Set the image data in the pipeline
         this->rescaler->SetInput(image);
-		// The importer needs to be updated to refresh the image
-		this->importer->Update();
+        // The importer needs to be updated to refresh the image
+        this->importer->Update();
 
         // Removing the existing actor and creating a new one
         // ensures we see the whole image if the new image is

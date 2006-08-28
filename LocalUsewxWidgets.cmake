@@ -3,7 +3,51 @@
 # Use wxWidgets
 #######################################
 SET (WXWINDOWS_USE_GL 1) 
-INCLUDE (${CMAKE_ROOT}/Modules/UsewxWidgets.cmake)
+# INCLUDE (${CMAKE_ROOT}/Modules/UsewxWidgets.cmake)
+
+# -------------------------------------------------------------
+# The following setup of wxWindows is from Mathieu Malaterre's
+# wxVTKRenderWindowInteractor sample project.
+FIND_PACKAGE(wxWindows)
+IF ( CMAKE_WX_CAN_COMPILE )
+
+IF(WXWINDOWS_INCLUDE_DIR)
+  INCLUDE_DIRECTORIES(${WXWINDOWS_INCLUDE_DIR})
+ENDIF(WXWINDOWS_INCLUDE_DIR)
+
+IF(CMAKE_WX_CXX_FLAGS)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_WX_CXX_FLAGS} ${CMAKE_CXX_FLAGS}")
+ENDIF(CMAKE_WX_CXX_FLAGS)
+
+IF(VTK_USE_X)
+  # Is this always true, do we really need gtk all the time ?
+
+  FIND_PROGRAM(CMAKE_PKG_CONFIG pkg-config ../gtk/bin ../../gtk/bin)
+  IF(CMAKE_PKG_CONFIG)
+    SET(CMAKE_GTK_CXX_FLAGS "`${CMAKE_PKG_CONFIG} --cflags gtk+-2.0`")
+    SET(GTK_LIBRARIES "`${CMAKE_PKG_CONFIG} --libs gtk+-2.0`")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_GTK_CXX_FLAGS} ${CMAKE_CXX_FLAGS}")
+  ELSE(CMAKE_PKG_CONFIG)
+    FIND_PROGRAM(CMAKE_GTK_CONFIG gtk-config ../gtk/bin ../../gtk/bin)
+    IF(CMAKE_GTK_CONFIG)
+      SET(CMAKE_GTK_CXX_FLAGS "`${CMAKE_GTK_CONFIG} --cxxflags`")
+      SET(GTK_LIBRARIES "`${CMAKE_GTK_CONFIG} --libs`")
+      SET(CMAKE_CXX_FLAGS "${CMAKE_GTK_CXX_FLAGS} ${CMAKE_CXX_FLAGS}")
+    ELSE(CMAKE_GTK_CONFIG)
+      # DOH ! We need to default to CMake's modules
+      FIND_PACKAGE(GTK)
+      INCLUDE_DIRECTORIES(${GTK_INCLUDE_DIR})
+    ENDIF(CMAKE_GTK_CONFIG)
+  ENDIF(CMAKE_PKG_CONFIG)
+
+ENDIF(VTK_USE_X)
+
+LINK_LIBRARIES( ${WXWINDOWS_LIBRARY} )
+
+ELSE ( CMAKE_WX_CAN_COMPILE )
+  MESSAGE("Cannot find wxWindows libraries and/or header files")
+ENDIF ( CMAKE_WX_CAN_COMPILE )
+# -------------------------------------------------------------
 
 #######################################
 # To make things interesting, wxWidgets' setup.h file appears

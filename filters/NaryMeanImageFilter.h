@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include "itkNaryFunctorImageFilter.h"
 #include "itkNumericTraits.h"
 
@@ -47,21 +46,11 @@ public:
 
 	itkNewMacro(Self);
 
-	void AddInput(const TInputImage * input)
-	{
-		SuperClass::SetInput(this->inputIdx, const_cast<TInputImage *>(input));
-		this->inputIdx++;
-	}
-
 protected:
-	NaryMeanImageFilter() 
-	{
-		this->inputIdx = 0;
-	}
+	NaryMeanImageFilter() {}
 	virtual ~NaryMeanImageFilter() {}
 
 private:
 	NaryMeanImageFilter(const Self&); // not implemented.
 	void operator=(const Self&); // not implemented.
-	unsigned int inputIdx;
 };

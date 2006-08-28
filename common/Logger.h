@@ -1,10 +1,9 @@
 #pragma once
 
-#include <iostream>
 #include <string>
+#include <iostream>
 
-enum LogLevel
-{
+enum LogLevel {
     None    = 0,
     Error   = 100,
     Warning = 200,

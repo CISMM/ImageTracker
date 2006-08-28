@@ -5,13 +5,10 @@
 // Copyright:   XX
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VtkCanvas_H__
-#define __VtkCanvas_H__
+#pragma once
 
-#if defined(__GNUG__) && !defined(NO_GCC_PRAGMA)
-    #pragma interface "VtkCanvas.cxx"
-#endif
-
+// For compilers that support precompilation, includes "wx/wx.h".
+#include "wx/wxprec.h"
 #ifndef WX_PRECOMP
     #include "wx/wx.h"
 #endif
@@ -45,9 +42,9 @@
 class VtkCanvas : public wxPanel
 {
 public:
-	typedef itk::Image<unsigned short, 2> ReadImageType;
-	typedef itk::Image<float, 2> InputImageType;
-	typedef itk::Image<unsigned char, 2> DisplayImageType;
+    typedef itk::Image<unsigned short, 2> ReadImageType;
+    typedef itk::Image<float, 2> InputImageType;
+    typedef itk::Image<unsigned char, 2> DisplayImageType;
 
     // constructors and destructors
     VtkCanvas( wxWindow *parent, wxWindowID id = -1,
@@ -79,17 +76,17 @@ private:
     void InitializePipeline();
     
     // WDR: member variable declarations for VtkCanvas
-	typedef itk::ImageFileReader<ReadImageType> ReaderType;
-	typedef itk::CastImageFilter<ReadImageType, InputImageType> CasterType;
+    typedef itk::ImageFileReader<ReadImageType> ReaderType;
+    typedef itk::CastImageFilter<ReadImageType, InputImageType> CasterType;
     typedef itk::RescaleIntensityImageFilter<InputImageType, DisplayImageType> RescalerType;
-	typedef itk::VTKImageExport<DisplayImageType> ExporterType;
+    typedef itk::VTKImageExport<DisplayImageType> ExporterType;
 
     bool firstTime;
     ReaderType::Pointer reader;
-	CasterType::Pointer caster;
+    CasterType::Pointer caster;
     RescalerType::Pointer rescaler;
-	ExporterType::Pointer exporter;
-	vtkImageImport* importer;
+    ExporterType::Pointer exporter;
+    vtkImageImport* importer;
     vtkImageFlip* flipper;
     vtkImageActor* actor;
     vtkRenderer* renderer;
@@ -101,5 +98,3 @@ private:
 private:
     DECLARE_EVENT_TABLE()
 };
-
-#endif

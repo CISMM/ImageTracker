@@ -4,13 +4,11 @@
 
 #include "itkCastImageFilter.h"
 #include "itkImage.h"
-#include "itkImageFileReader.h"
-#include "itkImageFileWriter.h"
 #include "itkResampleImageFilter.h"
 
 #include "CommonTypes.h"
 #include "FileSet.h"
-#include "FileSetImageReader.h"
+#include "ImageSetReader.h"
 #include "TransformGroup.h"
 
 /*
@@ -21,28 +19,38 @@
 class RegistrationOutput
 {
 public:
+    
+    RegistrationOutput() :
+        composeMode(RegistrationOutput::COMPOSE_PRE)
+    {}
+    
     /*
      * Complete constructor.  Requires a set of source files, a set of transforms, a set of destination files, and a compose mode.
      */
-    RegistrationOutput(FileSet* source = NULL, TransformGroup::TransformVector* transforms = NULL, FileSet* destination = NULL, int composeMode = RegistrationOutput::COMPOSE_PRE );
+    RegistrationOutput(const FileSet& source, const TransformGroup::TransformVector& transforms, const FileSet& destination, int composeMode = RegistrationOutput::COMPOSE_PRE ):
+        source(source),
+        destination(destination),
+        transforms(transforms),
+        composeMode(composeMode)
+    {}
+    
     /*
      * Desctructor.
      */
-    ~RegistrationOutput(void);
+    virtual ~RegistrationOutput(void) {}
 
     typedef CommonTypes::OutputImageType OutputImageType;
     typedef CommonTypes::ImageType InputImageType;
+    typedef ImageSetReader<InputImageType> ReaderType;
    
-    typedef itk::ImageFileReader<InputImageType> ReaderType;
     typedef itk::ResampleImageFilter<InputImageType, InputImageType> ResampleFilterType;
     typedef itk::CastImageFilter<InputImageType, OutputImageType> CastFilterType;
-    typedef itk::ImageFileWriter<OutputImageType> WriterType;
 
     enum {COMPOSE_NONE   = 1000,  COMPOSE_POST   = 1001, COMPOSE_PRE    = 1002};
 
-    void SetSource(FileSet* source);
-    void SetTransforms(TransformGroup::TransformVector* newTransforms);
-    void SetDestination(FileSet* destination);
+    void SetSource(const FileSet& source) { this->source = source; }
+    void SetDestination(const FileSet& destination) { this->destination = destination; }
+    void SetTransforms(const TransformGroup::TransformVector& trans) {this->transforms = trans; }
     
     /*
      * Save the result of transforming all source image files to destination image files.
@@ -55,11 +63,14 @@ public:
      * COMPOSE_POST means transform post-composition.
      * COMPOSE_PRE means transform pre-composition.
      */
-    void SetComposeMode(int mode);
+    void SetComposeMode(int mode)
+    {
+        this->composeMode = mode;
+    }
 
 private:
-    FileSet* source;
-    TransformGroup::TransformVector* transforms;
-    FileSet* destination;
+    FileSet source;
+    FileSet destination;
+    TransformGroup::TransformVector transforms;
     int composeMode;
 };

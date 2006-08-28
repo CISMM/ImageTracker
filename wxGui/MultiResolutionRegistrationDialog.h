@@ -8,10 +8,8 @@
 #ifndef __MultiResolutionRegistrationDialog_H__
 #define __MultiResolutionRegistrationDialog_H__
 
-#if defined(__GNUG__) && !defined(NO_GCC_PRAGMA)
-    #pragma interface "MultiResolutionRegistrationDialog.cxx"
-#endif
-
+// For compilers that support precompilation, includes "wx/wx.h".
+#include "wx/wxprec.h"
 #ifndef WX_PRECOMP
     #include "wx/wx.h"
 #endif
@@ -58,7 +56,7 @@ public:
     wxCheckBox* GetCheckAbove()  { return (wxCheckBox*) FindWindow( MR_CHECK_ABOVE ); }
     
     void SetCanvas(VtkCanvas* canvas) { this->canvas = canvas; }
-    void SetInputFiles(FileSet& inputFiles);
+    void SetInputFiles(const FileSet& inputFiles);
 
 protected:
     void UpdateCanvas();

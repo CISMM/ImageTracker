@@ -1,10 +1,12 @@
-#include "./GlobalRegistrationDialog.h"
-
 #include <limits>
+
+#include "itkExceptionObject.h"
+
 #include "CommonTypes.h"
 #include "Logger.h"
 #include "TransformGroup.h"
-#include "itkExceptionObject.h"
+#include "wxUtils.h"
+#include "GlobalRegistrationDialog.h"
 
 GlobalRegistrationDialog::GlobalRegistrationDialog(wxWindow *parent, wxWindowID id,
                                                    const wxString &title,
@@ -33,7 +35,7 @@ void GlobalRegistrationDialog::InitializeDialog()
     // TODO: how can we get min and max values for pixels?
     // int low = (int) std::numeric_limits<CommonTypes::InputPixelType>::min();
     // int high = (int) std::numeric_limits<CommonTypes::InputPixelType>::max();
-    GlobalRegistrationPipeline::ImageType::PixelType min=0, max=255;
+    CommonTypes::InputImageType::PixelType min=0, max=255;
     this->GetSliderAbove()->SetRange(min, max);
     this->GetSliderBelow()->SetRange(min, max);
     this->GetSliderSmooth()->SetRange(0, 20, 0.05);
@@ -42,7 +44,7 @@ void GlobalRegistrationDialog::InitializeDialog()
     this->GetSliderBelow()->SetValue(0);
     this->GetSliderSmooth()->SetValue(1.0);
 
-    this->GetTextPrefix()->SetValue("SRReg-");
+    this->GetTextPrefix()->SetValue(_("SRReg-"));
 }
 
 void GlobalRegistrationDialog::UpdateDialog()
@@ -53,31 +55,29 @@ void GlobalRegistrationDialog::UpdateDialog()
 
     this->UpdateThresholdRange();
 
-    wxString text;
+    wxString text(_(""));
     if (this->GetCheckAbove()->IsChecked())
     {
-        text = "";
-        text.Printf("%i", this->GetSliderAbove()->GetValue());
+        text.Printf(_("%i"), this->GetSliderAbove()->GetValue());
         this->GetTextAbove()->SetValue(text);
     }
     else
     {
-        this->GetTextAbove()->SetValue("");
+        this->GetTextAbove()->SetValue(text);
     }
 
     if (this->GetCheckBelow()->IsChecked())
     {
-        text = "";
-        text.Printf("%i", this->GetSliderBelow()->GetValue());
+        text.Printf(_("%i"), this->GetSliderBelow()->GetValue());
         this->GetTextBelow()->SetValue(text);
     }
     else
     {
-        this->GetTextBelow()->SetValue("");
+        this->GetTextBelow()->SetValue(text);
     }
 
-    text = "";
-    text.Printf("%3.2f", this->GetSliderSmooth()->GetDoubleValue());
+    text = _("");
+    text.Printf(_("%3.2f"), this->GetSliderSmooth()->GetDoubleValue());
     this->GetTextSmooth()->SetValue(text);
 
     this->GetTextTransform()->Enable(this->GetCheckTransform()->IsChecked());
@@ -87,9 +87,9 @@ void GlobalRegistrationDialog::UpdateDialog()
 
 void GlobalRegistrationDialog::InitializeOutput()
 {
-    wxString out(this->GetPipeline()->GetInput()->GetDirectory().c_str());
+    wxString out(std2wx(this->GetPipeline()->GetInput().GetDirectory()));
     this->GetTextOutdir()->SetValue(out);
-    this->GetTextTransform()->SetValue(out.append("SRTransforms.txt"));
+    this->GetTextTransform()->SetValue(out.append(_("SRTransforms.txt")));
 }
 
 void GlobalRegistrationDialog::SetCanvas(VtkCanvas *canvas)
@@ -192,17 +192,16 @@ void GlobalRegistrationDialog::SaveOutput()
 {
     if (this->GetPipeline()->IsRegistrationFinished())
     {
-        wxString text;
+        wxString text(_(""));
 
         if (this->GetCheckTransform()->IsChecked() && 
             !this->GetTextTransform()->GetValue().IsEmpty())
         {
             wxString xformFile = this->GetTextTransform()->GetValue();
-            text = "";
-            text.Printf("Saving transforms to: %s", xformFile.c_str());
-            Logger::logInfo(text.c_str());
-            TransformGroup::LogTransforms(this->GetPipeline()->GetTransforms());
-            this->GetPipeline()->SetTransformFile(xformFile.c_str());
+            text.Printf(_("Saving transforms to: %s"), xformFile.c_str());
+            Logger::logInfo(wx2std(text));
+            TransformGroup::LogTransforms(const_cast<TransformGroup::TransformVector&>(this->GetPipeline()->GetTransforms()));
+            this->GetPipeline()->SetTransformFile(wx2std(xformFile));
             this->GetPipeline()->SaveTransforms();
         }
 
@@ -210,13 +209,12 @@ void GlobalRegistrationDialog::SaveOutput()
             !(this->GetTextOutdir()->GetValue().IsEmpty() || 
               this->GetTextPrefix()->GetValue().IsEmpty()))
         {
-            text = "";
-            text.Printf("Saving image files to: %s", this->GetTextOutdir()->GetValue().c_str());
-            Logger::logInfo(text.c_str());
-            FileSet *outFiles = new FileSet(
+            text.Printf(_("Saving image files to: %s"), this->GetTextOutdir()->GetValue().c_str());
+            Logger::logInfo(wx2std(text));
+            FileSet outFiles(
                 this->GetPipeline()->GetInput(), 
-                this->GetTextPrefix()->GetValue().c_str());
-            outFiles->SetDirectory(this->GetTextOutdir()->GetValue().c_str());
+                wx2std(this->GetTextPrefix()->GetValue()));
+            outFiles.SetDirectory(wx2std(this->GetTextOutdir()->GetValue()));
             
             this->GetPipeline()->SetOutput(outFiles);
             this->GetPipeline()->SaveImages();
@@ -255,11 +253,11 @@ void GlobalRegistrationDialog::OnOutDirectory( wxCommandEvent &event )
         wxDirDialog dir(this, _("Choose a directory"), this->GetTextOutdir()->GetValue(), wxDD_NEW_DIR_BUTTON);
         if (dir.ShowModal() == wxID_OK)
         {
-            this->GetTextOutdir()->SetValue(dir.GetPath() + "\\");
+            this->GetTextOutdir()->SetValue(dir.GetPath() + _("\\"));
             
-            if (this->GetTextTransform()->GetValue().IsSameAs(""))
+            if (this->GetTextTransform()->GetValue().IsSameAs(std2wx("")))
             {
-                this->GetTextTransform()->SetValue(dir.GetPath() + "\\Transforms.txt");
+                this->GetTextTransform()->SetValue(dir.GetPath() + _("\\Transforms.txt"));
             }
         }
     }
@@ -275,9 +273,9 @@ void GlobalRegistrationDialog::OnTransformFile( wxCommandEvent &event )
         {
             this->GetTextTransform()->SetValue(save.GetPath());
 
-            if (this->GetTextOutdir()->GetValue().IsSameAs(""))
+            if (this->GetTextOutdir()->GetValue().IsSameAs(std2wx("")))
             {
-                this->GetTextOutdir()->SetValue(save.GetDirectory() + "\\");
+                this->GetTextOutdir()->SetValue(save.GetDirectory() + _("\\"));
             }
         }
     }

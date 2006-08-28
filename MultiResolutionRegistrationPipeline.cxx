@@ -9,6 +9,7 @@ MultiResolutionRegistrationPipeline::MultiResolutionRegistrationPipeline()
 	this->threshold[1] = ThresholdType::New();
 	this->registration = RegistrationType::New();
 	this->resample = ResampleType::New();
+	this->caster = CasterType::New();
 	this->smooth = SmoothType::New();
 
 	// Connect pipeline
@@ -17,36 +18,19 @@ MultiResolutionRegistrationPipeline::MultiResolutionRegistrationPipeline()
 	this->smooth->SetInput(this->threshold[0]->GetOutput());
 
 	// User must supply these
-	// this->inputFiles = 0;
-	// this->outputFiles = 0;
 	this->SetTransformFile("");
 }
 
-FileSet* MultiResolutionRegistrationPipeline::GetInputFiles()
-{
-	return &(this->inputFiles);
-}
-
-void MultiResolutionRegistrationPipeline::SetInputFiles(FileSet &files)
+void MultiResolutionRegistrationPipeline::SetInputFiles(const FileSet &files)
 {
 	this->inputFiles = files;
-	this->inputReader.SetFileSet(&(this->inputFiles));
+	this->inputReader = ReaderType(this->inputFiles);
 
-	this->resample->SetInput(this->inputReader.FirstImage());
-	this->threshold[0]->SetInput(this->inputReader.FirstImage());
-	this->threshold[1]->SetInput(this->inputReader.NextImage());
+	this->resample->SetInput(this->inputReader[0]);
+	this->threshold[0]->SetInput(this->inputReader[0]);
+	this->threshold[1]->SetInput(this->inputReader[1]);
 
 	this->smooth->SetInput(this->threshold[0]->GetOutput());
-}
-
-FileSet* MultiResolutionRegistrationPipeline::GetOutputFiles()
-{
-	return &(this->outputFiles);
-}
-
-void MultiResolutionRegistrationPipeline::SetOutputFiles(FileSet& files)
-{
-	this->outputFiles = files;
 }
 
 unsigned int MultiResolutionRegistrationPipeline::GetStartingShrinkFactor()
@@ -112,64 +96,55 @@ void MultiResolutionRegistrationPipeline::Update()
 	Logger::verbose << "MultiResolutionRegistrationPipeline::Update()" << std::endl;
 
 	// Create container for transforms
-	typedef std::vector<typename RegistrationType::TransformPointer> TransformVector;
+	typedef std::vector<RegistrationType::TransformPointer> TransformVector;
 	TransformVector transforms;
 	
 	// Create a running transform--keeps transform from current image to initial image
 	RegistrationType::TransformPointer transform = RegistrationType::TransformType::New();
 	transform->SetIdentity();
 
-	int total = this->outputFiles.GetFileNames()->size();
-	int idx = 1;
-	Logger::info << "MultiResolutionRegistrationPipeline::Update: " << idx << "/" << total << std::endl;
-
-	// Retrieve output filenames
-	FileSet::FileIterator outFileIt = this->outputFiles.GetFileNames()->begin();
-	ItkMagickIO::Pointer writer = ItkMagickIO::New();
+	int total = this->outputFiles.size();
+	Logger::info << "MultiResolutionRegistrationPipeline::Update: " << 1 << "/" << total << std::endl;
 
 	// Start at the beginning of the input images
-	ImageType::Pointer fixed = this->inputReader.FirstImage();
-	ImageType::Pointer moving;
+	// Write the first image, un-changed
+	this->caster->SetInput(this->inputReader[0]);
+	WriteImage(this->caster->GetOutput(), this->outputFiles[0]);
 
-	// Write the first image, un-changed	
-	writer->Write(*outFileIt, fixed);
-	if (outFileIt != this->outputFiles.GetFileNames()->end())
-		++outFileIt;
+	// Connect caster to the resampling pipeline
+	this->caster->SetInput(this->resample->GetOutput());
 
 	// Register every image with the previous image
-	while (this->inputReader.HasNext())
+	for (unsigned int i = 0; 
+	     i < this->inputReader.size()-1 && 
+	     i < this->outputFiles.size(); 
+	     i++)
 	{
-		moving = this->inputReader.NextImage();
-
-		// Update pipeline inputs
-		this->threshold[0]->SetInput(fixed);
-		this->threshold[1]->SetInput(moving);
-		this->smooth->SetInput(fixed);
-		this->resample->SetInput(moving);
-
-		// Run registration
-		Logger::info << "MultiResolutionRegistrationPipeline::Update: " << (++idx) << "/" << total << std::endl;
-		this->registration->StartRegistration();
-		// store transform
-		transforms.push_back(this->registration->GetLastTransform());
-		// pre-compose the current transform with the accumulated transform
-		transform->Compose(this->registration->GetLastTransform(), true);
-		
-		// Save registered image
-		if (outFileIt != this->outputFiles.GetFileNames()->end())
-		{
-			this->resample->SetTransform(transform);
-			this->resample->SetSize(fixed->GetLargestPossibleRegion().GetSize());
-			this->resample->SetOutputOrigin(fixed->GetOrigin());
-			this->resample->SetOutputSpacing(fixed->GetSpacing());
-			this->resample->SetDefaultPixelValue(0);
-			this->resample->Update();
-			writer->Write(*outFileIt, this->resample->GetOutput());
-			++outFileIt;
-		}
-
-		// The current moving image is the next fixed image
-		fixed = moving;
+            ImageType::Pointer fixed = this->inputReader[i];
+            ImageType::Pointer moving = this->inputReader[i+1];
+            
+            // Update pipeline inputs
+            this->threshold[0]->SetInput(fixed);
+            this->threshold[1]->SetInput(moving);
+            this->smooth->SetInput(this->threshold[0]->GetOutput());
+            this->resample->SetInput(moving);
+            
+            // Run registration
+            Logger::info << "MultiResolutionRegistrationPipeline::Update: " << (i+2) << "/" << total << std::endl;
+            this->registration->StartRegistration();
+            // store transform
+            transforms.push_back(this->registration->GetLastTransform());
+            // pre-compose the current transform with the accumulated transform
+            transform->Compose(this->registration->GetLastTransform(), true);
+            
+            // Save registered image
+            this->resample->SetTransform(transform);
+            this->resample->SetSize(fixed->GetLargestPossibleRegion().GetSize());
+            this->resample->SetOutputOrigin(fixed->GetOrigin());
+            this->resample->SetOutputSpacing(fixed->GetSpacing());
+            this->resample->SetDefaultPixelValue(0);
+            this->resample->Update();
+            WriteImage(this->caster->GetOutput(), this->outputFiles[i]);
 	}
 
 	// Save transform data
@@ -179,8 +154,8 @@ void MultiResolutionRegistrationPipeline::Update()
 	}
 
 	// Reset image
-	this->resample->SetInput(this->inputReader.FirstImage());
-	this->threshold[0]->SetInput(this->inputReader.FirstImage());
-	this->threshold[1]->SetInput(this->inputReader.NextImage());
+	this->resample->SetInput(this->inputReader[0]);
+	this->threshold[0]->SetInput(this->inputReader[0]);
+	this->threshold[1]->SetInput(this->inputReader[1]);
 	this->smooth->SetInput(this->threshold[0]->GetOutput());
 }

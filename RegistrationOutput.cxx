@@ -1,91 +1,55 @@
 #include <iostream>
 
 #include "RegistrationOutput.h"
-
-RegistrationOutput::RegistrationOutput(FileSet* source /* = NULL */, 
-        TransformGroup::TransformVector* transforms /* = NULL */, 
-        FileSet* destination /* = NULL */,
-        int composeMode /* = COMPOSE_NONE */)
-{
-    this->source = source;
-    this->transforms = transforms;
-    this->destination = destination;
-    this->SetComposeMode(composeMode);
-}
-
-RegistrationOutput::~RegistrationOutput(void)
-{
-}
-
-void RegistrationOutput::SetSource(FileSet* source)
-{
-    this->source = source;
-}
-
-void RegistrationOutput::SetTransforms(
-    TransformGroup::TransformVector* newTransforms)
-{
-    this->transforms = newTransforms;
-}
-
-void RegistrationOutput::SetDestination(FileSet* destination)
-{
-    this->destination = destination;
-}
+#include "ImageUtils.h"
 
 void RegistrationOutput::Update(void)
 {
     //Ensure everything is set up
-    if (this->source == NULL ||
-        this->transforms == NULL ||
-        this->destination == NULL)
+    if (this->source.size() == 0 ||
+        this->transforms.size() == 0 ||
+        this->destination.size() == 0)
     {
         std::cerr << "RegistrationOutput: invalid state.  Image source, transforms, or destination not set." << std::endl;
         return;
     }
 
     //There ought to be one fewer transformation than image--we start transforming on the second image.
-    if ((this->source->GetFileNames()->size() - 1 != this->transforms->size()) ||
-        (this->destination->GetFileNames()->size() < (signed) this->transforms->size()))
+    if ((this->source.size() - 1 != this->transforms.size()) ||
+        (this->destination.size() < (signed) this->transforms.size()))
     {
         std::cout << "RegistrationOutput: source, destination, and transform types are not lining up exactly: " <<
-            "\n\tSource image count => " << this->source->GetFileNames()->size() <<
-            "\n\tTransforms count   => " << this->transforms->size() <<
-            "\n\tDest image count   => " << this->destination->GetFileNames()->size() << std::endl;
+            "\n\tSource image count => " << this->source.size() <<
+            "\n\tTransforms count   => " << this->transforms.size() <<
+            "\n\tDest image count   => " << this->destination.size() << std::endl;
     }
 
-    TransformGroup::TransformVector::iterator tranIt = transforms->begin();
+    TransformGroup::TransformVector::iterator tranIt = transforms.begin();
     TransformGroup::TransformPointer transform = TransformGroup::TransformType::New();
     transform->SetIdentity();
 
-    FileSet::FileIterator destIt = destination->GetFileNames()->begin();
+    ReaderType reader(this->source);
 
-	FileSetImageReader reader(this->source);
+    InputImageType::Pointer image = reader[0];
     ResampleFilterType::Pointer resampler = ResampleFilterType::New();
     CastFilterType::Pointer caster = CastFilterType::New();
-    WriterType::Pointer writer = WriterType::New();
 
-	InputImageType::Pointer image = reader.FirstImage();
     resampler->SetInput(image);
     caster->SetInput(resampler->GetOutput());
-    writer->SetInput(caster->GetOutput());
 
     // Write the first image with no transformation
-    std::string outFile = *destIt;
     resampler->SetTransform(transform);
     resampler->SetSize(image->GetLargestPossibleRegion().GetSize());
     resampler->SetOutputOrigin(image->GetOrigin());
     resampler->SetOutputSpacing(image->GetSpacing());
     resampler->SetDefaultPixelValue(0);
-    writer->SetFileName(outFile.c_str());
-    writer->Update();
+    WriteImage(caster->GetOutput(), this->destination[0]);
 
-    *destIt++;
-
-    for ( ; reader.HasNext() &&
-			destIt != destination->GetFileNames()->end() &&
-            tranIt != transforms->end() ; 
-            *destIt++, *tranIt++)
+    for (unsigned int i = 1;
+         i < reader.size() &&
+         i < destination.size() &&
+         tranIt != transforms.end();
+         i++, ++tranIt)
     {
         if (this->composeMode == RegistrationOutput::COMPOSE_POST) 
         {
@@ -99,21 +63,14 @@ void RegistrationOutput::Update(void)
         {
             transform = *tranIt;
         }
-
-        outFile = *destIt;
-		image = reader.NextImage();
-		resampler->SetInput(image);
+        
+        image = reader[i];
+        resampler->SetInput(image);
         resampler->SetTransform(transform);
         resampler->SetSize(image->GetLargestPossibleRegion().GetSize());
         resampler->SetOutputOrigin(image->GetOrigin());
         resampler->SetOutputSpacing(image->GetSpacing());
         resampler->SetDefaultPixelValue(0);
-        writer->SetFileName(outFile.c_str());
-        writer->Update();
+        WriteImage(caster->GetOutput(), this->destination[i]);
     }
-}
-
-void RegistrationOutput::SetComposeMode(int mode)
-{
-    this->composeMode = mode;
 }
