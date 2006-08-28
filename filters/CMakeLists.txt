@@ -29,8 +29,6 @@ SET (Filters_SRCS
                             DerivativesToSurfaceImageFilter.h
                             Gaussian2DVectorFilter.h
                             GaussianFunctionImageFilter.h
-							itkFFTComplexToComplexImageFilter.h
-							itkFFTWComplexToComplexImageFilter.h
                             LocalContrastImageFilter.h
                             ModulateRegionImageFilter.h
                             NaryMeanImageFilter.h
