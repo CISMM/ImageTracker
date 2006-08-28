@@ -63,13 +63,11 @@ SET (Algorithms_SRCS
     HarrisFeatureDetector.cxx                   HarrisFeatureDetector.h
     ImageRegistration.cxx                       ImageRegistration.h
     ImageStatistics.cxx                         ImageStatistics.h
-    MultiImageRegistrationProcessor.cxx         MultiImageRegistrationProcessor.h
     MultiRegionRegistration.cxx                 MultiRegionRegistration.h
     MultiRegionRegistrationPipeline.cxx         MultiRegionRegistrationPipeline.h
                                                 MultiResolutionRegistration.h
-    MultiResolutionRegistrationPipeline.cxx		MultiResolutionRegistrationPipeline.h
+    MultiResolutionRegistrationPipeline.cxx	MultiResolutionRegistrationPipeline.h
     RegistrationOutput.cxx                      RegistrationOutput.h
-    ThresholdPipeline.cxx                       ThresholdPipeline.h
 )
 
 ADD_LIBRARY(ITAlgorithms ${Algorithms_SRCS})
