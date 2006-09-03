@@ -29,11 +29,11 @@ public:
 	typedef FFTComplexToComplexImageFilter Self;
 	typedef ImageToImageFilter< TInputImageType, TOutputImageType > Superclass;
 	typedef SmartPointer< Self > Pointer;
-	typedef SmartPointer< const Self > Pointer;
+	typedef SmartPointer< const Self > ConstPointer;
 
 	itkNewMacro(Self);
 	itkTypeMacro(FFTComplexToComplexImageFilter, ImageToImageFilter);
-	itkConstMacro(ImageDimension, unsigned int, TInputImageType::ImageDimension);
+	itkStaticConstMacro(ImageDimension, unsigned int, TInputImageType::ImageDimension);
 	
 	/**
 	 * Specify that the DFT routine should use a forward discrete Fourier transform.
@@ -50,6 +50,11 @@ public:
 	{
 		this->m_Forward = false;
 		this->Modified();
+	}
+	
+	bool IsForward()
+	{
+		return this->m_Forward;
 	}
 
 protected:

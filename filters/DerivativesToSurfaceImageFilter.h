@@ -12,8 +12,8 @@
  * (Ix, Iy) of a function I, we compute I.  First, compute the fast Fourier
  * transform (FFT) of Ix and Iy, yielding a set of coefficients Cx(wx, wy)
  * and Cy(wx, wy).  Compute a new set of coefficients from Cx and Cy by
- * C(wx, wy) = (-iwx * Cx(wx, wy) - iwy * Cy(wx, wy)) / (wx^2 + wy^2).  The
- * inverse Fourier tranform (IFFT) of C is the surface I.
+ * C(wx, wy) = (-i sin(wx) * Cx(wx, wy) - i sin(wy) * Cy(wx, wy)) / (wx^2 + wy^2).
+ * The inverse Fourier tranform (IFFT) of C is the surface I.
  *
  * For simplicity in dealing with complex image types in the frequency domain,
  * this filter generates an image of the same type as the input, and so has
@@ -25,7 +25,10 @@ public itk::ImageToImageFilter< TInput, TInput >
 {
 public:
     // Standard ITK typedefs
-    typedef DerivativesToSurfaceImageFilter Self;
+	typedef TInput TInputImageType;
+	typedef TInput TOutputImageType;
+
+	typedef DerivativesToSurfaceImageFilter Self;
     typedef itk::ImageToImageFilter< TInput, TInput > Superclass;
     typedef itk::SmartPointer< Self > Pointer;
     typedef itk::SmartPointer< const Self > ConstPointer;
@@ -34,16 +37,13 @@ public:
     itkTypeMacro(DerivativesToSurfaceImageFilter, ImageToImageFilter);
     
     // Helpful typedefs
-    typedef TInput InputDxImageType;
-    typedef TInput InputDyImageType;
+    typedef TInput InputImageType;
     typedef TInput OutputImageType;
-    typedef typename InputDxImageType::PixelType DerivPixelType;
-    typedef typename OutputImageType::PixelType OutputPixelType;
-    typedef typename InputDxImageType::Pointer InputDxPointer;
-    typedef typename InputDyImageType::Pointer InputDyPointer;
+    typedef typename InputImageType::PixelType PixelType;
+    typedef typename InputImageType::Pointer InputPointer;
     typedef typename OutputImageType::Pointer OutputPointer;
     
-    itkStaticConstMacro(ImageDimension, unsigned int, InputDxImageType::ImageDimension);
+    itkStaticConstMacro(ImageDimension, unsigned int, InputImageType::ImageDimension);
     
     /**
      * Returns the input x-derivative estimate.
@@ -97,11 +97,13 @@ private:
 #define USE_FFTWF
 #endif
 #include <cmath>
+#include "vnl/vnl_math.h"
 #include "itkImageRegionConstIteratorWithIndex.h"
 #include "itkImageRegionIterator.h"
-#include "itkFFTWComplexConjugateToRealImageFilter.h"
-#include "itkFFTWRealToComplexConjugateImageFilter.h"
+#include "itkComplexToRealImageFilter.h"
 
+#include "itkFFTWComplexToComplexImageFilter.h"
+#include "itkRealToComplexImageFilter.h"
 #include "ImageUtils.h"
 #include "Logger.h"
 
@@ -123,13 +125,15 @@ void DerivativesToSurfaceImageFilter<TInput>
     Logger::verbose << "DerivativesToSurfaceImageFilter::GenerateData(): begin." << std::endl;
     
     // Define types
-    typedef itk::FFTWRealToComplexConjugateImageFilter<DerivPixelType, ImageDimension> FFTDerivType;
-    typedef itk::FFTWComplexConjugateToRealImageFilter<OutputPixelType, ImageDimension> IFFTType;
-    typedef typename FFTDerivType::OutputImageType::IndexType DerivIndexType;
-    typedef itk::ImageRegionConstIteratorWithIndex<typename FFTDerivType::OutputImageType> DerivIteratorType;
-    typedef typename FFTDerivType::OutputImageType ComplexImageType;
-    typedef typename ComplexImageType::PixelType ComplexPixelType;
-    typedef itk::ImageRegionIterator<ComplexImageType> ComplexIteratorType;
+	typedef itk::RealToComplexImageFilter< PixelType, ImageDimension > R2CType;
+    typedef itk::FFTWComplexToComplexImageFilter< PixelType, ImageDimension > DFTType;
+	typedef typename DFTType::OutputImageType ComplexImageType;
+	typedef typename ComplexImageType::PixelType ComplexPixelType;
+	typedef typename DFTType::OutputImageType::IndexType IndexType;
+	
+	typedef itk::ComplexToRealImageFilter< ComplexImageType, OutputImageType > C2RType;
+    typedef itk::ImageRegionConstIteratorWithIndex< ComplexImageType > DerivIteratorType;
+    typedef itk::ImageRegionIterator< ComplexImageType > ComplexIteratorType;
     
     // Allocate the output buffer
     Logger::verbose << "\tAllocating output buffer..." << std::endl;
@@ -137,10 +141,17 @@ void DerivativesToSurfaceImageFilter<TInput>
     
     // Compute FFT of the input derivative estimates
     Logger::verbose << "\tComputing FFT of derivative estimates...";
-    typename FFTDerivType::Pointer fftDx = FFTDerivType::New();
-    typename FFTDerivType::Pointer fftDy = FFTDerivType::New();
-    fftDx->SetInput(this->GetInputDx());
-    fftDy->SetInput(this->GetInputDy());
+	typename R2CType::Pointer r2cX = R2CType::New();
+	typename R2CType::Pointer r2cY = R2CType::New();
+    typename DFTType::Pointer fftDx = DFTType::New();
+    typename DFTType::Pointer fftDy = DFTType::New();
+	fftDx->SetForward();
+	fftDy->SetForward();
+	
+	r2cX->SetInput(this->GetInputDx());
+	r2cY->SetInput(this->GetInputDy());
+    fftDx->SetInput(r2cX->GetOutput());
+    fftDy->SetInput(r2cY->GetOutput());
     fftDx->Update();
     fftDy->Update();
     Logger::verbose << "done." << std::endl;
@@ -150,7 +161,7 @@ void DerivativesToSurfaceImageFilter<TInput>
     DerivIteratorType dyIt(fftDy->GetOutput(), fftDy->GetOutput()->GetLargestPossibleRegion());
     
     // Find fundamental frequencies for the images
-    typename InputDxImageType::SizeType size = this->GetInputDx()->GetLargestPossibleRegion().GetSize();
+    typename InputImageType::SizeType size = this->GetInputDx()->GetLargestPossibleRegion().GetSize();
     float fundFreqX = 2.0 * M_PI / (float)size[0];
     float fundFreqY = 2.0 * M_PI / (float)size[1];
     Logger::verbose << "\tPI: " << M_PI << std::endl;
@@ -172,28 +183,33 @@ void DerivativesToSurfaceImageFilter<TInput>
         !(dxIt.IsAtEnd() || dyIt.IsAtEnd() || outIt.IsAtEnd());
         ++dxIt, ++dyIt, ++outIt)
     {
-        DerivIndexType index = dxIt.GetIndex();
-        float freqX(fundFreqX * index[0]);
-        float freqY(fundFreqY * index[1]);        
-        float denom = freqX * freqX + freqY * freqY;
+        IndexType index = dxIt.GetIndex();
+		float aX(vcl_cos(fundFreqX * index[0]));
+		float aY(vcl_cos(fundFreqY * index[1]));
+        float denom = aX * aX + aY * aY;
         if (denom == 0) // avoid divide by zero
         {
             outIt.Set(ComplexPixelType(0, 0));
         }
         else
         {
-            outIt.Set((ComplexPixelType(0,-freqX) * dxIt.Get() + ComplexPixelType(0, -freqY) * dyIt.Get()) / denom);
+			//TODO: Why does it seem ax and ay are switched here?
+			outIt.Set((ComplexPixelType(0,-aY) * dxIt.Get() + ComplexPixelType(0, -aX) * dyIt.Get()) / denom);
+            // outIt.Set((ComplexPixelType(0,-aX) * dxIt.Get() + ComplexPixelType(0, -aY) * dyIt.Get()) / denom);
         }
     }
     
     // Inverse Fourier transform to find the surface
     Logger::verbose << "\tComputing IFFT of frequency image to find surface..." << std::endl;
-    typename IFFTType::Pointer ifft = IFFTType::New();
+    typename DFTType::Pointer ifft = DFTType::New();
+	typename C2RType::Pointer complex2real = C2RType::New();
+	ifft->SetBackward();
     ifft->SetInput(complexOut);
-    ifft->Update();
+	complex2real->SetInput(ifft->GetOutput());
+    complex2real->Update();
     
     // Graft output
     Logger::verbose << "\tGrafting output..." << std::endl;
-    this->GraftOutput(ifft->GetOutput());
+    this->GraftOutput(complex2real->GetOutput());
     Logger::verbose << "DerivativesToSurfaceImageFilter::GenerateData(): done." << std::endl;    
 }

@@ -16,7 +16,7 @@ public FFTComplexToComplexImageFilter< TPixel, Dimension >
 {
 	// This is an empty, general definintion. The FFTW API requires that
 	// we create separate specialized classes for float and double implementations.
-}
+};
 
 #if defined(USE_FFTWF)
 template < unsigned int Dimension >
@@ -26,6 +26,9 @@ public FFTComplexToComplexImageFilter< float, Dimension >
 public:
 	// standard itk typedefs
 	typedef float TPixel;
+	typedef Image< std::complex< TPixel >, Dimension > TInputImageType;
+	typedef Image< std::complex< TPixel >, Dimension > TOutputImageType;
+
 	typedef FFTWComplexToComplexImageFilter Self;
 	typedef FFTComplexToComplexImageFilter< float, Dimension > Superclass;
 	typedef SmartPointer< Self > Pointer;
@@ -66,6 +69,9 @@ public FFTComplexToComplexImageFilter< double, Dimension >
 public:
 	// standard itk typedefs
 	typedef double TPixel;
+	typedef Image< std::complex< TPixel >, Dimension > TInputImageType;
+	typedef Image< std::complex< TPixel >, Dimension > TOutputImageType;
+
 	typedef FFTWComplexToComplexImageFilter Self;
 	typedef FFTComplexToComplexImageFilter< double, Dimension > Superclass;
 	typedef SmartPointer< Self > Pointer;
@@ -116,8 +122,8 @@ void FFTWComplexToComplexImageFilter< float, Dimension >
 ::GenerateData()
 {
 	// Get input and output
-	TInputImageType::ConstPointer input = this->GetInput();
-	TOutputImageType::Pointer output = this->GetOutput();
+	typename TInputImageType::ConstPointer input = this->GetInput();
+	typename TOutputImageType::Pointer output = this->GetOutput();
 	
 	// Validate that we can run
 	if (!(input && output))
@@ -132,9 +138,8 @@ void FFTWComplexToComplexImageFilter< float, Dimension >
 	output->Allocate();
 	
 	// Setup FFTW parameters
-	unsigned int total_size = 1;
-	int direction = this->m_Forward ? FFTW_FORWARD : FFTW_BACKWARD;
-	unsigned int flags = FFTW_ESTIMATE | PRESERVE_INPUT;
+	int direction = this->IsForward() ? FFTW_FORWARD : FFTW_BACKWARD;
+	unsigned int flags = FFTW_ESTIMATE | FFTW_PRESERVE_INPUT;
 	
 	// Recast input and output for FFTW
 	std::complex< TPixel > *pIn = const_cast< std::complex<TPixel> *>(input->GetBufferPointer());
@@ -191,8 +196,8 @@ void FFTWComplexToComplexImageFilter< double, Dimension >
 ::GenerateData()
 {
 	// Get input and output
-	TInputImageType::ConstPointer input = this->GetInput();
-	TOutputImageType::Pointer output = this->GetOutput();
+	typename TInputImageType::ConstPointer input = this->GetInput();
+	typename TOutputImageType::Pointer output = this->GetOutput();
 	
 	// Validate that we can run
 	if (!(input && output))
@@ -208,8 +213,8 @@ void FFTWComplexToComplexImageFilter< double, Dimension >
 	
 	// Setup FFTW parameters
 	unsigned int total_size = 1;
-	int direction = this->m_Forward ? FFTW_FORWARD : FFTW_BACKWARD;
-	unsigned int flags = FFTW_ESTIMATE | PRESERVE_INPUT;
+	int direction = this->IsForward() ? FFTW_FORWARD : FFTW_BACKWARD;
+	unsigned int flags = FFTW_ESTIMATE | FFTW_PRESERVE_INPUT;
 	
 	// Recast input and output for FFTW
 	std::complex< TPixel > *pIn = const_cast< std::complex<TPixel> *>(input->GetBufferPointer());

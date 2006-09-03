@@ -27,6 +27,8 @@ SET (Filters_SRCS
                             BilateralVectorImageFilter.h
                             CLGOpticFlowImageFilter.h
                             DerivativesToSurfaceImageFilter.h
+							itkFFTComplexToComplexImageFilter.h
+							itkFFTWComplexToComplexImageFilter.h
                             Gaussian2DVectorFilter.h
                             GaussianFunctionImageFilter.h
                             LocalContrastImageFilter.h
@@ -37,6 +39,7 @@ SET (Filters_SRCS
                             NaryMinimumImageFilter.h
                             NaryVarianceImageFilter.h
                             NonZeroLog10ImageFilter.h
+							itkRealToComplexImageFilter.h
                             RegistrationMotionFilter.h
                             WarpImageErrorFilter.h
 )
