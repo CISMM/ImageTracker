@@ -79,7 +79,7 @@ void FileSet::SetDirectory(const std::string& dir)
 std::string::size_type FileSet::DirectoryIndex(const std::string& filename) const
 {
     // find the index of the last "\"
-    return filename.rfind("\\");
+    return filename.rfind("/");
 }
 
 std::string FileSet::DirectoryPart(const std::string& filename) const
