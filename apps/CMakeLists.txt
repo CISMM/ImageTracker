@@ -53,6 +53,9 @@ TARGET_LINK_LIBRARIES(avgcontrast ITCommon ITImage ITFilters)
 ADD_EXECUTABLE(findsurface FindSurface.cxx)
 TARGET_LINK_LIBRARIES(findsurface ITCommon ITImage ITFilters)
 
+ADD_EXECUTABLE(testfft TestFFTComplex.cxx)
+TARGET_LINK_LIBRARIES(testfft ITCommon ITImage ITFilters)
+
 INCLUDE (../LocalUsewxWidgets.cmake)
 
 ###################################
