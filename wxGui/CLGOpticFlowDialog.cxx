@@ -122,7 +122,7 @@ void CLGOpticFlowDialog::OnDirectory( wxCommandEvent &event )
         if (dir.ShowModal() == wxID_OK)
         {
             this->outFileDir = wxString(dir.GetPath());
-            this->outFileDir.append(_("\\"));
+            this->outFileDir.append(_("/"));
             this->GetTextImageDir()->SetValue(this->outFileDir);
         }
     }

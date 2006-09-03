@@ -32,22 +32,22 @@ void PrintImageInfo(const TImage* image, const std::string& label = "")
 template < class TImage >
 void WriteImage(const TImage* image, const std::string& filename)
 {
+    Logger::verbose << "Writing:\t" << filename << std::endl;
     typedef itk::ImageFileWriter< TImage > WriterType;
     typename WriterType::Pointer writer = WriterType::New();
     writer->SetInput(image);
     writer->SetFileName(filename.c_str());
     writer->Update();
-    Logger::verbose << "Wrote:\t" << filename << std::endl;
 }
 
 template < class TImage >
 typename TImage::Pointer ReadImage(const std::string& filename)
 {
+    Logger::verbose << "Reading:\t" << filename << std::endl;
     typedef itk::ImageFileReader< TImage > ReaderType;
     typename ReaderType::Pointer reader = ReaderType::New();
     reader->SetFileName(filename.c_str());
     reader->Update();
-    Logger::verbose << "Read:\t" << filename << std::endl;
     return reader->GetOutput();
 }
 
