@@ -50,8 +50,11 @@ TARGET_LINK_LIBRARIES(compgrad ITCommon ITImage ITFilters)
 ADD_EXECUTABLE(avgcontrast ComputeAverageLocalContrast.cxx)
 TARGET_LINK_LIBRARIES(avgcontrast ITCommon ITImage ITFilters)
 
-ADD_EXECUTABLE(findsurface FindSurface.cxx)
-TARGET_LINK_LIBRARIES(findsurface ITCommon ITImage ITFilters)
+ADD_EXECUTABLE(reconstruct ReconstructSurface.cxx)
+TARGET_LINK_LIBRARIES(reconstruct ITCommon ITImage ITFilters)
+
+ADD_EXECUTABLE(findfixed FindFixedImage.cxx)
+TARGET_LINK_LIBRARIES(findfixed ITCommon ITImage ITFilters)
 
 ADD_EXECUTABLE(testfft TestFFTComplex.cxx)
 TARGET_LINK_LIBRARIES(testfft ITCommon ITImage ITFilters)
