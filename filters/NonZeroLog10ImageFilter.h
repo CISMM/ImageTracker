@@ -22,7 +22,7 @@ public:
     {
         TOutput result;
         if (input == 0)
-            result = 0;
+            result = 0;  // Which is log(1)
         else
             result = static_cast<TOutput>(vcl_log10(static_cast<double>(input)));
 

@@ -29,22 +29,8 @@ public:
         unsigned int idx = static_cast< unsigned int >(B.size() / 2);
         TOutput result;
         
-        if (B.size() == 0) // no elements
-        {
-            result = 0;
-        }
-        else if (B.size() % 2 == 0) // even number of elements
-        {
-            // average two center elements
-            result = static_cast< TOutput > ((B[idx-1]+B[idx]) / 2.0);
-        }
-        else // odd number of elements
-        {
-            // index we caclulate is the one we're after
-            result = static_cast< TOutput > (B[idx]);
-        }
-        
-        return result;
+        // index we caclulate is the one we're after
+        return static_cast< TOutput > (stdvec[idx]);
     }
 
     bool operator!=(const NMedianFunctor& other) const
