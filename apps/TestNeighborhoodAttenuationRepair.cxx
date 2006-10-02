@@ -71,7 +71,7 @@ int main(int argc, char** argv)
     std::cout << "Loading image files..." << std::endl;
     for (unsigned int i = 0; i < video.size(); i++)
     {
-        mean->AddInput(video[i]);
+        mean->PushBackInput(video[i]);
     }
 
     // Output mean image

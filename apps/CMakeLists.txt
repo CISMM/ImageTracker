@@ -59,6 +59,9 @@ TARGET_LINK_LIBRARIES(findfixed ITCommon ITImage ITFilters)
 ADD_EXECUTABLE(testfft TestFFTComplex.cxx)
 TARGET_LINK_LIBRARIES(testfft ITCommon ITImage ITFilters)
 
+ADD_EXECUTABLE(integrate IntegrateFlowField.cxx)
+TARGET_LINK_LIBRARIES(integrate ITCommon ITImage ITFilters)
+
 INCLUDE (../LocalUsewxWidgets.cmake)
 
 ###################################
@@ -75,7 +78,6 @@ IF (WIN32)
     # can't just use CMAKE_DEBUG_EXE_LINKER_FLAGS
     SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:msvcrt")
 ENDIF (WIN32)
-
 
 ADD_EXECUTABLE(viewer ${GUI_EXE} VtkViewerApp.cxx)
 TARGET_LINK_LIBRARIES(viewer ITView)

@@ -70,12 +70,12 @@ int main(int argc, char** argv)
     else                // vary modulation
     {
         Logger::verbose << "Setting up modulation regions, varying modulation." << std::endl;
-        for (unsigned int i = 0; i < steps; i++)
+        for (unsigned int i = 1; i < steps; i++)
         {
             double angle(i*2*PI / steps);
             point[0] = static_cast<PointType::ValueType>(center[0] + radius * std::cos(angle));
             point[1] = static_cast<PointType::ValueType>(center[1] + radius * std::sin(angle));
-            modulate->AddRegion(point, 4.0, (double) i / steps);
+            modulate->AddRegion(point, 6.0, (double) i / steps);
         }
     }
     

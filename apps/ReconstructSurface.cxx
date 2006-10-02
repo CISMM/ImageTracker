@@ -14,6 +14,7 @@
 #include "itkRescaleIntensityImageFilter.h"
 #include "itkStatisticsImageFilter.h"
 
+#include "CentralDifferenceImageFilter.h"
 #include "DerivativesToSurfaceImageFilter.h"
 #include "ImageUtils.h"
 #include "Logger.h"
@@ -47,24 +48,28 @@ int main(int argc, char** argv)
     typedef itk::CastImageFilter< FloatImageType, InputImageType > ShortCasterType;
     
     typedef itk::RecursiveGaussianImageFilter< FloatImageType, FloatImageType > GaussType;
+    typedef CentralDifferenceImageFilter< FloatImageType, FloatImageType > DerivType;
     typedef DerivativesToSurfaceImageFilter< FloatImageType > SurfaceType;
     
     typedef itk::StatisticsImageFilter< InputImageType > StatsType;
     typedef itk::RescaleIntensityImageFilter< FloatImageType, InputImageType > RescaleType;
     
     FloatCasterType::Pointer floatCast = FloatCasterType::New();
-    GaussType::Pointer dx = GaussType::New();
-    GaussType::Pointer dy = GaussType::New();
+    // GaussType::Pointer dx = GaussType::New();
+    // GaussType::Pointer dy = GaussType::New();
+    DerivType::Pointer dx = DerivType::New();
+    DerivType::Pointer dy = DerivType::New();
+    
     SurfaceType::Pointer surf = SurfaceType::New();
     StatsType::Pointer stats = StatsType::New();
     RescaleType::Pointer rescale = RescaleType::New();
     
     dx->SetDirection(0);	
     dy->SetDirection(1);	
-    dx->SetFirstOrder();
-    dy->SetFirstOrder();
-    dx->SetSigma(1.0);
-    dy->SetSigma(1.0);
+    // dx->SetFirstOrder();
+    // dy->SetFirstOrder();
+    // dx->SetSigma(1.0);
+    // dy->SetSigma(1.0);
     
     // Construct pipeline
     dx->SetInput(floatCast->GetOutput());

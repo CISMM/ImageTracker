@@ -72,7 +72,7 @@ int main(int argc, char** argv)
         ReaderType::Pointer reader = ReaderType::New();
         reader->SetFileName(it->c_str());
         reader->Update();
-        mean->AddInput(reader->GetOutput());
+        mean->PushBackInput(reader->GetOutput());
         video.push_back(reader);
     }
 
