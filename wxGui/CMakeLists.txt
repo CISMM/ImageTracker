@@ -6,18 +6,20 @@ PROJECT (gui)
 INCLUDE (../LocalUsewxWidgets.cmake)
 
 SET (Gui_SRCS
-    CLGOpticFlowDialog.cxx			CLGOpticFlowDialog.h
-    DoubleSlider.cxx				DoubleSlider.h
-    wxDoubleSlider.cxx				wxDoubleSlider.h
-    FileSetDialog.cxx				FileSetDialog.h
-    GlobalRegistrationDialog.cxx	GlobalRegistrationDialog.h
-    HarrisFeatureDialog.cxx			HarrisFeatureDialog.h
-    ImageViewer.cxx					ImageViewer.h
-    wxIntSlider.cxx					wxIntSlider.h
-    LoggerPanel.cxx					LoggerPanel.h
+    CLGOpticFlowDialog.cxx                      CLGOpticFlowDialog.h
+    DataSource.cxx                              DataSource.h
+    DoubleSlider.cxx                            DoubleSlider.h
+    wxDoubleSlider.cxx                          wxDoubleSlider.h
+    FileSetDialog.cxx                           FileSetDialog.h
+    GlobalRegistrationDialog.cxx                GlobalRegistrationDialog.h
+    HarrisFeatureDialog.cxx                     HarrisFeatureDialog.h
+    ImageTracker.cpp                            ImageTracker.h
+    ImageViewer.cxx                             ImageViewer.h
+    wxIntSlider.cxx                             wxIntSlider.h
+    LoggerPanel.cxx                             LoggerPanel.h
     MultiResolutionRegistrationDialog.cxx	MultiResolutionRegistrationDialog.h
-    RegistrationDesign_wdr.cpp		RegistrationDesign_wdr.h
-    wxCore_wdr.cpp					wxCore_wdr.h
+    RegistrationDesign_wdr.cpp                  RegistrationDesign_wdr.h
+    wxCore_wdr.cpp                              wxCore_wdr.h
     wxGui.rc
 )
 
