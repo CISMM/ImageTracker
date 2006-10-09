@@ -4,9 +4,8 @@ PROJECT (apps)
 # Command line and gui executables for the ImageTracker project
 ##############################
 
-IF (WIN32)
-  SET (GUI_EXE WIN32)
-ENDIF (WIN32)
+ADD_EXECUTABLE(transform TransformImages.cxx)
+TARGET_LINK_LIBRARIES(transform ITFilters ITImage ITAlgorithms)
 
 ADD_EXECUTABLE(translate TranslationGenerator.cxx)
 TARGET_LINK_LIBRARIES(translate ITFilters)
