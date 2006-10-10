@@ -142,8 +142,8 @@ int main(int argc, char** argv)
     typedef NonZeroLog10ImageFilter< InternalImageType, InternalImageType > LogType;
     typedef CentralDifferenceImageFilter< InternalImageType, InternalImageType > GradType;
     // typedef itk::RecursiveGaussianImageFilter< InternalImageType, InternalImageType > GradType;
-    typedef NaryMedianImageFilter< InternalImageType, InternalImageType > AverageType;
-    // typedef NaryMeanImageFilter< InternalImageType, InternalImageType > AverageType;
+    // typedef NaryMedianImageFilter< InternalImageType, InternalImageType > AverageType;
+    typedef NaryMeanImageFilter< InternalImageType, InternalImageType > AverageType;
     typedef DerivativesToSurfaceImageFilter< InternalImageType > SurfaceType;
     
     // For high-pass filter

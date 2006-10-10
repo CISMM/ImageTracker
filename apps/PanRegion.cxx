@@ -18,8 +18,7 @@ int main(int argc, char** argv)
 {
     if (argc < 11)
     {
-        Logger::error << "Usage: " << std::endl;
-        Logger::error << "\tdir fileIn geomX geomY startX startY endX endY steps formatOut" << std::endl;
+        Logger::error << "Usage:\n\t" << argv[0] << " dir fileIn geomX geomY startX startY endX endY steps formatOut" << std::endl;
         exit(1);
     }
     

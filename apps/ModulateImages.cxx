@@ -20,10 +20,10 @@ int main(int argc, char** argv)
 {
     if (argc < 6)
     {
-        Logger::error << "Usage: " << std::endl;
-        Logger::error << "    " << argv[0] << " dir formatIn start end formatOut {type}" << std::endl;
-        Logger::error << "      if type is 'size', occluders of different sizes are added to the video." << std::endl;
-        Logger::error << "      if type is 'mod', occluders of different densities are added to the video." << std::endl;
+        Logger::error << "Usage:\n\t" << argv[0] << " dir formatIn start end formatOut {type}" << std::endl;
+        Logger::error << "\tif type is 'size', occluders of different sizes are added to the video." << std::endl;
+        Logger::error << "\tif type is 'mod', occluders of different densities are added to the video." << std::endl;
+        Logger::error << "\tif type is 'large', one large occluder is added to the center of the video." << std::endl; 
         exit(1);
     }
     
@@ -67,7 +67,7 @@ int main(int argc, char** argv)
             modulate->AddRegion(point, 2*i + 1.0, 0.7);
         }
     }
-    else                // vary modulation
+    else if (type == "mod") // vary modulation
     {
         Logger::verbose << "Setting up modulation regions, varying modulation." << std::endl;
         for (unsigned int i = 1; i < steps; i++)
@@ -77,6 +77,11 @@ int main(int argc, char** argv)
             point[1] = static_cast<PointType::ValueType>(center[1] + radius * std::sin(angle));
             modulate->AddRegion(point, 6.0, (double) i / steps);
         }
+    }
+    else
+    {
+        Logger::verbose << "Setting up large modulation region." << std::endl;
+        modulate->AddRegion(center, radius, 0.5);
     }
     
     Logger::verbose << "Processing video..." << std::endl;

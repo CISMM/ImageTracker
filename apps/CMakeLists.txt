@@ -16,6 +16,9 @@ TARGET_LINK_LIBRARIES(modulate ITFilters ITImage)
 ADD_EXECUTABLE(pan PanRegion.cxx)
 TARGET_LINK_LIBRARIES(pan ITFilters ITImage)
 
+ADD_EXECUTABLE(rotate RotateRegion.cxx)
+TARGET_LINK_LIBRARIES(rotate ITFilters ITImage)
+
 ADD_EXECUTABLE(attenuate TestAttenuation.cxx)
 TARGET_LINK_LIBRARIES(attenuate ITFilters)
 
