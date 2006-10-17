@@ -90,6 +90,19 @@ int main(int argc, char** argv)
         // Logger::verbose << "Angle: " << angle << " rad" << std::endl;
         transform->SetAngle(angle);
         // resample->SetTransform(transform);
-        WriteImage(roi->GetOutput(), filesOut[i]);
+        WriteImage<ImageType>(roi->GetOutput(), filesOut[i]);
     }
+    
+    unsigned char aChar(0);
+    unsigned short aShort(0);
+    
+    Logger::verbose << "Oh, by the way:" << std::endl;
+    Logger::verbose << "\tsizeof(unsigned char)  =\t" << sizeof(aChar) << std::endl;
+    Logger::verbose << "\tsizeof(unsigned short) =\t" << sizeof(aShort) << std::endl;
+    Logger::verbose << "\tmax<unsigned char>     =\t" << std::numeric_limits<unsigned char>::max() << std::endl;
+    Logger::verbose << "\tmax<unsigned short>    =\t" << std::numeric_limits<unsigned short>::max() << std::endl;
+    
+    PrintImageInfo<ImageType>(image, "Original");
+    PrintImageInfo(resample->GetOutput(), "Resample");
+    PrintImageInfo(roi->GetOutput(), "ROI");
 }
