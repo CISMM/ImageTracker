@@ -18,19 +18,19 @@ public:
         // tranfer the pixel values to a std::vector, because that supports sorting
         // TODO: Does vnl_vector support sorting?  That is what itk::Array is based on.
         // TODO: The median calculation here is "sort and pick central value."  Because 
-        // it is based on sorting, this takes n log n time.  Linear time algoriths exist.
-        std::vector< TInput > stdvec(B.size());
+        // it is based on sorting, this takes n log n time.  Amortized linear time 
+        // algorithms exist.
+        std::vector< TInput > theVector();
+        theVector.reserve(B.size());
         for (unsigned int i = 0; i < B.size(); i++)
         {
-            stdvec.push_back(B[i]);
+            theVector.push_back(B[i]);
         }
         
-        std::sort(stdvec.begin(), stdvec.end());
-        unsigned int idx = static_cast< unsigned int >(B.size() / 2);
-        TOutput result;
+        std::sort(theVector.begin(), theVector.end());
         
-        // index we caclulate is the one we're after
-        return static_cast< TOutput > (stdvec[idx]);
+        // Choose the middle sorted value
+        return static_cast< TOutput >(theVector[static_cast< unsigned int >(B.size() / 2)]);
     }
 
     bool operator!=(const NMedianFunctor& other) const
