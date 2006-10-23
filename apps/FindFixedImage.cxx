@@ -5,6 +5,7 @@
 #include "itkDivideImageFilter.h"
 #include "itkImage.h"
 #include "itkImageDuplicator.h"
+#include "itkNaryFunctorImageFilter.h"
 #include "itkRecursiveGaussianImageFilter.h"
 #include "itkShiftScaleImageFilter.h"
 #include "itkStatisticsImageFilter.h"
@@ -115,11 +116,12 @@ int main(int argc, char** argv)
     }*/
     
     // Check command line arguments
-    if (argc < 9)
+    if (argc < 10)
     {
         Logger::error << "Usage:" << std::endl;
-        Logger::error << "\t" << argv[0] << " dir formatIn start end meangradlogImg rawattenImg attenuateImg formatOut" << std::endl;
+        Logger::error << "\t" << argv[0] << " dir formatIn start end meangradlogImg rawattenImg attenuateImg formatOut metric" << std::endl;
         Logger::error << "\tNote: the output mean and attenuation images should support float vector types (e.g. mha, vtk)." << std::endl;
+        Logger::error << "\tNote: the metric should be one of [mean, median]." << std::endl;
         exit(1);
     }
     
@@ -132,6 +134,7 @@ int main(int argc, char** argv)
     std::string rawAttenuateFile= argv[6];
     std::string attenuateFile = argv[7];
     std::string formatOut = argv[8];
+    std::string metric = argv[9];
     
     // typedefs
     const unsigned int Dimension = 2;
@@ -142,8 +145,8 @@ int main(int argc, char** argv)
     typedef NonZeroLog10ImageFilter< InternalImageType, InternalImageType > LogType;
     typedef CentralDifferenceImageFilter< InternalImageType, InternalImageType > GradType;
     // typedef itk::RecursiveGaussianImageFilter< InternalImageType, InternalImageType > GradType;
-    // typedef NaryMedianImageFilter< InternalImageType, InternalImageType > AverageType;
-    typedef NaryMeanImageFilter< InternalImageType, InternalImageType > AverageType;
+    typedef NaryMedianImageFilter< InternalImageType, InternalImageType > MedianType;
+    typedef NaryMeanImageFilter< InternalImageType, InternalImageType > MeanType;
     typedef DerivativesToSurfaceImageFilter< InternalImageType > SurfaceType;
     
     // For high-pass filter
@@ -169,9 +172,12 @@ int main(int argc, char** argv)
     LogType::Pointer log = LogType::New();
     GradType::Pointer dx = GradType::New();
     GradType::Pointer dy = GradType::New();
-    AverageType::Pointer avgX = AverageType::New();
-    AverageType::Pointer avgY = AverageType::New();
     
+    Logger::debug << "Metric type:\t" << metric << std::endl;
+    MedianType::Pointer medianX = MedianType::New();
+    MedianType::Pointer medianY= MedianType::New();
+    MeanType::Pointer meanX = MeanType::New();
+    MeanType::Pointer meanY = MeanType::New();
     CopyType::Pointer copyX = CopyType::New();
     CopyType::Pointer copyY = CopyType::New();
     
@@ -198,17 +204,35 @@ int main(int argc, char** argv)
         copyX->Update();
         copyY->Update();
         
-        avgX->PushBackInput(copyX->GetOutput());
-        avgY->PushBackInput(copyY->GetOutput());
+        if (metric == "median")
+        {
+            medianX->PushBackInput(copyX->GetOutput());
+            medianY->PushBackInput(copyY->GetOutput());
+        }
+        else // mean
+        {
+            meanX->PushBackInput(copyX->GetOutput());
+            meanY->PushBackInput(copyY->GetOutput());
+        }
     }
         
     // Average of gradient of logarithm
     PrintImageInfo(dx->GetOutput(), "Final gradX of log");
     PrintImageInfo(dy->GetOutput(), "Final gradY of log");
-    PrintImageInfo(avgX->GetOutput(), "Mean of gradX of log");
-    PrintImageInfo(avgY->GetOutput(), "Mean of gradY of log");
-    compose->SetInput1(avgX->GetOutput());
-    compose->SetInput2(avgY->GetOutput());
+    if (metric == "median")
+    {
+        PrintImageInfo(medianX->GetOutput(), "Median of gradX of log");
+        PrintImageInfo(medianY->GetOutput(), "Median of gradY of log");
+        compose->SetInput1(medianX->GetOutput());
+        compose->SetInput2(medianY->GetOutput());
+    }
+    else
+    {
+        PrintImageInfo(meanX->GetOutput(), "Mean of gradX of log");
+        PrintImageInfo(meanY->GetOutput(), "Mean of gradY of log");
+        compose->SetInput1(meanX->GetOutput());
+        compose->SetInput2(meanY->GetOutput());
+    }
     WriteImage(compose->GetOutput(), meanGradLogFile);
     
 /*    // High-pass filter to remove low-frequency distortion
@@ -249,8 +273,16 @@ int main(int argc, char** argv)
     // Compute log attenuation by integrating gradient of log attenuation
     Logger::debug << "Integrate surface from derivative estimates" << std::endl;
     SurfaceType::Pointer surface = SurfaceType::New();
-    surface->SetInputDx(avgX->GetOutput());
-    surface->SetInputDy(avgY->GetOutput());
+    if (metric == "median")
+    {
+        surface->SetInputDx(medianX->GetOutput());
+        surface->SetInputDy(medianY->GetOutput());
+    }
+    else
+    {
+        surface->SetInputDx(meanX->GetOutput());
+        surface->SetInputDy(meanY->GetOutput());
+    }
     PrintImageInfo(surface->GetOutput(), "Log of attenuation");
     
     // Take exponent of log to get absorption metric
