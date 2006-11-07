@@ -7,6 +7,7 @@
 #include "itkImageDuplicator.h"
 #include "itkNaryFunctorImageFilter.h"
 #include "itkRecursiveGaussianImageFilter.h"
+#include "itkRescaleIntensityImageFilter.h"
 #include "itkShiftScaleImageFilter.h"
 #include "itkStatisticsImageFilter.h"
 #include "itkSubtractImageFilter.h"
@@ -119,9 +120,10 @@ int main(int argc, char** argv)
     if (argc < 10)
     {
         Logger::error << "Usage:" << std::endl;
-        Logger::error << "\t" << argv[0] << " dir formatIn start end meangradlogImg rawattenImg attenuateImg formatOut metric" << std::endl;
+        Logger::error << "\t" << argv[0] << " dir formatIn start end meangradlogImg rawattenImg attenuateImg attenuateRescale formatOut [metric] [scaleto]" << std::endl;
         Logger::error << "\tNote: the output mean and attenuation images should support float vector types (e.g. mha, vtk)." << std::endl;
         Logger::error << "\tNote: the metric should be one of [mean, median]." << std::endl;
+        Logger::error << "\tNote: scaleto should be one of [mean, max]." << std::endl;
         exit(1);
     }
     
@@ -133,13 +135,21 @@ int main(int argc, char** argv)
     std::string meanGradLogFile = argv[5];
     std::string rawAttenuateFile= argv[6];
     std::string attenuateFile = argv[7];
-    std::string formatOut = argv[8];
-    std::string metric = argv[9];
+    std::string rescaleAttenuateFile = argv[8];
+    std::string formatOut = argv[9];
+    std::string metric("mean");
+    std::string scaleto("max");
+    
+    if (argc > 10)
+        metric = argv[10];
+    if (argc > 11)
+        scaleto = argv[11];
     
     // typedefs
     const unsigned int Dimension = 2;
     typedef itk::Image< unsigned short, Dimension > InputImageType;
     typedef itk::Image< float, Dimension > InternalImageType;
+    typedef itk::Image< unsigned short, Dimension > OutputImageType;
     typedef InputImageType::PixelType PixelType;
     
     typedef NonZeroLog10ImageFilter< InternalImageType, InternalImageType > LogType;
@@ -162,6 +172,7 @@ int main(int argc, char** argv)
     typedef itk::DivideImageFilter< InternalImageType, InternalImageType, InternalImageType > DivideType;
     typedef itk::ThresholdImageFilter< InternalImageType > ThresholdType;
     typedef itk::CastImageFilter< InternalImageType, InputImageType > CastType;
+    typedef itk::RescaleIntensityImageFilter< InternalImageType, OutputImageType > RescaleType;
 
     // Pipeline components
     Logger::verbose << "Creating pipeline components" << std::endl;
@@ -291,13 +302,24 @@ int main(int argc, char** argv)
     PrintImageInfo(exp->GetOutput(), "Raw absorption metric");
     WriteImage(exp->GetOutput(), rawAttenuateFile);
     
+    // Output attenuation metric in a friendly format, intensity stretched
+    RescaleType::Pointer rescale = RescaleType::New();
+    rescale->SetOutputMinimum(std::numeric_limits< RescaleType::OutputImageType::PixelType >::min());
+    rescale->SetOutputMaximum(std::numeric_limits< RescaleType::OutputImageType::PixelType >::max());
+    rescale->SetInput(exp->GetOutput());
+    PrintImageInfo(rescale->GetOutput(), "Stretched attenuation metric");
+    WriteImage(rescale->GetOutput(), rescaleAttenuateFile);
+    
     // Rescale attenuation metric to be 1.0 at maximum
     Logger::debug << "Rescaling attenuation metric" << std::endl;
     StatsType::Pointer stats = StatsType::New();
     ScaleType::Pointer scale = ScaleType::New();
     stats->SetInput(exp->GetOutput());
     stats->Update();
-    scale->SetScale(1.0 / stats->GetMaximum());
+    if (scaleto == "mean")
+        scale->SetScale(1.0 / stats->GetMean());
+    else
+        scale->SetScale(1.0 / stats->GetMaximum());
     scale->SetInput(exp->GetOutput());
     PrintImageInfo(scale->GetOutput(), "Rescaled attenuation metric");
     WriteImage(scale->GetOutput(), attenuateFile);
