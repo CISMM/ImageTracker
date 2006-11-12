@@ -40,6 +40,7 @@ SET (Filters_SRCS
                             NaryMinimumImageFilter.h
                             NaryVarianceImageFilter.h
                             NonZeroLog10ImageFilter.h
+                            PadFunctorImageFilter.h
                             Power10ImageFilter.h
                             itkRealToComplexImageFilter.h
                             RegistrationMotionFilter.h
