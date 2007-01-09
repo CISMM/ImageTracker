@@ -16,6 +16,7 @@
 #include "ImageUtils.h"
 #include "Logger.h"
 #include "NaryMeanImageFilter.h"
+#include "PeakSNRImageToImageMetric.h"
 
 /**
  * Compares two input videos, creating a third video that represents the
@@ -24,10 +25,10 @@
  */
 int main(int argc, char** argv)
 {
-    if (argc < 9)
+    if (argc < 8)
     {
-        Logger::error << "Usage:" << std::endl;
-        Logger::error << "    " << argv[0] << " dir formatIn1 formatIn2 start end formatOut mean meanDisp" << std::endl;
+        Logger::error << "Usage:\n\t" << argv[0] << " dir formatIn1 formatIn2 start end meanComp meanShort" << std::endl;
+        Logger::error << "\tmean image should be in float-compatible format (mha, vtk)." << std::endl;
         exit(1);
     }
     
@@ -37,37 +38,38 @@ int main(int argc, char** argv)
     std::string formatIn2 = argv[3];
     int start = atoi(argv[4]);
     int end = atoi(argv[5]);
-    std::string formatOut = argv[6];
-    std::string meanFile = argv[7];
-    std::string meanDispFile = argv[8];
+    std::string meanFile = argv[6];
+    std::string meanDispFile = argv[7];
     
     // Set up IO
     FileSet filesIn1(FilePattern(dir, formatIn1, start, end));
     FileSet filesIn2(FilePattern(dir, formatIn2, start, end));
-    FileSet filesOut(FilePattern(dir, formatOut, start, end));
     
     // Typedefs
     typedef itk::Image< unsigned short, 2 > InputImageType;
     typedef itk::Image< float, 2 > FloatImageType;
-    typedef itk::Image< unsigned char, 2 > DisplayImageType;
     // typedef itk::AbsoluteValueDifferenceImageFilter< ImageType, ImageType, ImageType > DifferenceType;
     // typedef itk::SquaredDifferenceImageFilter< ImageType, ImageType, FloatImageType > DifferenceType;
     typedef itk::SubtractImageFilter< FloatImageType, FloatImageType, FloatImageType > DifferenceType;
     typedef itk::DivideImageFilter< FloatImageType, FloatImageType, FloatImageType > DivideType;
-    typedef itk::AbsImageFilter< FloatImageType, FloatImageType > AbsType;
     typedef itk::ImageDuplicator< FloatImageType > CopyType;
     typedef NaryMeanImageFilter< FloatImageType, FloatImageType > MeanType;
-    typedef itk::RescaleIntensityImageFilter< FloatImageType, DisplayImageType > RescaleType;
+    typedef itk::RescaleIntensityImageFilter< FloatImageType, InputImageType > RescaleType;
+    typedef PeakSNRImageToImageMetric< FloatImageType, FloatImageType > PSNRType;
     
     // Create objects
     ImageSetReader<InputImageType, FloatImageType> video1(filesIn1);
     ImageSetReader<InputImageType, FloatImageType> video2(filesIn2);
     DifferenceType::Pointer difference = DifferenceType::New();
     DivideType::Pointer divide = DivideType::New();
-    // AbsType::Pointer abs = AbsType::New();
     CopyType::Pointer copy = CopyType::New();
     MeanType::Pointer mean = MeanType::New();
+    PSNRType::Pointer psnr = PSNRType::New();
     char label[80];
+    double minRMSE = itk::NumericTraits<double>::max(), maxRMSE = itk::NumericTraits<double>::min();
+    double minPSNR = itk::NumericTraits<double>::max(), maxPSNR = itk::NumericTraits<double>::min();
+    double sumRMSE = 0;
+    double sumPSNR = 0;
     
     for (unsigned int i = 0; i < video1.size(); i++)
     {
@@ -78,28 +80,36 @@ int main(int argc, char** argv)
         difference->SetInput2(video1[i]);
         divide->SetInput1(difference->GetOutput());
         divide->SetInput2(video1[i]);
-        
-        WriteImage(divide->GetOutput(), filesOut[i]);
-        
-        // abs->SetInput(divide->GetOutput());
-        // abs->Update();
         divide->Update();
+        
+        // Add image to mean computation
         copy->SetInputImage(divide->GetOutput());
         copy->Update();
         mean->PushBackInput(copy->GetOutput());
         
-        // sprintf(label, "Frame %03d % difference", i);
-        // PrintImageInfo(divide->GetOutput(), std::string(label));
+        // Compute PSNR
+        psnr->SetSourceImage(video1[i]);
+        psnr->SetReconstructImage(video2[i]);
+        minRMSE = psnr->GetRMSE() < minRMSE ? psnr->GetRMSE() : minRMSE;
+        maxRMSE = psnr->GetRMSE() > maxRMSE ? psnr->GetRMSE() : maxRMSE;
+        sumRMSE += psnr->GetRMSE();
+        minPSNR = psnr->GetPSNR() < minPSNR ? psnr->GetPSNR() : minPSNR;
+        maxPSNR = psnr->GetPSNR() > maxPSNR ? psnr->GetPSNR() : maxPSNR;
+        sumPSNR += psnr->GetPSNR();
     }
+    
+    Logger::debug << "\tmin\tmax\tmean" << std::endl;
+    Logger::debug << "RMSE\t" << minRMSE << "\t" << maxRMSE << "\t" << (sumRMSE / video1.size()) << std::endl;
+    Logger::debug << "PSNR\t" << minPSNR << "\t" << maxPSNR << "\t" << (sumPSNR / video1.size()) << std::endl;
     
     mean->Update();
     WriteImage(mean->GetOutput(), meanFile);
     PrintImageInfo<FloatImageType>(video1[0], "First frame");
-    PrintImageInfo(mean->GetOutput(), "Mean abs % difference");
+    PrintImageInfo(mean->GetOutput(), "Mean difference ratio");
     
     RescaleType::Pointer rescale = RescaleType::New();
-    rescale->SetOutputMinimum(itk::NumericTraits< DisplayImageType::PixelType >::min());
-    rescale->SetOutputMaximum(itk::NumericTraits< DisplayImageType::PixelType >::max());
+    rescale->SetOutputMinimum(itk::NumericTraits< InputImageType::PixelType >::min());
+    rescale->SetOutputMaximum(itk::NumericTraits< InputImageType::PixelType >::max());
     rescale->SetInput(mean->GetOutput());
     WriteImage(rescale->GetOutput(), meanDispFile);
     

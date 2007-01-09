@@ -12,6 +12,12 @@ TARGET_LINK_LIBRARIES(translate ITFilters)
 
 ADD_EXECUTABLE(modulate ModulateImages.cxx)
 TARGET_LINK_LIBRARIES(modulate ITFilters ITImage)
+        
+ADD_EXECUTABLE(modstrip ModulateStrips.cxx)
+TARGET_LINK_LIBRARIES(modstrip ITFilters ITImage)
+        
+ADD_EXECUTABLE(moddisc ModulateDiscs.cxx)
+TARGET_LINK_LIBRARIES(moddisc ITFilters ITImage)
 
 ADD_EXECUTABLE(pan PanRegion.cxx)
 TARGET_LINK_LIBRARIES(pan ITFilters ITImage)
@@ -60,6 +66,9 @@ TARGET_LINK_LIBRARIES(findfixed ITCommon ITImage ITFilters)
 
 ADD_EXECUTABLE(testfft TestFFTComplex.cxx)
 TARGET_LINK_LIBRARIES(testfft ITCommon ITImage ITFilters)
+        
+ADD_EXECUTABLE(testpad TestPadImageFilter.cxx)
+TARGET_LINK_LIBRARIES(testpad ITCommon ITImage ITFilters)
 
 ADD_EXECUTABLE(integrate IntegrateFlowField.cxx)
 TARGET_LINK_LIBRARIES(integrate ITCommon ITImage ITFilters)
