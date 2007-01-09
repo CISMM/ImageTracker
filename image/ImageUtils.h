@@ -30,6 +30,34 @@ void PrintImageInfo(const TImage* image, const std::string& label = "")
 }
 
 template < class TImage >
+void PrintRegionInfo(const typename TImage::RegionType& region, const std::string& label = "")
+{
+    unsigned int Dimension = TImage::ImageDimension;
+    if (label != "")
+        std::cout << label << " info: " << std::endl;
+    else
+        std::cout << "Region info: " << std::endl;
+    
+    std::cout << "\tIndex:\t[";
+    for (int i = 0; i < Dimension; i++)
+    {
+        std::cout << region.GetIndex()[i];
+        if (i != Dimension-1)
+            std::cout << ", ";
+    }
+    std::cout << "]" << std::endl;
+    
+    std::cout << "\tSize:\t[";
+    for (int i = 0; i < Dimension; i++)
+    {
+        std::cout << region.GetSize()[i];
+        if (i != Dimension-1)
+            std::cout << ", ";
+    }
+    std::cout << "]" << std::endl;
+}
+
+template < class TImage >
 void WriteImage(const TImage* image, const std::string& filename)
 {
     Logger::verbose << "Writing:\t" << filename << std::endl;
