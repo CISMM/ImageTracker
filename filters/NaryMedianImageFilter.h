@@ -20,7 +20,7 @@ public:
         // TODO: The median calculation here is "sort and pick central value."  Because 
         // it is based on sorting, this takes n log n time.  Amortized linear time 
         // algorithms exist.
-        std::vector< TInput > theVector();
+        std::vector< TInput > theVector;
         theVector.reserve(B.size());
         for (unsigned int i = 0; i < B.size(); i++)
         {

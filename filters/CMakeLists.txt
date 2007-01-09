@@ -41,6 +41,8 @@ SET (Filters_SRCS
                             NaryVarianceImageFilter.h
                             NonZeroLog10ImageFilter.h
                             PadFunctorImageFilter.h
+                            PeakSNRImageToImageMetric.h
+                            PercentileImageMetric.h
                             Power10ImageFilter.h
                             itkRealToComplexImageFilter.h
                             RegistrationMotionFilter.h

@@ -156,14 +156,13 @@ void PadFunctorImageFilter< TInputImage, TOutputImage, TFunctor >
     OutputImageSizeType outSize;
     OutputImageIndexType outIdx;
     
-    PrintRegionInfo<InputImageType>(inRegion, "Input image region");
-    PrintRegionInfo<OutputImageType>(outRegion, "Output image region");
+//     PrintRegionInfo<InputImageType>(inRegion, "Input image region");
+//     PrintRegionInfo<OutputImageType>(outRegion, "Output image region");
     
     const InputImageSizeType origSize = inRegion.GetSize();
     const OutputImageIndexType outOffset = outRegion.GetIndex();
     const unsigned long* plb = this->GetPadLowerBound();
     const unsigned long* pub = this->GetPadUpperBound();
-    
     
     // Copy input image to middle of output region (Region 0)
     outRegion.SetSize(inRegion.GetSize());
@@ -171,8 +170,8 @@ void PadFunctorImageFilter< TInputImage, TOutputImage, TFunctor >
     outIdx[1] = outOffset[1] + plb[1];
     outRegion.SetIndex(outIdx);
     
-    PrintRegionInfo<InputImageType>(inRegion, "Input region 0");
-    PrintRegionInfo<OutputImageType>(outRegion, "Output region 0");
+//     PrintRegionInfo<InputImageType>(inRegion, "Input region 0");
+//     PrintRegionInfo<OutputImageType>(outRegion, "Output region 0");
     InputIteratorType inIt(input, inRegion);
     OutputIteratorType outIt(output, outRegion);
     for (inIt.GoToBegin(), outIt.GoToBegin();
@@ -198,8 +197,8 @@ void PadFunctorImageFilter< TInputImage, TOutputImage, TFunctor >
     outRegion.SetIndex(outIdx);
     outRegion.SetSize(outSize);
     
-    PrintRegionInfo<InputImageType>(inRegion, "Input region 1");
-    PrintRegionInfo<OutputImageType>(outRegion, "Output region 1");
+//     PrintRegionInfo<InputImageType>(inRegion, "Input region 1");
+//     PrintRegionInfo<OutputImageType>(outRegion, "Output region 1");
     inIt = InputIteratorType(input, inRegion);
     outIt = OutputIteratorType(output, outRegion);
     
@@ -237,8 +236,8 @@ void PadFunctorImageFilter< TInputImage, TOutputImage, TFunctor >
     outRegion.SetIndex(outIdx);
     outRegion.SetSize(outSize);
     
-    PrintRegionInfo<InputImageType>(inRegion, "Input region 2");
-    PrintRegionInfo<OutputImageType>(outRegion, "Output region 2");
+//     PrintRegionInfo<InputImageType>(inRegion, "Input region 2");
+//     PrintRegionInfo<OutputImageType>(outRegion, "Output region 2");
     inIt = InputIteratorType(input, inRegion);
     outIt = OutputIteratorType(output, outRegion);
     // The x range goes from 0 to PadLowerBound[0] - 1
@@ -276,8 +275,8 @@ void PadFunctorImageFilter< TInputImage, TOutputImage, TFunctor >
     outRegion.SetIndex(outIdx);
     outRegion.SetSize(outSize);
     
-    PrintRegionInfo<InputImageType>(inRegion, "Input region 3");
-    PrintRegionInfo<OutputImageType>(outRegion, "Output region 3");
+//     PrintRegionInfo<InputImageType>(inRegion, "Input region 3");
+//     PrintRegionInfo<OutputImageType>(outRegion, "Output region 3");
     inIt = InputIteratorType(input, inRegion);
     outIt = OutputIteratorType(output, outRegion);
     
@@ -316,8 +315,8 @@ void PadFunctorImageFilter< TInputImage, TOutputImage, TFunctor >
     outRegion.SetIndex(outIdx);
     outRegion.SetSize(outSize);
     
-    PrintRegionInfo<InputImageType>(inRegion, "Input region 4");
-    PrintRegionInfo<OutputImageType>(outRegion, "Output region 4");
+//     PrintRegionInfo<InputImageType>(inRegion, "Input region 4");
+//     PrintRegionInfo<OutputImageType>(outRegion, "Output region 4");
     inIt = InputIteratorType(input, inRegion);
     outIt = OutputIteratorType(output, outRegion);
     
@@ -350,7 +349,7 @@ void PadFunctorImageFilter< TInputImage, TOutputImage, TFunctor >
     outRegion.SetIndex(outIdx);
     outRegion.SetSize(outSize);
     
-    PrintRegionInfo<OutputImageType>(outRegion, "Output region 5");
+//     PrintRegionInfo<OutputImageType>(outRegion, "Output region 5");
     outIt = OutputIteratorType(output, outRegion);
     
     for (outIt.GoToBegin(); !outIt.IsAtEnd(); ++outIt)
@@ -373,7 +372,7 @@ void PadFunctorImageFilter< TInputImage, TOutputImage, TFunctor >
     outRegion.SetIndex(outIdx);
     outRegion.SetSize(outSize);
     
-    PrintRegionInfo<OutputImageType>(outRegion, "Output region 6");
+//     PrintRegionInfo<OutputImageType>(outRegion, "Output region 6");
     outIt = OutputIteratorType(output, outRegion);
     
     for (outIt.GoToBegin(); !outIt.IsAtEnd(); ++outIt)
@@ -396,7 +395,7 @@ void PadFunctorImageFilter< TInputImage, TOutputImage, TFunctor >
     outRegion.SetIndex(outIdx);
     outRegion.SetSize(outSize);
     
-    PrintRegionInfo<OutputImageType>(outRegion, "Output region 7");
+//     PrintRegionInfo<OutputImageType>(outRegion, "Output region 7");
     outIt = OutputIteratorType(output, outRegion);
     
     for (outIt.GoToBegin(); !outIt.IsAtEnd(); ++outIt)
@@ -419,7 +418,7 @@ void PadFunctorImageFilter< TInputImage, TOutputImage, TFunctor >
     outRegion.SetIndex(outIdx);
     outRegion.SetSize(outSize);
     
-    PrintRegionInfo<OutputImageType>(outRegion, "Output region 8");
+//     PrintRegionInfo<OutputImageType>(outRegion, "Output region 8");
     outIt = OutputIteratorType(output, outRegion);
 
     for (outIt.GoToBegin(); !outIt.IsAtEnd(); ++outIt)
