@@ -101,12 +101,12 @@ void ImageViewer::OnRegisterMultiResolution( wxCommandEvent &event )
 
     if (!this->mrRegistrationDialog)
     {
-        this->mrRegistrationDialog = new MultiResolutionRegistrationDialog(this);
-        this->mrRegistrationDialog->SetCanvas(this->GetCanvas());
+        this->mrRegistrationDialog = new MultiResolutionRegistrationDialog(this, -1, wxT("Multi-Resolution Registration"));
+//         this->mrRegistrationDialog->SetCanvas(this->GetCanvas());
     }
 
     Logger::logVerbose("Showing multi-resolution registration dialog.");
-    this->mrRegistrationDialog->SetInputFiles(this->GetFileSetPanel()->GetFileSet());
+//     this->mrRegistrationDialog->SetInputFiles(this->GetFileSetPanel()->GetFileSet());
     this->mrRegistrationDialog->Show(true);
 }
 
