@@ -10,6 +10,13 @@
 #include <wx/splitter.h>
 // end wxGlade
 
+#include <string>
+
+#include "AboutDialog.h"
+#include "DataSourceDialog.h"
+#include "ImageTrackerController.h"
+#include "MultiResolutionRegistrationDialog.h"
+#include "RemoveOcclusionsDialog.h"
 #include "wxVTKRenderWindowInteractor.h"
 
 class ITApp : public wxApp
@@ -25,13 +32,29 @@ public:
 
     ImageTracker(wxWindow* parent, int id, const wxString& title, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_FRAME_STYLE);
 
+    virtual ~ImageTracker()
+    {
+        this->rwiView->Delete();
+    }
+    
     enum IDs
     { 
-        MENU_EXIT       =   1000,
+        MENU_EXIT           = 1000,
         MENU_ABOUT,
-        BTN_ADD_FILES   =   2000,
-        BTN_REMOVE_FILES
+        MENU_OPEN,
+        MENU_OCCLUSIONS,
+        MENU_STABILIZE,
+        BTN_ADD_DATASOURCE  = 2000,
+        BTN_REMOVE_DATASOURCE,
+        LBX_DATASOURCES,
+        SLD_IMAGE_INDEX,
+        IMAGE_TRACKER_CONTROLLER = 1000000
     };
+    
+    /**
+     * Updates the list of DataSources displayed in the ImageTracker.
+     */
+    void UpdateDataSources();
     
 private:
     // begin wxGlade: ImageTracker::methods
@@ -39,29 +62,45 @@ private:
     void do_layout();
     // end wxGlade
     
+    ImageTrackerController::Pointer controller;
+    DataSourceDialog* dlgDataSource;
+    RemoveOcclusionsDialog* dlgRemoveOcclusions;
+    MultiResolutionRegistrationDialog* dlgRegistration;
+    AboutDialog* dlgAbout;
+    wxStreamToTextRedirector* coutRedirect;
+    
 protected:
     // begin wxGlade: ImageTracker::attributes
-    wxStaticBox* sizer_5_staticbox;
     wxStaticBox* sizer_4_staticbox;
     wxMenuBar* itMenuBar;
     wxStatusBar* theStatusBar;
     wxListBox* lbxSources;
-    wxListBox* lbxFiles;
-    wxButton* btnAddFiles;
-    wxButton* btnRemoveFiles;
-    wxPanel* pnlData;
-    wxVTKRenderWindowInteractor* rwiViewer;
-    wxSlider* sldFrameNumber;
-    wxPanel* pnlView;
-    wxSplitterWindow* spltData;
+    wxButton* btnAddDataSource;
+    wxButton* btnRemoveDataSource;
+    wxPanel* window_2_pane_1;
+    wxVTKRenderWindowInteractor* rwiView;
+    wxSlider* sldImageIndex;
+    wxPanel* window_2_pane_2;
+    wxSplitterWindow* vsplitDataView;
+    wxPanel* window_1_pane_1;
+    wxTextCtrl* txtLogger;
+    wxPanel* window_1_pane_2;
+    wxSplitterWindow* hsplitDataLogger;
     // end wxGlade
     
     DECLARE_EVENT_TABLE()
     
 public:
+    void OnOpen(wxCommandEvent &event);
     void OnExit(wxCommandEvent &event);
-    void OnRemoveFiles(wxCommandEvent &event); // wxGlade: <event_handler>
-    void OnAddFiles(wxCommandEvent &event); // wxGlade: <event_handler>
+    void OnAbout(wxCommandEvent &event);
+    void OnOcclusions(wxCommandEvent &event);
+    void OnStabilize(wxCommandEvent &event);
+    void OnDataSourceChange(wxCommandEvent &event);
+    void OnAddDataSource(wxCommandEvent &event); // wxGlade: <event_handler>
+    void OnRemoveDataSource(wxCommandEvent &event); // wxGlade: <event_handler>
+    void OnEditDataSource(wxCommandEvent &event); // wxGlade: <event_handler>
+    void OnImageIndexScroll(wxScrollEvent &event); // wxGlade: <event_handler>
 }; // wxGlade: end class
 
 
