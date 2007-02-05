@@ -3,6 +3,7 @@ PROJECT (ImageTracker)
 SET (EXECUTABLE_OUTPUT_PATH "${ImageTracker_BINARY_DIR}/bin")
 SET (LIBRARY_OUTPUT_PATH "${ImageTracker_BINARY_DIR}/lib")
 SET (CMAKE_VERBOSE_MAKEFILE ON)
+SET (CMAKE_COLOR_MAKEFILE ON)
 
 #######################################
 # Include ITK
@@ -47,8 +48,9 @@ LINK_DIRECTORIES(${VTK_LIBRARY_DIRS})
 INCLUDE_DIRECTORIES (
 	${ImageTracker_SOURCE_DIR}/common
 	${ImageTracker_SOURCE_DIR}/image
-	${ImageTracker_SOURCE_DIR}/filters)
-SUBDIRS (common image filters)
+	${ImageTracker_SOURCE_DIR}/filters
+        ${ImageTracker_SOURCE_DIR}/pipelines)
+SUBDIRS (common image filters pipelines)
 
 #######################################
 # Image processing library
@@ -58,7 +60,7 @@ SET (Algorithms_SRCS
     CLGOpticFlowPipeline.cxx                    CLGOpticFlowPipeline.h
     DemonsPipeline.cxx                          DemonsPipeline.h
                                                 Feature.h
-    FeatureTrackingPipeline.cxx                 FeatureTrackingPipeline.h                                                
+    FeatureTrackingPipeline.cxx                 FeatureTrackingPipeline.h
     GlobalRegistrationPipeline.cxx              GlobalRegistrationPipeline.h
     HarrisFeatureDetector.cxx                   HarrisFeatureDetector.h
     ImageRegistration.cxx                       ImageRegistration.h
