@@ -66,7 +66,7 @@ void wxIntSlider::SetRange(int min, int max)
 
 void wxIntSlider::SetValue(int value)
 {
-	Logger::verbose << "wxIntSlider(" << this->GetId() << ")::SetValue: " << value << std::endl;
+// 	Logger::verbose << "wxIntSlider(" << this->GetId() << ")::SetValue: " << value << std::endl;
 	if (this->value != value) // value has changed
 	{
 		this->value = value;
@@ -115,7 +115,8 @@ void wxIntSlider::GenerateEvent()
 
 void wxIntSlider::OnText( wxCommandEvent &event )
 {
-    Logger::verbose << "wxIntSlider(" << this->GetId() << ")::OnText: " << this->GetTextControl()->GetValue().c_str() << std::endl;
+//     Logger::verbose << "wxIntSlider(" << this->GetId() << ")::OnText: " <<
+//             this->GetTextControl()->GetValue().c_str() << std::endl;
 
 	// Convert text entered to an int
 	long val;
@@ -136,9 +137,9 @@ void wxIntSlider::OnText( wxCommandEvent &event )
 
 void wxIntSlider::OnSlider( wxCommandEvent &event )
 {
-    Logger::verbose << "wxIntSlider(" << this->GetId() << ")::OnSlider: " 
-		<< this->GetSlider()->GetValue() 
-		<< "\tIgnore => " << this->ignoreNext << std::endl;
+//     Logger::verbose << "wxIntSlider(" << this->GetId() << ")::OnSlider: " 
+// 		<< this->GetSlider()->GetValue() 
+// 		<< "\tIgnore => " << this->ignoreNext << std::endl;
 
 	// find the value of the slider
 	int newVal = this->GetSlider()->GetValue();

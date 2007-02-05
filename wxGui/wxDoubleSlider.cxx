@@ -71,7 +71,7 @@ void wxDoubleSlider::SetRange(double min, double max, double interval)
 
 void wxDoubleSlider::SetValue(double value)
 {
-    Logger::verbose << "wxDoubleSlider(" << this->GetId() << ")::SetValue: " << value << std::endl;
+//     Logger::verbose << "wxDoubleSlider(" << this->GetId() << ")::SetValue: " << value << std::endl;
     if (this->value != value) // value has changed
     {
 		this->value = value;
@@ -142,7 +142,8 @@ void wxDoubleSlider::GenerateEvent()
 
 void wxDoubleSlider::OnText( wxCommandEvent &event )
 {
-    Logger::verbose << "wxDoubleSlider(" << this->GetId() << ")::OnText: " << this->GetTextControl()->GetValue().c_str() << std::endl;
+//     Logger::verbose << "wxDoubleSlider(" << this->GetId() << ")::OnText: " <<
+//             this->GetTextControl()->GetValue().c_str() << std::endl;
     
     // Convert text entered to a double (then cast to float)
     double val;
@@ -163,9 +164,9 @@ void wxDoubleSlider::OnText( wxCommandEvent &event )
 
 void wxDoubleSlider::OnSlider( wxCommandEvent &event )
 {
-    Logger::verbose << "wxDoubleSlider(" << this->GetId() << ")::OnSlider: " 
-		<< this->GetSlider()->GetValue() 
-		<< "\tIgnore => " << this->ignoreNext << std::endl;
+//     Logger::verbose << "wxDoubleSlider(" << this->GetId() << ")::OnSlider: " 
+// 		<< this->GetSlider()->GetValue() 
+// 		<< "\tIgnore => " << this->ignoreNext << std::endl;
     
     // Find the float value that the slider position corresponds to
 	double newVal = this->SliderToDouble();
