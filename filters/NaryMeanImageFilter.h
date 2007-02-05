@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 
 #include "itkNaryFunctorImageFilter.h"
 #include "itkNumericTraits.h"
@@ -13,7 +14,7 @@ public:
 	NMeanFunctor() {}
 	~NMeanFunctor() {}
 
-	inline TOutput operator()(const itk::Array< TInput > &B)
+	inline TOutput operator()(const std::vector< TInput > &B)
 	{
 		// Compute the mean of all input.
 		AccumulatorType sum = itk::NumericTraits< TOutput >::Zero;

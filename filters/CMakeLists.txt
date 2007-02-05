@@ -1,4 +1,6 @@
-
+#######################################
+# Filters are typically custom extensions to the ITK classes.
+#######################################
 PROJECT (Filters)
 
 #######################################

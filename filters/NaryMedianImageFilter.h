@@ -13,19 +13,16 @@ public:
     NMedianFunctor() {}
     virtual ~NMedianFunctor() {}
     
-    TOutput operator()(const itk::Array< TInput > &B)
+    TOutput operator()(const std::vector< TInput > &B)
     {
         // tranfer the pixel values to a std::vector, because that supports sorting
         // TODO: Does vnl_vector support sorting?  That is what itk::Array is based on.
+        // ITK changed the NaryFunctorImageFilter to be based on std::vectors.
         // TODO: The median calculation here is "sort and pick central value."  Because 
         // it is based on sorting, this takes n log n time.  Amortized linear time 
         // algorithms exist.
-        std::vector< TInput > theVector;
-        theVector.reserve(B.size());
-        for (unsigned int i = 0; i < B.size(); i++)
-        {
-            theVector.push_back(B[i]);
-        }
+        // We sort a working copy of B
+        std::vector< TInput > theVector(B);
         
         std::sort(theVector.begin(), theVector.end());
         
