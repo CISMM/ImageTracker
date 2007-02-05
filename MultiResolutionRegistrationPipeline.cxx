@@ -1,5 +1,12 @@
 #include "MultiResolutionRegistrationPipeline.h"
+
+#include <math.h>
 #include <vector>
+
+#include "itkArray2D.h"
+
+#include "CommonTypes.h"
+#include "Logger.h"
 #include "TransformGroup.h"
 
 MultiResolutionRegistrationPipeline::MultiResolutionRegistrationPipeline()
@@ -21,16 +28,64 @@ MultiResolutionRegistrationPipeline::MultiResolutionRegistrationPipeline()
 	this->SetTransformFile("");
 }
 
-void MultiResolutionRegistrationPipeline::SetInputFiles(const FileSet &files)
+void MultiResolutionRegistrationPipeline::SetInput(ImageSetReaderBase* input)
 {
-	this->inputFiles = files;
-	this->inputReader = ReaderType(this->inputFiles);
+	this->inputReader = input;
 
-	this->resample->SetInput(this->inputReader[0]);
-	this->threshold[0]->SetInput(this->inputReader[0]);
-	this->threshold[1]->SetInput(this->inputReader[1]);
+	this->resample->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(0)));
+        this->threshold[0]->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(0)));
+        this->threshold[1]->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(1)));
 
 	this->smooth->SetInput(this->threshold[0]->GetOutput());
+}
+
+void MultiResolutionRegistrationPipeline::SetPreviewShrinkFactor(unsigned int factor)
+{
+    double var = factor * factor * 0.25;
+    this->smooth->SetVariance(var);
+    this->smooth->Modified();
+}
+
+void MultiResolutionRegistrationPipeline::SetShrinkFactors(unsigned int min, unsigned int max)
+{
+    std::string function("MultiResolutionRegistrationPipeline::SetShrinkFactors");
+    Logger::debug << function << ":\tmin = " << min << "\tmax = " << max << std::endl;
+    
+    // We can use logs and exponents to compute the useful shrink levels--there is no reason to
+    // use more levels than what you get from halving the shrink level at each step.
+    int dims = ImageType::ImageDimension;
+    int levels = (int) (std::ceil(log2(max)) - std::floor(log2(min)) + 1);
+    Logger::debug << function << ":\tlevels = " << levels << std::endl;
+    
+    RegistrationType::ImagePyramidType::ScheduleType sched(levels, dims);
+    unsigned int shrink, next, level;
+    
+    Logger::debug << function << ":\tschedule =\n\t";
+    for (shrink = max, level = 0; shrink >= 1 && shrink >= min; level++)
+    {
+        for (unsigned int d = 0; d < dims; d++)
+        {
+            sched[level][d] = shrink;
+            Logger::debug << sched[level][d] << "\t";
+        }
+        Logger::debug << "\n\t";
+        
+        next = (unsigned int) exp2(std::floor(log2(shrink-1)));
+        if (next < min && shrink > min) // the minimum occurs before the next smaller power of 2
+        {
+            for (unsigned int d = 0; d < dims; d++)
+            {
+                sched[level+1][d] = min;
+                Logger::debug << sched[level+1][d] << "\t";
+            }
+        }
+        
+        shrink = next;
+    }
+    
+    Logger::debug << std::endl;
+    
+    this->registration->SetShrinkSchedule(sched);
 }
 
 unsigned int MultiResolutionRegistrationPipeline::GetStartingShrinkFactor()
@@ -108,7 +163,7 @@ void MultiResolutionRegistrationPipeline::Update()
 
 	// Start at the beginning of the input images
 	// Write the first image, un-changed
-	this->caster->SetInput(this->inputReader[0]);
+        this->caster->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(0)));
 	WriteImage(this->caster->GetOutput(), this->outputFiles[0]);
 
 	// Connect caster to the resampling pipeline
@@ -116,12 +171,12 @@ void MultiResolutionRegistrationPipeline::Update()
 
 	// Register every image with the previous image
 	for (unsigned int i = 0; 
-	     i < this->inputReader.size()-1 && 
-	     i < this->outputFiles.size(); 
+	     i < this->inputReader->size()-1 && 
+	     i < this->outputFiles.size()-1; 
 	     i++)
 	{
-            ImageType::Pointer fixed = this->inputReader[i];
-            ImageType::Pointer moving = this->inputReader[i+1];
+            ImageType::Pointer fixed = dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(i));
+            ImageType::Pointer moving = dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(i+1));
             
             // Update pipeline inputs
             this->threshold[0]->SetInput(fixed);
@@ -144,7 +199,7 @@ void MultiResolutionRegistrationPipeline::Update()
             this->resample->SetOutputSpacing(fixed->GetSpacing());
             this->resample->SetDefaultPixelValue(0);
             this->resample->Update();
-            WriteImage(this->caster->GetOutput(), this->outputFiles[i]);
+            WriteImage(this->caster->GetOutput(), this->outputFiles[i+1]);
 	}
 
 	// Save transform data
@@ -154,8 +209,8 @@ void MultiResolutionRegistrationPipeline::Update()
 	}
 
 	// Reset image
-	this->resample->SetInput(this->inputReader[0]);
-	this->threshold[0]->SetInput(this->inputReader[0]);
-	this->threshold[1]->SetInput(this->inputReader[1]);
+        this->resample->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(0)));
+        this->threshold[0]->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(0)));
+        this->threshold[1]->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(1)));
 	this->smooth->SetInput(this->threshold[0]->GetOutput());
 }

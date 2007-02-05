@@ -130,6 +130,8 @@ public:
 	// Set the starting shrink factor used in the multi-resolution method.
 	void SetStartingShrinkFactor(unsigned int factor);
 	unsigned int GetStartingShrinkFactor() const;
+        
+        void SetShrinkSchedule(const typename ImagePyramidType::ScheduleType& schedule);
 
 	// Set the optimizer's initial maximum step length.
 	void SetOptimizerInitialMaximumStepLength(double step);
@@ -322,8 +324,8 @@ MultiResolutionRegistration<TImage, TTransform>
 	this->registration->AddObserver(itk::IterationEvent(), observer);
 
 	// Choose some good default pyramid parameters
-	this->SetNumberOfLevels(3);
-	this->SetStartingShrinkFactor(4);
+// 	this->SetNumberOfLevels(3);
+// 	this->SetStartingShrinkFactor(4);
 }
 
 template <typename TImage, typename TTransform>
@@ -387,10 +389,25 @@ unsigned int MultiResolutionRegistration<TImage, TTransform>
 
 template <typename TImage, typename TTransform>
 void MultiResolutionRegistration<TImage, TTransform>
+::SetShrinkSchedule(const typename ImagePyramidType::ScheduleType& schedule)
+{
+    // For reasons opaque to me, the registration framework doesn't
+    // check the number of levels in the schedule--so you have to set it
+    // explicitely.
+    this->registration->SetNumberOfLevels(schedule.rows());
+    this->fixedPyramid->SetNumberOfLevels(schedule.rows());
+    this->movingPyramid->SetNumberOfLevels(schedule.rows());
+    this->fixedPyramid->SetSchedule(schedule);
+    this->movingPyramid->SetSchedule(schedule);
+}
+
+template <typename TImage, typename TTransform>
+void MultiResolutionRegistration<TImage, TTransform>
 ::SetOptimizerInitialMaximumStepLength(double step)
 {
 	// The observer takes care of initializing optimization parameters.
-	Logger::verbose << "MultiResolutionRegistration::SetOptimizerInitialMaximumStepLength => " << step << std::endl;
+	Logger::verbose << "MultiResolutionRegistration::SetOptimizerInitialMaximumStepLength => " << 
+                step << std::endl;
 	this->observer->SetInitialMaximumStepLength(step);
 	this->Modified();
 }
@@ -407,7 +424,8 @@ void MultiResolutionRegistration<TImage, TTransform>
 ::SetOptimizerInitialMinimumStepLength(double step)
 {
 	// The observer takes care of initializing optimization parameters.
-	Logger::verbose << "MultiResolutionRegistration::SetOptimizerInitialMinimumStepLength => " << step << std::endl;
+	Logger::verbose << "MultiResolutionRegistration::SetOptimizerInitialMinimumStepLength => " << 
+                step << std::endl;
 	this->observer->SetInitialMinimumStepLength(step);
 	this->Modified();
 }
@@ -424,7 +442,8 @@ void MultiResolutionRegistration<TImage, TTransform>
 ::SetOptimizerStepLengthScale(double scale)
 {
 	// The observer controls optimization parameters.
-	Logger::verbose << "MultiResolutionRegistration::SetOptimizerStepLengthScale => " << scale << std::endl;
+	Logger::verbose << "MultiResolutionRegistration::SetOptimizerStepLengthScale => " << 
+                scale << std::endl;
 	this->observer->SetStepLengthScale(scale);
 	this->Modified();
 }
@@ -441,7 +460,8 @@ void MultiResolutionRegistration<TImage, TTransform>
 ::SetOptimizerNumberOfIterations(unsigned long iters)
 {
 	// The observer controls optimization parameters.
-	Logger::verbose << "MultiResolutionRegistration::SetOptimizerNumberOfIterations => " << iters << std::endl;
+	Logger::verbose << "MultiResolutionRegistration::SetOptimizerNumberOfIterations => " << 
+                iters << std::endl;
 	this->observer->SetNumberOfIterations(iters);
 	this->Modified();
 }
@@ -503,7 +523,7 @@ void MultiResolutionRegistration<TImage, TTransform>
 
 	// Make sure we can do something.
 	if (!this->fixedImage ||
-		!this->movingImage)
+            !this->movingImage)
 	{
 		Logger::error << "Fixed or moving image is not present!" << std::endl;
 		return; // bail
@@ -621,23 +641,21 @@ void MultiResolutionRegistration<TImage, TTransform>
 {
 	// Superclass::PrintSelf(os, indent); // this is not very interesting
 	os << indent << "MultiResolutionRegistration::PrintSelf: " << std::endl;
-	os << indent << "   Number of Levels:            " << this->GetNumberOfLevels() << std::endl;
-	os << indent << "   Starting Shrink Factor:      " << this->GetStartingShrinkFactor() << std::endl;
-	os << indent << "   Optimizer Initial Max Step:  " << this->GetOptimizerInitialMaximumStepLength() << std::endl;
-	os << indent << "   Optimizer Initial Min Step:  " << this->GetOptimizerInitialMinimumStepLength() << std::endl;
-	os << indent << "   Optimizer Step Length Scale: " << this->GetOptimizerStepLengthScale() << std::endl;
-	os << indent << "   Optimizer Iterations:        " << this->GetOptimizerNumberOfIterations() << std::endl;
+	os << indent << "\tShrink Schedule:           \n" << this->fixedPyramid->GetSchedule() << std::endl;
+	os << indent << "\tOptimizer Initial Max Step:  " << this->GetOptimizerInitialMaximumStepLength() << std::endl;
+	os << indent << "\tOptimizer Initial Min Step:  " << this->GetOptimizerInitialMinimumStepLength() << std::endl;
+	os << indent << "\tOptimizer Step Length Scale: " << this->GetOptimizerStepLengthScale() << std::endl;
+	os << indent << "\tOptimizer Iterations:        " << this->GetOptimizerNumberOfIterations() << std::endl;
 }
 
 template <typename TImage, typename TTransform>
 void MultiResolutionRegistration<TImage, TTransform>
 ::LogSelf() const
 {
-	Logger::debug << "MultiResolutionRegistration::LogSelf: " << std::endl;
-	Logger::debug << "   Number of Levels:            " << this->GetNumberOfLevels() << std::endl;
-	Logger::debug << "   Starting Shrink Factor:      " << this->GetStartingShrinkFactor() << std::endl;
-	Logger::debug << "   Optimizer Initial Max Step:  " << this->GetOptimizerInitialMaximumStepLength() << std::endl;
-	Logger::debug << "   Optimizer Initial Min Step:  " << this->GetOptimizerInitialMinimumStepLength() << std::endl;
-	Logger::debug << "   Optimizer Step Length Scale: " << this->GetOptimizerStepLengthScale() << std::endl;
-	Logger::debug << "   Optimizer Iterations:        " << this->GetOptimizerNumberOfIterations() << std::endl;
+    Logger::debug << "MultiResolutionRegistration::LogSelf: " << std::endl;
+    Logger::debug << "\tShrink Schedule:           \n" << this->fixedPyramid->GetSchedule() << std::endl;
+    Logger::debug << "\tOptimizer Initial Max Step:  " << this->GetOptimizerInitialMaximumStepLength() << std::endl;
+    Logger::debug << "\tOptimizer Initial Min Step:  " << this->GetOptimizerInitialMinimumStepLength() << std::endl;
+    Logger::debug << "\tOptimizer Step Length Scale: " << this->GetOptimizerStepLengthScale() << std::endl;
+    Logger::debug << "\tOptimizer Iterations:        " << this->GetOptimizerNumberOfIterations() << std::endl;
 }

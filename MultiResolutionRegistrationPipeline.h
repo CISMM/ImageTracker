@@ -35,7 +35,7 @@ public:
 	// typedef itk::TranslationTransform<double, 2> TransformType;
 	typedef CommonTypes::InputImageType InputImageType;
 	typedef CommonTypes::InternalImageType ImageType;
-	typedef ImageSetReader<InputImageType, ImageType> ReaderType;
+	typedef ImageSetReaderBase* ReaderType;
 	typedef itk::ThresholdImageFilter<ImageType> ThresholdType;
 	typedef MultiResolutionRegistration<ImageType, TransformType> RegistrationType;
 	typedef itk::ResampleImageFilter<ImageType, ImageType> ResampleType;
@@ -51,15 +51,18 @@ public:
 	 */
 	void Update();
 
-	unsigned int GetStartingShrinkFactor();
-	unsigned int GetNumberOfLevels();
 	ImageType::PixelType GetUpperThreshold();
 	ImageType::PixelType GetLowerThreshold();
+        void SetUpperThreshold(ImageType::PixelType threshold);
+        void SetLowerThreshold(ImageType::PixelType threshold);
 
-	void SetStartingShrinkFactor(unsigned int factor);
+        void SetPreviewShrinkFactor(unsigned int factor);
+	void SetShrinkFactors(unsigned int min, unsigned int max);
+        
+        unsigned int GetStartingShrinkFactor();
+        unsigned int GetNumberOfLevels();
+        void SetStartingShrinkFactor(unsigned int factor);
 	void SetNumberOfLevels(unsigned int levels);
-	void SetUpperThreshold(ImageType::PixelType threshold);
-	void SetLowerThreshold(ImageType::PixelType threshold);
 
 	double GetOptimizerInitialMaximumStepLength() 
 	{ return this->registration->GetOptimizerInitialMaximumStepLength(); }
@@ -85,11 +88,10 @@ public:
 	void SetOptimizerNumberOfIterations(unsigned long iters)
 	{ this->registration->SetOptimizerNumberOfIterations(iters); }
 	
-	const FileSet& GetInputFiles() { return this->inputFiles; }
 	const FileSet& GetOutputFiles() { return this->outputFiles; }
-	void SetInputFiles(const FileSet& files);
 	void SetOutputFiles(const FileSet& files) { this->outputFiles = files; }
 
+        void SetInput(ImageSetReaderBase* input);
 	ImageType::Pointer GetPreviewImage();
 
 	itkGetMacro(TransformFile, std::string);
@@ -103,6 +105,7 @@ private:
 	FileSet inputFiles;
 	FileSet outputFiles;
 	std::string m_TransformFile;
+        bool m_ThresholdBetween;
 
 	ThresholdType::Pointer threshold[2];
 	RegistrationType::Pointer registration;
