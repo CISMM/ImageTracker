@@ -1,6 +1,7 @@
 #include "FileSet.h"
 
 FileSet::FileSet(const FilePattern& pattern)
+    : fileNames()
 {
     pattern.Validate();
 
@@ -19,6 +20,7 @@ FileSet::FileSet(const FileVector& names)
 }
 
 FileSet::FileSet(const FileSet& files, const std::string& prefix)
+    : fileNames()
 {
     for (FileVector::const_iterator fit = files.fileNames.begin(); fit != files.fileNames.end(); ++fit)
     {
@@ -32,6 +34,7 @@ FileSet::FileSet(const FileSet& files, const std::string& prefix)
 }
 
 FileSet::FileSet(const FileSet& files, const std::string& prefix, const std::string& ext)
+    : fileNames()
 {
     for (FileVector::const_iterator fit = files.fileNames.begin(); fit != files.fileNames.end(); fit++)
     {

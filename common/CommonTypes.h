@@ -3,6 +3,11 @@
 #include "itkImage.h"
 #include "itkCenteredRigid2DTransform.h"
 
+typedef itk::Image< unsigned char, 2 > ImageTypeUC2;
+typedef itk::Image< unsigned short, 2 > ImageTypeUS2;
+typedef itk::Image< float, 2 > ImageTypeF2;
+typedef itk::Image< itk::Vector< float, 2 >, 2 > ImageTypeV2F2;
+
 /**
  * Defines common types used for registration.
  */

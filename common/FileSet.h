@@ -19,7 +19,8 @@ public:
     /*
      * Default constructor.
      */ 
-    FileSet() 
+    FileSet()
+        : fileNames()
     {
     }
 
@@ -79,9 +80,14 @@ public:
         return this->fileNames.size();
     }
 
-    const std::string operator[](unsigned int index)
+    const std::string operator[](unsigned int index) const
     {
         return this->fileNames[index];
+    }
+    
+    void Add(const std::string file)
+    {
+        this->fileNames.push_back(file);
     }
 
 private:
