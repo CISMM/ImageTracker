@@ -6,6 +6,7 @@ PROJECT (image)
 ##############################
 
 SET (image_SRCS
+    DataSource.cxx                  DataSource.h
     FileSetImageReader.cxx          FileSetImageReader.h
                                     ImageSetReader.h
                                     ImageUtils.h
