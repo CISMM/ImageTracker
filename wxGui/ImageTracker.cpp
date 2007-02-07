@@ -30,6 +30,7 @@ BEGIN_EVENT_TABLE(ImageTracker, wxFrame)
     EVT_MENU(MENU_ABOUT, ImageTracker::OnAbout)
     EVT_MENU(MENU_OCCLUSIONS, ImageTracker::OnOcclusions)
     EVT_MENU(MENU_STABILIZE, ImageTracker::OnStabilize)
+    EVT_MENU(MENU_CLG_OPTIC_FLOW, ImageTracker::OnCLGOpticFlow)
     // begin wxGlade: ImageTracker::event_table
     EVT_LISTBOX_DCLICK(LBX_DATASOURCES, ImageTracker::OnEditDataSource)
     EVT_BUTTON(BTN_ADD_DATASOURCE, ImageTracker::OnAddDataSource)
@@ -103,6 +104,36 @@ void ImageTracker::OnStabilize(wxCommandEvent &event)
     this->dlgRegistration->SetInput(this->controller->GetDataSource(idx));
     this->dlgRegistration->SetController(this->controller);
     this->dlgRegistration->Show(true);
+}
+
+void ImageTracker::OnCLGOpticFlow(wxCommandEvent &event)
+{
+    // Make sure we at least have a data source to work with
+    if (this->lbxSources->GetCount() == 0)
+    {
+        wxMessageDialog alert(this, wxT("Please add a data source on which to operate first."), 
+                              wxT("No data sources."), wxOK);
+        alert.ShowModal();
+        return;
+    }
+    
+    this->theStatusBar->SetStatusText(wxT("Computing optic flow..."));
+    
+    // Find the user's selected DataSource.
+    // Find the user's selected DataSource
+    int idx = this->lbxSources->GetSelection();
+    idx = (idx == wxNOT_FOUND) ? 0 : idx;
+    if (this->controller->GetDataSource(idx)->size() < 2) // Need at least two images to register.
+    {
+        wxMessageDialog alert(this, wxT("This operation requires at least two images in the data source."),
+                              wxT("Not enough images."), wxOK);
+        alert.ShowModal();
+        return;
+    }
+    
+    this->dlgCLGOpticFlow->SetInput(this->controller->GetDataSource(idx));
+    this->dlgCLGOpticFlow->SetController(this->controller);
+    this->dlgCLGOpticFlow->Show(true);
 }
 
 void ImageTracker::OnRemoveDataSource(wxCommandEvent &event)
@@ -204,6 +235,9 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     menuEnhance->Append(MENU_OCCLUSIONS, wxT("&Remove Occlusions"), wxT("Detect and remove static partial occlusions from bright-field microscopy images"), wxITEM_NORMAL);
     menuEnhance->Append(MENU_STABILIZE, wxT("&Stabilize"), wxT("Remove global drift to keep an object stationary"), wxITEM_NORMAL);
     itMenuBar->Append(menuEnhance, wxT("&Enhance"));
+    wxMenu* menuCompute = new wxMenu();
+    menuCompute->Append(MENU_CLG_OPTIC_FLOW, wxT("CLG &Optic Flow"), wxT("Combined local-global motion computation"), wxITEM_NORMAL);
+    itMenuBar->Append(menuCompute, wxT("&Compute"));
     wxMenu* menuHelp = new wxMenu();
     menuHelp->Append(MENU_ABOUT, wxT("&About"), wxT("About this application"), wxITEM_NORMAL);
     itMenuBar->Append(menuHelp, wxT("&Help"));
@@ -231,6 +265,7 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     this->dlgDataSource = new DataSourceDialog(this, -1, wxT("Edit DataSource"));
     this->dlgRemoveOcclusions = new RemoveOcclusionsDialog(this, -1, wxT("Remove Partial Occlusions"));
     this->dlgRegistration = new MultiResolutionRegistrationDialog(this, -1, wxT("Stabilize"));
+    this->dlgCLGOpticFlow = new CLGOpticFlowDialog(this, -1, wxT("CLG Optic Flow"));
     this->dlgAbout = new AboutDialog(this, -1, wxT("About"));
     this->dlgAbout->SetMessage(APP_NAME + " " + APP_VERSION + "\n" + APP_AUTHOR + " " + APP_COPYRIGHT + "\n" + APP_WEBSITE);
     

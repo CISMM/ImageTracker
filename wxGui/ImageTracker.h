@@ -13,6 +13,7 @@
 #include <string>
 
 #include "AboutDialog.h"
+#include "CLGOpticFlowDialog.h"
 #include "DataSourceDialog.h"
 #include "ImageTrackerController.h"
 #include "MultiResolutionRegistrationDialog.h"
@@ -44,6 +45,7 @@ public:
         MENU_OPEN,
         MENU_OCCLUSIONS,
         MENU_STABILIZE,
+        MENU_CLG_OPTIC_FLOW,
         BTN_ADD_DATASOURCE  = 2000,
         BTN_REMOVE_DATASOURCE,
         LBX_DATASOURCES,
@@ -66,6 +68,7 @@ private:
     DataSourceDialog* dlgDataSource;
     RemoveOcclusionsDialog* dlgRemoveOcclusions;
     MultiResolutionRegistrationDialog* dlgRegistration;
+    CLGOpticFlowDialog* dlgCLGOpticFlow;
     AboutDialog* dlgAbout;
     wxStreamToTextRedirector* coutRedirect;
     
@@ -96,6 +99,7 @@ public:
     void OnAbout(wxCommandEvent &event);
     void OnOcclusions(wxCommandEvent &event);
     void OnStabilize(wxCommandEvent &event);
+    void OnCLGOpticFlow(wxCommandEvent &event);
     void OnDataSourceChange(wxCommandEvent &event);
     void OnAddDataSource(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnRemoveDataSource(wxCommandEvent &event); // wxGlade: <event_handler>
