@@ -7,17 +7,17 @@ INCLUDE (../LocalUsewxWidgets.cmake)
 
 SET (Gui_SRCS
     AboutDialog.cpp                             AboutDialog.h
-    CLGOpticFlowDialog.cxx                      CLGOpticFlowDialog.h
+    CLGOpticFlowDialog.cpp                      CLGOpticFlowDialog.h
     DataSourceDialog.cpp                        DataSourceDialog.h
     DoubleSlider.cxx                            DoubleSlider.h
     wxDoubleSlider.cxx                          wxDoubleSlider.h
     FileSetDialog.cxx                           FileSetDialog.h
     GlobalRegistrationDialog.cxx                GlobalRegistrationDialog.h
     GuiUtils.cxx                                GuiUtils.h
-    HarrisFeatureDialog.cxx                     HarrisFeatureDialog.h
+#    HarrisFeatureDialog.cxx                     HarrisFeatureDialog.h
     ImageTracker.cpp                            ImageTracker.h
     ImageTrackerController.cxx                  ImageTrackerController.h
-    ImageViewer.cxx                             ImageViewer.h
+#    ImageViewer.cxx                             ImageViewer.h
                                                 ItkVtkPipeline.h
     wxIntSlider.cxx                             wxIntSlider.h
     LoggerPanel.cxx                             LoggerPanel.h
