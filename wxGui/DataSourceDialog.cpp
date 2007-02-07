@@ -179,8 +179,15 @@ void DataSourceDialog::set_properties()
     // begin wxGlade: DataSourceDialog::set_properties
     SetTitle(wxT("Edit Data Source"));
     SetSize(wxSize(380, 480));
+    txtName->SetToolTip(wxT("A name to describe this data source"));
+    rbxPixelType->SetToolTip(wxT("The pixel type of the images in this data source"));
     rbxPixelType->SetSelection(1);
+    lbxFiles->SetToolTip(wxT("The image files in this data source"));
+    btnAddFiles->SetToolTip(wxT("Add images to this data source"));
+    btnRemoveFiles->SetToolTip(wxT("Remove selected images from this data source"));
+    btnOk->SetToolTip(wxT("Apply changes"));
     btnOk->SetDefault();
+    btnCancel->SetToolTip(wxT("Reject changes"));
     // end wxGlade
 }
 

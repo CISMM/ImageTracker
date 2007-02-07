@@ -127,7 +127,6 @@ void RemoveOcclusionsDialog::OnRun(wxCommandEvent &event)
 
 void RemoveOcclusionsDialog::OnHide(wxCommandEvent &event)
 {
-    this->Show(false);
     event.Skip();
 }
 
@@ -147,17 +146,22 @@ void RemoveOcclusionsDialog::set_properties()
 {
     // begin wxGlade: RemoveOcclusionsDialog::set_properties
     SetTitle(wxT("Remove Partial Occlusions"));
+    SetSize(wxSize(550, 360));
     comboMetric->SetToolTip(wxT("The metric to use to extimate the gradient of the fixed trasmission map"));
     comboMetric->SetSelection(0);
     label_3->SetMinSize(wxSize(120, 17));
     slidePercentile->SetToolTip(wxT("Percentile of the transmission map to set to 1 (total transmission)"));
     slidePadding->SetToolTip(wxT("Multiples of the image width by which to pad Fourier Transforms"));
     textDirectory->SetToolTip(wxT("The directory in which to store the output files"));
+    btnBrowse->SetToolTip(wxT("Find an output directory"));
     label_6->SetMinSize(wxSize(120, 27));
     textTransmission->SetToolTip(wxT("A file to hold the computed transmission map (must support float pixel type)"));
     textPrefix->SetToolTip(wxT("A prefix to append to every output file"));
+    checkOpenOutput->SetToolTip(wxT("Create a new data source and open it when complete"));
     checkOpenOutput->SetValue(1);
+    btnRun->SetToolTip(wxT("Run this task"));
     btnRun->SetDefault();
+    btnHide->SetToolTip(wxT("Close this dialog"));
     // end wxGlade
 }
 
@@ -203,8 +207,6 @@ void RemoveOcclusionsDialog::do_layout()
     sizer_2->Add(sizer_15, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 0);
     SetAutoLayout(true);
     SetSizer(sizer_2);
-    sizer_2->Fit(this);
-    sizer_2->SetSizeHints(this);
     Layout();
     // end wxGlade
 }

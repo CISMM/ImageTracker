@@ -21,11 +21,17 @@ bool MultiResolutionRegistrationDialog::TransferDataToWindow()
         if (stats->GetMaximum() > 255)
         {
             this->comboRange->SetValue(std2wx("16-bit"));
+            // setting the combo box programmatically does not trigger the event, 
+            // so we do it here
+            wxCommandEvent event;
+            this->OnRange(event);
             this->slideUpperBound->SetValue(65535);
         }
         else
         {
             this->comboRange->SetValue(std2wx("8-bit"));
+            wxCommandEvent event;
+            this->OnRange(event);
             this->slideUpperBound->SetValue(255);
         }
     }
@@ -85,6 +91,7 @@ void MultiResolutionRegistrationDialog::SetController(ImageTrackerController::Po
 void MultiResolutionRegistrationDialog::SetInput(DataSource::Pointer input)
 {
     this->input = input;
+    this->pipeline->SetInput(this->input->GetImages());
 }
 
 void MultiResolutionRegistrationDialog::ViewPreview(bool show)
@@ -96,8 +103,7 @@ void MultiResolutionRegistrationDialog::ViewPreview(bool show)
     {
         if (show)
         {
-//             Logger::debug << function << ": Setting up previewing." << std::endl;
-            this->pipeline->SetInput(this->input->GetImages());
+            Logger::debug << function << ": Setting up previewing." << std::endl;
             this->visual->SetInput(this->pipeline->GetPreviewImage());
             this->controller->GetRenderer()->AddActor(this->visual->GetOutput());
             this->preview = true;
@@ -308,7 +314,6 @@ void MultiResolutionRegistrationDialog::OnRun(wxCommandEvent &event)
 void MultiResolutionRegistrationDialog::OnHide(wxCommandEvent &event)
 {
     this->ViewPreview(false);
-    this->Show(false);
     event.Skip();
 }
 
@@ -323,9 +328,26 @@ void MultiResolutionRegistrationDialog::set_properties()
     SetSize(wxSize(550, 800));
     checkEnabled->Hide();
     checkEnabled->SetValue(1);
+    slideUpperBound->SetToolTip(wxT("The upper threshold of image intensities to consider"));
+    slideLowerBound->SetToolTip(wxT("The lower threshold of image intensities to consider"));
+    comboRange->SetToolTip(wxT("Select the range of intensities for thresholding"));
     comboRange->SetSelection(0);
     label_8->SetMinSize(wxSize(140, 17));
+    slideMaxSmooth->SetToolTip(wxT("The coarsest resolution at which to align images"));
+    slideMinSmooth->SetToolTip(wxT("The finest resolution at which to align images"));
+    slideIterations->SetToolTip(wxT("The number of optimization iterations to apply at each resolution"));
+    slideMaxStepLength->SetToolTip(wxT("The maximum step size at the coarsest resolution level"));
+    slideMinStepLength->SetToolTip(wxT("The minimum step size at the coarsest resolution"));
+    slideStepScale->SetToolTip(wxT("Scale factor by which to reduce the max and min step size at each resolution level"));
+    textDirectory->SetToolTip(wxT("Directory in which to save registered images"));
+    btnBrowseDir->SetToolTip(wxT("Find an output directory"));
+    textTransform->SetToolTip(wxT("File in which to save the transform parameters"));
+    btnBrowseTransform->SetToolTip(wxT("Find a transform file"));
+    textPrefix->SetToolTip(wxT("Prefix to append to each output image"));
+    checkOpenOutput->SetToolTip(wxT("Create a new data source and open it when complete"));
     checkOpenOutput->SetValue(1);
+    btnRun->SetToolTip(wxT("Run this task"));
+    btnHide->SetToolTip(wxT("Close this dialog"));
     // end wxGlade
 }
 
