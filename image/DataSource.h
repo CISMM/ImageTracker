@@ -122,15 +122,8 @@ public:
     void SetPixelDataType(PixelDataType type);
     
 protected:
-    DataSource() :
-        name("NewDataSource"),
-        files()
-    {
-        video = new ImageSetReaderUS2();
-    }
-
-    virtual ~DataSource()
-    {}
+    DataSource();
+    virtual ~DataSource();
 
 private:
     std::string name;

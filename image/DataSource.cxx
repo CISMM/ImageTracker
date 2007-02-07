@@ -4,6 +4,23 @@
 
 #include "Logger.h"
 
+DataSource::DataSource() :
+    name("NewDataSource"),
+    files()
+{
+    // create a default video
+    video = new ImageSetReaderUS2();
+}
+
+DataSource::~DataSource()
+{
+    // We have to destroy our video
+    if (this->video != NULL)
+    {
+        delete(this->video);
+    }
+}
+
 itk::DataObject* DataSource::GetImage(unsigned int i)
 {
      Logger::verbose << "DataSource::GetImage(" << i << ") const" << std::endl;

@@ -133,6 +133,12 @@ public:
     {
         this->SetFiles(set);
     }
+    
+    virtual ~ImageSetReader()
+    {
+        Logger::debug << "ImageSetReader::~ImageSetReader()" << std::endl;
+        this->LogStatistics();
+    }
 
     /**
      * Access an image from this ImageSetReader by index.
