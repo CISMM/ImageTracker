@@ -3,13 +3,22 @@
 
 #include "Logger.h"
 
+CLGOpticFlowPipeline::CLGOpticFlowPipeline(void) :
+    init(false),
+    index(0)
+{
+    this->inputReader = NULL;
+    this->flowFilter = FlowFilterType::New();
+    this->smooth = SmoothFilterType::New();
+}
+
 void CLGOpticFlowPipeline::InitializePipeline()
 {
-    if ((!this->source.size() == 0 || this->destination.size() == 0))
+    if (this->inputReader && 
+         this->inputReader->size() != 0 && 
+         this->outputFiles.size() != 0)
     {
-        this->reader = ReaderType(this->source);
         this->index = 0;
-
         this->init = true;
     }
     else
@@ -27,14 +36,14 @@ bool CLGOpticFlowPipeline::UpdateOne()
     }
 
     if (this->init &&
-        this->index < (this->source.size() - 1) &&
-        this->index < this->destination.size())
+        this->index < (this->inputReader->size() - 1) &&
+        this->index < this->outputFiles.size())
     {
-        this->flowFilter->SetInput1(this->reader[this->index]);
-        this->flowFilter->SetInput2(this->reader[this->index+1]);
+        this->flowFilter->SetInput1(dynamic_cast<ImageType*>(this->inputReader->GetImage(this->index)));
+        this->flowFilter->SetInput2(dynamic_cast<ImageType*>(this->inputReader->GetImage(this->index+1)));
 
-        Logger::logInfo("Writing vector image: " + this->destination[this->index]);
-        WriteImage(this->flowFilter->GetOutput(), this->destination[this->index]);
+        Logger::logInfo("Writing flow field image: " + this->outputFiles[this->index]);
+        WriteImage(this->flowFilter->GetOutput(), this->outputFiles[this->index]);
 
         this->index++;
         return true;
@@ -47,4 +56,53 @@ bool CLGOpticFlowPipeline::UpdateOne()
 void CLGOpticFlowPipeline::UpdateAll()
 {
     while (this->UpdateOne());
+}
+
+void CLGOpticFlowPipeline::Update()
+{
+    this->UpdateAll();
+}
+
+void CLGOpticFlowPipeline::SetSpatialSigma(double sigma) 
+{ 
+    this->flowFilter->SetSpatialSigma(sigma);
+    
+    // Discrete gaussian image filter takes variance--standard deviation squared
+    this->smooth->SetVariance(sigma*sigma);
+    this->smooth->Modified();
+    
+    this->init = false;
+}
+void CLGOpticFlowPipeline::SetRegularization(double reg) 
+{ 
+    this->flowFilter->SetRegularization(reg);
+    this->init = false;
+}
+void CLGOpticFlowPipeline::SetRelaxation(double relax) 
+{ 
+    this->flowFilter->SetRelaxation(relax);
+    this->init = false;
+}
+void CLGOpticFlowPipeline::SetIterations(unsigned int iter) 
+{ 
+    this->flowFilter->SetIterations(iter);
+    this->init = false;
+}
+    
+void CLGOpticFlowPipeline::SetInput(ReaderType input)
+{
+    this->inputReader = input;
+    this->smooth->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(0)));
+    this->init = false;
+}
+    
+void CLGOpticFlowPipeline::SetOutputFiles(const FileSet& dest)
+{
+    this->outputFiles = dest;
+    this->init = false;
+}
+
+CLGOpticFlowPipeline::ImageType::Pointer CLGOpticFlowPipeline::GetPreviewImage()
+{
+    return this->smooth->GetOutput();
 }

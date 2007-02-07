@@ -24,7 +24,7 @@ class MultiResolutionRegistrationPipeline :
 public:
 	// Standard itk object definitions
 	typedef MultiResolutionRegistrationPipeline Self;
-	typedef itk::LightObject Superclass;
+	typedef itk::Object Superclass;
 	typedef itk::SmartPointer<Self> Pointer;
 	typedef itk::SmartPointer<const Self> ConstPointer;
 	itkNewMacro(Self);
@@ -102,7 +102,6 @@ protected:
 	~MultiResolutionRegistrationPipeline(){}
 
 private:
-	FileSet inputFiles;
 	FileSet outputFiles;
 	std::string m_TransformFile;
         bool m_ThresholdBetween;

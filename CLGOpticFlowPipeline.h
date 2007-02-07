@@ -1,14 +1,15 @@
 #pragma once
 
-#include "itkImageFileWriter.h"
-#include "itkLightObject.h"
+#include "itkDiscreteGaussianImageFilter.h"
+#include "itkObject.h"
 
 #include "CLGOpticFlowImageFilter.h"
 #include "CommonTypes.h"
 #include "FileSet.h"
 #include "ImageSetReader.h"
 
-class CLGOpticFlowPipeline : public itk::LightObject
+class CLGOpticFlowPipeline : 
+    public itk::Object
 {
 public:
     /** Standard itk object typedefs */
@@ -18,77 +19,48 @@ public:
     typedef itk::LightObject Superclass;
 
     /** Some helpful typedefs */
-    typedef CommonTypes::InputImageType InputImageType;
     typedef CommonTypes::InternalImageType ImageType;
-    typedef ImageSetReader<InputImageType, ImageType> ReaderType;
+    typedef ImageSetReaderBase* ReaderType;
     typedef CLGOpticFlowImageFilter<ImageType, ImageType> FlowFilterType;
+    typedef itk::DiscreteGaussianImageFilter< ImageType, ImageType > SmoothFilterType;
 
     /** itk object macros */
     itkNewMacro(Self);
-    itkTypeMacro(CLGOpticFlowPipeline, itk::LightObject);
+    itkTypeMacro(CLGOpticFlowPipeline, itk::Object);
 
     double GetSpatialSigma() { return this->flowFilter->GetSpatialSigma(); }
     double GetRegularization() { return this->flowFilter->GetRegularization(); }
     double GetRelaxation() { return this->flowFilter->GetRelaxation(); }
     unsigned int GetIterations() { return this->flowFilter->GetIterations(); }
-    const FileSet& GetSource() { return this->source; }
-    const FileSet& GetDestination() { return this->destination; }
 
-    void SetSpatialSigma(double sigma) 
-    { 
-        this->flowFilter->SetSpatialSigma(sigma);
-        this->init = false;
-    }
-    void SetRegularization(double reg) 
-    { 
-        this->flowFilter->SetRegularization(reg);
-        this->init = false;
-    }
-    void SetRelaxation(double relax) 
-    { 
-        this->flowFilter->SetRelaxation(relax);
-        this->init = false;
-    }
-    void SetIterations(unsigned int iter) 
-    { 
-        this->flowFilter->SetIterations(iter);
-        this->init = false;
-    }
-    void SetSource(const FileSet& source)
-    {
-        this->source = source;
-        this->init = false;
-    }
-    void SetDestination(const FileSet& dest)
-    {
-        this->destination = dest;
-        this->init = false;
-    }
+    const FileSet& GetOutputFiles() { return this->outputFiles; }
+    
+    ImageType::Pointer GetPreviewImage();
+
+    void SetSpatialSigma(double sigma);
+    void SetRegularization(double reg);
+    void SetRelaxation(double relax);
+    void SetIterations(unsigned int iter);
+    
+    void SetInput(ReaderType input);
+    void SetOutputFiles(const FileSet& dest);
 
     bool UpdateOne();
     void UpdateAll();
+    void Update();
 
 protected:
-    CLGOpticFlowPipeline(void) :
-        init(false),
-        index(0)
-    {
-        this->flowFilter = FlowFilterType::New();
-        this->init = false;
-    }
-
-    virtual ~CLGOpticFlowPipeline(void) 
-    {
-    }
+    CLGOpticFlowPipeline(void);
+    virtual ~CLGOpticFlowPipeline(void) {}
 
 private:
     void InitializePipeline();
 
     bool init;
     unsigned int index;
-    FileSet source;
-    FileSet destination;
-    ReaderType reader;
+    FileSet outputFiles;
+    ReaderType inputReader;
     
     FlowFilterType::Pointer flowFilter;
+    SmoothFilterType::Pointer smooth;
 };
