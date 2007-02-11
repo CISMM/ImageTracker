@@ -30,7 +30,13 @@ BEGIN_EVENT_TABLE(ImageTracker, wxFrame)
     EVT_MENU(MENU_ABOUT, ImageTracker::OnAbout)
     EVT_MENU(MENU_OCCLUSIONS, ImageTracker::OnOcclusions)
     EVT_MENU(MENU_STABILIZE, ImageTracker::OnStabilize)
+    EVT_MENU(MENU_APPLY_TRANSFORM, ImageTracker::OnApplyTransform)
     EVT_MENU(MENU_CLG_OPTIC_FLOW, ImageTracker::OnCLGOpticFlow)
+    EVT_MENU(MENU_LOG_ERROR, ImageTracker::OnLoggingMenu)
+    EVT_MENU(MENU_LOG_WARN, ImageTracker::OnLoggingMenu)
+    EVT_MENU(MENU_LOG_INFO, ImageTracker::OnLoggingMenu)
+    EVT_MENU(MENU_LOG_DEBUG, ImageTracker::OnLoggingMenu)
+    EVT_MENU(MENU_LOG_VERBOSE, ImageTracker::OnLoggingMenu)
     // begin wxGlade: ImageTracker::event_table
     EVT_LISTBOX_DCLICK(LBX_DATASOURCES, ImageTracker::OnEditDataSource)
     EVT_BUTTON(BTN_ADD_DATASOURCE, ImageTracker::OnAddDataSource)
@@ -54,6 +60,30 @@ void ImageTracker::OnAbout(wxCommandEvent &event)
 {
     this->theStatusBar->SetStatusText(wxT("About..."));
     this->dlgAbout->Show(true);
+}
+
+void ImageTracker::OnLoggingMenu(wxCommandEvent &event)
+{
+    switch (event.GetId())
+    {
+    case MENU_LOG_ERROR:
+        Logger::setLevel(Error);
+        break;
+    case MENU_LOG_WARN:
+        Logger::setLevel(Warning);
+        break;
+    case MENU_LOG_INFO:
+        Logger::setLevel(Info);
+        break;
+    case MENU_LOG_DEBUG:
+        Logger::setLevel(Debug);
+        break;
+    case MENU_LOG_VERBOSE:
+        Logger::setLevel(Verbose);
+        break;
+    default:
+        Logger::setLevel(Verbose);
+    }
 }
 
 void ImageTracker::OnOcclusions(wxCommandEvent &event)
@@ -90,7 +120,6 @@ void ImageTracker::OnStabilize(wxCommandEvent &event)
     
     this->theStatusBar->SetStatusText(wxT("Stabilizing..."));
     
-    // Find the user's selected DataSource.
     // Find the user's selected DataSource
     int idx = this->lbxSources->GetSelection();
     idx = (idx == wxNOT_FOUND) ? 0 : idx;
@@ -104,6 +133,27 @@ void ImageTracker::OnStabilize(wxCommandEvent &event)
     this->dlgRegistration->SetInput(this->controller->GetDataSource(idx));
     this->dlgRegistration->SetController(this->controller);
     this->dlgRegistration->Show(true);
+}
+
+void ImageTracker::OnApplyTransform(wxCommandEvent &event)
+{
+    // Make sure we at least have a data source to work with
+    if (this->lbxSources->GetCount() == 0)
+    {
+        wxMessageDialog alert(this, wxT("Please add a data source on which to operate first."), 
+                              wxT("No data sources."), wxOK);
+        alert.ShowModal();
+        return;
+    }
+    
+    this->theStatusBar->SetStatusText(wxT("Applying transform..."));
+    
+    // Find the user's selected DataSource
+    int idx = this->lbxSources->GetSelection();
+    idx = (idx == wxNOT_FOUND) ? 0 : idx;
+    this->dlgApplyTransform->SetInput(this->controller->GetDataSource(idx));
+    this->dlgApplyTransform->SetController(this->controller);
+    this->dlgApplyTransform->Show(true);
 }
 
 void ImageTracker::OnCLGOpticFlow(wxCommandEvent &event)
@@ -234,11 +284,19 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     wxMenu* menuEnhance = new wxMenu();
     menuEnhance->Append(MENU_OCCLUSIONS, wxT("&Remove Occlusions"), wxT("Detect and remove static partial occlusions from bright-field microscopy images"), wxITEM_NORMAL);
     menuEnhance->Append(MENU_STABILIZE, wxT("&Stabilize"), wxT("Remove global drift to keep an object stationary"), wxITEM_NORMAL);
+    menuEnhance->Append(MENU_APPLY_TRANSFORM, wxT("Apply &Transform"), wxT("Apply a transforms from one stabilization to another data source"), wxITEM_NORMAL);
     itMenuBar->Append(menuEnhance, wxT("&Enhance"));
     wxMenu* menuCompute = new wxMenu();
     menuCompute->Append(MENU_CLG_OPTIC_FLOW, wxT("CLG &Optic Flow"), wxT("Combined local-global motion computation"), wxITEM_NORMAL);
     itMenuBar->Append(menuCompute, wxT("&Compute"));
     wxMenu* menuHelp = new wxMenu();
+    wxMenu* menuLogging = new wxMenu();
+    menuLogging->Append(MENU_LOG_ERROR, wxT("Error"), wxT("Display only error logging messages"), wxITEM_RADIO);
+    menuLogging->Append(MENU_LOG_WARN, wxT("Warn"), wxT("Display warning and higher logging messages"), wxITEM_RADIO);
+    menuLogging->Append(MENU_LOG_INFO, wxT("Info"), wxT("Display information and higher logging messages"), wxITEM_RADIO);
+    menuLogging->Append(MENU_LOG_DEBUG, wxT("Debug"), wxT("Display debug and higher logging messages"), wxITEM_RADIO);
+    menuLogging->Append(MENU_LOG_VERBOSE, wxT("Verbose"), wxT("Display verbose and higer logging messages (all messages)"), wxITEM_RADIO);
+    menuHelp->Append(wxNewId(), wxT("Logging"), menuLogging, wxT(""));
     menuHelp->Append(MENU_ABOUT, wxT("&About"), wxT("About this application"), wxITEM_NORMAL);
     itMenuBar->Append(menuHelp, wxT("&Help"));
     theStatusBar = CreateStatusBar(1, 0);
@@ -258,6 +316,7 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     
     // ----- Custom code! ----- //
     // Select log level, and redirect output to log panel
+    menuHelp->Check(MENU_LOG_VERBOSE, true);
     Logger::setLevel(Verbose);
     this->coutRedirect = new wxStreamToTextRedirector(this->txtLogger);
     
@@ -265,6 +324,7 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     this->dlgDataSource = new DataSourceDialog(this, -1, wxT("Edit DataSource"));
     this->dlgRemoveOcclusions = new RemoveOcclusionsDialog(this, -1, wxT("Remove Partial Occlusions"));
     this->dlgRegistration = new MultiResolutionRegistrationDialog(this, -1, wxT("Stabilize"));
+    this->dlgApplyTransform = new ApplyTransformDialog(this, -1, wxT("Apply Transform"));
     this->dlgCLGOpticFlow = new CLGOpticFlowDialog(this, -1, wxT("CLG Optic Flow"));
     this->dlgAbout = new AboutDialog(this, -1, wxT("About"));
     this->dlgAbout->SetMessage(APP_NAME + " " + APP_VERSION + "\n" + APP_AUTHOR + " " + APP_COPYRIGHT + "\n" + APP_WEBSITE);

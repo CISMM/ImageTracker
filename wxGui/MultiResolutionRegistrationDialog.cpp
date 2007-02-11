@@ -53,7 +53,6 @@ bool MultiResolutionRegistrationDialog::TransferDataFromWindow()
     this->pipeline->SetUpperThreshold(this->slideUpperBound->GetValue());
     this->pipeline->SetLowerThreshold(this->slideLowerBound->GetValue());
     
-    // TODO: Why does this crash, when it didn't before?
     this->pipeline->SetShrinkFactors(this->slideMinSmooth->GetValue(), this->slideMaxSmooth->GetValue());
     
     this->pipeline->SetOptimizerNumberOfIterations(this->slideIterations->GetValue());

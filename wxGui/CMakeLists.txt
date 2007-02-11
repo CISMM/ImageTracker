@@ -7,6 +7,7 @@ INCLUDE (../LocalUsewxWidgets.cmake)
 
 SET (Gui_SRCS
     AboutDialog.cpp                             AboutDialog.h
+    ApplyTransformDialog.cpp                    ApplyTransformDialog.h
     CLGOpticFlowDialog.cpp                      CLGOpticFlowDialog.h
     DataSourceDialog.cpp                        DataSourceDialog.h
     DoubleSlider.cxx                            DoubleSlider.h

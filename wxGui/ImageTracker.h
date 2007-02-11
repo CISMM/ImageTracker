@@ -13,6 +13,7 @@
 #include <string>
 
 #include "AboutDialog.h"
+#include "ApplyTransformDialog.h"
 #include "CLGOpticFlowDialog.h"
 #include "DataSourceDialog.h"
 #include "ImageTrackerController.h"
@@ -45,7 +46,13 @@ public:
         MENU_OPEN,
         MENU_OCCLUSIONS,
         MENU_STABILIZE,
+        MENU_APPLY_TRANSFORM,
         MENU_CLG_OPTIC_FLOW,
+        MENU_LOG_ERROR,
+        MENU_LOG_WARN,
+        MENU_LOG_INFO,
+        MENU_LOG_DEBUG,
+        MENU_LOG_VERBOSE,
         BTN_ADD_DATASOURCE  = 2000,
         BTN_REMOVE_DATASOURCE,
         LBX_DATASOURCES,
@@ -68,6 +75,7 @@ private:
     DataSourceDialog* dlgDataSource;
     RemoveOcclusionsDialog* dlgRemoveOcclusions;
     MultiResolutionRegistrationDialog* dlgRegistration;
+    ApplyTransformDialog* dlgApplyTransform;
     CLGOpticFlowDialog* dlgCLGOpticFlow;
     AboutDialog* dlgAbout;
     wxStreamToTextRedirector* coutRedirect;
@@ -99,8 +107,10 @@ public:
     void OnAbout(wxCommandEvent &event);
     void OnOcclusions(wxCommandEvent &event);
     void OnStabilize(wxCommandEvent &event);
+    void OnApplyTransform(wxCommandEvent &event);
     void OnCLGOpticFlow(wxCommandEvent &event);
     void OnDataSourceChange(wxCommandEvent &event);
+    void OnLoggingMenu(wxCommandEvent &event);
     void OnAddDataSource(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnRemoveDataSource(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnEditDataSource(wxCommandEvent &event); // wxGlade: <event_handler>
