@@ -5,6 +5,7 @@
 PROJECT (Pipelines)
 
 SET (Pipelines_SRCS
+    ApplyTransformsPipeline.cxx             ApplyTransformsPipeline.h
     RemovePartialOcclusionsPipeline.cxx     RemovePartialOcclusionsPipeline.h
 )
 
