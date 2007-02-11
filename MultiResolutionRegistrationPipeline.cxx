@@ -148,69 +148,74 @@ MultiResolutionRegistrationPipeline::GetPreviewImage()
 
 void MultiResolutionRegistrationPipeline::Update()
 {
-	Logger::verbose << "MultiResolutionRegistrationPipeline::Update()" << std::endl;
+    std::string function("MultiResolutionRegistrationPipeline::Update()");
+    Logger::verbose << function << std::endl;
 
-	// Create container for transforms
-	typedef std::vector<RegistrationType::TransformPointer> TransformVector;
-	TransformVector transforms;
-	
-	// Create a running transform--keeps transform from current image to initial image
-	RegistrationType::TransformPointer transform = RegistrationType::TransformType::New();
-	transform->SetIdentity();
+    // Create container for transforms
+    typedef std::vector<RegistrationType::TransformPointer> TransformVector;
+    TransformVector transforms;
+    
+    // Store an initial identity transformation for the first image--it registers with itself perfectly
+    RegistrationType::TransformPointer transform = RegistrationType::TransformType::New();
+    transform->SetIdentity();
+    transforms.push_back(transform);
+    // Create a running transform--keeps transform from current image to initial image
+    transform = RegistrationType::TransformType::New();
+    transform->SetIdentity();
 
-	int total = this->outputFiles.size();
-	Logger::info << "MultiResolutionRegistrationPipeline::Update: " << 1 << "/" << total << std::endl;
+    int total = this->outputFiles.size();
+    Logger::info << function << ": " << 1 << "/" << total << std::endl;
 
-	// Start at the beginning of the input images
-	// Write the first image, un-changed
-        this->caster->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(0)));
-	WriteImage(this->caster->GetOutput(), this->outputFiles[0]);
+    // Start at the beginning of the input images
+    // Write the first image, un-changed
+    this->caster->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(0)));
+    WriteImage(this->caster->GetOutput(), this->outputFiles[0]);
 
-	// Connect caster to the resampling pipeline
-	this->caster->SetInput(this->resample->GetOutput());
+    // Connect caster to the resampling pipeline
+    this->caster->SetInput(this->resample->GetOutput());
 
-	// Register every image with the previous image
-	for (unsigned int i = 0; 
-	     i < this->inputReader->size()-1 && 
-	     i < this->outputFiles.size()-1; 
-	     i++)
-	{
-            ImageType::Pointer fixed = dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(i));
-            ImageType::Pointer moving = dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(i+1));
-            
-            // Update pipeline inputs
-            this->threshold[0]->SetInput(fixed);
-            this->threshold[1]->SetInput(moving);
-            this->smooth->SetInput(this->threshold[0]->GetOutput());
-            this->resample->SetInput(moving);
-            
-            // Run registration
-            Logger::info << "MultiResolutionRegistrationPipeline::Update: " << (i+2) << "/" << total << std::endl;
-            this->registration->StartRegistration();
-            // store transform
-            transforms.push_back(this->registration->GetLastTransform());
-            // pre-compose the current transform with the accumulated transform
-            transform->Compose(this->registration->GetLastTransform(), true);
-            
-            // Save registered image
-            this->resample->SetTransform(transform);
-            this->resample->SetSize(fixed->GetLargestPossibleRegion().GetSize());
-            this->resample->SetOutputOrigin(fixed->GetOrigin());
-            this->resample->SetOutputSpacing(fixed->GetSpacing());
-            this->resample->SetDefaultPixelValue(0);
-            this->resample->Update();
-            WriteImage(this->caster->GetOutput(), this->outputFiles[i+1]);
-	}
+    // Register every image with the previous image
+    for (unsigned int i = 0; 
+            i < this->inputReader->size()-1 && 
+            i < this->outputFiles.size()-1; 
+            i++)
+    {
+        ImageType::Pointer fixed = dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(i));
+        ImageType::Pointer moving = dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(i+1));
+        
+        // Update pipeline inputs
+        this->threshold[0]->SetInput(fixed);
+        this->threshold[1]->SetInput(moving);
+        this->smooth->SetInput(this->threshold[0]->GetOutput());
+        this->resample->SetInput(moving);
+        
+        // Run registration
+        Logger::info << function << ": " << (i+2) << "/" << total << std::endl;
+        this->registration->StartRegistration();
+        // store transform
+        transforms.push_back(this->registration->GetLastTransform());
+        // pre-compose the current transform with the accumulated transform
+        transform->Compose(this->registration->GetLastTransform(), true);
+        
+        // Save registered image
+        this->resample->SetTransform(transform);
+        this->resample->SetSize(fixed->GetLargestPossibleRegion().GetSize());
+        this->resample->SetOutputOrigin(fixed->GetOrigin());
+        this->resample->SetOutputSpacing(fixed->GetSpacing());
+        this->resample->SetDefaultPixelValue(0);
+        this->resample->Update();
+        WriteImage(this->caster->GetOutput(), this->outputFiles[i+1]);
+    }
 
-	// Save transform data
-	if (this->GetTransformFile() != "")
-	{
-		TransformGroup::SaveTransforms(&transforms, this->GetTransformFile());
-	}
+    // Save transform data
+    if (this->GetTransformFile() != "")
+    {
+            TransformGroup::SaveTransforms(&transforms, this->GetTransformFile());
+    }
 
-	// Reset image
-        this->resample->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(0)));
-        this->threshold[0]->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(0)));
-        this->threshold[1]->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(1)));
-	this->smooth->SetInput(this->threshold[0]->GetOutput());
+    // Reset image
+    this->resample->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(0)));
+    this->threshold[0]->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(0)));
+    this->threshold[1]->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(1)));
+    this->smooth->SetInput(this->threshold[0]->GetOutput());
 }
