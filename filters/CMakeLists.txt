@@ -17,9 +17,17 @@ ENDIF(ITK_FOUND)
 INCLUDE_DIRECTORIES(${ITK_INCLUDE_DIRS})
 LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
 
+#######################################
+# Include fftw
 # We use the fftw fourier transform libraries instead of ITK's vxl libraries.
 # The ITK libraries seem to be buggy (e.g. two forward transforms do not yeild the same image)
+#######################################
+IF (WIN32)
+INCLUDE_DIRECTORIES(C:/Nano/bin/fftw)
+LINK_DIRECTORIES(C:/Nano/bin/fftw)
+ELSE (WIN32)
 LINK_LIBRARIES(fftw3 fftw3f)
+ENDIF (WIN32)
 
 # Note: the Dummy.cpp file is here to force cmake to use c++ linking for this project
 SET (Filters_SRCS

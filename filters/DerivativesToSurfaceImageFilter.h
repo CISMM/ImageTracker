@@ -100,7 +100,7 @@ private:
 #ifndef USE_FFTWF
 #define USE_FFTWF
 #endif
-#include <cmath>
+
 #include "vnl/vnl_math.h"
 #include "itkComplexToRealImageFilter.h"
 #include "itkComplexToImaginaryImageFilter.h"
@@ -112,6 +112,9 @@ private:
 #include "itkRealToComplexImageFilter.h"
 #include "ImageUtils.h"
 #include "Logger.h"
+#include "MathUtils.h"
+
+// visual studio's math library does not define pi
 
 template <class TInput>
 void DerivativesToSurfaceImageFilter<TInput>
