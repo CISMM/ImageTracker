@@ -316,8 +316,8 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     
     // ----- Custom code! ----- //
     // Select log level, and redirect output to log panel
-    menuHelp->Check(MENU_LOG_VERBOSE, true);
-    Logger::setLevel(Verbose);
+    menuHelp->Check(MENU_LOG_INFO, true);
+    Logger::setLevel(Info);
     this->coutRedirect = new wxStreamToTextRedirector(this->txtLogger);
     
     // Pre-create dialogs

@@ -37,6 +37,17 @@ public:
     virtual ~ImageTracker()
     {
         this->rwiView->Delete();
+
+		// Not sure why we have to do this...seems to be only on Windows.
+		// wx should be deleting all child objects, which these dialogs are.
+		// But, without deleting these, the ImageTracker app sticks around
+		// after closing.
+		delete dlgDataSource;
+		delete dlgRemoveOcclusions;
+		delete dlgRegistration;
+		delete dlgApplyTransform;
+		delete dlgCLGOpticFlow;
+		delete dlgAbout;
     }
     
     enum IDs
