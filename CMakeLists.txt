@@ -36,13 +36,6 @@ INCLUDE_DIRECTORIES(${VTK_INCLUDE_DIRS})
 LINK_DIRECTORIES(${VTK_LIBRARY_DIRS})
 
 #######################################
-# Include ImageMagick
-# No longer needed from ITK 2.6.0
-# According to ITK, their tiff library is better.
-#######################################
-# INCLUDE (./vtkView/Use_ImageMagick.cmake)
-
-#######################################
 # Personal filter library and support classes.
 #######################################
 INCLUDE_DIRECTORIES (

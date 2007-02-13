@@ -1,12 +1,13 @@
 #include "MultiResolutionRegistrationPipeline.h"
 
-#include <math.h>
+#include <cmath>
 #include <vector>
 
 #include "itkArray2D.h"
 
 #include "CommonTypes.h"
 #include "Logger.h"
+#include "MathUtils.h"
 #include "TransformGroup.h"
 
 MultiResolutionRegistrationPipeline::MultiResolutionRegistrationPipeline()
