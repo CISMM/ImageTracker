@@ -5,7 +5,7 @@ PROJECT (apps)
 ##############################
 
 ADD_EXECUTABLE(transform TransformImages.cxx)
-TARGET_LINK_LIBRARIES(transform ITFilters ITImage ITAlgorithms)
+TARGET_LINK_LIBRARIES(transform ITFilters ITImage ITAlgorithms ITPipelines)
 
 ADD_EXECUTABLE(translate TranslationGenerator.cxx)
 TARGET_LINK_LIBRARIES(translate ITFilters)
@@ -73,6 +73,9 @@ TARGET_LINK_LIBRARIES(testpad ITCommon ITImage ITFilters)
 ADD_EXECUTABLE(integrate IntegrateFlowField.cxx)
 TARGET_LINK_LIBRARIES(integrate ITCommon ITImage ITFilters)
 
+ADD_EXECUTABLE(datasource TestDataSource.cxx)
+TARGET_LINK_LIBRARIES(datasource ITCommon ITImage ITFilters ITGui)
+
 INCLUDE (../LocalUsewxWidgets.cmake)
 
 ###################################
@@ -87,11 +90,11 @@ IF (WIN32)
     SET (GUI_EXE WIN32)
     # This seems to be necessary for debug builds...for some reason, though, we
     # can't just use CMAKE_DEBUG_EXE_LINKER_FLAGS
-    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:msvcrt")
+    # SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:msvcrt")
 ENDIF (WIN32)
 
 ADD_EXECUTABLE(viewer ${GUI_EXE} VtkViewerApp.cxx)
 TARGET_LINK_LIBRARIES(viewer ITView)
 
 ADD_EXECUTABLE(ImageTracker ${GUI_EXE} ImageTrackerApp.cxx)
-TARGET_LINK_LIBRARIES(ImageTracker ITCommon ITImage ITAlgorithms ITView ITGui)
+TARGET_LINK_LIBRARIES(ImageTracker ITCommon ITImage ITFilters ITAlgorithms ITPipelines ITView ITGui)
