@@ -1,5 +1,12 @@
 #include "FileSet.h"
 
+#ifdef _WIN32
+	const std::string FileSet::PATH_DELIMITER("\\");
+#else
+	const std::string FileSet::PATH_DELIMITER("/");
+#endif
+
+
 FileSet::FileSet(const FilePattern& pattern)
     : fileNames()
 {
@@ -8,7 +15,7 @@ FileSet::FileSet(const FilePattern& pattern)
     for (int i = pattern.start; i <= (int) pattern.end; i++)
     {
         char cname[512];
-        std::string format = pattern.directory + "/" + pattern.format;
+        std::string format = pattern.directory + PATH_DELIMITER + pattern.format;
         sprintf(cname, format.c_str(), i);
         this->fileNames.push_back(std::string(cname));
     }
@@ -81,8 +88,8 @@ void FileSet::SetDirectory(const std::string& dir)
 
 std::string::size_type FileSet::DirectoryIndex(const std::string& filename) const
 {
-    // find the index of the last "\"
-    return filename.rfind("/");
+    // find the index of the last "/"
+    return filename.rfind(PATH_DELIMITER);
 }
 
 std::string FileSet::DirectoryPart(const std::string& filename) const

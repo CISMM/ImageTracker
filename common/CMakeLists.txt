@@ -8,6 +8,7 @@ SET (common_SRCS
                 	FilePattern.h
     FileSet.cxx		FileSet.h
     Logger.cxx      Logger.h
+					MathUtils.h
     StopWatch.cxx   StopWatch.h
 )
 
