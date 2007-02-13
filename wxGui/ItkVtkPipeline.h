@@ -24,6 +24,7 @@ public:
     virtual vtkProp* GetOutput()
     {
         Logger::warning << "ItkVtkPipeline::GetOutput(): Base class method called, but should be overriden." << std::endl;
+		return NULL;
     }
     virtual void Update() {}
     

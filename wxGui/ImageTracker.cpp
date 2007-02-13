@@ -301,9 +301,9 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     itMenuBar->Append(menuHelp, wxT("&Help"));
     theStatusBar = CreateStatusBar(1, 0);
     const wxString lbxSources_choices[] = {
-        
+        wxT("")
     };
-    lbxSources = new wxListBox(window_2_pane_1, LBX_DATASOURCES, wxDefaultPosition, wxDefaultSize, 0, lbxSources_choices, wxLB_SINGLE);
+    lbxSources = new wxListBox(window_2_pane_1, LBX_DATASOURCES, wxDefaultPosition, wxDefaultSize, 1, lbxSources_choices, wxLB_SINGLE);
     btnAddDataSource = new wxButton(window_2_pane_1, BTN_ADD_DATASOURCE, wxT("+"));
     btnRemoveDataSource = new wxButton(window_2_pane_1, BTN_REMOVE_DATASOURCE, wxT("-"));
     rwiView = new wxVTKRenderWindowInteractor(window_2_pane_2, -1);
@@ -338,12 +338,18 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     this->controller = ImageTrackerController::New();
     this->controller->SetParent(this, IMAGE_TRACKER_CONTROLLER);
     this->controller->SetRenderWindow(this->rwiView->GetRenderWindow());
+    
+    // This is pretty messed up right here.  Windows complains if the choices array for a
+    // list box is empty.  If you pass an empty wxString as the only element, everything
+    // is ok.  But, then you have a list item by default, which is bad.  So, we have to 
+    // clear it here.  Wow.
+    this->lbxSources->Clear();
 }
 
 void ImageTracker::set_properties()
 {
     // begin wxGlade: ImageTracker::set_properties
-    SetSize(wxSize(921, 623));
+    SetSize(wxSize(982, 623));
     int theStatusBar_widths[] = { -1 };
     theStatusBar->SetStatusWidths(1, theStatusBar_widths);
     const wxString theStatusBar_fields[] = {
@@ -352,6 +358,7 @@ void ImageTracker::set_properties()
     for(int i = 0; i < theStatusBar->GetFieldsCount(); ++i) {
         theStatusBar->SetStatusText(theStatusBar_fields[i], i);
     }
+    lbxSources->SetSelection(0);
     // end wxGlade
 }
 

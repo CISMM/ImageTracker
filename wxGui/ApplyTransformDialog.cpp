@@ -2,6 +2,7 @@
 
 #include "ApplyTransformDialog.h"
         
+#include "FileSet.h"
 #include "Logger.h"
 #include "wxUtils.h"
 
@@ -102,7 +103,7 @@ void ApplyTransformDialog::OnBrowseDirectory(wxCommandEvent &event)
     wxDirDialog dir(this, wxT("Choose an output directory"), this->textDirectory->GetValue());
     if (dir.ShowModal() == wxID_OK)
     {
-        this->textDirectory->SetValue(dir.GetPath().Append(wxT("/")));
+		this->textDirectory->SetValue(dir.GetPath().Append(std2wx(FileSet::PATH_DELIMITER)));
     }
 }
 

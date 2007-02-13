@@ -5,6 +5,7 @@
 #include "itkStatisticsImageFilter.h"
 #include "vtkRenderWindow.h"
 
+#include "FileSet.h"
 #include "Logger.h"
 #include "wxUtils.h"
 
@@ -289,7 +290,7 @@ void MultiResolutionRegistrationDialog::OnBrowseDir(wxCommandEvent &event)
     wxDirDialog dlg(this, wxT("Choose a directory"), this->textDirectory->GetValue());
     if (dlg.ShowModal() == wxID_OK)
     {
-        this->textDirectory->SetValue(dlg.GetPath().Append(wxT("/")));
+		this->textDirectory->SetValue(dlg.GetPath().Append(std2wx(FileSet::PATH_DELIMITER)));
     }
 }
 

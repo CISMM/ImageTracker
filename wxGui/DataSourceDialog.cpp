@@ -116,9 +116,9 @@ DataSourceDialog::DataSourceDialog(wxWindow* parent, int id, const wxString& tit
     };
     rbxPixelType = new wxRadioBox(this, -1, wxT("Pixel Type"), wxDefaultPosition, wxDefaultSize, 4, rbxPixelType_choices, 0, wxRA_SPECIFY_ROWS);
     const wxString lbxFiles_choices[] = {
-        
+        wxT("")
     };
-    lbxFiles = new wxListBox(this, -1, wxDefaultPosition, wxDefaultSize, 0, lbxFiles_choices, wxLB_MULTIPLE);
+    lbxFiles = new wxListBox(this, -1, wxDefaultPosition, wxDefaultSize, 1, lbxFiles_choices, wxLB_MULTIPLE|wxLB_EXTENDED);
     btnAddFiles = new wxButton(this, BTN_ADD_FILES, wxT("+"));
     btnRemoveFiles = new wxButton(this, BTN_REMOVE_FILES, wxT("-"));
     btnOk = new wxButton(this, wxID_OK, wxT("&OK"));
@@ -131,6 +131,12 @@ DataSourceDialog::DataSourceDialog(wxWindow* parent, int id, const wxString& tit
     // TODO: implement vector float support
     // Disable vector floats, for now
     rbxPixelType->Enable(3, false);
+    
+    // This is pretty messed up right here.  Windows complains if the choices array for a
+    // list box is empty.  If you pass an empty wxString as the only element, everything
+    // is ok.  But, then you have a list item by default, which is bad.  So, we have to 
+    // clear it here.  Wow.
+    this->lbxFiles->Clear();
 }
 
 
@@ -183,6 +189,7 @@ void DataSourceDialog::set_properties()
     rbxPixelType->SetToolTip(wxT("The pixel type of the images in this data source"));
     rbxPixelType->SetSelection(1);
     lbxFiles->SetToolTip(wxT("The image files in this data source"));
+    lbxFiles->SetSelection(0);
     btnAddFiles->SetToolTip(wxT("Add images to this data source"));
     btnRemoveFiles->SetToolTip(wxT("Remove selected images from this data source"));
     btnOk->SetToolTip(wxT("Apply changes"));

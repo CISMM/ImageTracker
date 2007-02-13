@@ -135,7 +135,7 @@ void RemoveOcclusionsDialog::OnBrowse(wxCommandEvent &event)
     wxDirDialog dir(this, wxT("Choose a directory"), this->textDirectory->GetValue());
     if (dir.ShowModal() == wxID_OK)
     {
-        this->textDirectory->SetValue(dir.GetPath().Append(wxT("/")));
+		this->textDirectory->SetValue(dir.GetPath().Append(std2wx(FileSet::PATH_DELIMITER)));
     }
 }
 
