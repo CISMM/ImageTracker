@@ -39,6 +39,7 @@ bool ApplyTransformDialog::TransferDataFromWindow()
         this->controller->AddDataSource(ds);
     }
     
+	this->Show(false);
     return true;
 }
 
@@ -109,6 +110,15 @@ void ApplyTransformDialog::OnBrowseDirectory(wxCommandEvent &event)
     }
 }
 
+void ApplyTransformDialog::OnRun(wxCommandEvent &event)
+{
+	event.Skip();
+}
+
+void ApplyTransformDialog::OnHide(wxCommandEvent &event)
+{
+	event.Skip();
+}
 
 // wxGlade: add ApplyTransformDialog event handlers
 

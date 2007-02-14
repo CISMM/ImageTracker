@@ -68,6 +68,7 @@ bool RemoveOcclusionsDialog::TransferDataFromWindow()
     }
     
     // Return false if we want to keep the window up.
+	this->Show(false);
     return true;
 }
 

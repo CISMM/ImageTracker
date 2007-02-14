@@ -27,7 +27,7 @@ bool CLGOpticFlowDialog::TransferDataFromWindow()
     this->pipeline->SetRelaxation(this->slideRelaxation->GetValue());
     this->pipeline->SetIterations(this->slideIterations->GetValue());
     
-    FileSet outputFiles(this->input->GetFiles(), wx2std(this->textPrefix->GetValue()), ".mha");
+    FileSet outputFiles(this->input->GetFiles(), wx2std(this->textPrefix->GetValue()), "mha");
     outputFiles.SetDirectory(wx2std(this->textDirectory->GetValue()));
     this->pipeline->SetOutputFiles(outputFiles);
     
@@ -36,6 +36,7 @@ bool CLGOpticFlowDialog::TransferDataFromWindow()
     //TODO: When we support flow field visualization, load result here.
     
     this->ViewPreview(false);
+	this->Show(false);
     return true;
 }
 

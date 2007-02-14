@@ -79,7 +79,7 @@ bool MultiResolutionRegistrationDialog::TransferDataFromWindow()
     }
     
     this->ViewPreview(false);
-    
+    this->Show(false);
     return true;
 }
 
@@ -306,7 +306,7 @@ void MultiResolutionRegistrationDialog::OnBrowseTransform(wxCommandEvent &event)
 
 
 void MultiResolutionRegistrationDialog::OnRun(wxCommandEvent &event)
-{
+{	
     event.Skip();
 }
 
