@@ -54,6 +54,8 @@ protected:
 public:
     void OnBrowseTransform(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnBrowseDirectory(wxCommandEvent &event); // wxGlade: <event_handler>
+    void OnRun(wxCommandEvent &event); // wxGlade: <event_handler>
+    void OnHide(wxCommandEvent &event); // wxGlade: <event_handler>
     
 public:
     virtual bool TransferDataToWindow();
