@@ -329,7 +329,8 @@
   	      </tr>
 		<tr>
 			<td>&nbsp;</td>
-			<td><p><a name="v2.03" class="subsection">Version 2.03</a></p>
+			<td>
+			<p><a name="v2.03" class="subsection">Version 2.03</a></p>
 			<p>Features</p>
 			<ul>
 			<li>Remove fixed partial occlusions from brigt-field microscopy videos</li>
@@ -340,7 +341,16 @@
 			<li>Better image preview ability&mdash;while a dialog with preview component is visible, that preview appears in the ImageTracker main window; the preview is removed with the dialog is closed</li>
 			<li>Adjustable size logging and data source panels</li>
 			<li>Feature-based tracking has been removed</li>
-			</ul></td>
+			</ul>
+			<p>Known bugs</p>
+			<ul>
+			<li>When selecting a group of files to constitute a data source, the last file is inserted at the top of the list. This only occurs on Windows XP, so this may be a wxWidgets compatibility issue.</li>
+			<li>Sometimes dialogs stay open and become unresponsive when an operation finishes. If this happens, select the ImageTracker menu item that launched the dialog initially. The dialog can then be closed. This problem only occurs on Windows XP, so this may be a wxWidgets compatibility issue.</li>
+			<li>The logging window does not always update while processes are running. It is advisable to try a processing task with a small set of images first, to gauge how long it might take.</li>
+			<li>If two data sources with different image counts are loaded in ImageTracker, the application may crash when the frame slider overruns the index of the shorter data source.</li>
+			<li>If the ImageTracker main window split panes (which separate the logging and data source panels from the image panel) are collapsed, there is no way to recover the hidden panels.</li>
+			</ul>
+			</td>
 			<td>&nbsp;</td>
 			<td><p><a href="#top">Top</a></p></td>
 		</tr>
