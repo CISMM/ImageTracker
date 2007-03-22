@@ -298,12 +298,12 @@ void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
     dGy->SetZeroOrder();
     dGy->Update();
     copier->Update();
-    dIt->SetInput1(copier->GetOutput());
+    dIt->SetInput2(copier->GetOutput());
 
     dGx->SetInput(this->GetInput2());
     dGy->Update();
     copier->Update();
-    dIt->SetInput2(copier->GetOutput());
+    dIt->SetInput1(copier->GetOutput());
 
     dIt->Update();
     dt = dIt->GetOutput();
