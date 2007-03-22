@@ -49,6 +49,9 @@ TARGET_LINK_LIBRARIES(clgflow ITCommon ITImage ITFilters)
 ADD_EXECUTABLE(findback FindBackground.cxx)
 TARGET_LINK_LIBRARIES(findback ITCommon ITImage ITFilters)
 
+ADD_EXECUTABLE(backsub SubtractBackground.cxx)
+TARGET_LINK_LIBRARIES(backsub ITCommon ITImage ITFilters)
+        
 ADD_EXECUTABLE(gradocc GradientOcclusion.cxx)
 TARGET_LINK_LIBRARIES(gradocc ITCommon ITImage ITFilters)
 
@@ -75,6 +78,12 @@ TARGET_LINK_LIBRARIES(integrate ITCommon ITImage ITFilters)
 
 ADD_EXECUTABLE(datasource TestDataSource.cxx)
 TARGET_LINK_LIBRARIES(datasource ITCommon ITImage ITFilters ITGui)
+
+ADD_EXECUTABLE(hornflow ComputeHornOpticalFlow.cxx)
+TARGET_LINK_LIBRARIES(hornflow ITCommon ITImage ITFilters ITPipelines)
+        
+ADD_EXECUTABLE(harris TestHarrisFeatureDetector.cxx)
+TARGET_LINK_LIBRARIES(harris ITCommon ITImage ITFilters)
 
 INCLUDE (../LocalUsewxWidgets.cmake)
 
