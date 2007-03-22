@@ -4,6 +4,7 @@
 
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
+#include "itkRescaleIntensityImageFilter.h"
 #include "itkStatisticsImageFilter.h"
 
 #include "Logger.h"
@@ -65,6 +66,27 @@ void WriteImage(const TImage* image, const std::string& filename)
     typename WriterType::Pointer writer = WriterType::New();
     writer->SetInput(image);
     writer->SetFileName(filename.c_str());
+    writer->Update();
+}
+
+template < class TImageIn, class TImageOut >
+void WriteImage(const TImageIn* image, const std::string& filename, bool rescale = true)
+{
+    Logger::verbose << "Writing:\t" << filename << std::endl;
+    typedef itk::RescaleIntensityImageFilter< TImageIn, TImageOut > CastType;
+    typedef itk::ImageFileWriter< TImageOut > WriterType;
+    typedef typename TImageOut::PixelType OutputPixelType;
+    
+    typename CastType::Pointer caster = CastType::New();
+    typename WriterType::Pointer writer = WriterType::New();
+    caster->SetInput(image);
+    writer->SetInput(caster->GetOutput());
+    writer->SetFileName(filename.c_str());
+    if (rescale)
+    {
+        caster->SetOutputMinimum(std::numeric_limits<OutputPixelType>::min());
+        caster->SetOutputMaximum(std::numeric_limits<OutputPixelType>::max());
+    }
     writer->Update();
 }
 
