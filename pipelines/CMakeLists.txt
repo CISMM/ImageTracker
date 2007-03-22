@@ -6,6 +6,7 @@ PROJECT (Pipelines)
 
 SET (Pipelines_SRCS
     ApplyTransformsPipeline.cxx             ApplyTransformsPipeline.h
+    HornOpticalFlowPipeline.cxx             HornOpticalFlowPipeline.h
     RemovePartialOcclusionsPipeline.cxx     RemovePartialOcclusionsPipeline.h
 )
 
