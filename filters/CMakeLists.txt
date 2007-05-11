@@ -25,6 +25,7 @@ LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
 IF (WIN32)
 INCLUDE_DIRECTORIES(C:/Nano/bin/fftw)
 LINK_DIRECTORIES(C:/Nano/bin/fftw)
+SET (FFTW_LIBS  libfftw3l-3 libfftw3f-3)
 ELSE (WIN32)
 LINK_LIBRARIES(fftw3 fftw3f)
 ENDIF (WIN32)
@@ -64,4 +65,4 @@ SET (Filters_SRCS
 )
 
 ADD_LIBRARY(ITFilters ${Filters_SRCS})
-TARGET_LINK_LIBRARIES(ITFilters ITKCommon ITKBasicFilters ITKIO ITKAlgorithms )
+TARGET_LINK_LIBRARIES(ITFilters ITKCommon ITKBasicFilters ITKIO ITKAlgorithms ${FFTW_LIBS} )
