@@ -10,7 +10,7 @@
 #include "wxUtils.h"
 
 static const std::string APP_NAME("ImageTracker");
-static const std::string APP_VERSION("v 2.03");
+static const std::string APP_VERSION("v 2.04");
 static const std::string APP_AUTHOR("Brian Eastwood");
 static const std::string APP_COPYRIGHT("(c) 2007");
 static const std::string APP_WEBSITE("http://www.cs.unc.edu/research/Nano/ImageTracker");
@@ -327,7 +327,7 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     this->dlgApplyTransform = new ApplyTransformDialog(this, -1, wxT("Apply Transform"));
     this->dlgCLGOpticFlow = new CLGOpticFlowDialog(this, -1, wxT("CLG Optic Flow"));
     this->dlgAbout = new AboutDialog(this, -1, wxT("About"));
-    this->dlgAbout->SetMessage(APP_NAME + " " + APP_VERSION + "\n" + APP_AUTHOR + " " + APP_COPYRIGHT + "\n" + APP_WEBSITE);
+	this->dlgAbout->SetMessage(APP_NAME + " " + APP_VERSION + "\n" + APP_AUTHOR + " " + APP_COPYRIGHT); // + "\n" + APP_WEBSITE);
     
     // Set up the interactor style...we like the trackball camera
     vtkInteractorStyleSwitch* inter = vtkInteractorStyleSwitch::New();
