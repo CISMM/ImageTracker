@@ -45,6 +45,7 @@
 				</ul>
 				<li><a href="#versionhistory" class="menu-section">Version History</a></li>
 				<ul>
+					<li><a href="#v2.04" class="menu-subsection">Version 2.04</a></li>
 					<li><a href="#v2.03" class="menu-subsection">Version 2.03</a></li>
 					<li><a href="#v2.02" class="menu-subsection">Version 2.02</a></li>
 					<li><a href="#v2.01" class="menu-subsection">Version 2.01</a></li>
@@ -286,12 +287,12 @@
 	  	  <tr>
 	  	    <td>&nbsp;</td>
 	  	    <td><p><a name="visualization" class="subsection">Visualization</a></p>
-  	        <p>ImageTracker does not provide visualization for computed flow fields (yet). <a href="http://www.paraview.org/HTML/Index.html" target="_blank">ParaView</a>, a free application from <a href="http://www.kitware.com/" target="_blank">Kitware</a>, provides this functionality. Follow the instructions from Kitware on how to install and run ParaView. The following  will help you create a visualization of flow fields with ParaView.</p>
+  	        <p>ImageTracker does not provide visualization for computed flow fields (yet). <a href="http://www.paraview.org/HTML/Index.html" target="_blank">ParaView</a>, a free application from <a href="http://www.kitware.com/" target="_blank">Kitware</a>, provides this functionality. Follow the instructions from Kitware on how to install and run ParaView. The following  will help you create a visualization of flow fields with ParaView 2.4.4.</p>
   	        <p>Select File--&gt;Open Data from the ParaView menu. Navigate to and select the flow field file(s) created by ImageTracker (.mha extension). The default visualization for vector image data is a scalar field of vector magnitude intensities. We will create arrow glyphs that will represent the magnitude and direction of the flow field.</p>
 		<p>Becaues of a disconnect between image and data origin conventions, flow fields computed in ImageTracker are flipped in ParaView. To correct this, choose Filter-&gt;Reflection from the ParaView menu. Configure the reflection filter as follows: Plane = Y; Center = image height-1; Copy Input off. After clicking accept, the flow field image will flip.</p>
   	        <p>Click on the Calculator icon on the ParaView tool bar, or select Filter--&gt;Calculator from the menu. Use the buttons on the calculator parameters tab to create the following expression:</p>
-  	        <p><code>-iHat*ImageFile_0+jHat*ImageFile_1</code></p>
-  	        <p>The ImageFile_x expressions are available under the scalars dropdown box. This expression computes a vector in ParaView from the scalar components stored in the image file. (Note that the negative sign in front of the x-axis expression represents a convention change from that used in ImageTracker.) Once the expression is entered, press the Accept button.</p>
+  	        <p><code>iHat*ImageFile_0-jHat*ImageFile_1</code></p>
+  	        <p>The ImageFile_x expressions are available under the scalars dropdown box. This expression computes a vector in ParaView from the scalar components stored in the image file. (Note that the negative sign in front of the y-axis expression is due to the flipped flow field.) Once the expression is entered, press the Accept button.</p>
   	        <p>Select Filter--&gt;Glyph from the menu. ParaView will automatically select a vector scale factor appropriate to make the glyphs visible. Press the Accept button. </p>
   	        <p>The default colormap in ParaView is a blue-to-red rainbow color scale. To change this, select the Display tab from the Glyph property control, and then press the Edit Color Map button. Click on the preset colormap button (beneath the lock icon), and select either Greyscale or CIELab Blue to Red. These colormaps may be easier to use to interpret vector data. </p>
   	        <p>It may be helpful to view the original image data along with the vector flow fields. To do this, turn off the visualization of the Calculator filter (the arrow glyphs should remain). Select File--&gt;Open Data from the menu, and select the original image file(s). Note that Paraview does not support TIFF images, so you may have to convert files to a supported format, such as PNG. You may also want to adjust the maximum number of glyphs to display, or their scale factor. The image at the right shows a visualization of mucus flow using the steps thus far. </p>  	        </td>
@@ -327,6 +328,16 @@
 	  	    <td>&nbsp;</td>
 	  	    <td><p><a href="#top">Top</a></p></td>
   	      </tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><p><a name="v2.04" class="subsection">Version 2.04</a></p>
+			<p>Features</p>
+			<ul>
+			<li>Minor bug fixes, including file naming and a correction of the sign of computed flow fields</li>
+			</ul></td>
+			<td>&nbsp;</td>
+			<td><p><a href="#top">Top</a></p></td>
+		</tr>
 		<tr>
 			<td>&nbsp;</td>
 			<td>
