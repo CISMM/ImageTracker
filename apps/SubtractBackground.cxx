@@ -1,10 +1,11 @@
 #include <string>
 
+#include "itkCastImageFilter.h"
 #include "itkImage.h"
 #include "itkShiftScaleImageFilter.h"
 #include "itkStatisticsImageFilter.h"
 #include "itkSubtractImageFilter.h"
-#include "itkRescaleIntensityImageFilter.h"
+#include "itkThresholdImageFilter.h"
 
 #include "FilePattern.h"
 #include "FileSet.h"
@@ -22,13 +23,14 @@
  */
 int main(int argc, char** argv)
 {
-    typedef itk::Image< unsigned char, 2 > InputImageType;
+    typedef itk::Image< unsigned short, 2 > InputImageType;
     typedef itk::Image< float, 2 > InternalImageType;
     typedef ImageSetReader< InputImageType, InternalImageType > VideoType;
     typedef NaryMeanImageFilter< InternalImageType, InternalImageType > MeanType;
     typedef itk::SubtractImageFilter< InternalImageType, InternalImageType, InternalImageType  > SubtractType;
     typedef itk::ShiftScaleImageFilter< InternalImageType, InternalImageType > ShiftScaleType;
-    typedef itk::RescaleIntensityImageFilter< InternalImageType > RescaleType;
+    typedef itk::ThresholdImageFilter< InternalImageType > ThresholdType;
+    typedef itk::CastImageFilter< InternalImageType, InputImageType > CastType;
     typedef itk::StatisticsImageFilter< InternalImageType > StatsType;
     
     std::string function("SubtractBackground");
@@ -65,12 +67,16 @@ int main(int argc, char** argv)
     Logger::debug << function << ": Setting up mean subtraction pipeline" << std::endl;
     SubtractType::Pointer subtract = SubtractType::New();
     ShiftScaleType::Pointer shift = ShiftScaleType::New();
-    RescaleType::Pointer threshold = RescaleType::New();
+    ThresholdType::Pointer thresholdMax = ThresholdType::New();
+    ThresholdType::Pointer thresholdMin = ThresholdType::New();
+    CastType::Pointer cast = CastType::New();
     
     subtract->SetInput1(video[0]);
     subtract->SetInput2(mean->GetOutput());
     shift->SetInput(subtract->GetOutput());
-    threshold->SetInput(shift->GetOutput());
+    thresholdMax->SetInput(shift->GetOutput());
+    thresholdMin->SetInput(thresholdMax->GetOutput());
+    cast->SetInput(thresholdMin->GetOutput());
     
     // Compute the shift to apply to the images from the first image
     Logger::debug << function << ": Finding shift amount" << std::endl;
@@ -85,13 +91,19 @@ int main(int argc, char** argv)
     shift->SetShift(meanImg0 - meanSub0);
     
     // Threshold to the output image range 
-    threshold->SetOutputMinimum(std::numeric_limits<InputImageType::PixelType>::min());
-    threshold->SetOutputMaximum(std::numeric_limits<InputImageType::PixelType>::max());
+    // We have to use two thresholds, because we could have overflowed or underflowed values
+    thresholdMax->SetOutsideValue(std::numeric_limits<InputImageType::PixelType>::max());
+    thresholdMax->ThresholdAbove(std::numeric_limits<InputImageType::PixelType>::max());
+    thresholdMin->SetOutsideValue(std::numeric_limits<InputImageType::PixelType>::min());
+    thresholdMin->ThresholdBelow(std::numeric_limits<InputImageType::PixelType>::min());
+    
+    thresholdMin->Update();
+    PrintImageInfo(thresholdMin->GetOutput(), "First frame");
     
     Logger::debug << function << ": Computing adjusted images" << std::endl;
     for (int i = 0; i < video.size(); i++)
     {
         subtract->SetInput1(video[i]);
-        WriteImage<InternalImageType, InputImageType>(threshold->GetOutput(), filesOut[i]);
+        WriteImage(cast->GetOutput(), filesOut[i]);
     }
 }
