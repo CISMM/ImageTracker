@@ -112,7 +112,4 @@ int main(int argc, char** argv)
     rescale->SetOutputMaximum(itk::NumericTraits< InputImageType::PixelType >::max());
     rescale->SetInput(mean->GetOutput());
     WriteImage(rescale->GetOutput(), meanDispFile);
-    
-    video1.LogStatistics();
-    video2.LogStatistics();
 }
