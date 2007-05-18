@@ -275,6 +275,13 @@ InternalImageType::Pointer ComputeTransmissionMedian(VideoType& video, std::stri
         
         medianX->PushBackInput(copyX->GetOutput());
         medianY->PushBackInput(copyY->GetOutput());
+        
+//         if (i == 0)
+//         {
+//             WriteImage(log->GetOutput(), "logimg.mha");
+//             WriteImage(dx->GetOutput(), "logdx.mha");
+//             WriteImage(dy->GetOutput(), "logdy.mha");
+//         }
     }
     
     // Estimate of gradient of logarithm
@@ -286,6 +293,9 @@ InternalImageType::Pointer ComputeTransmissionMedian(VideoType& video, std::stri
     compose->SetInput1(medianX->GetOutput());
     compose->SetInput2(medianY->GetOutput());
     WriteImage(compose->GetOutput(), mglFile);
+    
+//     WriteImage(medianX->GetOutput(), "med-dx-est.mha");
+//     WriteImage(medianY->GetOutput(), "med-dy-est.mha");
     
     // We have to adjust the padded image's index for the Fourier transform to work.
     padRegion = pad->GetOutput()->GetLargestPossibleRegion();
