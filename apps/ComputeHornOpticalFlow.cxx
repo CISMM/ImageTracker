@@ -7,6 +7,7 @@
 #include "HornOpticalFlowPipeline.h"
 #include "ImageSetReader.h"
 #include "Logger.h"
+#include "TextPipelineObserver.h"
 
 /**
  * \brief Compute the optical flow of an image sequence using the Horn & Schunck optical flow algorithm.
@@ -55,6 +56,9 @@ int main(int argc, char** argv)
     pipeline->SetSpatialSigma(sigma);
     pipeline->SetSmoothWeighting(weight);
     pipeline->SetIterations(iterations);
+    
+    TextPipelineObserver::Pointer observer = TextPipelineObserver::New();
+    pipeline->AddObserver(observer.GetPointer());
     
     Logger::debug << function << ": Executing optical flow pipeline" << std::endl;
     pipeline->Update();
