@@ -24,7 +24,7 @@ public:
     itkNewMacro(Self);
     itkTypeMacro(TextPipelineObserver, ItkPipelineObserver);
     
-    virtual void Update(double progress, const std::string& message, bool* abort);
+    virtual bool Update(double progress, const std::string& message);
     
 protected:
     TextPipelineObserver(){}

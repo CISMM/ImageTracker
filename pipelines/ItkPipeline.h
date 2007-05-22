@@ -17,8 +17,8 @@
  * The Update() method executes the pipeline.
  *
  * An Observer pattern provides progress information for pipeline
- * execution.  Subclasses should periodically call Notify() from
- * within the Update() method.
+ * execution.  Subclasses should periodically call NotifyProgress()
+ * from within the Update() method.
  */
 class ItkPipeline :
     public itk::Object
@@ -35,7 +35,13 @@ public:
     
     virtual void AddObserver(ItkPipelineObserver* observer);
     virtual void RemoveObserver(ItkPipelineObserver* observer);
-    virtual bool Notify(double progress, const std::string& message = "");
+    
+    /** 
+     * Notifies all observers of the progress of this ItkPipeline. Returns
+     * true if one of the observers has requested that the pipeline execution
+     * be aborted.
+     */
+    virtual bool NotifyProgress(double progress, const std::string& message = "");
     
 protected:
     ItkPipeline(){}

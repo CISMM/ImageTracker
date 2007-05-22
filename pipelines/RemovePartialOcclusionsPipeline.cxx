@@ -35,6 +35,8 @@ void RemovePartialOcclusionsPipeline::Update()
     Logger::verbose << function << ": Creating input video" << std::endl;
     VideoType video(this->GetInputFiles());
     
+    this->NotifyProgress(0.0, "Initializing");
+    
     // Compute the raw transmission metric
     InternalImageType::Pointer rawTransmit;
     switch (this->GetMetric())
@@ -69,6 +71,10 @@ void RemovePartialOcclusionsPipeline::Update()
     
     // Repair input video
     Logger::verbose << function << ": Repairing input video" << std::endl;
+    
+    double done = 0.75;
+    this->NotifyProgress(done, "Reparing");
+    
     DivideType::Pointer divide = DivideType::New();
     ThresholdType::Pointer clamp = ThresholdType::New();
     CastType::Pointer cast = CastType::New();
@@ -82,10 +88,13 @@ void RemovePartialOcclusionsPipeline::Update()
     divide->SetInput2(scale->GetOutput());
     clamp->SetInput(divide->GetOutput());
     cast->SetInput(clamp->GetOutput());
+    
+    int count = video.size();
     for (unsigned int i = 0; i < video.size() && i < this->GetOutputFiles().size(); i++)
     {
         divide->SetInput1(video[i]);
         WriteImage(cast->GetOutput(), this->GetOutputFiles()[i]);
+        this->NotifyProgress(done + (1.0-done) * (double(i+1)/count));
     }
 }
 
@@ -99,6 +108,8 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
     std::string function("RemovePartialOcclusionsPipeline::ComputeTransmissionMean()");
     Logger::verbose << function << std::endl;
     
+    double contrib = 0.75;
+    
     typedef NonZeroLog10ImageFilter< InternalImageType, InternalImageType > LogType;
     typedef itk::ImageDuplicator< InternalImageType > CopyType;
     typedef NaryMeanImageFilter< InternalImageType, InternalImageType > MeanType;
@@ -110,14 +121,16 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
     MeanType::Pointer mean = MeanType::New();
     
     // Compute mean of logarithm of all images
+    int size = video.size();
     Logger::verbose << function << ": Computing mean of logarithm of all frames" << std::endl;
-    for (int i = 0; i < video.size(); i++)
+    for (int i = 0; i < size; i++)
     {
         log->SetInput(video[i]);
         log->Update();
         copy->SetInputImage(log->GetOutput());
         copy->Update();
         mean->PushBackInput(copy->GetOutput());
+        this->NotifyProgress(contrib * double(i+1)/size);
     }
     
     // Compute exp of mean log image...this is equivalent to the geometric mean of all images
@@ -139,6 +152,8 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
 {
     std::string function("RemovePartialOcclusionsPipeline::ComputeTransmissionMedian()");
     Logger::verbose << function << std::endl;
+    
+    double contribDeriv = 0.50, contribIntegrate = 0.25;
     
     // Typedefs
     typedef NonZeroLog10ImageFilter< InternalImageType, InternalImageType > LogType;
@@ -193,7 +208,8 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
     
     // Compute average gradient of log intensity for all images
     Logger::verbose << function << ": Computing derivative transmission metric" << std::endl;
-    for (unsigned int i = 0; i < video.size(); i++)
+    unsigned int size = video.size();
+    for (unsigned int i = 0; i < size; i++)
     {
         // logarithm
         log->SetInput(video[i]);
@@ -210,6 +226,7 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
         
         medianX->PushBackInput(copyX->GetOutput());
         medianY->PushBackInput(copyY->GetOutput());
+        this->NotifyProgress(contribDeriv * double(i+1)/size);
     }
     
     // We have to adjust the padded image's index for the Fourier transform to work.
@@ -223,6 +240,8 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
     // Re-adjust padded regions
     medianX->GetOutput()->SetRegions(padRegion);
     medianY->GetOutput()->SetRegions(padRegion);
+    
+    this->NotifyProgress(contribDeriv + contribIntegrate * 0.5);
     
     surface->SetInputDx(medianX->GetOutput());
     surface->SetInputDy(medianY->GetOutput());
@@ -241,5 +260,8 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
     PowerType::Pointer exp = PowerType::New();
     exp->SetInput(roi->GetOutput());
     exp->Update();
+    
+    this->NotifyProgress(contribDeriv + contribIntegrate);
+    
     return exp->GetOutput();
 }

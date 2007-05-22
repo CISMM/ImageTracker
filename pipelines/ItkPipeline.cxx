@@ -12,7 +12,7 @@ void ItkPipeline::RemoveObserver(ItkPipelineObserver* observer)
     this->observers.remove(observer);
 }
 
-bool ItkPipeline::Notify(double progress, const std::string& message)
+bool ItkPipeline::NotifyProgress(double progress, const std::string& message)
 {
     bool abort = false, abortIt = false;
     
@@ -20,7 +20,8 @@ bool ItkPipeline::Notify(double progress, const std::string& message)
     ObserverList::const_iterator it;
     for (it = this->observers.begin(); it != this->observers.end(); ++it)
     {
-        (*it)->Update(progress, message, &abortIt);
+        if (*it) // check if the object is still there
+            abortIt = (*it)->Update(progress, message);
         // determine if any observer has requested an abort
         abort = (abort || abortIt);
     }

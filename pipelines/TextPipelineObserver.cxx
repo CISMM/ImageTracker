@@ -2,12 +2,13 @@
 
 #include "Logger.h"
 
-void TextPipelineObserver::Update(double progress, const std::string& message, bool* abort)
+bool TextPipelineObserver::Update(double progress, const std::string& message)
 {
     std::string function("TextPipelineObserver::Update");
     Logger::info << 
             function << ": " << 
             (100*progress) << "%, " << 
             message << std::endl;
-    *abort = false;
+    
+    return false;
 }

@@ -26,10 +26,9 @@ public:
     
     /**
      * Update this observer with the progress from the ItkPipeline under observation.
-     * If the abort flag is true after Update(), the ItkPipeline should halt at an
-     * opportune moment.
+     * If Update() returns true, the ItkPipeline should halt at an opportune moment.
      */
-    virtual void Update(double progress, const std::string& message, bool* abort) = 0;
+    virtual bool Update(double progress, const std::string& message) = 0;
     
     itkGetMacro(Progress, double);
 

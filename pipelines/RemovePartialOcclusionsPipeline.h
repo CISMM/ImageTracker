@@ -7,6 +7,7 @@
 
 #include "FileSet.h"
 #include "ImageSetReader.h"
+#include "ItkPipeline.h"
 
 enum MetricType 
 {
@@ -19,17 +20,18 @@ enum MetricType
  * \brief Computes and removes the constant occlusions from a bright-field microscopy image sequence.
  */
 class RemovePartialOcclusionsPipeline :
-    public itk::Object
+    public ItkPipeline
 {
 public:
 
     // Standard ITK typedefs
     typedef RemovePartialOcclusionsPipeline Self;
-    typedef itk::Object Superclass;
+    typedef ItkPipeline Superclass;
     typedef itk::SmartPointer< Self > Pointer;
     typedef itk::SmartPointer< const Self > ConstPointer;
     
     itkNewMacro(Self);
+    itkTypeMacro(RemovePartialOcclusionsPipeline, ItkPipeline);
     
     // Typedefs
     typedef itk::Image< unsigned short, 2 > InputImageType;
@@ -68,7 +70,7 @@ public:
     /**
      * Compute and remove the constant occlusions from the image sequence.
      */
-    void Update();
+    virtual void Update();
 
 protected:
     RemovePartialOcclusionsPipeline()

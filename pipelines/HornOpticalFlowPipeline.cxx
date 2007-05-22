@@ -18,7 +18,7 @@ void HornOpticalFlowPipeline::Update()
         return;
     }
     
-    bool abort = this->Notify(0.0, "Initializing");
+    bool abort = this->NotifyProgress(0.0, "Initializing");
     
     Logger::debug << function << ": Setting up flow computation" << std::endl;
     typedef HornOpticalFlowImageFilter< InternalImageType, InternalImageType, float > FlowFilter;
@@ -40,6 +40,6 @@ void HornOpticalFlowPipeline::Update()
         flow->SetInput2(dynamic_cast< InternalImageType* >(this->input->GetImage(i+1)));
         flow->Update();
         WriteImage(flow->GetOutput(), this->GetOutputFiles()[i]);
-        abort = this->Notify(((double)(i+1)/count), "Computing flow");
+        abort = this->NotifyProgress(((double)(i+1)/count), "Computing flow");
     }
 }

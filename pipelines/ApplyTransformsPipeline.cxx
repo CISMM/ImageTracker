@@ -27,7 +27,7 @@ void ApplyTransformsPipeline::Update()
     typedef MultiResolutionRegistrationPipeline::TransformType TransformType;
     typedef std::vector< TransformType::Pointer > TransformVector;
     
-    bool abort = this->Notify(0.0, "Loading transforms");
+    bool abort = this->NotifyProgress(0.0, "Loading transforms");
     
     Logger::verbose << function << ": Loading the transforms from transform file" << std::endl;
     TransformVector *pTransforms = TransformGroup::LoadTransforms(this->m_TransformFile);
@@ -80,7 +80,7 @@ void ApplyTransformsPipeline::Update()
         
         // Write the image
         WriteImage(cast->GetOutput(), this->outputFiles[index]);
-        abort = this->Notify(((double) (index+1)/count));
+        abort = this->NotifyProgress(((double) (index+1)/count));
     }
     
     Logger::verbose << function << ": Cleaning up dumb pointers" << std::endl;
