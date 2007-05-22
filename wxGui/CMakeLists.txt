@@ -26,6 +26,7 @@ SET (Gui_SRCS
     RegistrationDesign_wdr.cpp                  RegistrationDesign_wdr.h
     RemoveOcclusionsDialog.cpp                  RemoveOcclusionsDialog.h
     ScalarImageItkVtkPipeline.cxx               ScalarImageItkVtkPipeline.h
+    WxPipelineObserver.cxx                      WxPipelineObserver.h
     wxCore_wdr.cpp                              wxCore_wdr.h
     wxGui.rc
 )

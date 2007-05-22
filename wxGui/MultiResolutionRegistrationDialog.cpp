@@ -8,6 +8,7 @@
 #include "FileSet.h"
 #include "Logger.h"
 #include "wxUtils.h"
+#include "WxPipelineObserver.h"
 
 bool MultiResolutionRegistrationDialog::TransferDataToWindow()
 {
@@ -67,7 +68,10 @@ bool MultiResolutionRegistrationDialog::TransferDataFromWindow()
     this->pipeline->SetTransformFile(
             wx2std(this->textDirectory->GetValue() + this->textTransform->GetValue()));
     
+    WxPipelineObserver::Pointer progress = WxPipelineObserver::New();
+    this->pipeline->AddObserver(progress);
     this->pipeline->Update();
+    this->pipeline->RemoveObserver(progress);
     
     // Add the result to the controller, if the user wants
     if (this->checkOpenOutput->IsChecked() && this->controller.IsNotNull())

@@ -5,6 +5,7 @@
 #include "Logger.h"
 #include "MathUtils.h"
 #include "wxUtils.h"
+#include "WxPipelineObserver.h"
 
 bool CLGOpticFlowDialog::TransferDataToWindow()
 {
@@ -31,12 +32,16 @@ bool CLGOpticFlowDialog::TransferDataFromWindow()
     outputFiles.SetDirectory(wx2std(this->textDirectory->GetValue()));
     this->pipeline->SetOutputFiles(outputFiles);
     
+    // Attache a progress monitor and run pipeline
+    WxPipelineObserver::Pointer progress = WxPipelineObserver::New();
+    this->pipeline->AddObserver(progress);
     this->pipeline->Update();
+    this->pipeline->RemoveObserver(progress);
     
     //TODO: When we support flow field visualization, load result here.
     
     this->ViewPreview(false);
-	this->Show(false);
+    this->Show(false);
     return true;
 }
 

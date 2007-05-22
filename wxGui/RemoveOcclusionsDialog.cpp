@@ -4,6 +4,7 @@
 
 #include "FileSet.h"
 #include "wxUtils.h"
+#include "WxPipelineObserver.h"
 
 /**
  * Called by wxWidgets when this dialog is displayed. Sets up the
@@ -57,7 +58,10 @@ bool RemoveOcclusionsDialog::TransferDataFromWindow()
     this->pipeline->SetTransmitPercentile(this->slidePercentile->GetValue());
     this->pipeline->SetFourierPadding(this->slidePadding->GetValue());
     
+    WxPipelineObserver::Pointer progress = WxPipelineObserver::New();
+    this->pipeline->AddObserver(progress);
     this->pipeline->Update();
+    this->pipeline->RemoveObserver(progress);
     
     if (this->checkOpenOutput->IsChecked() && this->controller.IsNotNull())
     {

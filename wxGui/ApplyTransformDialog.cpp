@@ -5,6 +5,7 @@
 #include "FileSet.h"
 #include "Logger.h"
 #include "wxUtils.h"
+#include "WxPipelineObserver.h"
 
 bool ApplyTransformDialog::TransferDataToWindow()
 {
@@ -27,8 +28,13 @@ bool ApplyTransformDialog::TransferDataFromWindow()
     outputFiles.SetDirectory(wx2std(this->textDirectory->GetValue()));
     this->pipeline->SetOutputFiles(outputFiles);
     
+    // Attach an observer to the pipeline
+    WxPipelineObserver::Pointer progress = WxPipelineObserver::New();
+    this->pipeline->AddObserver(progress);
+    
     // Execute the pipeline
     this->pipeline->Update();
+    this->pipeline->RemoveObserver(progress);
     
     // Create a result data source, if desired
     if (this->checkOpenOutput->IsChecked() && this->controller.IsNotNull())
@@ -39,7 +45,7 @@ bool ApplyTransformDialog::TransferDataFromWindow()
         this->controller->AddDataSource(ds);
     }
     
-	this->Show(false);
+    this->Show(false);
     return true;
 }
 
