@@ -50,7 +50,6 @@ SUBDIRS (common image filters pipelines)
 #######################################
 SET (Algorithms_SRCS
     BlurFilterSchedule.cxx                      BlurFilterSchedule.h
-    CLGOpticFlowPipeline.cxx                    CLGOpticFlowPipeline.h
     DemonsPipeline.cxx                          DemonsPipeline.h
                                                 Feature.h
     FeatureTrackingPipeline.cxx                 FeatureTrackingPipeline.h
@@ -61,7 +60,6 @@ SET (Algorithms_SRCS
     MultiRegionRegistration.cxx                 MultiRegionRegistration.h
     MultiRegionRegistrationPipeline.cxx         MultiRegionRegistrationPipeline.h
                                                 MultiResolutionRegistration.h
-    MultiResolutionRegistrationPipeline.cxx	MultiResolutionRegistrationPipeline.h
     RegistrationOutput.cxx                      RegistrationOutput.h
 )
 
