@@ -8,6 +8,7 @@
 #include "CommonTypes.h"
 #include "FileSet.h"
 #include "ImageSetReader.h"
+#include "ItkPipeline.h"
 
 /**
  * \class ApplyTransformsPipeline
@@ -18,12 +19,12 @@
  * transforms.
  */
 class ApplyTransformsPipeline :
-    public itk::Object
+    public ItkPipeline
 {
 public:
     // Standard itk typedefs
     typedef ApplyTransformsPipeline Self;
-    typedef itk::Object Superclass;
+    typedef ItkPipeline Superclass;
     typedef itk::SmartPointer< Self > Pointer;
     typedef itk::SmartPointer< const Self > ConstPointer;
     itkNewMacro(Self);
@@ -35,7 +36,7 @@ public:
     const FileSet& GetOutputFiles() { return this->outputFiles; }
     void SetOutputFiles(const FileSet& files) { this->outputFiles = files; }
 
-    void Update();
+    virtual void Update();
     
     typedef CommonTypes::InputImageType WriteImageType;
     typedef CommonTypes::InternalImageType InternalImageType;

@@ -7,19 +7,21 @@
 #include "CommonTypes.h"
 #include "FileSet.h"
 #include "ImageSetReader.h"
+#include "ItkPipeline.h"
 #include "Logger.h"
 
 class HornOpticalFlowPipeline :
-    public itk::Object
+    public ItkPipeline
 {
 public:
     // Common itk typedefs
     typedef HornOpticalFlowPipeline Self;
-    typedef itk::Object Superclass;
+    typedef ItkPipeline Superclass;
     typedef itk::SmartPointer< Self > Pointer;
     typedef itk::SmartPointer< const Self > ConstPointer;
+    
     itkNewMacro(Self);
-    itkTypeMacro(HornOpticalFlowPipeline, itk::Object);
+    itkTypeMacro(HornOpticalFlowPipeline, ItkPipeline);
     
     // Image typedefs
     typedef CommonTypes::InternalImageType InternalImageType;
@@ -39,7 +41,7 @@ public:
     
     void SetInput(ImageSetReaderBase* input) { this->input = input; }
     
-    void Update();
+    virtual void Update();
     
 protected:
     HornOpticalFlowPipeline()

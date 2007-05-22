@@ -7,7 +7,10 @@ PROJECT (Pipelines)
 SET (Pipelines_SRCS
     ApplyTransformsPipeline.cxx             ApplyTransformsPipeline.h
     HornOpticalFlowPipeline.cxx             HornOpticalFlowPipeline.h
+    ItkPipeline.cxx                         ItkPipeline.h
+                                            ItkPipelineObserver.h
     RemovePartialOcclusionsPipeline.cxx     RemovePartialOcclusionsPipeline.h
+    TextPipelineObserver.cxx                TextPipelineObserver.h
 )
 
 ADD_LIBRARY (ITPipelines ${Pipelines_SRCS})
