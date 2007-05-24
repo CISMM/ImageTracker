@@ -31,11 +31,11 @@ MultiResolutionRegistrationPipeline::MultiResolutionRegistrationPipeline()
 
 void MultiResolutionRegistrationPipeline::SetInput(ImageSetReaderBase* input)
 {
-	this->inputReader = input;
+	this->input = input;
 
-	this->resample->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(0)));
-        this->threshold[0]->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(0)));
-        this->threshold[1]->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(1)));
+	this->resample->SetInput(dynamic_cast<ImageTypeF2*>(this->input->GetImage(0)));
+        this->threshold[0]->SetInput(dynamic_cast<ImageTypeF2*>(this->input->GetImage(0)));
+        this->threshold[1]->SetInput(dynamic_cast<ImageTypeF2*>(this->input->GetImage(1)));
 
 	this->smooth->SetInput(this->threshold[0]->GetOutput());
 }
@@ -171,7 +171,7 @@ void MultiResolutionRegistrationPipeline::Update()
 
     // Start at the beginning of the input images
     // Write the first image, un-changed
-    this->caster->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(0)));
+    this->caster->SetInput(dynamic_cast<ImageTypeF2*>(this->input->GetImage(0)));
     WriteImage(this->caster->GetOutput(), this->outputFiles[0]);
 
     // Connect caster to the resampling pipeline
@@ -181,13 +181,13 @@ void MultiResolutionRegistrationPipeline::Update()
     
     // Register every image with the previous image
     for (unsigned int i = 0; 
-            i < this->inputReader->size()-1 && 
+            i < this->input->size()-1 && 
             i < this->outputFiles.size()-1 &&
             !abort; 
             i++)
     {
-        ImageType::Pointer fixed = dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(i));
-        ImageType::Pointer moving = dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(i+1));
+        ImageType::Pointer fixed = dynamic_cast<ImageTypeF2*>(this->input->GetImage(i));
+        ImageType::Pointer moving = dynamic_cast<ImageTypeF2*>(this->input->GetImage(i+1));
         
         // Update pipeline inputs
         this->threshold[0]->SetInput(fixed);
@@ -222,8 +222,8 @@ void MultiResolutionRegistrationPipeline::Update()
     }
 
     // Reset image
-    this->resample->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(0)));
-    this->threshold[0]->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(0)));
-    this->threshold[1]->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(1)));
+    this->resample->SetInput(dynamic_cast<ImageTypeF2*>(this->input->GetImage(0)));
+    this->threshold[0]->SetInput(dynamic_cast<ImageTypeF2*>(this->input->GetImage(0)));
+    this->threshold[1]->SetInput(dynamic_cast<ImageTypeF2*>(this->input->GetImage(1)));
     this->smooth->SetInput(this->threshold[0]->GetOutput());
 }

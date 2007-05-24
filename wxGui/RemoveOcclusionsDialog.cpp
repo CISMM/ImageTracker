@@ -41,7 +41,7 @@ bool RemoveOcclusionsDialog::TransferDataToWindow()
  */
 bool RemoveOcclusionsDialog::TransferDataFromWindow()
 {
-    this->pipeline->SetInputFiles(this->input->GetFiles());
+    this->pipeline->SetInput(this->input->GetImages());
     
     FileSet outFiles(this->input->GetFiles(), wx2std(this->textPrefix->GetValue()));
     outFiles.SetDirectory(wx2std(this->textDirectory->GetValue()));

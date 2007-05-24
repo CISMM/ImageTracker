@@ -32,9 +32,9 @@ public:
     itkGetMacro(TransformFile, std::string);
     itkSetMacro(TransformFile, std::string);
     
-    void SetInput(ImageSetReaderBase* input) { this->input = input; }
-    const FileSet& GetOutputFiles() { return this->outputFiles; }
-    void SetOutputFiles(const FileSet& files) { this->outputFiles = files; }
+    //void SetInput(ImageSetReaderBase* input) { this->input = input; }
+    //const FileSet& GetOutputFiles() { return this->outputFiles; }
+    //void SetOutputFiles(const FileSet& files) { this->outputFiles = files; }
 
     virtual void Update();
     
@@ -50,7 +50,7 @@ private:
     ApplyTransformsPipeline(const Self& other);
     void operator=(const Self& other);
     
-    ImageSetReaderBase* input;
-    FileSet outputFiles;
+    //ImageSetReaderBase* input;
+    //FileSet outputFiles;
     std::string m_TransformFile;
 };

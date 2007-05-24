@@ -24,7 +24,8 @@ void RemovePartialOcclusionsPipeline::Update()
     std::string function("RemovePartialOcclusionsPipeline::Update()");
     
     // Check inputs
-    if (this->inputFiles.size() == 0 ||
+    if (this->input == NULL ||
+        this->input->size() == 0 ||
         this->outputFiles.size() == 0)
     {
         Logger::error << function << ": Input or output files not set...aborting" << std::endl;
@@ -33,7 +34,7 @@ void RemovePartialOcclusionsPipeline::Update()
     
     // Video I/O components
     Logger::verbose << function << ": Creating input video" << std::endl;
-    VideoType video(this->GetInputFiles());
+    // VideoType video(this->GetInputFiles());
     
     this->NotifyProgress(0.0, "Initializing");
     
@@ -42,11 +43,11 @@ void RemovePartialOcclusionsPipeline::Update()
     switch (this->GetMetric())
     {
     case Median:
-        rawTransmit = this->ComputeTransmissionMedian(video);
+        rawTransmit = this->ComputeTransmissionMedian(this->input);
         break;
     case Mean:
     default:
-        rawTransmit = this->ComputeTransmissionMean(video);
+        rawTransmit = this->ComputeTransmissionMean(this->input);
     }
     
 //     PrintImageInfo<InternalImageType>(rawTransmit, "Raw transmission");
@@ -89,10 +90,10 @@ void RemovePartialOcclusionsPipeline::Update()
     clamp->SetInput(divide->GetOutput());
     cast->SetInput(clamp->GetOutput());
     
-    int count = video.size();
-    for (unsigned int i = 0; i < video.size() && i < this->GetOutputFiles().size(); i++)
+    int count = this->input->size();
+    for (unsigned int i = 0; i < this->input->size() && i < this->GetOutputFiles().size(); i++)
     {
-        divide->SetInput1(video[i]);
+        divide->SetInput1(dynamic_cast< InternalImageType* >(this->input->GetImage(i)));
         WriteImage(cast->GetOutput(), this->GetOutputFiles()[i]);
         this->NotifyProgress(done + (1.0-done) * (double(i+1)/count));
     }
@@ -121,11 +122,11 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
     MeanType::Pointer mean = MeanType::New();
     
     // Compute mean of logarithm of all images
-    int size = video.size();
+    int size = video->size();
     Logger::verbose << function << ": Computing mean of logarithm of all frames" << std::endl;
     for (int i = 0; i < size; i++)
     {
-        log->SetInput(video[i]);
+        log->SetInput(dynamic_cast< InternalImageType* >(video->GetImage(i)));
         log->Update();
         copy->SetInputImage(log->GetOutput());
         copy->Update();
@@ -183,7 +184,7 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
     // of the input images in each dimension.  We'll also need a zeroing index
     // and we'll need to keep track of the offset to get back to the original
     // image region.
-    InternalImageType::RegionType padRegion = video[0]->GetLargestPossibleRegion();
+    InternalImageType::RegionType padRegion = dynamic_cast< InternalImageType* >(video->GetImage(0))->GetLargestPossibleRegion();
     InternalImageType::IndexType zeroIndex;
     InternalImageType::IndexType padOffset;
     
@@ -208,11 +209,11 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
     
     // Compute average gradient of log intensity for all images
     Logger::verbose << function << ": Computing derivative transmission metric" << std::endl;
-    unsigned int size = video.size();
+    unsigned int size = video->size();
     for (unsigned int i = 0; i < size; i++)
     {
         // logarithm
-        log->SetInput(video[i]);
+        log->SetInput(dynamic_cast< InternalImageType* >(video->GetImage(i)));
         logStat->Update();
         pad->SetBoundaryValue(logStat->GetMean());
         
@@ -251,7 +252,7 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
     // of the image...so the original input image region, with an offset, should extract the 
     // part of the surface we want.
     ROIType::Pointer roi = ROIType::New();
-    padRegion = video[0]->GetLargestPossibleRegion();
+    padRegion = dynamic_cast< InternalImageType* >(video->GetImage(0))->GetLargestPossibleRegion();
     padRegion.SetIndex(padOffset);
     roi->SetRegionOfInterest(padRegion);
     roi->SetInput(surface->GetOutput());

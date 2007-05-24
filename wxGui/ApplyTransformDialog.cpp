@@ -4,6 +4,7 @@
         
 #include "FileSet.h"
 #include "Logger.h"
+#include "PipelineExecutor.h"
 #include "wxUtils.h"
 #include "WxPipelineObserver.h"
 
@@ -18,7 +19,9 @@ bool ApplyTransformDialog::TransferDataToWindow()
 
 bool ApplyTransformDialog::TransferDataFromWindow()
 {
-    Logger::verbose << "ApplyTransformDialog::TransferDataFromWindow()" << std::endl;
+    std::string function("ApplyTransformDialog::TransferDataFromWindow");
+    Logger::verbose << function << ": entering" << std::endl;
+    
     // Set up pipeline paramters
     this->pipeline->SetInput(this->input->GetImages());
     this->pipeline->SetTransformFile(wx2std(this->textTransform->GetValue()));
@@ -28,22 +31,35 @@ bool ApplyTransformDialog::TransferDataFromWindow()
     outputFiles.SetDirectory(wx2std(this->textDirectory->GetValue()));
     this->pipeline->SetOutputFiles(outputFiles);
     
-    // Attach an observer to the pipeline
-    WxPipelineObserver::Pointer progress = WxPipelineObserver::New();
-    this->pipeline->AddObserver(progress);
-    
-    // Execute the pipeline
-    this->pipeline->Update();
-    this->pipeline->RemoveObserver(progress);
+    // Create and launch a pipeline executor (uses another thread)
+    PipelineExecutor* exec = new PipelineExecutor(this->pipeline);
+    exec->SetOpenFiles(this->checkOpenOutput->IsChecked(), this->controller);
+    if (exec->Create() == wxTHREAD_NO_ERROR)
+    {
+        exec->Run();
+    }
+    else
+    {
+        Logger::warning << function << ": Unable able to create threaded pipeline execution object" << std::endl;
+        delete exec;
+    }
+
+    //// Attach an observer to the pipeline
+    //WxPipelineObserver::Pointer progress = WxPipelineObserver::New();
+    //this->pipeline->AddObserver(progress);
+    //
+    //// Execute the pipeline
+    //this->pipeline->Update();
+    //this->pipeline->RemoveObserver(progress);
     
     // Create a result data source, if desired
-    if (this->checkOpenOutput->IsChecked() && this->controller.IsNotNull())
-    {
-        DataSource::Pointer ds = DataSource::New();
-        ds->SetName("trans " + this->input->GetName());
-        ds->SetFiles(this->pipeline->GetOutputFiles());
-        this->controller->AddDataSource(ds);
-    }
+    //if (this->checkOpenOutput->IsChecked() && this->controller.IsNotNull())
+    //{
+    //    DataSource::Pointer ds = DataSource::New();
+    //    ds->SetName("trans " + this->input->GetName());
+    //    ds->SetFiles(this->pipeline->GetOutputFiles());
+    //    this->controller->AddDataSource(ds);
+    //}
     
     this->Show(false);
     return true;
@@ -100,7 +116,7 @@ END_EVENT_TABLE();
 void ApplyTransformDialog::OnBrowseTransform(wxCommandEvent &event)
 {
     wxFileDialog open(this, wxT("Choose a transform file"), wxT(""), wxT(""), wxT("All Files|*.*|Text Files|*.txt"));
-    if (open.ShowModal() == true)
+    if (open.ShowModal() == wxID_OK)
     {
         this->textTransform->SetValue(open.GetFilename());
     }

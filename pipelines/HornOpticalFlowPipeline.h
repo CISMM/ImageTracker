@@ -36,10 +36,9 @@ public:
     itkGetMacro(SmoothWeighting, float);
     itkSetMacro(SmoothWeighting, float);
             
-    const FileSet& GetOutputFiles() { return this->outputFiles; }
-    void SetOutputFiles(const FileSet& files) { this->outputFiles = files; }
-    
-    void SetInput(ImageSetReaderBase* input) { this->input = input; }
+    //const FileSet& GetOutputFiles() { return this->outputFiles; }
+    //void SetOutputFiles(const FileSet& files) { this->outputFiles = files; }
+    //void SetInput(ImageSetReaderBase* input) { this->input = input; }
     
     virtual void Update();
     
@@ -56,8 +55,8 @@ private:
     HornOpticalFlowPipeline(const Self& other);
     void operator=(const Self& other);
     
-    ImageSetReaderBase* input;
-    FileSet outputFiles;
+    //ImageSetReaderBase* input;
+    //FileSet outputFiles;
     
     unsigned int m_Iterations;
     float m_SpatialSigma;

@@ -34,7 +34,7 @@ public:
     double GetRelaxation() { return this->flowFilter->GetRelaxation(); }
     unsigned int GetIterations() { return this->flowFilter->GetIterations(); }
 
-    const FileSet& GetOutputFiles() { return this->outputFiles; }
+    //const FileSet& GetOutputFiles() { return this->outputFiles; }
     
     ImageType::Pointer GetPreviewImage();
 
@@ -43,8 +43,8 @@ public:
     void SetRelaxation(double relax);
     void SetIterations(unsigned int iter);
     
-    void SetInput(ReaderType input);
-    void SetOutputFiles(const FileSet& dest);
+    virtual void SetInput(ReaderType input);
+    virtual void SetOutputFiles(const FileSet& dest);
 
     bool UpdateOne();
     void UpdateAll();
@@ -59,8 +59,7 @@ private:
 
     bool init;
     unsigned int index;
-    FileSet outputFiles;
-    ReaderType inputReader;
+    //FileSet outputFiles;
     
     FlowFilterType::Pointer flowFilter;
     SmoothFilterType::Pointer smooth;

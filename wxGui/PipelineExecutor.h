@@ -3,6 +3,7 @@
 #include <wx/wx.h>
 #include <wx/thread.h>
 
+#include "ImageTrackerController.h"
 #include "ItkPipeline.h"
 #include "WxPipelineObserver.h"
 
@@ -29,6 +30,8 @@ public:
      * execution.
      */
     virtual ExitCode Entry();
+
+	void SetOpenFiles(bool open, ImageTrackerController* controller = NULL);
     
 protected:
     // The pipeline to execute on this thread.
@@ -38,5 +41,6 @@ protected:
     WxPipelineObserver::Pointer progress;
     
 private:
-    
+    bool openResult;
+	ImageTrackerController* controller;
 };

@@ -89,13 +89,14 @@ bool MultiResolutionRegistrationDialog::TransferDataFromWindow()
     }
     
     // Add the result to the controller, if the user wants
-    if (this->checkOpenOutput->IsChecked() && this->controller.IsNotNull())
-    {
-        DataSource::Pointer data = DataSource::New();
-        data->SetName("reg " + this->input->GetName());
-        data->SetFiles(this->pipeline->GetOutputFiles());
-        this->controller->AddDataSource(data);
-    }
+	// Todo: need to figure out another way to load the data....
+    //if (this->checkOpenOutput->IsChecked() && this->controller.IsNotNull())
+    //{
+    //    DataSource::Pointer data = DataSource::New();
+    //    data->SetName("reg " + this->input->GetName());
+    //    data->SetFiles(this->pipeline->GetOutputFiles());
+    //    this->controller->AddDataSource(data);
+    //}
     
     this->ViewPreview(false);
     this->Show(false);

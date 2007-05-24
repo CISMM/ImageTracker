@@ -38,7 +38,7 @@ public:
     typedef itk::Image< float, 2 > InternalImageType;
     typedef itk::Image< unsigned short, 2 > OutputImageType;
     typedef InputImageType::PixelType PixelType;
-    typedef ImageSetReader< InputImageType, InternalImageType > VideoType;
+    typedef ImageSetReaderBase* VideoType;
     
     itkStaticConstMacro(ImageDimension, unsigned int,
                         InputImageType::ImageDimension);
@@ -56,16 +56,16 @@ public:
     itkSetMacro(TransmissionFile, std::string);
     
     const FileSet& GetInputFiles() const
-    { return this->inputFiles; }
+    { return this->input->GetFiles(); }
 
-    void SetInputFiles(const FileSet& files)
-    { this->inputFiles = files; }
-    
-    const FileSet& GetOutputFiles() const
-    { return this->outputFiles; }
+    //void SetInputFiles(const FileSet& files)
+    //{ this->inputFiles = files; }
+    //
+    //const FileSet& GetOutputFiles() const
+    //{ return this->outputFiles; }
 
-    void SetOutputFiles(const FileSet& files)
-    { this->outputFiles = files; }
+    //void SetOutputFiles(const FileSet& files)
+    //{ this->outputFiles = files; }
     
     /**
      * Compute and remove the constant occlusions from the image sequence.
@@ -74,9 +74,7 @@ public:
 
 protected:
     RemovePartialOcclusionsPipeline()
-    :   inputFiles(),
-        outputFiles(),
-        m_TransmissionFile(""),
+    :   m_TransmissionFile(""),
         m_TransmitPercentile(90),
         m_FourierPadding(0.5),
         m_Metric(Median)
@@ -93,8 +91,6 @@ private:
     void operator=(const Self& other);
     
     // Attributes
-    FileSet inputFiles;
-    FileSet outputFiles;
     std::string m_TransmissionFile;
     int m_TransmitPercentile;
     double m_FourierPadding;

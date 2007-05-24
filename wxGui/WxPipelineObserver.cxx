@@ -8,7 +8,7 @@ bool WxPipelineObserver::Update(double progress, const std::string& message)
     bool notAbort = true;
     if (this->dlgProgress)
     {
-        int prog = (int) (progress * 100);
+        int prog = (int) (progress * 90);
         notAbort = this->dlgProgress->Update(prog, std2wx(message));
         Logger::verbose << "WxPipelineObserver::Update: " << prog << ", " << message << ", " << 
                 (notAbort ? "continuing" : "aborting") << std::endl;

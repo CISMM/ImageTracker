@@ -28,3 +28,23 @@ bool ItkPipeline::NotifyProgress(double progress, const std::string& message)
     
     return abort;
 }
+
+ImageSetReaderBase* ItkPipeline::GetInput()
+{
+    return this->input;
+}
+
+void ItkPipeline::SetInput(ImageSetReaderBase *input)
+{
+    this->input = input;
+}
+
+const FileSet& ItkPipeline::GetOutputFiles()
+{
+    return this->outputFiles;
+}
+
+void ItkPipeline::SetOutputFiles(const FileSet &files)
+{
+    this->outputFiles = files;
+}

@@ -5,6 +5,7 @@
 
 #include "itkObject.h"
 
+#include "ImageSetReader.h"
 #include "ItkPipelineObserver.h"
 
 /**
@@ -42,12 +43,20 @@ public:
      * be aborted.
      */
     virtual bool NotifyProgress(double progress, const std::string& message = "");
+
+    virtual void SetInput(ImageSetReaderBase* input);
+    virtual ImageSetReaderBase* GetInput();
+
+    virtual void SetOutputFiles(const FileSet& files);
+    virtual const FileSet& GetOutputFiles();
     
 protected:
-    ItkPipeline(){}
+    ItkPipeline() : outputFiles() {}
     virtual ~ItkPipeline(){}
     
     ObserverList observers;
+    ImageSetReaderBase* input;
+    FileSet outputFiles;
     
 private:
     // not implemented

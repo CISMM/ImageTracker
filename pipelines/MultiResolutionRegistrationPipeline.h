@@ -54,16 +54,16 @@ public:
 
 	ImageType::PixelType GetUpperThreshold();
 	ImageType::PixelType GetLowerThreshold();
-        void SetUpperThreshold(ImageType::PixelType threshold);
-        void SetLowerThreshold(ImageType::PixelType threshold);
+    void SetUpperThreshold(ImageType::PixelType threshold);
+    void SetLowerThreshold(ImageType::PixelType threshold);
 
-        void SetPreviewShrinkFactor(unsigned int factor);
+    void SetPreviewShrinkFactor(unsigned int factor);
 	void SetShrinkFactors(unsigned int min, unsigned int max);
         
-        unsigned int GetStartingShrinkFactor();
-        unsigned int GetNumberOfLevels();
-        void SetStartingShrinkFactor(unsigned int factor);
-	void SetNumberOfLevels(unsigned int levels);
+    unsigned int GetStartingShrinkFactor();
+    unsigned int GetNumberOfLevels();
+    void SetStartingShrinkFactor(unsigned int factor);
+    void SetNumberOfLevels(unsigned int levels);
 
 	double GetOptimizerInitialMaximumStepLength() 
 	{ return this->registration->GetOptimizerInitialMaximumStepLength(); }
@@ -89,10 +89,10 @@ public:
 	void SetOptimizerNumberOfIterations(unsigned long iters)
 	{ this->registration->SetOptimizerNumberOfIterations(iters); }
 	
-	const FileSet& GetOutputFiles() { return this->outputFiles; }
-	void SetOutputFiles(const FileSet& files) { this->outputFiles = files; }
+    //const FileSet& GetOutputFiles() { return this->outputFiles; }
+    //void SetOutputFiles(const FileSet& files) { this->outputFiles = files; }
+    virtual void SetInput(ImageSetReaderBase* input);
 
-        void SetInput(ImageSetReaderBase* input);
 	ImageType::Pointer GetPreviewImage();
 
 	itkGetMacro(TransformFile, std::string);
@@ -103,15 +103,13 @@ protected:
 	~MultiResolutionRegistrationPipeline(){}
 
 private:
-	FileSet outputFiles;
+	//FileSet outputFiles;
 	std::string m_TransformFile;
-        bool m_ThresholdBetween;
+    bool m_ThresholdBetween;
 
 	ThresholdType::Pointer threshold[2];
 	RegistrationType::Pointer registration;
 	ResampleType::Pointer resample;
 	CasterType::Pointer caster;
 	SmoothType::Pointer smooth;
-
-	ReaderType inputReader;
 };

@@ -1,5 +1,4 @@
 #include "CLGOpticFlowPipeline.h"
-// #include "ImageWindow.h"
 
 #include "Logger.h"
 
@@ -7,15 +6,15 @@ CLGOpticFlowPipeline::CLGOpticFlowPipeline(void) :
     init(false),
     index(0)
 {
-    this->inputReader = NULL;
+    this->input = NULL;
     this->flowFilter = FlowFilterType::New();
     this->smooth = SmoothFilterType::New();
 }
 
 void CLGOpticFlowPipeline::InitializePipeline()
 {
-    if (this->inputReader && 
-         this->inputReader->size() != 0 && 
+    if (this->input && 
+         this->input->size() != 0 && 
          this->outputFiles.size() != 0)
     {
         this->index = 0;
@@ -36,17 +35,17 @@ bool CLGOpticFlowPipeline::UpdateOne()
     }
 
     if (this->init &&
-        this->index < (this->inputReader->size() - 1) &&
+        this->index < (this->input->size() - 1) &&
         this->index < this->outputFiles.size())
     {
-        this->flowFilter->SetInput1(dynamic_cast<ImageType*>(this->inputReader->GetImage(this->index)));
-        this->flowFilter->SetInput2(dynamic_cast<ImageType*>(this->inputReader->GetImage(this->index+1)));
+        this->flowFilter->SetInput1(dynamic_cast<ImageType*>(this->input->GetImage(this->index)));
+        this->flowFilter->SetInput2(dynamic_cast<ImageType*>(this->input->GetImage(this->index+1)));
 
         Logger::logInfo("Writing flow field image: " + this->outputFiles[this->index]);
         WriteImage(this->flowFilter->GetOutput(), this->outputFiles[this->index]);
 
         this->index++;
-        bool abort = this->NotifyProgress(((double) this->index) / (this->inputReader->size()-1));
+        bool abort = this->NotifyProgress(((double) this->index) / (this->input->size()-1));
         return !abort;
     }
 
@@ -93,8 +92,8 @@ void CLGOpticFlowPipeline::SetIterations(unsigned int iter)
     
 void CLGOpticFlowPipeline::SetInput(ReaderType input)
 {
-    this->inputReader = input;
-    this->smooth->SetInput(dynamic_cast<ImageTypeF2*>(this->inputReader->GetImage(0)));
+    this->input = input;
+    this->smooth->SetInput(dynamic_cast<ImageTypeF2*>(this->input->GetImage(0)));
     this->init = false;
 }
     
