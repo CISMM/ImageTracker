@@ -32,17 +32,9 @@ public:
                               wxWindow* parent = NULL, int style = wxPD_APP_MODAL | wxPD_CAN_ABORT | wxPD_REMAINING_TIME | wxPD_SMOOTH);
     
 protected:
-    WxPipelineObserver() 
-        : dlgProgress(0)
-    {
-        this->CreateProgressDialog();
-    }
+    WxPipelineObserver();
+    virtual ~WxPipelineObserver();
     
-    virtual ~WxPipelineObserver() 
-    {
-        if (this->dlgProgress)
-            this->dlgProgress->Destroy();
-    }
     
 private:
     // not implemented

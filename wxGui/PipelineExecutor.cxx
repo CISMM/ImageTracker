@@ -48,7 +48,11 @@ PipelineExecutor::ExitCode PipelineExecutor::Entry()
         DataSource::Pointer source = DataSource::New();
         source->SetName("Result");
         source->SetFiles(this->pipeline->GetOutputFiles());
+        
+        // This will eventually trigger a wx event, so wrap in a gui mutex
+        wxMutexGuiEnter();
         this->controller->AddDataSource(source);
+        wxMutexGuiLeave();
     }
 
     Logger::verbose << "PipelineExecutor::Entry: done" << std::endl;

@@ -31,7 +31,7 @@ public:
      */
     virtual ExitCode Entry();
 
-	void SetOpenFiles(bool open, ImageTrackerController* controller = NULL);
+    void SetOpenFiles(bool open, ImageTrackerController* controller = NULL);
     
 protected:
     // The pipeline to execute on this thread.
@@ -42,5 +42,5 @@ protected:
     
 private:
     bool openResult;
-	ImageTrackerController* controller;
+    ImageTrackerController* controller;
 };
