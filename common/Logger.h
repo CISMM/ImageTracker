@@ -18,7 +18,9 @@ class LogStream;
 class StreamRedirector;
 
 /**
- * Logger provides access to the logging system. It allows you to write
+ * \class Logger
+ * \brief A multi-level, streaming logger.
+ * Logger provides access to the logging system. It enables writing
  * application messages of varying levels to output streams. The general
  * format for messaging follows std c++ streaming:
  * Logger::error << "Application error!" << std::endl;
@@ -66,41 +68,95 @@ protected:
 };
 
 /**
-* LogStream handles streaming of data to output streams. A LogStream
-* has an associated LogLevel that controls whether output is generated.
-*/
-class LogStream
+ * \class ToggleLogStream
+ * \brief A LogStream that can be toggled on and off.
+ * A logging stream class that can be turned on and off (enabled or disabled).
+ */
+class ToggleLogStream
 {
 public:
-    LogStream(LogLevel level = Error) : level(level) {}
-    virtual ~LogStream() {}
+    ToggleLogStream(bool enable = true) : 
+        enabled(enable) 
+    {}
+    virtual ~ToggleLogStream(){}
 
-    /*
-    * Stream arbitrary types and values.
-    */
+    /**
+     * Stream arbitrary types and values.
+     */
     template <typename T>
-        LogStream& operator<<(const T& val)
+    ToggleLogStream& operator<<(const T& val)
     {
-        if (this->level <= Logger::getLevel())
+        if (this->enabled)
             std::cout << val;
         return *this;
     }
 
-    /*
+    /**
      * Handle stream manipulators. Borrowed heavily from:
      * Josuttis, Nicolai. The C++ Standard Library.
      * Addison-Wesley, New York, 2005, p. 612.
      */
-    virtual LogStream& operator<<(std::ostream& (*op)(std::ostream&))
+    virtual ToggleLogStream& operator<<(std::ostream& (*op)(std::ostream&))
     {
-        if (this->level <= Logger::getLevel())
+        if (this->enabled)
             (*op)(std::cout);
         return *this;
     }
 
+    /** Turn this log stream on. */
+    void Enable() { this->enabled = true; }
+    
+    /** Turn this log stream off. */
+    void Disable() { this->enabled = false; }
+    
+    /** Turn this log stream on or off. */
+    void SetEnabled(bool enable) { this->enabled = enable; }
+    
+    /** Determine if this log stream is on or off. */
+    bool GetEnabled() { return this->enabled; }
+
+protected:
+    bool enabled;
+private:
+};
+
+/**
+ * \class LogStream
+ * \brief Streams text and other data to output.
+ * LogStream handles streaming of data to output streams. A LogStream
+ * has an associated LogLevel that controls whether output is generated.
+ */
+class LogStream
+{
+public:
+    LogStream(LogLevel level = Error, std::string msg = "ERROR: ") : 
+        level(level),
+        message(msg)
+        {}
+    virtual ~LogStream() {}
+    
+    /**
+     * Stream arbitrary types and values.
+     */
+    template <typename T>
+    ToggleLogStream& operator<<(const T& val)
+    {
+        toggleStream.SetEnabled(this->level <= Logger::getLevel());
+        return (toggleStream << this->message << val);
+    }
+    
+    virtual ToggleLogStream& operator<<(std::ostream& (*op)(std::ostream&))
+    {
+        toggleStream.SetEnabled(this->level <= Logger::getLevel());
+        return (toggleStream << this->message << (*op));
+    }
+
+    
 protected:
     LogLevel level;
-    // TODO: Add support for redirecting output to files or other streams...
+    std::string message;
+    static ToggleLogStream toggleStream;
+private:
 };
 
 /*

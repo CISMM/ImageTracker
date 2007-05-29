@@ -1,19 +1,23 @@
 #include "Logger.h"
 
 LogLevel Logger::level(All);
-LogStream Logger::error(Error);
-LogStream Logger::warning(Warning);
-LogStream Logger::info(Info);
-LogStream Logger::debug(Debug);
-LogStream Logger::verbose(Verbose);
+
+LogStream Logger::error(Error,      "ERROR:    ");
+LogStream Logger::warning(Warning,  "WARNING:  ");
+LogStream Logger::info(Info,        "INFO:     ");
+LogStream Logger::debug(Debug,      "DEBUG:    ");
+LogStream Logger::verbose(Verbose,  "VERBOSE:  ");
+
 StreamRedirector* Logger::redirector = NULL;
 
-void Logger::logError(const std::string msg) { Logger::error << "ERROR:   " << msg << std::endl; }
-void Logger::logWarning(const std::string msg) { Logger::warning << "WARN:    " << msg << std::endl; }
-void Logger::logWarn(const std::string msg) { Logger::warning << "WARN:    " << msg << std::endl; }
-void Logger::logInfo(const std::string msg) { Logger::info << "INFO:    " << msg << std::endl; }
-void Logger::logDebug(const std::string msg) { Logger::debug << "DEBUG:   " << msg << std::endl; }
-void Logger::logVerbose(const std::string msg) { Logger::verbose << "VERBOSE: " << msg << std::endl; }
+ToggleLogStream LogStream::toggleStream(true);
+
+void Logger::logError(const std::string msg)    { Logger::error     << msg << std::endl; }
+void Logger::logWarning(const std::string msg)  { Logger::warning   << msg << std::endl; }
+void Logger::logWarn(const std::string msg)     { Logger::warning   << msg << std::endl; }
+void Logger::logInfo(const std::string msg)     { Logger::info      << msg << std::endl; }
+void Logger::logDebug(const std::string msg)    { Logger::debug     << msg << std::endl; }
+void Logger::logVerbose(const std::string msg)  { Logger::verbose   << msg << std::endl; }
 
 Logger::Logger()
 {
