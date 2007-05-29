@@ -23,7 +23,9 @@ bool WxPipelineObserver::Update(double progress, const std::string& message)
     bool notAbort = true;
     if (this->dlgProgress)
     {
-        int prog = (int) (progress * 100);
+        // We prevent the progress box from reaching 100% progress to avoid the 
+        // events that get triggered when that happens.
+        int prog = std::min(99, (int) (progress * 100));
         
         // This may not be on the main thread, so wrap in a gui mutex
         wxMutexGuiEnter();

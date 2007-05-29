@@ -43,23 +43,6 @@ bool ApplyTransformDialog::TransferDataFromWindow()
         Logger::warning << function << ": Unable able to create threaded pipeline execution object" << std::endl;
         delete exec;
     }
-
-    //// Attach an observer to the pipeline
-    //WxPipelineObserver::Pointer progress = WxPipelineObserver::New();
-    //this->pipeline->AddObserver(progress);
-    //
-    //// Execute the pipeline
-    //this->pipeline->Update();
-    //this->pipeline->RemoveObserver(progress);
-    
-    // Create a result data source, if desired
-    //if (this->checkOpenOutput->IsChecked() && this->controller.IsNotNull())
-    //{
-    //    DataSource::Pointer ds = DataSource::New();
-    //    ds->SetName("trans " + this->input->GetName());
-    //    ds->SetFiles(this->pipeline->GetOutputFiles());
-    //    this->controller->AddDataSource(ds);
-    //}
     
     this->Show(false);
     return true;

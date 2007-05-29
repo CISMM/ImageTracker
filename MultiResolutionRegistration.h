@@ -241,7 +241,7 @@ void MultiResolutionIterationCommand<TRegistration>::Execute(itk::Object* object
 	OptimizerPointer optimizer = 
 		dynamic_cast<OptimizerPointer>(registration->GetOptimizer());
 
-	Logger::info << 
+	Logger::debug << 
 		"MultiresolutionIterationCommand::Execute: Updating optimizer at level: " 
 		<< registration->GetCurrentLevel() << std::endl;
 
@@ -564,8 +564,8 @@ void MultiResolutionRegistration<TImage, TTransform>
 		return;
 	}
 	timer.Stop();
-	Logger::info << "MultiResolutionRegistration: registration time: " << timer.GetMeanTime() << std::endl;
-	Logger::info << "MutliResolutionRegistration: optimizer metric:  " << this->optimizer->GetValue() << std::endl;
+	Logger::debug << "MultiResolutionRegistration: registration time: " << timer.GetMeanTime() << std::endl;
+	Logger::debug << "MutliResolutionRegistration: optimizer metric:  " << this->optimizer->GetValue() << std::endl;
 
 	// Grab results
 	typename TransformType::Pointer xform = TransformType::New();

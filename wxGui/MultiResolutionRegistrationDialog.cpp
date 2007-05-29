@@ -70,13 +70,9 @@ bool MultiResolutionRegistrationDialog::TransferDataFromWindow()
     this->pipeline->SetTransformFile(
             wx2std(this->textDirectory->GetValue() + this->textTransform->GetValue()));
     
-    // WxPipelineObserver::Pointer progress = WxPipelineObserver::New();
-    // this->pipeline->AddObserver(progress);
-    // this->pipeline->Update();
-    // this->pipeline->RemoveObserver(progress);
-    
     Logger::verbose << function << ": Creating executor thread" << std::endl;
     PipelineExecutor* exec = new PipelineExecutor(this->pipeline);
+    exec->SetOpenFiles(this->checkOpenOutput->IsChecked(), this->controller);
     if (exec->Create() == wxTHREAD_NO_ERROR)
     {
         Logger::verbose << function << ": Running exectutor thread" << std::endl;
@@ -85,18 +81,8 @@ bool MultiResolutionRegistrationDialog::TransferDataFromWindow()
     }
     else
     {
-        Logger::verbose << function << ": Thread was not created." << std::endl;
+        Logger::warning << function << ": Thread was not created; pipeline not executed." << std::endl;
     }
-    
-    // Add the result to the controller, if the user wants
-	// Todo: need to figure out another way to load the data....
-    //if (this->checkOpenOutput->IsChecked() && this->controller.IsNotNull())
-    //{
-    //    DataSource::Pointer data = DataSource::New();
-    //    data->SetName("reg " + this->input->GetName());
-    //    data->SetFiles(this->pipeline->GetOutputFiles());
-    //    this->controller->AddDataSource(data);
-    //}
     
     this->ViewPreview(false);
     this->Show(false);
