@@ -121,6 +121,7 @@ protected:
     DECLARE_EVENT_TABLE()
     
 public:
+    void OnIdle(wxIdleEvent &event);
     void OnOpen(wxCommandEvent &event);
     void OnExit(wxCommandEvent &event);
     void OnAbout(wxCommandEvent &event);

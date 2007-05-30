@@ -11,7 +11,8 @@ ImageTrackerController::ImageTrackerController() :
     index(0),
     datavis(),
     resetCamera(false),
-    wxId(-1)
+    wxId(-1),
+    isDataSourceChanged(false)
 {
     this->renderer = NULL;
     this->renderWindow = NULL;
@@ -40,7 +41,8 @@ void ImageTrackerController::AddDataSource(DataSource::Pointer source)
     }
 
     this->UpdateView();
-    this->OnDataSourceChange();
+    // this->OnDataSourceChange();
+    this->SetIsDataSourceChanged(true);
 }
 
 void ImageTrackerController::RemoveDataSource(unsigned int i)
@@ -52,7 +54,8 @@ void ImageTrackerController::RemoveDataSource(unsigned int i)
         this->datavis.erase(this->datavis.begin() + i);
     }
     this->UpdateView();
-    this->OnDataSourceChange();
+    // this->OnDataSourceChange();
+    this->SetIsDataSourceChanged(true);
 }
 
 void ImageTrackerController::GetDataSourceNames(wxArrayString& names)

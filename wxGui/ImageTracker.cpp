@@ -25,6 +25,7 @@ bool ITApp::OnInit()
 
 BEGIN_EVENT_TABLE(ImageTracker, wxFrame)
     EVT_COMMAND_ENTER(IMAGE_TRACKER_CONTROLLER, ImageTracker::OnDataSourceChange)
+    EVT_IDLE(           ImageTracker::OnIdle)
     EVT_MENU(MENU_OPEN, ImageTracker::OnOpen)
     EVT_MENU(MENU_EXIT, ImageTracker::OnExit)
     EVT_MENU(MENU_ABOUT, ImageTracker::OnAbout)
@@ -48,6 +49,15 @@ BEGIN_EVENT_TABLE(ImageTracker, wxFrame)
     EVT_BUTTON(BTN_LAST, ImageTracker::OnLastFrame)
     // end wxGlade
 END_EVENT_TABLE();
+
+void ImageTracker::OnIdle(wxIdleEvent &event)
+{
+    if (this->controller->IsDataSourceChanged())
+    {
+        this->controller->SetIsDataSourceChanged(false);
+        this->UpdateDataSources();
+    }
+}
 
 void ImageTracker::OnOpen(wxCommandEvent &event)
 {
@@ -299,7 +309,7 @@ void ImageTracker::UpdateDataSources()
     wxArrayString names;
     this->controller->GetDataSourceNames(names);
     this->lbxSources->Set(names);
-    this->lbxSources->SetSelection(idx);
+    this->lbxSources->SetSelection(std::min(idx, ((int)this->lbxSources->GetCount())-1));
     this->sldImageIndex->SetRange(0, this->controller->GetMaxSize()-1);
 }
 

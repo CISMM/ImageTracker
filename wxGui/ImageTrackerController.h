@@ -108,6 +108,9 @@ public:
         return this->renderer;
     }
 
+    bool IsDataSourceChanged() { return this->isDataSourceChanged; }
+    void SetIsDataSourceChanged(bool changed) { this->isDataSourceChanged = changed; }
+
 protected:
     ImageTrackerController();
     virtual ~ImageTrackerController();
@@ -119,11 +122,27 @@ private:
     void operator=(const Self& other);
     
     // Data members
+    // The current data frame index.
     unsigned int index;
+
+    // The set of data and visualization pairs.
     DataVisualList datavis;
+
+    // A flag indicating if the camera should be reset.
     bool resetCamera;
+
+    // This controller's wxWidget's id.
     int wxId;
+
+    // The VTK Renderer in which visualizations are displayed
     vtkRenderer* renderer;
+
+    // The VTK RenderWindow that houses the vtk renderer.
     vtkRenderWindow* renderWindow;
+
+    // The wxWidgets window that created this controller.
     wxWindow* parent;
+
+    // A flag indicating if this controller has new data sources.
+    bool isDataSourceChanged;
 };
