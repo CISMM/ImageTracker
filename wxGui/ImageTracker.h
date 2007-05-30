@@ -66,7 +66,10 @@ public:
         MENU_LOG_VERBOSE,
         BTN_ADD_DATASOURCE  = 2000,
         BTN_REMOVE_DATASOURCE,
+        BTN_FIRST,
+        BTN_REWIND,
         BTN_PLAY,
+        BTN_LAST,
         LBX_DATASOURCES,
         SLD_IMAGE_INDEX,
         IMAGE_TRACKER_CONTROLLER = 1000000
@@ -103,7 +106,10 @@ protected:
     wxPanel* window_2_pane_1;
     wxVTKRenderWindowInteractor* rwiView;
     wxSlider* sldImageIndex;
+    wxButton* btnFirst;
+    wxButton* btnRewind;
     wxButton* btnPlay;
+    wxButton* btnLast;
     wxPanel* window_2_pane_2;
     wxSplitterWindow* vsplitDataView;
     wxPanel* window_1_pane_1;
@@ -129,6 +135,9 @@ public:
     void OnEditDataSource(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnImageIndexScroll(wxScrollEvent &event); // wxGlade: <event_handler>
     void OnPlay(wxCommandEvent &event); // wxGlade: <event_handler>
+    void OnFirstFrame(wxCommandEvent &event); // wxGlade: <event_handler>
+    void OnRewind(wxCommandEvent &event); // wxGlade: <event_handler>
+    void OnLastFrame(wxCommandEvent &event); // wxGlade: <event_handler>
 }; // wxGlade: end class
 
 

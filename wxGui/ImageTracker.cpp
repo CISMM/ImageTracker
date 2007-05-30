@@ -42,7 +42,10 @@ BEGIN_EVENT_TABLE(ImageTracker, wxFrame)
     EVT_BUTTON(BTN_ADD_DATASOURCE, ImageTracker::OnAddDataSource)
     EVT_BUTTON(BTN_REMOVE_DATASOURCE, ImageTracker::OnRemoveDataSource)
     EVT_COMMAND_SCROLL(SLD_IMAGE_INDEX, ImageTracker::OnImageIndexScroll)
+    EVT_BUTTON(BTN_FIRST, ImageTracker::OnFirstFrame)
+    EVT_BUTTON(BTN_REWIND, ImageTracker::OnRewind)
     EVT_BUTTON(BTN_PLAY, ImageTracker::OnPlay)
+    EVT_BUTTON(BTN_LAST, ImageTracker::OnLastFrame)
     // end wxGlade
 END_EVENT_TABLE();
 
@@ -248,6 +251,23 @@ void ImageTracker::OnImageIndexScroll(wxScrollEvent &event)
     this->controller->SetIndex(this->sldImageIndex->GetValue());
 }
 
+void ImageTracker::OnFirstFrame(wxCommandEvent &event)
+{
+    Logger::verbose << "ImageTracker::OnFirstFrame" << std::endl;
+    this->sldImageIndex->SetValue(0);
+    this->controller->SetIndex(0);
+}
+
+void ImageTracker::OnRewind(wxCommandEvent &event)
+{
+    Logger::verbose << "ImageTracker::OnRewind" << std::endl;
+    for (int i = this->sldImageIndex->GetValue(); i >= 0; i--)
+    {
+        this->sldImageIndex->SetValue(i);
+        this->controller->SetIndex(i);
+    }
+}
+
 void ImageTracker::OnPlay(wxCommandEvent &event)
 {
     Logger::verbose << "ImageTracker::OnPlay" << std::endl;
@@ -256,6 +276,14 @@ void ImageTracker::OnPlay(wxCommandEvent &event)
         this->sldImageIndex->SetValue(i);
         this->controller->SetIndex(i);
     }
+}
+
+void ImageTracker::OnLastFrame(wxCommandEvent &event)
+{
+    Logger::verbose << "ImageTracker::OnLastFrame" << std::endl;
+    int idx = this->sldImageIndex->GetMax();
+    this->sldImageIndex->SetValue(idx);
+    this->controller->SetIndex(idx);
 }
 
 // wxGlade: add ImageTracker event handlers
@@ -318,8 +346,11 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     btnAddDataSource = new wxButton(window_2_pane_1, BTN_ADD_DATASOURCE, wxT("+"));
     btnRemoveDataSource = new wxButton(window_2_pane_1, BTN_REMOVE_DATASOURCE, wxT("-"));
     rwiView = new wxVTKRenderWindowInteractor(window_2_pane_2, -1);
-    sldImageIndex = new wxSlider(window_2_pane_2, SLD_IMAGE_INDEX, 0, 0, 10, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS);
-    btnPlay = new wxButton(window_2_pane_2, BTN_PLAY, wxT("Play"));
+    sldImageIndex = new wxSlider(window_2_pane_2, SLD_IMAGE_INDEX, 0, 0, 0, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS);
+    btnFirst = new wxButton(window_2_pane_2, BTN_FIRST, wxT("|<"));
+    btnRewind = new wxButton(window_2_pane_2, BTN_REWIND, wxT("<"));
+    btnPlay = new wxButton(window_2_pane_2, BTN_PLAY, wxT(">"));
+    btnLast = new wxButton(window_2_pane_2, BTN_LAST, wxT(">|"));
     txtLogger = new wxTextCtrl(window_1_pane_2, -1, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
 
     set_properties();
@@ -361,7 +392,7 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
 void ImageTracker::set_properties()
 {
     // begin wxGlade: ImageTracker::set_properties
-    SetSize(wxSize(1000, 740));
+    SetSize(wxSize(1000, 791));
     int theStatusBar_widths[] = { -1 };
     theStatusBar->SetStatusWidths(1, theStatusBar_widths);
     const wxString theStatusBar_fields[] = {
@@ -371,6 +402,10 @@ void ImageTracker::set_properties()
         theStatusBar->SetStatusText(theStatusBar_fields[i], i);
     }
     lbxSources->SetSelection(0);
+    btnFirst->SetMinSize(wxSize(40, 35));
+    btnRewind->SetMinSize(wxSize(40, 35));
+    btnPlay->SetMinSize(wxSize(40, 35));
+    btnLast->SetMinSize(wxSize(40, 35));
     // end wxGlade
 }
 
@@ -396,16 +431,19 @@ void ImageTracker::do_layout()
     window_2_pane_1->SetSizer(sizer_3);
     sizer_3->Fit(window_2_pane_1);
     sizer_3->SetSizeHints(window_2_pane_1);
-    sizer_10->Add(rwiView, 6, wxALL|wxEXPAND, 0);
-    sizer_32->Add(sldImageIndex, 2, wxEXPAND|wxADJUST_MINSIZE, 0);
+    sizer_10->Add(rwiView, 8, wxALL|wxEXPAND, 0);
+    sizer_32->Add(sldImageIndex, 3, wxEXPAND|wxADJUST_MINSIZE, 0);
+    sizer_33->Add(btnFirst, 0, wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 0);
+    sizer_33->Add(btnRewind, 0, wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 0);
     sizer_33->Add(btnPlay, 0, wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 0);
-    sizer_32->Add(sizer_33, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    sizer_33->Add(btnLast, 0, wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 0);
+    sizer_32->Add(sizer_33, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     sizer_10->Add(sizer_32, 1, wxEXPAND, 0);
     window_2_pane_2->SetAutoLayout(true);
     window_2_pane_2->SetSizer(sizer_10);
     sizer_10->Fit(window_2_pane_2);
     sizer_10->SetSizeHints(window_2_pane_2);
-    vsplitDataView->SplitVertically(window_2_pane_1, window_2_pane_2, 207);
+    vsplitDataView->SplitVertically(window_2_pane_1, window_2_pane_2, 10);
     sizer_9->Add(vsplitDataView, 5, wxEXPAND, 0);
     window_1_pane_1->SetAutoLayout(true);
     window_1_pane_1->SetSizer(sizer_9);
@@ -416,7 +454,7 @@ void ImageTracker::do_layout()
     window_1_pane_2->SetSizer(sizer_14);
     sizer_14->Fit(window_1_pane_2);
     sizer_14->SetSizeHints(window_1_pane_2);
-    hsplitDataLogger->SplitHorizontally(window_1_pane_1, window_1_pane_2, 583);
+    hsplitDataLogger->SplitHorizontally(window_1_pane_1, window_1_pane_2, 580);
     sizer_1->Add(hsplitDataLogger, 2, wxEXPAND, 0);
     SetAutoLayout(true);
     SetSizer(sizer_1);
