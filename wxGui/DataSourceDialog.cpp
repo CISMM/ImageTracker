@@ -118,7 +118,7 @@ DataSourceDialog::DataSourceDialog(wxWindow* parent, int id, const wxString& tit
     const wxString lbxFiles_choices[] = {
         wxT("")
     };
-    lbxFiles = new wxListBox(this, -1, wxDefaultPosition, wxDefaultSize, 1, lbxFiles_choices, wxLB_MULTIPLE|wxLB_EXTENDED);
+    lbxFiles = new wxListBox(this, -1, wxDefaultPosition, wxDefaultSize, 1, lbxFiles_choices, wxLB_EXTENDED);
     btnAddFiles = new wxButton(this, BTN_ADD_FILES, wxT("+"));
     btnRemoveFiles = new wxButton(this, BTN_REMOVE_FILES, wxT("-"));
     btnOk = new wxButton(this, wxID_OK, wxT("&OK"));
