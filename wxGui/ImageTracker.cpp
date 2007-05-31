@@ -52,9 +52,11 @@ END_EVENT_TABLE();
 
 void ImageTracker::OnIdle(wxIdleEvent &event)
 {
-    if (this->controller->IsDataSourceChanged())
+    this->UpdatePlayState();
+    if (this->controller->IsControllerChanged())
     {
-        this->controller->SetIsDataSourceChanged(false);
+        this->controller->SetIsControllerChanged(false);
+        this->controller->UpdateView();
         this->UpdateDataSources();
     }
 }
@@ -264,36 +266,25 @@ void ImageTracker::OnImageIndexScroll(wxScrollEvent &event)
 void ImageTracker::OnFirstFrame(wxCommandEvent &event)
 {
     Logger::verbose << "ImageTracker::OnFirstFrame" << std::endl;
-    this->sldImageIndex->SetValue(0);
-    this->controller->SetIndex(0);
+    this->SetPlayState(SkipFirst);
 }
 
 void ImageTracker::OnRewind(wxCommandEvent &event)
 {
     Logger::verbose << "ImageTracker::OnRewind" << std::endl;
-    for (int i = this->sldImageIndex->GetValue(); i >= 0; i--)
-    {
-        this->sldImageIndex->SetValue(i);
-        this->controller->SetIndex(i);
-    }
+    this->SetPlayState(Rewind);
 }
 
 void ImageTracker::OnPlay(wxCommandEvent &event)
 {
     Logger::verbose << "ImageTracker::OnPlay" << std::endl;
-    for (int i = this->sldImageIndex->GetValue(); i <= this->sldImageIndex->GetMax(); i++)
-    {
-        this->sldImageIndex->SetValue(i);
-        this->controller->SetIndex(i);
-    }
+    this->SetPlayState(Play);
 }
 
 void ImageTracker::OnLastFrame(wxCommandEvent &event)
 {
     Logger::verbose << "ImageTracker::OnLastFrame" << std::endl;
-    int idx = this->sldImageIndex->GetMax();
-    this->sldImageIndex->SetValue(idx);
-    this->controller->SetIndex(idx);
+    this->SetPlayState(SkipLast);
 }
 
 // wxGlade: add ImageTracker event handlers
@@ -301,6 +292,60 @@ void ImageTracker::OnLastFrame(wxCommandEvent &event)
 void ImageTracker::OnDataSourceChange(wxCommandEvent &event)
 {
     this->UpdateDataSources();
+}
+
+void ImageTracker::UpdatePlayState()
+{
+    // Get the current and maximum index
+    int idx = this->sldImageIndex->GetValue();
+    int maxIdx = this->sldImageIndex->GetMax();
+    
+    // Determine the next index and next play state
+    // based on the current state; like a state machine.
+    switch (this->GetPlayState())
+    {
+    case Play:      // advance one frame
+        if (idx < maxIdx)
+        {
+            this->sldImageIndex->SetValue(idx+1);
+            this->controller->SetIndex(idx+1);
+        }
+        else
+        {
+            this->SetPlayState(Pause);
+        }
+        break;
+    case Rewind:    // retreat one frame
+        if (idx > 0)
+        {
+            this->sldImageIndex->SetValue(idx-1);
+            this->controller->SetIndex(idx-1);
+        }
+        else
+        {
+            this->SetPlayState(Pause);
+        }
+        break;
+    case SkipFirst: // go to the first frame
+        if (maxIdx > 0) // when no data is loaded, max idx is negative
+        {
+            this->sldImageIndex->SetValue(0);
+            this->controller->SetIndex(0);
+        }
+        this->SetPlayState(Pause);
+        break;
+    case SkipLast:  // go to the last frame
+        if (maxIdx > 0) // when no data is loaded, max idx is negative
+        {
+            this->sldImageIndex->SetValue(maxIdx);
+            this->controller->SetIndex(maxIdx);
+        }
+        this->SetPlayState(Pause);
+        break;
+    case Pause:     // pause...does nothing--stable, default state
+    default:
+        break;
+    }
 }
 
 void ImageTracker::UpdateDataSources()
@@ -368,6 +413,9 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     // end wxGlade
     
     // ----- Custom code! ----- //
+    // Initialize play state
+    this->SetPlayState(Pause);
+
     // Select log level, and redirect output to log panel
     menuHelp->Check(MENU_LOG_INFO, true);
     Logger::setLevel(Info);

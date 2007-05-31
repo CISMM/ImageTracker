@@ -74,11 +74,24 @@ public:
         SLD_IMAGE_INDEX,
         IMAGE_TRACKER_CONTROLLER = 1000000
     };
+
+    // Possible playing states (controls a state machine)
+    enum PlayState
+    {
+        Pause = 0,
+        Play,
+        Rewind,
+        SkipFirst,
+        SkipLast
+    };
     
     /**
      * Updates the list of DataSources displayed in the ImageTracker.
      */
     void UpdateDataSources();
+
+    PlayState GetPlayState() { return this->playState; }
+    void SetPlayState(PlayState state) { this->playState = state; }
     
 private:
     // begin wxGlade: ImageTracker::methods
@@ -94,6 +107,7 @@ private:
     CLGOpticFlowDialog* dlgCLGOpticFlow;
     AboutDialog* dlgAbout;
     wxStreamToTextRedirector* coutRedirect;
+    PlayState playState;
     
 protected:
     // begin wxGlade: ImageTracker::attributes
@@ -120,6 +134,12 @@ protected:
     
     DECLARE_EVENT_TABLE()
     
+    /**
+     * Updates the currently displayed data slice based on
+     * the ImageTracker play state.
+     */
+    void UpdatePlayState();
+
 public:
     void OnIdle(wxIdleEvent &event);
     void OnOpen(wxCommandEvent &event);

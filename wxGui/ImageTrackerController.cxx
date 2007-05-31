@@ -2,17 +2,21 @@
 
 #include <typeinfo>
 
+#include <wx/thread.h>
+
 #include "ImageUtils.h"
 #include "GuiUtils.h"
 #include "Logger.h"
 #include "wxUtils.h"
+
+wxMutex ImageTrackerController::s_ControllerMutex;
 
 ImageTrackerController::ImageTrackerController() :
     index(0),
     datavis(),
     resetCamera(false),
     wxId(-1),
-    isDataSourceChanged(false)
+    isControllerChanged(false)
 {
     this->renderer = NULL;
     this->renderWindow = NULL;
@@ -30,6 +34,18 @@ ImageTrackerController::~ImageTrackerController()
     this->renderWindow = NULL;
 }
 
+bool ImageTrackerController::IsControllerChanged()
+{
+    wxMutexLocker lock(ImageTrackerController::s_ControllerMutex);
+    return this->isControllerChanged;
+}
+
+void ImageTrackerController::SetIsControllerChanged(bool changed)
+{
+    wxMutexLocker lock(ImageTrackerController::s_ControllerMutex);
+    this->isControllerChanged = changed;
+}
+
 void ImageTrackerController::AddDataSource(DataSource::Pointer source)
 {
     ItkVtkPipeline::Pointer view = GenerateVisualPipeline(source);
@@ -40,9 +56,7 @@ void ImageTrackerController::AddDataSource(DataSource::Pointer source)
         this->resetCamera = true;
     }
 
-    this->UpdateView();
-    // this->OnDataSourceChange();
-    this->SetIsDataSourceChanged(true);
+    this->SetIsControllerChanged(true);
 }
 
 void ImageTrackerController::RemoveDataSource(unsigned int i)
@@ -53,9 +67,7 @@ void ImageTrackerController::RemoveDataSource(unsigned int i)
         this->GetRenderer()->RemoveActor(this->datavis[i].second->GetOutput());
         this->datavis.erase(this->datavis.begin() + i);
     }
-    this->UpdateView();
-    // this->OnDataSourceChange();
-    this->SetIsDataSourceChanged(true);
+    this->SetIsControllerChanged(true);
 }
 
 void ImageTrackerController::GetDataSourceNames(wxArrayString& names)
@@ -73,7 +85,7 @@ void ImageTrackerController::SetIndex(unsigned int index)
 {
     // Logger::verbose << "ImageTrackerController::SetIndex: " << index << std::endl;
     this->index = index;
-    this->UpdateView();
+    this->SetIsControllerChanged(true);
 }
 
 unsigned int ImageTrackerController::GetMaxSize()
@@ -96,11 +108,11 @@ void ImageTrackerController::SetParent(wxWindow* parent, int id)
 
 void ImageTrackerController::OnDataSourceChange()
 {
-    if (this->parent)
-    {
-        wxCommandEvent evt(wxEVT_COMMAND_ENTER, wxId);
-        this->parent->GetEventHandler()->ProcessEvent(evt);
-    }
+    //if (this->parent)
+    //{
+    //    wxCommandEvent evt(wxEVT_COMMAND_ENTER, wxId);
+    //    this->parent->GetEventHandler()->ProcessEvent(evt);
+    //}
 }
 
 /**

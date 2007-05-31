@@ -6,6 +6,7 @@
 
 #include <wx/arrstr.h>
 #include <wx/event.h>
+#include <wx/thread.h>
 #include <wx/window.h>
 
 #include "itkLightObject.h"
@@ -108,8 +109,8 @@ public:
         return this->renderer;
     }
 
-    bool IsDataSourceChanged() { return this->isDataSourceChanged; }
-    void SetIsDataSourceChanged(bool changed) { this->isDataSourceChanged = changed; }
+    bool IsControllerChanged();
+    void SetIsControllerChanged(bool changed);
 
 protected:
     ImageTrackerController();
@@ -144,5 +145,6 @@ private:
     wxWindow* parent;
 
     // A flag indicating if this controller has new data sources.
-    bool isDataSourceChanged;
+    bool isControllerChanged;
+    static wxMutex s_ControllerMutex;
 };

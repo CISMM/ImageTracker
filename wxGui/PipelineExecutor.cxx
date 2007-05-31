@@ -10,12 +10,12 @@ PipelineExecutor::PipelineExecutor(ItkPipeline* pipeline, wxThreadKind kind) :
 {
     this->controller = NULL;
     Logger::verbose << "PipelineExecutor::PipelineExecutor" << std::endl;
-     this->pipeline = pipeline;
-     if (this->pipeline != NULL)
-     {
-         this->progress = WxPipelineObserver::New();
-         this->pipeline->AddObserver(this->progress);
-     }
+    this->pipeline = pipeline;
+    if (this->pipeline != NULL)
+    {
+        this->progress = WxPipelineObserver::New();
+        this->pipeline->AddObserver(this->progress);
+    }
 }
 
 PipelineExecutor::~PipelineExecutor()
@@ -49,10 +49,8 @@ PipelineExecutor::ExitCode PipelineExecutor::Entry()
         source->SetName("Result");
         source->SetFiles(this->pipeline->GetOutputFiles());
         
-        // This will eventually trigger a wx event, so wrap in a gui mutex
-        wxMutexGuiEnter();
+        // Add the new data source to the controller
         this->controller->AddDataSource(source);
-        wxMutexGuiLeave();
     }
 
     Logger::verbose << "PipelineExecutor::Entry: done" << std::endl;
