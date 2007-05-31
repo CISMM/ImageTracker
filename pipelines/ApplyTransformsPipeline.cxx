@@ -65,9 +65,9 @@ void ApplyTransformsPipeline::Update()
     
     for (TransformVector::iterator vecIt = pTransforms->begin();
          vecIt != pTransforms->end() && 
-                 index < this->input->size() && 
-                 index < this->outputFiles.size() &&
-                 !abort;
+             index < this->input->size() && 
+             index < this->outputFiles.size() &&
+             !abort;
          ++vecIt, 
          index++)
     {
@@ -82,6 +82,9 @@ void ApplyTransformsPipeline::Update()
         WriteImage(cast->GetOutput(), this->outputFiles[index]);
         abort = this->NotifyProgress(((double) (index+1)/count));
     }
+    
+    // At this point, we have succeeded if we were not stopped.
+    this->SetSuccess(!abort);
     
     Logger::verbose << function << ": Cleaning up dumb pointers" << std::endl;
     delete (pTransforms);

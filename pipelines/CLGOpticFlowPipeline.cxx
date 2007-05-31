@@ -46,6 +46,7 @@ bool CLGOpticFlowPipeline::UpdateOne()
 
         this->index++;
         bool abort = this->NotifyProgress(((double) this->index) / (this->input->size()-1));
+        this->SetSuccess(!abort);
         return !abort;
     }
 

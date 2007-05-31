@@ -4,8 +4,8 @@
 #include "wxUtils.h"
 
 WxPipelineObserver::WxPipelineObserver()
-    : dlgProgress(0)
 {
+    this->dlgProgress = NULL;
     this->CreateProgressDialog();
 }
     
@@ -13,14 +13,15 @@ WxPipelineObserver::~WxPipelineObserver()
 {
     if (this->dlgProgress)
     {
-        this->dlgProgress->Destroy();
+        this->dlgProgress->Show(false);
+        // this->dlgProgress->Destroy(); // destroy crashes system when pipeline was aborted.
         this->dlgProgress = NULL;
     }
 }
 
 bool WxPipelineObserver::Update(double progress, const std::string& message)
 {
-    bool notAbort = true;
+    bool doContinue = true;
     if (this->dlgProgress)
     {
         // We prevent the progress box from reaching 100% progress to avoid the 
@@ -29,13 +30,13 @@ bool WxPipelineObserver::Update(double progress, const std::string& message)
         
         // This may not be on the main thread, so wrap in a gui mutex
         wxMutexGuiEnter();
-        notAbort = this->dlgProgress->Update(prog, std2wx(message));
+        doContinue = this->dlgProgress->Update(prog, std2wx(message));
         wxMutexGuiLeave();
         
         Logger::verbose << "WxPipelineObserver::Update: " << prog << ", " << message << ", " << 
-                (notAbort ? "continuing" : "aborting") << std::endl;
+                (doContinue ? "continuing" : "aborting") << std::endl;
     }
-    return !notAbort;
+    return !doContinue; // convert to abort indicator
 }
 
 void WxPipelineObserver::CreateProgressDialog(const std::string& title, const std::string& message, int maximum, 

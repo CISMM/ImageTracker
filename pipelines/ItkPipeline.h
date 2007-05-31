@@ -50,13 +50,20 @@ public:
     virtual void SetOutputFiles(const FileSet& files);
     virtual const FileSet& GetOutputFiles();
     
+    itkGetMacro(Success, bool);
+    itkSetMacro(Success, bool);
+
 protected:
-    ItkPipeline() : outputFiles() {}
+    ItkPipeline() : 
+        outputFiles(),
+        m_Success(true)
+    {}
     virtual ~ItkPipeline(){}
     
     ObserverList observers;
     ImageSetReaderBase* input;
     FileSet outputFiles;
+    bool m_Success;
     
 private:
     // not implemented

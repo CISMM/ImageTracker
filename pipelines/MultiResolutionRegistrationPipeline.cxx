@@ -181,10 +181,10 @@ void MultiResolutionRegistrationPipeline::Update()
     
     // Register every image with the previous image
     for (unsigned int i = 0; 
-            i < this->input->size()-1 && 
-            i < this->outputFiles.size()-1 &&
-            !abort; 
-            i++)
+         i < this->input->size()-1 && 
+             i < this->outputFiles.size()-1 &&
+             !abort; 
+         i++)
     {
         ImageType::Pointer fixed = dynamic_cast<ImageTypeF2*>(this->input->GetImage(i));
         ImageType::Pointer moving = dynamic_cast<ImageTypeF2*>(this->input->GetImage(i+1));
@@ -220,6 +220,9 @@ void MultiResolutionRegistrationPipeline::Update()
     {
         TransformGroup::SaveTransforms(&transforms, this->GetTransformFile());
     }
+
+    // At this point, we have succeeded if we were not stopped.
+    this->SetSuccess(!abort);
 
     // Reset image
     this->resample->SetInput(dynamic_cast<ImageTypeF2*>(this->input->GetImage(0)));

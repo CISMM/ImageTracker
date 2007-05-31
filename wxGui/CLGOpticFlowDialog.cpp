@@ -4,8 +4,8 @@
 #include "FileSet.h"
 #include "Logger.h"
 #include "MathUtils.h"
+#include "PipelineExecutor.h"
 #include "wxUtils.h"
-#include "WxPipelineObserver.h"
 
 bool CLGOpticFlowDialog::TransferDataToWindow()
 {
@@ -23,6 +23,7 @@ bool CLGOpticFlowDialog::TransferDataToWindow()
 
 bool CLGOpticFlowDialog::TransferDataFromWindow()
 {
+    std::string function("CLGOpticFlowDialog::TransferDataFromWindow");
     this->pipeline->SetSpatialSigma(this->slideSmoothing->GetValue());
     this->pipeline->SetRegularization(exp10(this->slideRegularization->GetValue()));
     this->pipeline->SetRelaxation(this->slideRelaxation->GetValue());
@@ -32,13 +33,19 @@ bool CLGOpticFlowDialog::TransferDataFromWindow()
     outputFiles.SetDirectory(wx2std(this->textDirectory->GetValue()));
     this->pipeline->SetOutputFiles(outputFiles);
     
-    // Attache a progress monitor and run pipeline
-    WxPipelineObserver::Pointer progress = WxPipelineObserver::New();
-    this->pipeline->AddObserver(progress);
-    this->pipeline->Update();
-    this->pipeline->RemoveObserver(progress);
-    
-    //TODO: When we support flow field visualization, load result here.
+    // Create and launch a pipeline executor (uses another thread)
+    PipelineExecutor* exec = new PipelineExecutor(this->pipeline);
+    // TODO: When we support flow field visualization, uncomment next line.
+    // exec->SetOpenFiles(this->checkOpenOutput->IsChecked(), this->controller);
+    if (exec->Create() == wxTHREAD_NO_ERROR)
+    {
+        exec->Run();
+    }
+    else
+    {
+        Logger::warning << function << ": Unable to create threaded pipeline execution object." << std::endl;
+        delete exec;
+    }
     
     this->ViewPreview(false);
     this->Show(false);

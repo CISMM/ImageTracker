@@ -3,8 +3,8 @@
 #include "RemoveOcclusionsDialog.h"
 
 #include "FileSet.h"
+#include "PipelineExecutor.h"
 #include "wxUtils.h"
-#include "WxPipelineObserver.h"
 
 /**
  * Called by wxWidgets when this dialog is displayed. Sets up the
@@ -41,8 +41,12 @@ bool RemoveOcclusionsDialog::TransferDataToWindow()
  */
 bool RemoveOcclusionsDialog::TransferDataFromWindow()
 {
+    std::string function("RemoveOcclusionsDialog::TransferDataFromWindow");
+    
+    // Set up pipeline parameters
     this->pipeline->SetInput(this->input->GetImages());
     
+    // Create an output file set
     FileSet outFiles(this->input->GetFiles(), wx2std(this->textPrefix->GetValue()));
     outFiles.SetDirectory(wx2std(this->textDirectory->GetValue()));
     
@@ -58,17 +62,17 @@ bool RemoveOcclusionsDialog::TransferDataFromWindow()
     this->pipeline->SetTransmitPercentile(this->slidePercentile->GetValue());
     this->pipeline->SetFourierPadding(this->slidePadding->GetValue());
     
-    WxPipelineObserver::Pointer progress = WxPipelineObserver::New();
-    this->pipeline->AddObserver(progress);
-    this->pipeline->Update();
-    this->pipeline->RemoveObserver(progress);
-    
-    if (this->checkOpenOutput->IsChecked() && this->controller.IsNotNull())
+    // Create and launch a pipeline executor on another thread
+    PipelineExecutor* exec = new PipelineExecutor(this->pipeline);
+    exec->SetOpenFiles(this->checkOpenOutput->IsChecked(), this->controller);
+    if (exec->Create() == wxTHREAD_NO_ERROR)
     {
-        DataSource::Pointer data = DataSource::New();
-        data->SetName("rpo " + this->input->GetName());
-        data->SetFiles(this->pipeline->GetOutputFiles());
-        this->controller->AddDataSource(data);
+        exec->Run();
+    }
+    else
+    {
+        Logger::warning << function << ": Unable to create threaded pipeline execution object." << std::endl;
+        delete exec;
     }
     
     // Return false if we want to keep the window up.

@@ -6,7 +6,6 @@
 #include "Logger.h"
 #include "PipelineExecutor.h"
 #include "wxUtils.h"
-#include "WxPipelineObserver.h"
 
 bool ApplyTransformDialog::TransferDataToWindow()
 {

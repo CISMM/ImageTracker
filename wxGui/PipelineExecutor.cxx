@@ -43,7 +43,9 @@ PipelineExecutor::ExitCode PipelineExecutor::Entry()
     }
 
     // Open the result, if we're supposed to
-    if (this->openResult && this->controller != NULL)
+    if (this->openResult &&
+        this->pipeline->GetSuccess() && 
+        this->controller != NULL)
     {
         DataSource::Pointer source = DataSource::New();
         source->SetName("Result");
