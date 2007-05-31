@@ -45,6 +45,7 @@ BEGIN_EVENT_TABLE(ImageTracker, wxFrame)
     EVT_COMMAND_SCROLL(SLD_IMAGE_INDEX, ImageTracker::OnImageIndexScroll)
     EVT_BUTTON(BTN_FIRST, ImageTracker::OnFirstFrame)
     EVT_BUTTON(BTN_REWIND, ImageTracker::OnRewind)
+    EVT_BUTTON(BTN_PAUSE, ImageTracker::OnPause)
     EVT_BUTTON(BTN_PLAY, ImageTracker::OnPlay)
     EVT_BUTTON(BTN_LAST, ImageTracker::OnLastFrame)
     // end wxGlade
@@ -275,6 +276,12 @@ void ImageTracker::OnRewind(wxCommandEvent &event)
     this->SetPlayState(Rewind);
 }
 
+void ImageTracker::OnPause(wxCommandEvent &event)
+{
+    Logger::verbose << "ImageTracker::OnPause" << std::endl;
+    this->SetPlayState(Pause);
+}
+
 void ImageTracker::OnPlay(wxCommandEvent &event)
 {
     Logger::verbose << "ImageTracker::OnPlay" << std::endl;
@@ -404,6 +411,7 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     sldImageIndex = new wxSlider(window_2_pane_2, SLD_IMAGE_INDEX, 0, 0, 0, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS);
     btnFirst = new wxButton(window_2_pane_2, BTN_FIRST, wxT("|<"));
     btnRewind = new wxButton(window_2_pane_2, BTN_REWIND, wxT("<"));
+    btnPause = new wxButton(window_2_pane_2, BTN_PAUSE, wxT("||"));
     btnPlay = new wxButton(window_2_pane_2, BTN_PLAY, wxT(">"));
     btnLast = new wxButton(window_2_pane_2, BTN_LAST, wxT(">|"));
     txtLogger = new wxTextCtrl(window_1_pane_2, -1, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
@@ -462,6 +470,7 @@ void ImageTracker::set_properties()
     lbxSources->SetSelection(0);
     btnFirst->SetMinSize(wxSize(40, 35));
     btnRewind->SetMinSize(wxSize(40, 35));
+    btnPause->SetMinSize(wxSize(40, 35));
     btnPlay->SetMinSize(wxSize(40, 35));
     btnLast->SetMinSize(wxSize(40, 35));
     // end wxGlade
@@ -493,6 +502,7 @@ void ImageTracker::do_layout()
     sizer_32->Add(sldImageIndex, 3, wxEXPAND|wxADJUST_MINSIZE, 0);
     sizer_33->Add(btnFirst, 0, wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 0);
     sizer_33->Add(btnRewind, 0, wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 0);
+    sizer_33->Add(btnPause, 0, wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 0);
     sizer_33->Add(btnPlay, 0, wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 0);
     sizer_33->Add(btnLast, 0, wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 0);
     sizer_32->Add(sizer_33, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);

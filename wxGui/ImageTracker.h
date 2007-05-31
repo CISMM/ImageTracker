@@ -68,6 +68,7 @@ public:
         BTN_REMOVE_DATASOURCE,
         BTN_FIRST,
         BTN_REWIND,
+        BTN_PAUSE,
         BTN_PLAY,
         BTN_LAST,
         LBX_DATASOURCES,
@@ -122,6 +123,7 @@ protected:
     wxSlider* sldImageIndex;
     wxButton* btnFirst;
     wxButton* btnRewind;
+    wxButton* btnPause;
     wxButton* btnPlay;
     wxButton* btnLast;
     wxPanel* window_2_pane_2;
@@ -159,6 +161,7 @@ public:
     void OnFirstFrame(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnRewind(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnLastFrame(wxCommandEvent &event); // wxGlade: <event_handler>
+    void OnPause(wxCommandEvent &event); // wxGlade: <event_handler>
 }; // wxGlade: end class
 
 
