@@ -29,7 +29,7 @@ public:
     virtual bool Update(double progress, const std::string& message);
     
     void CreateProgressDialog(const std::string& title = "Pipeline Progress", const std::string& message = "", int maximum = 100, 
-                              wxWindow* parent = NULL, int style = wxPD_APP_MODAL | wxPD_CAN_ABORT | wxPD_REMAINING_TIME | wxPD_SMOOTH);
+                              wxWindow* parent = NULL, int style = wxPD_CAN_ABORT | wxPD_REMAINING_TIME);
     
 protected:
     WxPipelineObserver();
@@ -42,4 +42,5 @@ private:
     void operator=(const Self& other);
     
     wxProgressDialog* dlgProgress;
+    bool wasAborted;
 };

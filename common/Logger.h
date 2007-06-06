@@ -3,6 +3,9 @@
 #include <string>
 #include <iostream>
 
+#include "Mutex.h"
+#include "MutexLocker.h"
+
 enum LogLevel {
     None    = 0,
     Error   = 100,
@@ -76,7 +79,8 @@ class ToggleLogStream
 {
 public:
     ToggleLogStream(bool enable = true) : 
-        enabled(enable) 
+        enabled(enable),
+        mutex()
     {}
     virtual ~ToggleLogStream(){}
 
@@ -87,7 +91,10 @@ public:
     ToggleLogStream& operator<<(const T& val)
     {
         if (this->enabled)
+        {
+            MutexLocker lock(this->mutex);
             std::cout << val;
+        }
         return *this;
     }
 
@@ -99,7 +106,10 @@ public:
     virtual ToggleLogStream& operator<<(std::ostream& (*op)(std::ostream&))
     {
         if (this->enabled)
+        {
+            MutexLocker lock(this->mutex);
             (*op)(std::cout);
+        }
         return *this;
     }
 
@@ -117,6 +127,7 @@ public:
 
 protected:
     bool enabled;
+    Mutex mutex;
 private:
 };
 

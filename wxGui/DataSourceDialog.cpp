@@ -157,6 +157,7 @@ void DataSourceDialog::OnAddFiles(wxCommandEvent &event)
     {
         wxArrayString paths;
         open.GetPaths(paths);
+        paths.Sort();
         this->lbxFiles->Append(paths);
     }
 }

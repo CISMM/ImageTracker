@@ -36,6 +36,16 @@ INCLUDE_DIRECTORIES(${VTK_INCLUDE_DIRS})
 LINK_DIRECTORIES(${VTK_LIBRARY_DIRS})
 
 #######################################
+# Handle threading libraries
+#######################################
+FIND_PACKAGE(Threads)
+IF (CMAKE_USE_PTHREADS_INIT)
+    ADD_DEFINITIONS(-DIT_USE_PTHREADS)
+ELSEIF (CMAKE_USE_WIN32_THREADS_INIT)
+    ADD_DEFINITIONS(-DIT_USE_WIN32_THREADS)
+ENDIF(CMAKE_USE_PTHREADS_INIT)
+
+#######################################
 # Personal filter library and support classes.
 #######################################
 INCLUDE_DIRECTORIES (
