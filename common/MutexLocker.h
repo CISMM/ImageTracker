@@ -16,6 +16,6 @@ public:
     MutexLocker(const Mutex& mutex);
     virtual ~MutexLocker();
 protected:
-    Mutex mutex;
+    Mutex* mutex;
 private:
 };

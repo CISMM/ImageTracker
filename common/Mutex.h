@@ -9,6 +9,7 @@ typedef pthread_mutex_t MutexType;
 #endif
 
 #ifdef IT_USE_WIN32_THREADS
+#include <windows.h>
 #include <winbase.h>
 typedef CRITICAL_SECTION MutexType;
 #endif
@@ -31,4 +32,8 @@ public:
 protected:
     mutable MutexType lock;
 private:
+    // Not implemented on purpose.  We don't want any copies
+    // of mutex created willy-nilly.
+    Mutex(const Mutex& other);
+    void operator=(const Mutex& other);
 };

@@ -1,4 +1,5 @@
 #include "Logger.h"
+#include "Mutex.h"
 
 LogLevel Logger::level(All);
 
@@ -10,6 +11,7 @@ LogStream Logger::verbose(Verbose,  "VERBOSE:  ");
 
 StreamRedirector* Logger::redirector = NULL;
 
+Mutex ToggleLogStream::mutex;
 ToggleLogStream LogStream::toggleStream(true);
 
 void Logger::logError(const std::string msg)    { Logger::error     << msg << std::endl; }

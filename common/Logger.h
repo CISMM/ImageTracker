@@ -74,13 +74,13 @@ protected:
  * \class ToggleLogStream
  * \brief A LogStream that can be toggled on and off.
  * A logging stream class that can be turned on and off (enabled or disabled).
+ * ToggleLogStream is thread-safe.
  */
 class ToggleLogStream
 {
 public:
     ToggleLogStream(bool enable = true) : 
-        enabled(enable),
-        mutex()
+        enabled(enable)
     {}
     virtual ~ToggleLogStream(){}
 
@@ -127,7 +127,10 @@ public:
 
 protected:
     bool enabled;
-    Mutex mutex;
+
+    // A mutex controls access to the log stream; this makes logging
+    // tread-safe.
+    static Mutex mutex;
 private:
 };
 
