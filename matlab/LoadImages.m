@@ -24,13 +24,29 @@ if (nargin < 4)
     stride = 1;
 end;
 
+
 idx=1;
+ii = start:stride:stop;
+t = length(ii);
+
 if (rgb == 0)
+    % read first image to get dimensions
+    img = double(imread(sprintf(format,start)));
+    [h w] = size(img);
+    imgs = zeros(h,w,t);
+    clear img;
+    
     for i=start:stride:stop
         imgs(:,:,idx) = double(imread(sprintf(format, i)));
         idx = idx+1;
     end;
 else % rgb images
+    % read first image to get dimensions
+    img = double(rgb2gray(imread(sprintf(format,start))));
+    [h w] = size(img);
+    imgs = zeros(h,w,t);
+    clear img;
+    
     for i=start:stride:stop
         imgs(:,:,idx) = double(rgb2gray(imread(sprintf(format, i))));
         idx = idx+1;

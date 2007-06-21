@@ -2,6 +2,8 @@ function [ features ] = KLTTracker( imgs, sigmaS, sigmaT, count, featRadius, fea
 %KLTTRACKER Summary of this function goes here
 %   Detailed explanation goes here
 
+display(sprintf('KLTTracker: %s \t Starting', datestr(now, 'HH:MM:SS')));
+
 if (nargin < 6)
     featFrame = 5;
 end;
@@ -54,6 +56,6 @@ for i=1:t-1
     features(:,3:4,i+1) = [err val];
     
     % Progress update
-    display(sprintf('Finished: %3d of %3d (%3d%%), %5d of %5d features valid', i, t-1, round(100*i/(t-1)), sum(features(:,4,i+1)), size(features,1)));
+    display(sprintf('Progress %s: %3d of %3d (%3d%%), %5d of %5d features valid', datestr(now, 'HH:MM:SS'), i, t-1, round(100*i/(t-1)), sum(features(:,4,i+1)), size(features,1)));
 end;
-
+display(sprintf('KLTTracker: %s \t Finished', datestr(now, 'HH:MM:SS')));
