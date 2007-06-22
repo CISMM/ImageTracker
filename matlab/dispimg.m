@@ -3,8 +3,8 @@ function [] = dispimg(img, cmap)
 %
 % Display the given image with the chosen color map.
 % Inputs (default):
-% img      - The input image
-% cmap     - The colormap to use (gray)
+% img         - The input image
+% cmap        - The colormap to use (gray)
 %
 % Outputs:
 % none

@@ -1,6 +1,6 @@
 function [ ] = ShowMovie( frames, fps )
-%SHOWMOVIE Summary of this function goes here
-%   Detailed explanation goes here
+% ShowMovie(frames, fps) Displays an image sequence in a figure window at
+% the requested frame rate (fps, default is 30).
 
 [h, w, l] = size(frames);
 

@@ -6,14 +6,15 @@ function [ features, himg ] = HarrisDetector( img, scaleD, scaleI, count, fRadiu
 % list.
 %
 % Input (default):
-% img      - The input image
-% scaleD   - The derivative scale at which to detect features (1.0)
-% scaleI   - The integration scale over which to sum features (1.0)
-% count    - The targeted number of feature points (1000)
-% fRadius  - The radius around an established feature where no other
+% img         - The input image
+% scaleD      - The derivative scale at which to detect features (1.0)
+% scaleI      - The integration scale over which to sum features (1.0)
+% count       - The targeted number of feature points (1000)
+% fRadius     - The radius around an established feature where no other
 % features should be selected (5)
-% fExist   - Existing feature set ([])
-% cutoff   - The percentage of maximum below which to ignore features (0.05)
+% fExist      - Existing feature set ([])
+% cutoff      - The percentage of maximum below which to ignore features
+% (0.05)
 %
 % Output:
 % features - The location of features; a Nx4 array of [y,x,error,valid] points

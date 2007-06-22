@@ -5,17 +5,22 @@ function [ imgs ] = LoadImages( format, start, stop, stride, rgb )
 % each frame is NxM (h,w) pixels and F=stop-start+1.  Each pixel is
 % represented as a double grayscale value.
 %
+% Image data memory is allocated early in this process, so if the system
+% does not have enough memory to load all images, MATLAB will provide a
+% warning rather quickly.  After this, reading all the data from disk may
+% take a while.
+%
 % Inputs (default):
-% format   - The sprintf format of the image sequence file names, e.g.
+% format      - The sprintf format of the image sequence file names, e.g.
 % 'myseq-%04d.tif' for myseq-0000.tif, myseq-0001.tif, etc.
-% start    - The starting image index of the file sequence
-% stop     - The stopping image index of the file sequence
-% stride   - The distance between consecutive image indices (1)
-% rgb      - 1 if the images are rgb format; they will be converted to
+% start       - The starting image index of the file sequence
+% stop        - The stopping image index of the file sequence
+% stride      - The distance between consecutive image indices (1)
+% rgb         - 1 if the images are rgb format; they will be converted to
 % grayscale (0)
 %
 % Output:
-% imgs     - The NxMxF image sequence data
+% imgs        - The NxMxF image sequence data
 
 if (nargin < 5)
     rgb = 0;

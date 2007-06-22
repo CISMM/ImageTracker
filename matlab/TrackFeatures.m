@@ -6,15 +6,15 @@ function [ d ] = TrackFeatures( dx, dy, dt, pts, radius )
 % features.
 % 
 % Input (default)
-% dx       - The x-derivative of the image sequence
-% dy       - The y-derivative of the image sequence
-% dt       - The t-derivative of the image sequence
-% pts      - The indices (y,x) of the interest features
-% radius   - The image patch radius to use when computing the
+% dx          - The x-derivative of the image sequence
+% dy          - The y-derivative of the image sequence
+% dt          - The t-derivative of the image sequence
+% pts         - The indices (y,x) of the interest features
+% radius      - The image patch radius to use when computing the
 % displacement (2)
 %
 % Output
-% d        - The displacement of each image feature in pts (y, x)
+% d           - The displacement of each image feature in pts (y, x)
 
 if (nargin < 5)
     radius = 2;

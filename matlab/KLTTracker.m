@@ -1,6 +1,49 @@
 function [ features ] = KLTTracker( imgs, sigmaS, sigmaT, count, featRadius, featFrame )
-%KLTTRACKER Summary of this function goes here
-%   Detailed explanation goes here
+% KLTTracker( imgs, sigmaS, sigmaT, count, featRadius, featFrame ) Tracks
+% features in an image sequence.
+%
+% An implemntation of the KLT (Kanade, Lucas, Tomasi) tracker.  Uses a
+% Harris interest feature detector to find features to track.  The set of
+% features is tracked for each frame using a closed-form linear equation
+% that presumes features have a constant appearance over time.  At each
+% frame, tracking error for each feature is established by comparing the
+% current feature patch to the initially detected feature patch.  Features
+% that fail the error test are no longer tracked.  New features, however,
+% can be detected periodically.
+%
+% The tracked feature information is stored in a F x 4 x N matrix, where F
+% is the total number of features detected throughout the video sequence
+% and N is the number of frames in the image sequence.  For each feature at
+% each frame, the 4-vector provides:
+% y-position  - in pixels
+% x-position  - in pixels
+% error       - the error metric value for the feature in the current
+% frame; this value ranges between 0 and 1, 1 representing the best
+% tracking. This value is used to determine when tracking fails, so once
+% the error metric for a particular feature drops below a certain
+% threshold, the features is no longer considered valid and all subsequent
+% error values should be 0.
+% valid       - Indicates whether the feature is successfully tracked in
+% the current frame
+%
+% Some progress information is provided to give some indication of how long
+% the tracking process is likely to take.
+%
+% Input (default):
+% imgs        - The image sequence on which to perform tracking
+% sigmaS      - The spatial scale to use for image smoothing and image
+% derivative computation (1.0)
+% sigmaT      - The temporal scale to use for image smoothing and image
+% derivative computation; NB: not currently used for anything; temporal
+% derivatives are computed using frame differences. (1.0)
+% count       - The maximum number of concurrent actively tracked features
+% (500)
+% featRadius  - The minimum distance in pixels between two features (5)
+% featFrame   - The number of frames to wait before searching for new
+% features to track (5)
+%
+% Output:
+% features    - The Fx4xN feature tracking matrix, as described above
 
 display(sprintf('KLTTracker: %s \t Starting', datestr(now, 'HH:MM:SS')));
 

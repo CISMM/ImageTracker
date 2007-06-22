@@ -1,20 +1,21 @@
 function [ err, val ] = CheckError( imgs, feat, tolerance, radius )
 % CheckError(imgs, feat, tolerance, radius) Computes the error in tracking
 % a feature.
+%
 % Given a set of features in I1 and a set of corresponding displacements of
 % each feature to I2, this function computes the error (normalized c,ross
 % correlation) in each image patch.  Additionally, a validity flag is set
 % for the feature if the computed error is above the specified tolerance.
 %
 % Input (default):
-% imgs     - The image sequence
-% feat     - The set of features
-% tolerance- The error tolerance threshold (0.85)
-% radius   - The image patch radius (2)
+% imgs        - The image sequence
+% feat        - The set of features
+% tolerance   - The error tolerance threshold (0.85)
+% radius      - The image patch radius (2)
 %
 % Output
-% err      - The set of errors corresponding to each feature patch
-% val      - A flag indicating whether each feature patch was within the
+% err         - The set of errors corresponding to each feature patch
+% val         - A flag indicating whether each feature patch was within the
 % error tolerance
 
 if (nargin < 4)
