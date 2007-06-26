@@ -1,4 +1,4 @@
-function [ ] = ShowFeatureMovie( imgs, feats, fps, filename )
+function [ ] = ShowFeatureMovie( imgs, feats, tracks, fps, filename )
 % ShowFeatureMovie(imgs, feats) displays an image sequence along with
 % tracked features.
 %
@@ -6,11 +6,14 @@ function [ ] = ShowFeatureMovie( imgs, feats, fps, filename )
 % green  - a feature newly detected in the current frame
 % yellow - a feature successfully tracked in the current frame
 % red    - a feature whose tracking fails in the current frame
+%
+% The tracks parameter determines whether to display each feature's
+% history as a set of connected blue dots.
 % 
 % The play rate can be controlled with the fps variable.  This is mainly a
 % suggestion of how long to wait (1/fps) after displaying one frame and
 % before displaying the next one; the frame rate could drop lower if
-% plotting many features.
+% plotting many features or when displaying the feature tracks.
 %
 % The function enables saving an AVI to the specified filename.  If no
 % filename is specified, no movie will be saved.  The target frame rate is
@@ -20,6 +23,7 @@ function [ ] = ShowFeatureMovie( imgs, feats, fps, filename )
 % Input (default)
 % imgs        - The image sequence to display
 % feats       - The features tracked in the image sequence
+% tracks      - A flag indicating whether to display the feature tracks
 % fps         - The target display frame rate (20)
 % filename    - The file name to use to save an AVI movie of the feature
 % tracking
@@ -28,14 +32,17 @@ function [ ] = ShowFeatureMovie( imgs, feats, fps, filename )
 % none
 
 % Setup defaults
-if (nargin < 4)
+if (nargin < 5)
     filename = '';
     save = false;
 else
     save = true;
 end;
-if (nargin < 3)
+if (nargin < 4)
     fps = 20;
+end;
+if (nargin < 3)
+    tracks = false;
 end;
 
 [hi,wi,ti] = size(imgs);
@@ -71,8 +78,21 @@ for i=2:min(ti,tf)
     plot(feats(newIdx, 2,i), feats( newIdx,1,i), 'gs');
     plot(feats(contIdx,2,i), feats(contIdx,1,i), 'ys');
     plot(feats(deadIdx,2,i), feats(deadIdx,1,i), 'rs');
+
+    % Show each feature's history, if necessary
+    if (tracks)
+        fidx = find(feats(:,4,i)); % valid features
+        for f = 1:length(fidx)
+            tidx = find(feats(fidx(f),4,:)); % feature track history
+            % crop history to this frame
+            tidx = tidx.*(tidx <= i); 
+            tt = find(tidx);
+            plot(squeeze(feats(fidx(f),2,tidx(tt))), squeeze(feats(fidx(f),1,tidx(tt))), 'b.-');
+        end;
+    end;
+
     hold off;
-    
+
     % Grab frame, if we're saving the movie
     if (save)
         mov(i) = getframe;
