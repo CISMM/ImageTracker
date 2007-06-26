@@ -1,13 +1,13 @@
-function [ d ] = TrackFeatures( dx, dy, dt, pts, radius )
-% TrackFeatures(dx, dy, dt, pts, radius) Tracks features from one frame to
+function [ d ] = TrackFeatures( I1, I2, pts, radius, sigmaS, iters )
+% TrackFeatures(GI1, GI2, dt, pts, radius) Tracks features from one frame to
 % the next.
 % Given the derivatives of an image sequence in x, y, and t and the indices
 % of features to track, this function finds the displacement of the
 % features.
 % 
 % Input (default)
-% dx          - The x-derivative of the image sequence
-% dy          - The y-derivative of the image sequence
+% GI          - The spatial gradient of the image sequence at the current
+% frame (or between the two frames)
 % dt          - The t-derivative of the image sequence
 % pts         - The indices (y,x) of the interest features
 % radius      - The image patch radius to use when computing the
@@ -16,9 +16,30 @@ function [ d ] = TrackFeatures( dx, dy, dt, pts, radius )
 % Output
 % d           - The displacement of each image feature in pts (y, x)
 
+if (nargin < 6)
+    iters = 5;
+end;
 if (nargin < 5)
+    sigmaS = 1.0;
+end;
+if (nargin < 4)
     radius = 2;
 end;
+
+% Create some 1D Gaussian kernels
+Gs = GaussianKernel1D(sigmaS, 0, 3);
+% We negate the derivative kernel to detect positive step edges when
+% filtering (equivalent to convolution with true derivatives)
+dGs = -GaussianKernel1D(sigmaS, 1, 3);
+
+% Create some spatial kernels
+Gx = Gs'*dGs;
+Gy = dGs'*Gs;
+
+% compute image gradients
+I = I1 + I2;
+GI(:,:,1) = filter2(Gx, I);
+GI(:,:,2) = filter2(Gy, I);
 
 % Create a weighting function--the error in the tracker increases from the
 % center of the image patch
@@ -28,36 +49,49 @@ end;
 % gg = g'*g;
 % gg = gg/max(gg(:));
 
-[h,w] = size(dx);
+[h,w] = size(I1);
 
 d = zeros(size(pts,1),2);
-for i=1:size(pts,1)
-    if (pts(i,4) == 0) 
-        % Feature is not valid, ignore
-    else
-        y = pts(i,1);
-        x = pts(i,2);
-        yy = max(1,y-radius):1.0:min(h,y+radius);
-        xx = max(1,x-radius):1.0:min(w,x+radius);
 
-        % Find the indices for the weighting function
-    %     wxi = radius+1 - min(radius,x):radius+1 + min(radius,w-x);
-    %     wyi = radius+1 - min(radius,y):radius+1 + min(radius,h-y);
-    %     w = [gg(wyi,wxi)];
-    %     ww = [w(:) w(:)].^2';
+% Find valid feature indices
+fidx = find(pts(:,4));
 
-        % create the sampling grid
-        [xidx, yidx] = meshgrid(xx,yy);
+for idx=1:length(fidx) % for each valid feature
+    i = fidx(idx);
+    y = pts(i,1);
+    x = pts(i,2);
+    
+    % Find the indices of the image patch
+    yy = max(1,y-radius):1.0:min(h,y+radius);
+    xx = max(1,x-radius):1.0:min(w,x+radius);
+    
+    % create the sampling grid over the image patch
+    [xidx, yidx] = meshgrid(xx,yy);
 
-        % interpolate derivatives on the sampling grid
-        dxx = interp2(dx, xidx, yidx);
-        dyy = interp2(dy, xidx, yidx);
-        dtt = interp2(dt, xidx, yidx);
+    % interpolate derivatives on the sampling grid, using the symmetric
+    % treatment of the image gradients
+    dxx = interp2(GI(:,:,1), xidx, yidx);
+    dyy = interp2(GI(:,:,2), xidx, yidx);
+    
+    for iter = 1:iters
+        % Each iteration, the estimate of the new image patch changes, so
+        % the estimate of It changes. Here, we use the current displacement
+        % estimate to define the image patch in the second frame.
+        yy2 = yy + d(i,1);
+        xx2 = xx + d(i,2);
+        [xidx2 yidx2] = meshgrid(xx2, yy2);
+        dtt = interp2(I2, xidx2, yidx2) - interp2(I1, xidx, yidx);
+
+    % Find the indices for the weighting function
+%     wxi = radius+1 - min(radius,x):radius+1 + min(radius,w-x);
+%     wyi = radius+1 - min(radius,y):radius+1 + min(radius,h-y);
+%     w = [gg(wyi,wxi)];
+%     ww = [w(:) w(:)].^2';
 
         A = [dxx(:), dyy(:)];
         b = -dtt(:);
     %     v = inv((A'.*ww)*A)*A'.*ww*b;
         v = inv(A'*A)*A'*b;
-        d(i,:) = [v(2) v(1)]; % have to swap order of x,y displacement
+        d(i,:) = d(i,:) + [v(2) v(1)]; % have to swap order of x,y displacement
     end;
 end;

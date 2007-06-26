@@ -1,4 +1,4 @@
-function [ features ] = KLTTracker( imgs, sigmaS, sigmaT, count, featRadius, featFrame )
+function [ features ] = KLTTracker( imgs, sigmaS, sigmaT, count, featRadius, featFrame, windRadius )
 % KLTTracker( imgs, sigmaS, sigmaT, count, featRadius, featFrame ) Tracks
 % features in an image sequence.
 %
@@ -47,6 +47,9 @@ function [ features ] = KLTTracker( imgs, sigmaS, sigmaT, count, featRadius, fea
 
 display(sprintf('KLTTracker: %s \t Starting', datestr(now, 'HH:MM:SS')));
 
+if (nargin < 7)
+    windRadius = 2;
+end;
 if (nargin < 6)
     featFrame = 5;
 end;
@@ -65,18 +68,6 @@ end;
 
 [h w t] = size(imgs);
 
-% Create some 1D Gaussian kernels
-Gs = GaussianKernel1D(sigmaS, 0, 3);
-Gt = GaussianKernel1D(sigmaT, 0, 3);
-% We negate the derivative kernel to detect positive step edges when
-% filtering (equivalent to convolution with true derivatives)
-dGs = -GaussianKernel1D(sigmaS, 1, 3);
-dGt = -GaussianKernel1D(sigmaT, 1, 3);
-
-% Create some spatial kernels
-Gx = Gs'*dGs;
-Gy = dGs'*Gs;
-
 % Find initial features
 features(:,:,1) = HarrisDetector(imgs(:,:,1), sigmaS, sigmaS, count, featRadius);
 displayFeatures(imgs(:,:,1), features(:,:,1));
@@ -90,12 +81,11 @@ for i=1:t-1
         clear newFeat;
     end;
     
-    Ix = filter2(Gx, imgs(:,:,i));
-    Iy = filter2(Gy, imgs(:,:,i));
-    It = imgs(:,:,i+1)-imgs(:,:,i);
-    d = TrackFeatures(Ix, Iy, It, features(:,:,i));
+    % Track the features for one frame
+    d = TrackFeatures(imgs(:,:,i), imgs(:,:,i+1), features(:,:,i), windRadius, sigmaS, 5);
     features(:,1:2,i+1) = features(:,1:2,i) + d;
-    [err, val] = CheckError(imgs, features);
+    % Check the error on tracked features
+    [err, val] = CheckError(imgs, features, 0.85, windRadius);
     features(:,3:4,i+1) = [err val];
     
     % Progress update

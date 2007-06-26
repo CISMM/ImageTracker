@@ -67,19 +67,27 @@ hcutoff = max(himg(:)) * cutoff;
 
 % Find local maxima in the Harris feature image
 [h, w] = size(img);
-ii = 2:h-1;
-jj = 2:w-1;
+M = zeros(h,w);
+ii = 1+fRadius:h-fRadius;
+jj = 1+fRadius:w-fRadius;
 % M marks the possible location of Harris features--local maxima
 % (himg(ii,jj)>hcutoff).*
 M(ii,jj) = (himg(ii,jj)>hcutoff).*(himg(ii,jj)>himg(ii-1,jj-1)).*(himg(ii,jj)>himg(ii-1,jj)).*(himg(ii,jj)>himg(ii-1,jj+1)).*(himg(ii,jj)>himg(ii,jj-1)).*(himg(ii,jj)>himg(ii,jj+1)).*(himg(ii,jj)>himg(ii+1,jj-1)).*(himg(ii,jj)>himg(ii+1,jj)).*(himg(ii,jj)>himg(ii+1,jj+1));
-M(h,w) = 0;
 
 % Copy existing features to result
 features = fExist;
 
-% Zero out M where there are already features being tracked
-for i=1:length(fExist)
-    if (fExist(i,4) > 0)
+% Handle existing features
+if (~isempty(fExist))  
+    % Kill features that have gotten too close to the edge of the image
+    fidx = find(fExist(:,4));
+    ff = 1:length(fidx);
+    fExist(ff,4) = (fExist(ff,1) > 1+fRadius).*(fExist(ff,1) < h-fRadius).*(fExist(ff,2) > 1+fRadius).*(fExist(ff,2) < w-fRadius);
+
+    % Zero out regions in the feature map that are close to existing features
+    fidx = find(fExist(:,4));
+    for idx=1:length(fidx)
+        i = fidx(idx);
         ii = max(1,fExist(i,1)-fRadius):min(h,fExist(i,1)+fRadius);
         jj = max(1,fExist(i,2)-fRadius):min(w,fExist(i,2)+fRadius);
         M(round(ii),round(jj)) = 0;
