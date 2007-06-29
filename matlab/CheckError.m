@@ -25,8 +25,8 @@ if (nargin < 3)
     tolerance = 0.85;
 end;
 
-err = zeros(length(feat),1);
-val = zeros(length(feat),1);
+err = zeros(size(feat,1),1);
+val = zeros(size(feat,1),1);
 
 % The current image frame
 cframe = size(feat,3);

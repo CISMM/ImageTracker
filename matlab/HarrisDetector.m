@@ -74,15 +74,11 @@ jj = 1+fRadius:w-fRadius;
 % (himg(ii,jj)>hcutoff).*
 M(ii,jj) = (himg(ii,jj)>hcutoff).*(himg(ii,jj)>himg(ii-1,jj-1)).*(himg(ii,jj)>himg(ii-1,jj)).*(himg(ii,jj)>himg(ii-1,jj+1)).*(himg(ii,jj)>himg(ii,jj-1)).*(himg(ii,jj)>himg(ii,jj+1)).*(himg(ii,jj)>himg(ii+1,jj-1)).*(himg(ii,jj)>himg(ii+1,jj)).*(himg(ii,jj)>himg(ii+1,jj+1));
 
-% Copy existing features to result
-features = fExist;
-
 % Handle existing features
 if (~isempty(fExist))  
     % Kill features that have gotten too close to the edge of the image
     fidx = find(fExist(:,4));
-    ff = 1:length(fidx);
-    fExist(ff,4) = (fExist(ff,1) > 1+fRadius).*(fExist(ff,1) < h-fRadius).*(fExist(ff,2) > 1+fRadius).*(fExist(ff,2) < w-fRadius);
+    fExist(fidx,4) = (fExist(fidx,1) > 1+fRadius).*(fExist(fidx,1) < h-fRadius).*(fExist(fidx,2) > 1+fRadius).*(fExist(fidx,2) < w-fRadius);
 
     % Zero out regions in the feature map that are close to existing features
     fidx = find(fExist(:,4));
@@ -101,9 +97,12 @@ hScore = himg.*M;
 [si, sj, sVal] = find(hScore);
 [tmp, sortIdx] = sort(sVal,1,'descend');
 
+% Copy existing features to result
+features = fExist;
+
 % Add new features if they are not too close to existing features
 idx = 1;
-while ((size(features,2) < 1 || sum(features(:,4)) < count) && idx <= length(sortIdx))
+while ((isempty(features) || sum(features(:,4)) < count) && idx <= length(sortIdx))
     % Get the feature's position
     pos = [si(sortIdx(idx)) sj(sortIdx(idx))];
     % Check if feature is still valid

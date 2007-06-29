@@ -73,11 +73,7 @@ for i=2:min(ti,tf)
     contIdx = find(contFeat);
     deadIdx = find(deadFeat);
     
-    % display the features, color coded
-    hold on;
-    plot(feats(newIdx, 2,i), feats( newIdx,1,i), 'gs');
-    plot(feats(contIdx,2,i), feats(contIdx,1,i), 'ys');
-    plot(feats(deadIdx,2,i), feats(deadIdx,1,i), 'rs');
+    hold on; % keep the image up while drawing features
 
     % Show each feature's history, if necessary
     if (tracks)
@@ -87,11 +83,17 @@ for i=2:min(ti,tf)
             % crop history to this frame
             tidx = tidx.*(tidx <= i); 
             tt = find(tidx);
-            plot(squeeze(feats(fidx(f),2,tidx(tt))), squeeze(feats(fidx(f),1,tidx(tt))), 'b.-');
+            % display track
+            plot(squeeze(feats(fidx(f),2,tidx(tt))), squeeze(feats(fidx(f),1,tidx(tt))), 'b-');
         end;
     end;
+    
+    % display the features, color coded
+    plot(feats(newIdx, 2,i), feats( newIdx,1,i), 'gs');
+    plot(feats(contIdx,2,i), feats(contIdx,1,i), 'ys');
+    plot(feats(deadIdx,2,i), feats(deadIdx,1,i), 'rs');
 
-    hold off;
+    hold off; % done drawing on the figure
 
     % Grab frame, if we're saving the movie
     if (save)
