@@ -51,7 +51,7 @@ function [ features ] = KLTTracker( imgs, sigmaS, sigmaT, count, featRadius, fea
 display(sprintf('KLTTracker: %s \t Starting', datestr(now, 'HH:MM:SS')));
 
 if (nargin < 8)
-    iters = 3;
+    iters = 1;
 end;
 if (nargin < 7)
     windRadius = 2;
@@ -87,6 +87,10 @@ for i=1:t-1
         clear newFeat;
     end;
     
+    % Kill features that have gotten too close to the edge of the image
+    fidx = find(features(:,4,end));
+    features(fidx,4,end) = (features(fidx,1,end) > 1+featRadius).*(features(fidx,1,end) < h-featRadius).*(features(fidx,2,end) > 1+featRadius).*(features(fidx,2,end) < w-featRadius);
+
     % Track the features for one frame
     d = TrackFeatures(imgs(:,:,i), imgs(:,:,i+1), features(:,:,i), windRadius, sigmaS, iters);
     features(:,1:2,i+1) = features(:,1:2,i) + d;

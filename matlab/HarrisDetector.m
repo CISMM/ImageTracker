@@ -76,10 +76,6 @@ M(ii,jj) = (himg(ii,jj)>hcutoff).*(himg(ii,jj)>himg(ii-1,jj-1)).*(himg(ii,jj)>hi
 
 % Handle existing features
 if (~isempty(fExist))  
-    % Kill features that have gotten too close to the edge of the image
-    fidx = find(fExist(:,4));
-    fExist(fidx,4) = (fExist(fidx,1) > 1+fRadius).*(fExist(fidx,1) < h-fRadius).*(fExist(fidx,2) > 1+fRadius).*(fExist(fidx,2) < w-fRadius);
-
     % Zero out regions in the feature map that are close to existing features
     fidx = find(fExist(:,4));
     for idx=1:length(fidx)
