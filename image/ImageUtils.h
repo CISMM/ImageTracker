@@ -10,7 +10,7 @@
 #include "Logger.h"
 
 template < class TImage >
-void PrintImageInfo(const TImage* image, const std::string& label = "")
+void PrintImageInfo(const TImage* image, const std::string& label = "", LogStream &logger = Logger::debug)
 {
     typedef itk::StatisticsImageFilter< TImage> StatsType;
 
@@ -19,43 +19,38 @@ void PrintImageInfo(const TImage* image, const std::string& label = "")
     stats->Update();
 
     if (label != "")
-        std::cout << label << " info:" << std::endl;
+        logger << label << " info:" << std::endl;
     else
-        std::cout << "Image info: " << std::endl;
-    std::cout << "\tclass: " << image->GetNameOfClass() << std::endl;
-    std::cout << "\tmin:   " << (float) stats->GetMinimum() << std::endl;
-    std::cout << "\tmax:   " << (float) stats->GetMaximum() << std::endl;
-    std::cout << "\tmean:  " << (float) stats->GetMean() << std::endl;
-    std::cout << "\tvar:   " << (float) stats->GetVariance() << std::endl;
-    std::cout << "\tstd:   " << (float) stats->GetSigma() << std::endl;
+        logger << "Image info: " << std::endl;
+    
+    logger << "\tclass: " << image->GetNameOfClass() << std::endl;
+    logger << "\tmin:   " << (float) stats->GetMinimum() << std::endl;
+    logger << "\tmax:   " << (float) stats->GetMaximum() << std::endl;
+    logger << "\tmean:  " << (float) stats->GetMean() << std::endl;
+    logger << "\tvar:   " << (float) stats->GetVariance() << std::endl;
+    logger << "\tstd:   " << (float) stats->GetSigma() << std::endl;
 }
 
 template < class TImage >
-void PrintRegionInfo(const typename TImage::RegionType& region, const std::string& label = "")
+void PrintRegionInfo(const typename TImage::RegionType& region, const std::string& label = "", LogStream &logger = Logger::debug)
 {
     unsigned int Dimension = TImage::ImageDimension;
     if (label != "")
-        std::cout << label << " info: " << std::endl;
+        logger << label << " info: " << std::endl;
     else
-        std::cout << "Region info: " << std::endl;
+        logger << "Region info: " << std::endl;
     
-    std::cout << "\tIndex:\t[";
-    for (int i = 0; i < Dimension; i++)
+    // We have to be deterministic (we can't just do this in a for loop) here, to avoid odd printing of log levels
+    if (Dimension == 2)
     {
-        std::cout << region.GetIndex()[i];
-        if (i != Dimension-1)
-            std::cout << ", ";
+        logger << "\tIndex:\t[" << region.GetIndex()[0] << "," << region.GetIndex()[1] << "]" << std::endl;
+        logger << "\tSize:\t["  << region.GetSize()[0]  << "," << region.GetSize()[1]  << "]" << std::endl;
     }
-    std::cout << "]" << std::endl;
-    
-    std::cout << "\tSize:\t[";
-    for (int i = 0; i < Dimension; i++)
+    else if (Dimension == 3)
     {
-        std::cout << region.GetSize()[i];
-        if (i != Dimension-1)
-            std::cout << ", ";
+        logger << "\tIndex:\t[" << region.GetIndex()[0] << "," << region.GetIndex()[1] << "," << region.GetIndex()[2] << "]" << std::endl;
+        logger << "\tSize:\t["  << region.GetSize()[0]  << "," << region.GetSize()[1] << ","  << region.GetSize()[2]  << "]" << std::endl;
     }
-    std::cout << "]" << std::endl;
 }
 
 template < class TImage >

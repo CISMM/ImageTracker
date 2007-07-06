@@ -10,6 +10,7 @@
 #include "itkDataObject.h"
 #include "itkImageFileReader.h"
 #include "itkLightObject.h"
+#include "itkVector.h"
 
 #include "FileSet.h"
 #include "ImageUtils.h"
@@ -81,6 +82,35 @@ public:
     { return static_cast<ExternalType>(input); }
 };
 
+template <>
+class PixelAccessor< itk::Vector< float, 2 >, itk::Vector< float, 2 > >
+{
+public:
+    typedef itk::Vector< float, 2 > InternalType;
+    typedef itk::Vector< float, 2 > ExternalType;
+        
+    ExternalType Get(const InternalType& input)
+    {
+        return input;
+    }
+};
+
+// template < class TInput, class TOutput, unsigned int VDim>
+// class PixelAccessor< itk::Vector< TInput, VDim >, itk::Vector< TOutput, VDim > >
+// { 
+// public:
+//     typedef itk::Vector< TInput, VDim > InternalType;
+//     typedef itk::Vector< TOutput, VDim > ExternalType;
+//         
+//     ExternalType Get(const InternalType& input)
+//     {
+//         ExternalType v;
+//         for (int d = 0; d < VDim; d++)
+//             v[d] = static_cast<TOutput>(input[d]);
+//         return v;
+//     }
+// };
+
 /**
  * An ImageSetReader provides an intuitive interface to a set of
  * images, e.g. frames of a video. The class attepts to mirror the
@@ -101,9 +131,9 @@ public:
     typedef TOutput OutputImageType;
     typedef typename InputImageType::Pointer InputImagePointer;
     typedef typename OutputImageType::Pointer OutputImagePointer;
+    // typedef itk::CastImageFilter< InputImageType, OutputImageType > CasterType;
     typedef itk::AdaptImageFilter< InputImageType, OutputImageType, 
         PixelAccessor< typename InputImageType::PixelType, typename OutputImageType::PixelType > > CasterType;
-//     typedef itk::CastImageFilter< InputImageType, OutputImageType > CasterType;
     typedef typename CasterType::Pointer CasterPointer;
 
     // We have to store references to the image caster--otherwise it gets deleted.
@@ -201,7 +231,6 @@ ImageSetReader<TInput, TOutput>::operator[](unsigned int index)
         CasterPointer caster = CasterType::New();
         caster->SetInput(ReadImage<InputImageType>(const_cast<FileSet&>(this->GetFiles())[index]));
         this->images[index] = caster;
-//         this->images[index] = ReadImage<InputImageType>(const_cast<FileSet&>(this->GetFiles())[index]);
 
         this->indices.push_back(index);
         // must count stored indices because the image array's size is
@@ -209,7 +238,6 @@ ImageSetReader<TInput, TOutput>::operator[](unsigned int index)
         this->maxCount = this->indices.size() > this->maxCount ?
                 this->indices.size() : this->maxCount;
     }
-
     
     // Logger::verbose << "ImageSetReader[" << index << "] end." << std::endl;
     return this->images[index]->GetOutput();
