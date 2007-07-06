@@ -6,6 +6,7 @@
 #include "itkImageDuplicator.h"
 #include "itkImageSeriesReader.h"
 #include "itkImageRegionIteratorWithIndex.h"
+#include "itkSubtractImageFilter.h"
 #include "itkVector.h"
 
 #include "FilePattern.h"
@@ -27,10 +28,11 @@
  */
 int main(int argc, char** argv)
 {
+    std::string function("IntegrateFlowField");
     // Check argument count
     if (argc < 10)
     {
-        Logger::error << "Usage:\n\t" << argv[0] << " dir formatIn start stop timeStart timeStop timeStep initOut posOut" << std::endl;
+        Logger::error << "Usage:\n\t" << argv[0] << " dir formatIn start stop timeStart timeStop timeStep initOut formatOut" << std::endl;
         exit(1);
     }
     
@@ -42,7 +44,7 @@ int main(int argc, char** argv)
     float timeEnd           = atof(argv[6]);
     float timeStep          = atof(argv[7]);
     std::string initOutFile = argv[8];
-    std::string posOutFile  = argv[9];
+    std::string formatOut   = argv[9];
     
     typedef itk::Vector< float, 2 > VectorPixelType;
     typedef itk::Image< VectorPixelType, 3 > FlowFieldType;
@@ -53,16 +55,18 @@ int main(int argc, char** argv)
     
     typedef RungeKuttaSolver< PositionFieldType, PositionFieldType, FlowFieldType > SolverType;
     typedef itk::ImageDuplicator< PositionFieldType > CopyType;
+    typedef itk::SubtractImageFilter< PositionFieldType, PositionFieldType, PositionFieldType > SubtractType;
     
     // Load flow field
-    Logger::verbose << "Loading flow field" << std::endl;
+    Logger::verbose << function << ": Loading flow field" << std::endl;
     FileSet flowFiles(FilePattern(dir, formatIn, start, end));
     FlowReaderType::Pointer reader = FlowReaderType::New();
     reader->SetFileNames(flowFiles.GetFileNames());
     reader->Update();
+    PrintRegionInfo<FlowFieldType>(reader->GetOutput()->GetLargestPossibleRegion(), "Flow field region");
     
     // Create initial position (initial conditions)
-    Logger::verbose << "Creating initial condition image" << std::endl;
+    Logger::verbose << function << ": Creating initial condition image" << std::endl;
     FlowFieldType::SizeType flowSize = reader->GetOutput()->GetLargestPossibleRegion().GetSize();
     PositionFieldType::SizeType size;
     PositionFieldType::IndexType index;
@@ -77,9 +81,10 @@ int main(int argc, char** argv)
     PositionFieldType::Pointer initial = PositionFieldType::New();
     initial->SetRegions(region);
     initial->Allocate();
+    PrintRegionInfo<PositionFieldType>(initial->GetLargestPossibleRegion(), "Initial position region");
     
     // Fill initial conditions with image indices
-    Logger::verbose << "Filling initial conditions with image indices." << std::endl;
+    Logger::verbose << function << ": Filling initial conditions with image indices." << std::endl;
     PositionIteratorType posIt(initial, region);
     for (posIt.GoToBegin(); !posIt.IsAtEnd(); ++posIt)
     {
@@ -94,32 +99,40 @@ int main(int argc, char** argv)
     WriteImage<PositionFieldType>(initial, initOutFile);
     
     // Create RungeKutter solver
-    Logger::verbose << "Setting up RK4 solver" << std::endl;
+    Logger::verbose << function << ": Setting up RK4 solver" << std::endl;
     SolverType::Pointer solver = SolverType::New();
     CopyType::Pointer copy = CopyType::New();
+    SubtractType::Pointer subtract = SubtractType::New();
+    subtract->SetInput2(initial);
     
-    solver->SetInput(initial);
+    PositionFieldType::Pointer current = PositionFieldType::New();
+    copy->SetInputImage(initial);
+    copy->Update();
+    current = copy->GetOutput();
+    
     solver->SetDerivative(reader->GetOutput());
-    solver->SetStartTime(timeStart);
     solver->SetStepSize(timeStep);
     
-    Logger::verbose << "Solving first time step." << std::endl;
-    Logger::verbose << "\tTime: " << timeStart << " -> " << (timeStart+timeStep) << std::endl;
-    solver->Update();
-    
-    // Solve for position over all image steps
-    Logger::verbose << "Solving over all time steps" << std::endl;
     int steps = int ((timeEnd - timeStart) / timeStep);
-    for (int i = 1; i < steps; i++)
+    for (int i = 0; i < steps; i++)
     {
-        Logger::verbose << "\tTime: " << (timeStart + i * timeStep) << " -> " << (timeStart + (i+1) * timeStep) << std::endl;
-        copy->SetInputImage(solver->GetOutput());
-        copy->Update(); // This updates the input to the solver
-        solver->SetInput(copy->GetOutput());
-        solver->SetStartTime(timeStart + i * timeStep);
+        // Solve the next time step
+        double time = timeStart + i * timeStep;
+        Logger::verbose << function << ": Time: " << time << " -> " << (time + timeStep) << std::endl;
+        solver->SetInput(current);
+        solver->SetStartTime(time);
         solver->Update();
+        
+        // Copy output to current position
+        copy->SetInputImage(solver->GetOutput());
+        copy->Update();
+        current = copy->GetOutput();
+        
+        // Write to a file
+        subtract->SetInput1(current);
+        char file[120];
+        sprintf(file, formatOut.c_str(), i);
+        std::string filestr(file);
+        WriteImage<PositionFieldType>(subtract->GetOutput(), filestr);
     }
-    
-    Logger::verbose << "Writing result" << std::endl;
-    WriteImage(solver->GetOutput(), posOutFile);
 }
