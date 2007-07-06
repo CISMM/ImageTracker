@@ -100,6 +100,8 @@ template < class TInput, class TOutput, class TDerivative >
 void RungeKuttaSolver< TInput, TOutput, TDerivative >
 ::GenerateData()
 {
+    std::string function("RungeKuttaSolver::GenerateData");
+    Logger::verbose << function << ": time: " << this->GetStartTime() << "\tstep: " << this->GetStepSize() << std::endl;
     // Typedefs
     typedef itk::LinearInterpolateImageFunction< DerivativeType > InterpolateType;
     typedef itk::ImageRegionConstIterator< InputImageType > InputIteratorType;
@@ -111,11 +113,11 @@ void RungeKuttaSolver< TInput, TOutput, TDerivative >
     typedef typename InterpolateType::OutputType DerivativeValueType;
     
     // Allocate output buffer
-    Logger::verbose << "Allocating output" << std::endl;
+    Logger::verbose << function << ": Allocating output" << std::endl;
     Superclass::AllocateOutputs();
     
     // Grab inital image and final image
-    Logger::verbose << "Retreiving input" << std::endl;
+    Logger::verbose << function << ": Retreiving input" << std::endl;
     typename InputImageType::Pointer input = const_cast< InputImageType *>(this->GetInput());
     typename OutputImageType::Pointer output = this->GetOutput();
     
@@ -124,7 +126,7 @@ void RungeKuttaSolver< TInput, TOutput, TDerivative >
     interpolate->SetInputImage(this->GetDerivative());
     
     // Determine the region over which to solve the differential equation
-    Logger::verbose << "Setting up iterators" << std::endl;
+    Logger::verbose << function << ": Setting up iterators" << std::endl;
     typename OutputImageType::RegionType outRegion = output->GetRequestedRegion();
     InputIteratorType inIt(input, outRegion);
     OutputIteratorType outIt(output, outRegion);
@@ -135,7 +137,7 @@ void RungeKuttaSolver< TInput, TOutput, TDerivative >
     float oneThird = 1.0 / 3.0;
     unsigned int pointDim = DerivativePointType::PointDimension;
     unsigned int d;
-    Logger::verbose << "Point dimension => " << pointDim << std::endl;
+    Logger::verbose << function << ": Point dimension => " << pointDim << std::endl;
     
     // Compute RK4 at each image location
     for (inIt.GoToBegin(), outIt.GoToBegin();
@@ -149,23 +151,21 @@ void RungeKuttaSolver< TInput, TOutput, TDerivative >
         // value of the derivative at that point
         DerivativeValueType dValue;
         
+        OutputPixelType k1, k2, k3, k4, outPixel;
+        
         // Logger::verbose << "Pixel (" << xn[0] << "," << xn[1] << "), Time " << this->GetStartTime() << std::endl;
         
         // Note in the following that we compute each k-value
         // while we set up the position at which to find the
         // derivative for the next k-value.  We do this to
         // avoid type cast and operator definition issues.
-        // Logger::verbose << "Computing K1" << std::endl;
         for (d = 0; d < pointDim-1; d++)
         {
             dPoint[d] = xn[d];
         }
         dPoint[pointDim-1] = this->GetStartTime();
         dValue = interpolate->Evaluate(dPoint);
-        // Logger::verbose << "\tdF/dt at (" << dPoint[0] << "," << dPoint[1] << "," << dPoint[2] << ") is [" << dValue[0] << "," << dValue[1] << "]" << std::endl;
         
-        OutputPixelType k1;
-        // Logger::verbose << "Computing K2" << std::endl;
         for (d = 0; d < pointDim-1; d++)
         {
             k1[d] = this->GetStepSize() * dValue[d];
@@ -173,20 +173,14 @@ void RungeKuttaSolver< TInput, TOutput, TDerivative >
         }
         dPoint[pointDim-1] = this->GetStartTime() + halfStep;
         dValue = interpolate->Evaluate(dPoint);
-        // Logger::verbose << "\tdF/dt at (" << dPoint[0] << "," << dPoint[1] << "," << dPoint[2] << ") is [" << dValue[0] << "," << dValue[1] << "]" << std::endl;
         
-        OutputPixelType k2;
-        // Logger::verbose << "Computing K3" << std::endl;
         for (d = 0; d < pointDim-1; d++)
         {
             k2[d] = this->GetStepSize() * dValue[d];
             dPoint[d] = xn[d] + 0.5 * k2[d];
         }
         dValue = interpolate->Evaluate(dPoint);
-        // Logger::verbose << "\tdF/dt at (" << dPoint[0] << "," << dPoint[1] << "," << dPoint[2] << ") is [" << dValue[0] << "," << dValue[1] << "]" << std::endl;
         
-        OutputPixelType k3;
-        // Logger::verbose << "Computing K4" << std::endl;
         for (d = 0; d < pointDim-1; d++)
         {
             k3[d] = this->GetStepSize() * dValue[d];
@@ -194,11 +188,7 @@ void RungeKuttaSolver< TInput, TOutput, TDerivative >
         }
         dPoint[pointDim-1] = this->GetStartTime() + this->GetStepSize();
         dValue = interpolate->Evaluate(dPoint);
-        // Logger::verbose << "\tdF/dt at (" << dPoint[0] << "," << dPoint[1] << "," << dPoint[2] << ") is [" << dValue[0] << "," << dValue[1] << "]" << std::endl;
         
-        OutputPixelType k4;
-        // Logger::verbose << "Computing output pixel" << std::endl;
-        OutputPixelType outPixel;
         for (d = 0; d < pointDim-1; d++)
         {
             k4[d] = this->GetStepSize() * dValue[d];
@@ -208,6 +198,6 @@ void RungeKuttaSolver< TInput, TOutput, TDerivative >
         outIt.Set(outPixel);
     }
     
-    Logger::verbose << "Grafting output" << std::endl;
+    Logger::verbose << function << ": Grafting output" << std::endl;
     this->GraftOutput(output);
 }
