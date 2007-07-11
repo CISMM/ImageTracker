@@ -11,7 +11,7 @@
 #include "wxUtils.h"
 
 static const std::string APP_NAME("ImageTracker");
-static const std::string APP_VERSION("v 2.04");
+static const std::string APP_VERSION("v 2.05");
 static const std::string APP_AUTHOR("Brian Eastwood");
 static const std::string APP_COPYRIGHT("(c) 2007");
 static const std::string APP_WEBSITE("http://www.cs.unc.edu/research/Nano/ImageTracker");
