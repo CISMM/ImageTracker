@@ -84,6 +84,13 @@ void ImageTracker::OnAbout(wxCommandEvent &event)
 
 void ImageTracker::OnImageInfo(wxCommandEvent &event)
 {
+    // Make sure we at least have a data source to work with
+    if (this->lbxSources->GetCount() == 0)
+    {
+        Logger::warning << "There are no images open for which to provide information.  Please load some data." << std::endl;
+        return;
+    }
+    
     int dsIdx = this->lbxSources->GetSelection();
     dsIdx = (dsIdx == wxNOT_FOUND) ? 0 : dsIdx;
     int imgIdx = this->sldImageIndex->GetValue();
