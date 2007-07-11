@@ -2,26 +2,57 @@
 
 #include <string>
 
+#include "itkImage.h"
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkRescaleIntensityImageFilter.h"
 #include "itkStatisticsImageFilter.h"
+#include "itkVector.h"
 
+#include "CommonTypes.h"
 #include "Logger.h"
 
 template < class TImage >
 void PrintImageInfo(const TImage* image, const std::string& label = "", LogStream &logger = Logger::debug)
 {
-    typedef itk::StatisticsImageFilter< TImage> StatsType;
-
-    typename StatsType::Pointer stats = StatsType::New();
-    stats->SetInput(image);
-    stats->Update();
-
     if (label != "")
         logger << label << " info:" << std::endl;
     else
         logger << "Image info: " << std::endl;
+    
+    unsigned int dim = TImage::ImageDimension;
+    typename TImage::RegionType region = image->GetLargestPossibleRegion();
+    typename TImage::PointType origin = image->GetOrigin();
+    typename TImage::SpacingType spacing = image->GetSpacing();
+    if (dim == 3)
+    {
+        logger << "\tOrigin:  " << origin[0] << ", " << origin[1] << ", " << origin[2] << std::endl;
+        logger << "\tSpacing: " << spacing[0] << ", " << spacing[1] << ", " << spacing[2] << std::endl;
+        logger << "\tRegion:  " << std::endl;
+        logger << "\t  Index: " << region.GetIndex()[0] << ", " << region.GetIndex()[1] << ", " << region.GetIndex()[2] << std::endl;
+        logger << "\t   Size: " << region.GetSize()[0] << ", " << region.GetSize()[1] << ", " << region.GetSize()[2] << std::endl;
+    }
+    else if (dim == 2)
+    {
+        logger << "\tOrigin:  " << origin[0] << ", " << origin[1] << std::endl;
+        logger << "\tSpacing: " << spacing[0] << ", " << spacing[1] << std::endl;
+        logger << "\tRegion:  " << std::endl;
+        logger << "\t  Index: " << region.GetIndex()[0] << ", " << region.GetIndex()[1] << std::endl;
+        logger << "\t   Size: " << region.GetSize()[0] << ", " << region.GetSize()[1] << std::endl;
+    }
+    else if (dim == 1)
+    {
+        logger << "\tOrigin:  " << origin[0] << std::endl;
+        logger << "\tSpacing: " << spacing[0] << std::endl;
+        logger << "\tRegion:  " << std::endl;
+        logger << "\t  Index: " << region.GetIndex()[0] << std::endl;
+        logger << "\t   Size: " << region.GetSize()[0] << std::endl;
+    }
+    
+    typedef itk::StatisticsImageFilter< TImage> StatsType;
+    typename StatsType::Pointer stats = StatsType::New();
+    stats->SetInput(image);
+    stats->Update();
     
     logger << "\tclass: " << image->GetNameOfClass() << std::endl;
     logger << "\tmin:   " << (float) stats->GetMinimum() << std::endl;
@@ -30,6 +61,9 @@ void PrintImageInfo(const TImage* image, const std::string& label = "", LogStrea
     logger << "\tvar:   " << (float) stats->GetVariance() << std::endl;
     logger << "\tstd:   " << (float) stats->GetSigma() << std::endl;
 }
+
+template <>
+void PrintImageInfo< ImageTypeV2F2 >(const ImageTypeV2F2* image, const std::string& label, LogStream &logger);
 
 template < class TImage >
 void PrintRegionInfo(const typename TImage::RegionType& region, const std::string& label = "", LogStream &logger = Logger::debug)

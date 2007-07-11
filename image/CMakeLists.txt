@@ -9,7 +9,7 @@ SET (image_SRCS
     DataSource.cxx                  DataSource.h
     FileSetImageReader.cxx          FileSetImageReader.h
                                     ImageSetReader.h
-                                    ImageUtils.h
+    ImageUtils.cxx                  ImageUtils.h
     TransformGroup.cxx              TransformGroup.h
 )
 
