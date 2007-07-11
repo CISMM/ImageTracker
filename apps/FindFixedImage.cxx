@@ -63,16 +63,10 @@ int main(int argc, char** argv)
     std::string scaleTramsmitFile = argv[8];
     std::string shortTransmitFile = argv[9];
     std::string formatOut = argv[10];
-    std::string metric("mean");
-    double scalePct = 1.0;
-    double padFrac = 0.5;
     
-    if (argc > 11)
-        metric = argv[11];
-    if (argc > 12)
-        scalePct = atof(argv[12]);
-    if (argc > 13)
-        padFrac = atof(argv[13]);
+    std::string metric  = argc > 11 ? argv[11] : "mean";
+    double scalePct     = argc > 12 ? atof(argv[12]) : 1.0;
+    double padFrac      = argc > 13 ? atof(argv[13]) : 0.5;
     
     // Video I/O components
     Logger::verbose << "Creating video I/O components" << std::endl;
@@ -300,6 +294,7 @@ InternalImageType::Pointer ComputeTransmissionMedian(VideoType& video, std::stri
     // We have to adjust the padded image's index for the Fourier transform to work.
     padRegion = pad->GetOutput()->GetLargestPossibleRegion();
     padRegion.SetIndex(zeroIndex);
+    PrintRegionInfo<InternalImageType>(padRegion, "Padded image region");
     
     // Compute log attenuation by integrating gradient of log attenuation
     Logger::debug << "Integrate surface from derivative estimates" << std::endl;

@@ -46,6 +46,15 @@ TARGET_LINK_LIBRARIES(meanvector ITCommon ITImage ITFilters)
 ADD_EXECUTABLE(clgflow ComputeCLGOpticFlow.cxx)
 TARGET_LINK_LIBRARIES(clgflow ITCommon ITImage ITFilters)
 
+ADD_EXECUTABLE(hornflow ComputeHornOpticalFlow.cxx)
+TARGET_LINK_LIBRARIES(hornflow ITCommon ITImage ITFilters ITPipelines)
+
+ADD_EXECUTABLE(flowerr ComputeFlowError.cxx)
+TARGET_LINK_LIBRARIES(flowerr ITCommon ITImage ITFilters)
+
+ADD_EXECUTABLE(intflow IntegrateOpticalFlow.cxx)
+TARGET_LINK_LIBRARIES(intflow ITCommon ITImage ITFilters ITPipelines)
+
 ADD_EXECUTABLE(findback FindBackground.cxx)
 TARGET_LINK_LIBRARIES(findback ITCommon ITImage ITFilters)
 
@@ -78,9 +87,6 @@ TARGET_LINK_LIBRARIES(integrate ITCommon ITImage ITFilters)
 
 ADD_EXECUTABLE(datasource TestDataSource.cxx)
 TARGET_LINK_LIBRARIES(datasource ITCommon ITImage ITFilters ITGui)
-
-ADD_EXECUTABLE(hornflow ComputeHornOpticalFlow.cxx)
-TARGET_LINK_LIBRARIES(hornflow ITCommon ITImage ITFilters ITPipelines)
         
 ADD_EXECUTABLE(harris TestHarrisFeatureDetector.cxx)
 TARGET_LINK_LIBRARIES(harris ITCommon ITImage ITFilters)

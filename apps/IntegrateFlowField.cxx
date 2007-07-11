@@ -131,7 +131,7 @@ int main(int argc, char** argv)
         // Write to a file
         subtract->SetInput1(current);
         char file[120];
-        sprintf(file, formatOut.c_str(), i);
+        sprintf(file, formatOut.c_str(), i + start);
         std::string filestr(file);
         WriteImage<PositionFieldType>(subtract->GetOutput(), filestr);
     }
