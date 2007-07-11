@@ -50,7 +50,7 @@ void RemovePartialOcclusionsPipeline::Update()
         rawTransmit = this->ComputeTransmissionMean(this->input);
     }
     
-//     PrintImageInfo<InternalImageType>(rawTransmit, "Raw transmission");
+    PrintImageInfo<InternalImageType>(rawTransmit, "Raw transmission");
     
     // For rescaling transmission map
     typedef PercentileImageMetric< InternalImageType > PercentileType;
@@ -131,7 +131,7 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
         copy->SetInputImage(log->GetOutput());
         copy->Update();
         mean->PushBackInput(copy->GetOutput());
-        this->NotifyProgress(contrib * double(i+1)/size);
+        this->NotifyProgress(contrib * double(i+1)/size, "Computing mean...");
     }
     
     // Compute exp of mean log image...this is equivalent to the geometric mean of all images
@@ -139,6 +139,9 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
     PowerType::Pointer power = PowerType::New();
     power->SetInput(mean->GetOutput());
     power->Update();
+    
+    this->NotifyProgress(contrib, "Computing constant transmission");
+    
     return power->GetOutput();
 }
 
@@ -227,12 +230,21 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
         
         medianX->PushBackInput(copyX->GetOutput());
         medianY->PushBackInput(copyY->GetOutput());
-        this->NotifyProgress(contribDeriv * double(i+1)/size);
+        this->NotifyProgress(contribDeriv * double(i+1)/size, "Computing median gradient");
     }
+    
+    medianX->Update();
+    medianY->Update();
+    
+//     PrintImageInfo(dx->GetOutput(), "Final gradX of log");
+//     PrintImageInfo(dy->GetOutput(), "Final gradY of log");
+//     PrintImageInfo(medianX->GetOutput(), "Median of gradX of log");
+//     PrintImageInfo(medianY->GetOutput(), "Median of gradY of log");
     
     // We have to adjust the padded image's index for the Fourier transform to work.
     padRegion = pad->GetOutput()->GetLargestPossibleRegion();
     padRegion.SetIndex(zeroIndex);
+    PrintRegionInfo<InternalImageType>(padRegion, "Padded image region");
     
     // Compute log attenuation by integrating gradient of log attenuation
     Logger::debug << function << ": Integrate surface from derivative estimates" << std::endl;
@@ -262,7 +274,7 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
     exp->SetInput(roi->GetOutput());
     exp->Update();
     
-    this->NotifyProgress(contribDeriv + contribIntegrate);
+    this->NotifyProgress(contribDeriv + contribIntegrate, "Computing constant transmission");
     
     return exp->GetOutput();
 }

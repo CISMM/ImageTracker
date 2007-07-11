@@ -8,6 +8,7 @@ SET (Pipelines_SRCS
     ApplyTransformsPipeline.cxx             ApplyTransformsPipeline.h
     CLGOpticFlowPipeline.cxx                CLGOpticFlowPipeline.h
     HornOpticalFlowPipeline.cxx             HornOpticalFlowPipeline.h
+    IntegrateFlowFieldPipeline.cxx          IntegrateFlowFieldPipeline.h
     ItkPipeline.cxx                         ItkPipeline.h
                                             ItkPipelineObserver.h
     MultiResolutionRegistrationPipeline.cxx MultiResolutionRegistrationPipeline.h
