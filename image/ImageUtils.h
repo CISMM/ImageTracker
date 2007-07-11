@@ -26,27 +26,27 @@ void PrintImageInfo(const TImage* image, const std::string& label = "", LogStrea
     typename TImage::SpacingType spacing = image->GetSpacing();
     if (dim == 3)
     {
-        logger << "\tOrigin:  " << origin[0] << ", " << origin[1] << ", " << origin[2] << std::endl;
-        logger << "\tSpacing: " << spacing[0] << ", " << spacing[1] << ", " << spacing[2] << std::endl;
-        logger << "\tRegion:  " << std::endl;
-        logger << "\t  Index: " << region.GetIndex()[0] << ", " << region.GetIndex()[1] << ", " << region.GetIndex()[2] << std::endl;
-        logger << "\t   Size: " << region.GetSize()[0] << ", " << region.GetSize()[1] << ", " << region.GetSize()[2] << std::endl;
+        logger << "\tOrigin: \t" << origin[0] << ", " << origin[1] << ", " << origin[2] << std::endl;
+        logger << "\tSpacing:\t" << spacing[0] << ", " << spacing[1] << ", " << spacing[2] << std::endl;
+        logger << "\tRegion: \t" << std::endl;
+        logger << "\t\tIndex:\t" << region.GetIndex()[0] << ", " << region.GetIndex()[1] << ", " << region.GetIndex()[2] << std::endl;
+        logger << "\t\tSize: \t" << region.GetSize()[0] << ", " << region.GetSize()[1] << ", " << region.GetSize()[2] << std::endl;
     }
     else if (dim == 2)
     {
-        logger << "\tOrigin:  " << origin[0] << ", " << origin[1] << std::endl;
-        logger << "\tSpacing: " << spacing[0] << ", " << spacing[1] << std::endl;
-        logger << "\tRegion:  " << std::endl;
-        logger << "\t  Index: " << region.GetIndex()[0] << ", " << region.GetIndex()[1] << std::endl;
-        logger << "\t   Size: " << region.GetSize()[0] << ", " << region.GetSize()[1] << std::endl;
+        logger << "\tOrigin: \t" << origin[0] << ", " << origin[1] << std::endl;
+        logger << "\tSpacing:\t" << spacing[0] << ", " << spacing[1] << std::endl;
+        logger << "\tRegion: \t" << std::endl;
+        logger << "\t\tIndex:\t" << region.GetIndex()[0] << ", " << region.GetIndex()[1] << std::endl;
+        logger << "\t\tSize: \t" << region.GetSize()[0] << ", " << region.GetSize()[1] << std::endl;
     }
     else if (dim == 1)
     {
-        logger << "\tOrigin:  " << origin[0] << std::endl;
-        logger << "\tSpacing: " << spacing[0] << std::endl;
-        logger << "\tRegion:  " << std::endl;
-        logger << "\t  Index: " << region.GetIndex()[0] << std::endl;
-        logger << "\t   Size: " << region.GetSize()[0] << std::endl;
+        logger << "\tOrigin: \t" << origin[0] << std::endl;
+        logger << "\tSpacing:\t" << spacing[0] << std::endl;
+        logger << "\tRegion: \t" << std::endl;
+        logger << "\t\tIndex:\t" << region.GetIndex()[0] << std::endl;
+        logger << "\t\tSize: \t" << region.GetSize()[0] << std::endl;
     }
     
     typedef itk::StatisticsImageFilter< TImage> StatsType;
@@ -54,12 +54,12 @@ void PrintImageInfo(const TImage* image, const std::string& label = "", LogStrea
     stats->SetInput(image);
     stats->Update();
     
-    logger << "\tclass: " << image->GetNameOfClass() << std::endl;
-    logger << "\tmin:   " << (float) stats->GetMinimum() << std::endl;
-    logger << "\tmax:   " << (float) stats->GetMaximum() << std::endl;
-    logger << "\tmean:  " << (float) stats->GetMean() << std::endl;
-    logger << "\tvar:   " << (float) stats->GetVariance() << std::endl;
-    logger << "\tstd:   " << (float) stats->GetSigma() << std::endl;
+    logger << "\tclass:\t" << image->GetNameOfClass() << std::endl;
+    logger << "\tmin:  \t" << (float) stats->GetMinimum() << std::endl;
+    logger << "\tmax:  \t" << (float) stats->GetMaximum() << std::endl;
+    logger << "\tmean: \t" << (float) stats->GetMean() << std::endl;
+    logger << "\tvar:  \t" << (float) stats->GetVariance() << std::endl;
+    logger << "\tstd:  \t" << (float) stats->GetSigma() << std::endl;
 }
 
 template <>
