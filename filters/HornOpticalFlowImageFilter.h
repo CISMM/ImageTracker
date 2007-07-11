@@ -156,6 +156,10 @@ void HornOpticalFlowImageFilter< TInputImage1, TInputImage2, TComponentType >
     Superclass::AllocateOutputs();
     OutputImagePointer output = this->GetOutput();
     
+    // Ensure origin and spacing are preserved
+    output->SetOrigin(input1->GetOrigin());
+    output->SetSpacing(input1->GetSpacing());
+    
     Logger::debug << function << ": Setting up derivative pipelines" << std::endl;
     // Pipeline typedefs
     typedef itk::Image< float, 2 > InternalImageType;
