@@ -158,7 +158,7 @@ void CLGOpticFlowDialog::OnBrowse(wxCommandEvent &event)
     wxDirDialog dlg(this, wxT("Choose a directory"), this->textDirectory->GetValue());
     if (dlg.ShowModal() == wxID_OK)
     {
-		this->textDirectory->SetValue(dlg.GetPath().Append(std2wx(FileSet::PATH_DELIMITER)));
+        this->textDirectory->SetValue(dlg.GetPath().Append(std2wx(FileSet::PATH_DELIMITER)));
     }
 }
 
@@ -183,7 +183,7 @@ void CLGOpticFlowDialog::set_properties()
 {
     // begin wxGlade: CLGOpticFlowDialog::set_properties
     SetTitle(wxT("CLG Optic Flow"));
-    SetSize(wxSize(550, 400));
+    SetSize(wxSize(640, 450));
     slideSmoothing->SetToolTip(wxT("Smoothing to apply to each input image"));
     label_16->SetMinSize(wxSize(145, 17));
     slideRegularization->SetToolTip(wxT("Weighting to apply to the global component of flow computation (higher value creates smoother flow)"));

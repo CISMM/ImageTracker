@@ -15,6 +15,7 @@ SET (Gui_SRCS
     FileSetDialog.cxx                           FileSetDialog.h
     GlobalRegistrationDialog.cxx                GlobalRegistrationDialog.h
     GuiUtils.cxx                                GuiUtils.h
+    HornOpticalFlowDialog.cpp                   HornOpticalFlowDialog.h
 #    HarrisFeatureDialog.cxx                     HarrisFeatureDialog.h
     ImageTracker.cpp                            ImageTracker.h
     ImageTrackerController.cxx                  ImageTrackerController.h

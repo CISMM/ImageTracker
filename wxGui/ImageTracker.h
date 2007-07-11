@@ -16,6 +16,7 @@
 #include "ApplyTransformDialog.h"
 #include "CLGOpticFlowDialog.h"
 #include "DataSourceDialog.h"
+#include "HornOpticalFlowDialog.h"
 #include "ImageTrackerController.h"
 #include "MultiResolutionRegistrationDialog.h"
 #include "RemoveOcclusionsDialog.h"
@@ -38,16 +39,17 @@ public:
     {
         this->rwiView->Delete();
 
-		// Not sure why we have to do this...seems to be only on Windows.
-		// wx should be deleting all child objects, which these dialogs are.
-		// But, without deleting these, the ImageTracker app sticks around
-		// after closing.
-		delete dlgDataSource;
-		delete dlgRemoveOcclusions;
-		delete dlgRegistration;
-		delete dlgApplyTransform;
-		delete dlgCLGOpticFlow;
-		delete dlgAbout;
+        // Not sure why we have to do this...seems to be only on Windows.
+        // wx should be deleting all child objects, which these dialogs are.
+        // But, without deleting these, the ImageTracker app sticks around
+        // after closing.
+        delete dlgDataSource;
+        delete dlgRemoveOcclusions;
+        delete dlgRegistration;
+        delete dlgApplyTransform;
+        delete dlgCLGOpticFlow;
+        delete dlgHornOpticalFlow;
+        delete dlgAbout;
     }
     
     enum IDs
@@ -59,6 +61,8 @@ public:
         MENU_STABILIZE,
         MENU_APPLY_TRANSFORM,
         MENU_CLG_OPTIC_FLOW,
+        MENU_HORN_OPTICAL_FLOW,
+        MENU_IMAGE_INFO,
         MENU_LOG_ERROR,
         MENU_LOG_WARN,
         MENU_LOG_INFO,
@@ -106,6 +110,7 @@ private:
     MultiResolutionRegistrationDialog* dlgRegistration;
     ApplyTransformDialog* dlgApplyTransform;
     CLGOpticFlowDialog* dlgCLGOpticFlow;
+    HornOpticalFlowDialog* dlgHornOpticalFlow;
     AboutDialog* dlgAbout;
     wxStreamToTextRedirector* coutRedirect;
     PlayState playState;
@@ -151,8 +156,10 @@ public:
     void OnStabilize(wxCommandEvent &event);
     void OnApplyTransform(wxCommandEvent &event);
     void OnCLGOpticFlow(wxCommandEvent &event);
+    void OnHornOpticalFlow(wxCommandEvent &event);
     void OnDataSourceChange(wxCommandEvent &event);
     void OnLoggingMenu(wxCommandEvent &event);
+    void OnImageInfo(wxCommandEvent &event);
     void OnAddDataSource(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnRemoveDataSource(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnEditDataSource(wxCommandEvent &event); // wxGlade: <event_handler>

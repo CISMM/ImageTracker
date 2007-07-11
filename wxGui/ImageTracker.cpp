@@ -6,6 +6,7 @@
 
 #include "vtkInteractorStyleSwitch.h"
 
+#include "ImageUtils.h"
 #include "Logger.h"
 #include "wxUtils.h"
 
@@ -33,6 +34,8 @@ BEGIN_EVENT_TABLE(ImageTracker, wxFrame)
     EVT_MENU(MENU_STABILIZE, ImageTracker::OnStabilize)
     EVT_MENU(MENU_APPLY_TRANSFORM, ImageTracker::OnApplyTransform)
     EVT_MENU(MENU_CLG_OPTIC_FLOW, ImageTracker::OnCLGOpticFlow)
+    EVT_MENU(MENU_HORN_OPTICAL_FLOW, ImageTracker::OnHornOpticalFlow)
+    EVT_MENU(MENU_IMAGE_INFO, ImageTracker::OnImageInfo)
     EVT_MENU(MENU_LOG_ERROR, ImageTracker::OnLoggingMenu)
     EVT_MENU(MENU_LOG_WARN, ImageTracker::OnLoggingMenu)
     EVT_MENU(MENU_LOG_INFO, ImageTracker::OnLoggingMenu)
@@ -77,6 +80,15 @@ void ImageTracker::OnAbout(wxCommandEvent &event)
 {
     this->theStatusBar->SetStatusText(wxT("About..."));
     this->dlgAbout->Show(true);
+}
+
+void ImageTracker::OnImageInfo(wxCommandEvent &event)
+{
+    int dsIdx = this->lbxSources->GetSelection();
+    dsIdx = (dsIdx == wxNOT_FOUND) ? 0 : dsIdx;
+    int imgIdx = this->sldImageIndex->GetValue();
+    
+    PrintImageInfo(dynamic_cast<ImageTypeF2*>(this->controller->GetDataSource(dsIdx)->GetImage(imgIdx)), "", Logger::info);
 }
 
 void ImageTracker::OnLoggingMenu(wxCommandEvent &event)
@@ -184,7 +196,7 @@ void ImageTracker::OnCLGOpticFlow(wxCommandEvent &event)
         return;
     }
     
-    this->theStatusBar->SetStatusText(wxT("Computing optic flow..."));
+    this->theStatusBar->SetStatusText(wxT("Computing CLG optical flow..."));
     
     // Find the user's selected DataSource.
     // Find the user's selected DataSource
@@ -201,6 +213,36 @@ void ImageTracker::OnCLGOpticFlow(wxCommandEvent &event)
     this->dlgCLGOpticFlow->SetInput(this->controller->GetDataSource(idx));
     this->dlgCLGOpticFlow->SetController(this->controller);
     this->dlgCLGOpticFlow->Show(true);
+}
+
+void ImageTracker::OnHornOpticalFlow(wxCommandEvent &event)
+{
+    // Make sure we at least have a data source to work with
+    if (this->lbxSources->GetCount() == 0)
+    {
+        wxMessageDialog alert(this, wxT("Please add a data source on which to operate first."), 
+                              wxT("No data sources."), wxOK);
+        alert.ShowModal();
+        return;
+    }
+    
+    this->theStatusBar->SetStatusText(wxT("Computing H&S optical flow..."));
+    
+    // Find the user's selected DataSource.
+    // Find the user's selected DataSource
+    int idx = this->lbxSources->GetSelection();
+    idx = (idx == wxNOT_FOUND) ? 0 : idx;
+    if (this->controller->GetDataSource(idx)->size() < 2) // Need at least two images to register.
+    {
+        wxMessageDialog alert(this, wxT("This operation requires at least two images in the data source."),
+                              wxT("Not enough images."), wxOK);
+        alert.ShowModal();
+        return;
+    }
+    
+    this->dlgHornOpticalFlow->SetInput(this->controller->GetDataSource(idx));
+    this->dlgHornOpticalFlow->SetController(this->controller);
+    this->dlgHornOpticalFlow->Show(true);
 }
 
 void ImageTracker::OnRemoveDataSource(wxCommandEvent &event)
@@ -388,9 +430,11 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     menuEnhance->Append(MENU_APPLY_TRANSFORM, wxT("Apply &Transform"), wxT("Apply a transforms from one stabilization to another data source"), wxITEM_NORMAL);
     itMenuBar->Append(menuEnhance, wxT("&Enhance"));
     wxMenu* menuCompute = new wxMenu();
-    menuCompute->Append(MENU_CLG_OPTIC_FLOW, wxT("CLG &Optic Flow"), wxT("Combined local-global motion computation"), wxITEM_NORMAL);
+    menuCompute->Append(MENU_CLG_OPTIC_FLOW, wxT("CLG &Optical Flow"), wxT("Combined local and global optical flow computation"), wxITEM_NORMAL);
+    menuCompute->Append(MENU_HORN_OPTICAL_FLOW, wxT("Horn O&ptical Flow"), wxT("Horn and Schunck global optical flow computation"), wxITEM_NORMAL);
     itMenuBar->Append(menuCompute, wxT("&Compute"));
     wxMenu* menuHelp = new wxMenu();
+    menuHelp->Append(MENU_IMAGE_INFO, wxT("&Image Info"), wxT("Print information about the current image"), wxITEM_NORMAL);
     wxMenu* menuLogging = new wxMenu();
     menuLogging->Append(MENU_LOG_ERROR, wxT("Error"), wxT("Display only error logging messages"), wxITEM_RADIO);
     menuLogging->Append(MENU_LOG_WARN, wxT("Warn"), wxT("Display warning and higher logging messages"), wxITEM_RADIO);
@@ -434,7 +478,8 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     this->dlgRemoveOcclusions = new RemoveOcclusionsDialog(this, -1, wxT("Remove Partial Occlusions"));
     this->dlgRegistration = new MultiResolutionRegistrationDialog(this, -1, wxT("Stabilize"));
     this->dlgApplyTransform = new ApplyTransformDialog(this, -1, wxT("Apply Transform"));
-    this->dlgCLGOpticFlow = new CLGOpticFlowDialog(this, -1, wxT("CLG Optic Flow"));
+    this->dlgCLGOpticFlow = new CLGOpticFlowDialog(this, -1, wxT("CLG Optical Flow"));
+    this->dlgHornOpticalFlow = new HornOpticalFlowDialog(this, -1, wxT("Horn and Schunck Optical Flow"));
     this->dlgAbout = new AboutDialog(this, -1, wxT("About"));
 	this->dlgAbout->SetMessage(APP_NAME + " " + APP_VERSION + "\n" + APP_AUTHOR + " " + APP_COPYRIGHT); // + "\n" + APP_WEBSITE);
     
