@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: wxVTKRenderWindowInteractor.h,v $
   Language:  C++
-  Date:      $Date: 2007/07/13 20:09:12 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007/07/13 20:18:10 $
+  Version:   $Revision: 1.4 $
 
   Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
   All rights reserved.
@@ -84,7 +84,7 @@ class wxSizeEvent;
 #if defined(__WXGTK__) && defined(USE_WXGLCANVAS)
 class VTK_RENDERING_EXPORT wxVTKRenderWindowInteractor : public wxGLCanvas, virtual public vtkRenderWindowInteractor
 #else
-class VTK_RENDERING_EXPORT wxVTKRenderWindowInteractor : public wxWindow, virtual public vtkRenderWindowInteractor
+class wxVTKRenderWindowInteractor : public wxWindow, virtual public vtkRenderWindowInteractor
 #endif //__WXGTK__
 {
   DECLARE_DYNAMIC_CLASS(wxVTKRenderWindowInteractor)
