@@ -1,9 +1,9 @@
 function [vectors] = ReadMHAVector(filename)
 % Reads a meta-image vector file.
-% Returns the data set as a matrix with dimensions 
-% [height, width, elements], where height and width are the size of
-% the vector field and elements is the number of elements in each
-% vector.
+% Returns the data set as a matrix with dimensions [height, width,
+% elements], where height and width are the size of the vector field and
+% elements is the number of elements in each vector. The elements in the
+% vector are returned in the order provided in the image file.
 
 % Things to read:
 %    NDims = 3
@@ -20,7 +20,7 @@ function [vectors] = ReadMHAVector(filename)
 % open the file
 [file, msg] = fopen(filename, 'r');
 if (file == -1)
-    printf('Failed to open file: %s\n\t%s\n', filename, msg);
+    display(sprintf('Failed to open file: %s\n\t%s\n', filename, msg));
     return;
 end;
 
@@ -64,7 +64,10 @@ if (ndims == 0 || sum(dimsize) == 0 || elems == 0 || strcmp(datafile, ''))
 end;
 
 % Read the data
+vectors = zeros(dimsize(1), dimsize(2), elems);
 for y = 1:dimsize(1)
     row = fread(file, [elems, dimsize(2)], type);
     vectors(y,:,:) = row';
 end;
+
+fclose(file);

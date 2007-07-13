@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: wxVTKRenderWindowInteractor.h,v $
   Language:  C++
-  Date:      $Date: 2006/06/01 20:13:48 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007/07/13 20:09:12 $
+  Version:   $Revision: 1.3 $
 
   Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
   All rights reserved.
@@ -55,10 +55,14 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderWindow.h"
 
-#ifdef __WXGTK__
+// Apparently since wxGTK 2.8.0 one can finally use wxWindow (just as in any
+// other port):
+#if (!wxCHECK_VERSION(2, 8, 0))
+#define USE_WXGLCANVAS
+#endif
+
+#if defined(__WXGTK__) && defined(USE_WXGLCANVAS)
 #  if wxUSE_GLCANVAS
-#    include "gdk/gdkprivate.h"
-#    include <wx/gtk/win_gtk.h>
 #    include <wx/glcanvas.h>
 #  else
 #    error "problem of wxGLCanvas, you need to build wxWidgets with opengl"
@@ -77,7 +81,7 @@ class wxTimerEvent;
 class wxKeyEvent;
 class wxSizeEvent;
 
-#ifdef __WXGTK__
+#if defined(__WXGTK__) && defined(USE_WXGLCANVAS)
 class VTK_RENDERING_EXPORT wxVTKRenderWindowInteractor : public wxGLCanvas, virtual public vtkRenderWindowInteractor
 #else
 class VTK_RENDERING_EXPORT wxVTKRenderWindowInteractor : public wxWindow, virtual public vtkRenderWindowInteractor
@@ -97,13 +101,15 @@ class VTK_RENDERING_EXPORT wxVTKRenderWindowInteractor : public wxWindow, virtua
                                 const wxString &name = wxPanelNameStr);
 	//vtk ::New()
     static wxVTKRenderWindowInteractor * New();
+    void PrintSelf(ostream& os, vtkIndent indent);
 
-	 //destructor
+	  //destructor
     ~wxVTKRenderWindowInteractor();
 
     // vtkRenderWindowInteractor overrides
     void Initialize();
     void Enable();
+    bool Enable(bool enable);
     void Disable();
     void Start();
     void UpdateSize(int x, int y);
@@ -126,6 +132,7 @@ class VTK_RENDERING_EXPORT wxVTKRenderWindowInteractor : public wxWindow, virtua
 #endif
     void OnTimer(wxTimerEvent &event);
     void OnSize(wxSizeEvent &event);
+    void OnMouseWheel(wxMouseEvent& event);
 
     void Render();
     void SetRenderWhenDisabled(int newValue);
@@ -148,7 +155,7 @@ class VTK_RENDERING_EXPORT wxVTKRenderWindowInteractor : public wxWindow, virtua
     wxTimer timer;
     int ActiveButton;
     int RenderAllowed;
-    long GetHandle();
+    long GetHandleHack();
     int Stereo;
     
   private:

@@ -1,6 +1,14 @@
 function [ ] = ShowVectorField( field, count, scale )
-%SHOWVECTORFIELD Summary of this function goes here
-%   Detailed explanation goes here
+% ShowVectorField(field, count, scale) Depicts a vector field as a needle
+% diagram.
+% Displays a needle diagram for a vector field (e.g. a flow field).
+% Inputs (default):
+% field       - The vector field, as a h x w x 2 vector, where the 2 vector
+% contains (x,y) vector information
+% count       - The number of vectors to display; larger numbers create
+% denser plots (1000)
+% scale       - The scaling to apply to each vector; larger numbers create
+% longer needles (1)
 
 if (nargin < 3)
     scale = 1;
@@ -9,18 +17,27 @@ if (nargin < 2)
     count = 1000;
 end;
 
+% Determine sample stride based on field dimensions
 [h w d] = size(field);
-stride = round(h*w/count);
+hw = h*w;
+stride = round(hw/count);
 
+% Displaying an image gets MATLAB in the imaging, not plotting, mood.
 dispimg(ones(h,w));
 
+% Create a grid of pixel locations
+xx = 1:w;
+yy = 1:h;
+[xGrid, yGrid] = meshgrid(xx, yy);
+
+% Determine sample indices, in absolute terms
+ii = 1:stride:(hw);
+
 hold on;
-for i = 0:stride:(h*w)-1
-    y = floor(i/w);
-    x = i - w*y + 1;
-    y = h - y;
-    
-    plot(x,y,'b.');
-    plot([x; x+scale*field(x,y,1)], [y, y+scale*field(x,y,2)], 'b-');
+% Plot dots at the image grid locations
+plot(xGrid(ii), yGrid(ii), 'b.');
+for i = 1:length(ii)
+    % Plot a needle at each grid location, based on the vector field
+    plot([xGrid(ii(i)); xGrid(ii(i))+scale*field(ii(i))], [yGrid(ii(i)); yGrid(ii(i))+scale*field(hw+ii(i))], 'b-');
 end;
 hold off;

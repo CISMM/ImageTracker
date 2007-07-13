@@ -1,4 +1,4 @@
-function [ imgOut ] = ResampleImage( imgIn, wind, func )
+function [ imgOut, disp ] = ResampleImage( imgIn, wind, func )
 % ResampleImage(imgIn, wind, func) Resamples an input image over a given
 % window with a given distortion function.
 % 
@@ -21,5 +21,9 @@ yxSamp = func(yGrid, xGrid);
 ySamp = yxSamp(1:h,:);
 xSamp = yxSamp(h+1:end,:);
 
+% Note: displacement is stored x, y!!!
+disp(:,:,1) = xGrid - xSamp;
+disp(:,:,2) = yGrid - ySamp;
+
 % Resample the input image
-imgOut = interp2(imgIn, xSamp, ySamp);
+imgOut = interp2(imgIn, xSamp, ySamp, 'linear', 0);
