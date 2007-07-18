@@ -43,6 +43,7 @@ SET (Filters_SRCS
                             itkFFTWComplexToComplexImageFilter.h
                             Gaussian2DVectorFilter.h
                             GaussianFunctionImageFilter.h
+                            GaussianGradientImageFilter.h
                             HarrisFeatureInterestImageFilter.h
                             HornOpticalFlowImageFilter.h
                             HornOpticalFlowIterativeStepImageFilter.h
