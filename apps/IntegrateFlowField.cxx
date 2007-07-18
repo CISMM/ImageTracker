@@ -1,16 +1,19 @@
 
 #include <string>
 
+#include "itkAdaptImageFilter.h"
 #include "itkCastImageFilter.h"
 #include "itkImage.h"
 #include "itkImageDuplicator.h"
 #include "itkImageSeriesReader.h"
 #include "itkImageRegionIteratorWithIndex.h"
+#include "itkNthElementPixelAccessor.h"
 #include "itkSubtractImageFilter.h"
 #include "itkVector.h"
 
 #include "FilePattern.h"
 #include "FileSet.h"
+#include "GaussianGradientImageFilter.h"
 #include "ImageUtils.h"
 #include "Logger.h"
 #include "RungeKuttaSolver.h"
@@ -30,9 +33,9 @@ int main(int argc, char** argv)
 {
     std::string function("IntegrateFlowField");
     // Check argument count
-    if (argc < 10)
+    if (argc < 12)
     {
-        Logger::error << "Usage:\n\t" << argv[0] << " dir formatIn start stop timeStart timeStop timeStep initOut formatOut" << std::endl;
+        Logger::error << "Usage:\n\t" << argv[0] << " dir formatIn start stop timeStart timeStop timeStep initOut formatOut formatStrainX formatStrainY strainSigma" << std::endl;
         exit(1);
     }
     
@@ -45,17 +48,24 @@ int main(int argc, char** argv)
     float timeStep          = atof(argv[7]);
     std::string initOutFile = argv[8];
     std::string formatOut   = argv[9];
+    std::string formatStrainX = argv[10];
+    std::string formatStrainY = argv[11];
+    float strainSigma = argc <= 12 ? 1.0 : atof(argv[12]);
     
-    typedef itk::Vector< float, 2 > VectorPixelType;
+    typedef float ElementType;
+    typedef itk::Vector< ElementType, 2 > VectorPixelType;
     typedef itk::Image< VectorPixelType, 3 > FlowFieldType;
     typedef itk::ImageSeriesReader< FlowFieldType > FlowReaderType;
     
-    typedef itk::Image< VectorPixelType, 2 > PositionFieldType;
-    typedef itk::ImageRegionIteratorWithIndex< PositionFieldType > PositionIteratorType;
+    typedef itk::Image< VectorPixelType, 2 > VectorFieldType;
+    typedef itk::Image< ElementType, 2 > ScalarFieldType;
+    typedef itk::ImageRegionIteratorWithIndex< VectorFieldType > VectorIteratorType;
     
-    typedef RungeKuttaSolver< PositionFieldType, PositionFieldType, FlowFieldType > SolverType;
-    typedef itk::ImageDuplicator< PositionFieldType > CopyType;
-    typedef itk::SubtractImageFilter< PositionFieldType, PositionFieldType, PositionFieldType > SubtractType;
+    typedef RungeKuttaSolver< VectorFieldType, VectorFieldType, FlowFieldType > SolverType;
+    typedef itk::ImageDuplicator< VectorFieldType > CopyType;
+    typedef itk::SubtractImageFilter< VectorFieldType, VectorFieldType, VectorFieldType > SubtractType;
+    typedef itk::AdaptImageFilter< VectorFieldType, ScalarFieldType, itk::NthElementPixelAccessor< ElementType, VectorPixelType > > ComponentExtractType;
+    typedef GaussianGradientImageFilter< ScalarFieldType > GradientType;
     
     // Load flow field
     Logger::verbose << function << ": Loading flow field" << std::endl;
@@ -68,35 +78,35 @@ int main(int argc, char** argv)
     // Create initial position (initial conditions)
     Logger::verbose << function << ": Creating initial condition image" << std::endl;
     FlowFieldType::SizeType flowSize = reader->GetOutput()->GetLargestPossibleRegion().GetSize();
-    PositionFieldType::SizeType size;
-    PositionFieldType::IndexType index;
-    for (unsigned int d = 0; d < PositionFieldType::ImageDimension; d++)
+    VectorFieldType::SizeType size;
+    VectorFieldType::IndexType index;
+    for (unsigned int d = 0; d < VectorFieldType::ImageDimension; d++)
     {
         size[d] = flowSize[d];
         index[d] = 0;
     }
-    PositionFieldType::RegionType region;
+    VectorFieldType::RegionType region;
     region.SetSize(size);
     region.SetIndex(index);
-    PositionFieldType::Pointer initial = PositionFieldType::New();
+    VectorFieldType::Pointer initial = VectorFieldType::New();
     initial->SetRegions(region);
     initial->Allocate();
-    PrintRegionInfo<PositionFieldType>(initial->GetLargestPossibleRegion(), "Initial position region");
+    PrintRegionInfo<VectorFieldType>(initial->GetLargestPossibleRegion(), "Initial position region");
     
     // Fill initial conditions with image indices
     Logger::verbose << function << ": Filling initial conditions with image indices." << std::endl;
-    PositionIteratorType posIt(initial, region);
+    VectorIteratorType posIt(initial, region);
     for (posIt.GoToBegin(); !posIt.IsAtEnd(); ++posIt)
     {
-        PositionFieldType::PixelType pixel;
-        PositionFieldType::IndexType index(posIt.GetIndex());
-        for (unsigned int d = 0; d < PositionFieldType::ImageDimension; d++)
+        VectorFieldType::PixelType pixel;
+        VectorFieldType::IndexType index(posIt.GetIndex());
+        for (unsigned int d = 0; d < VectorFieldType::ImageDimension; d++)
         {
             pixel[d] = index[d];
         }
         posIt.Set(pixel);
     }
-    WriteImage<PositionFieldType>(initial, initOutFile);
+    WriteImage<VectorFieldType>(initial, initOutFile);
     
     // Create RungeKutter solver
     Logger::verbose << function << ": Setting up RK4 solver" << std::endl;
@@ -105,13 +115,31 @@ int main(int argc, char** argv)
     SubtractType::Pointer subtract = SubtractType::New();
     subtract->SetInput2(initial);
     
-    PositionFieldType::Pointer current = PositionFieldType::New();
+    VectorFieldType::Pointer current = VectorFieldType::New();
     copy->SetInputImage(initial);
     copy->Update();
     current = copy->GetOutput();
     
     solver->SetDerivative(reader->GetOutput());
     solver->SetStepSize(timeStep);
+    
+    // Create Strain computation pipeline
+    Logger::verbose << function << ": Setting up strain computation" << std::endl;
+    ComponentExtractType::Pointer component[2];
+    GradientType::Pointer grad[2];
+    
+    for (int i = 0; i < 2; i++)
+    {
+        Logger::verbose << function << ": Component extractor: " << i << std::endl;
+        component[i] = ComponentExtractType::New();
+        component[i]->SetInput(subtract->GetOutput());
+        component[i]->GetAccessor().SetElementNumber(i);
+        
+        Logger::verbose << function << ": Gradient filter: " << i << std::endl;
+        grad[i] = GradientType::New();
+        grad[i]->SetInput(component[i]->GetOutput());
+        grad[i]->SetSigma(1.0);
+    }
     
     int steps = int ((timeEnd - timeStart) / timeStep);
     for (int i = 0; i < steps; i++)
@@ -132,7 +160,12 @@ int main(int argc, char** argv)
         subtract->SetInput1(current);
         char file[120];
         sprintf(file, formatOut.c_str(), i + start);
-        std::string filestr(file);
-        WriteImage<PositionFieldType>(subtract->GetOutput(), filestr);
+        WriteImage<VectorFieldType>(subtract->GetOutput(), std::string(file));
+        
+        // Write strain
+        sprintf(file, formatStrainX.c_str(), i + start);
+        WriteImage<GradientType::OutputImageType>(grad[0]->GetOutput(), std::string(file));
+        sprintf(file, formatStrainY.c_str(), i + start);
+        WriteImage<GradientType::OutputImageType>(grad[1]->GetOutput(), std::string(file));
     }
 }
