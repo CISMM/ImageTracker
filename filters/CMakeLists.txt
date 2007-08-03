@@ -49,6 +49,7 @@ SET (Filters_SRCS
                             HornOpticalFlowIterativeStepImageFilter.h
                             LocalContrastImageFilter.h
                             ModulateRegionImageFilter.h
+                            MultiResolutionOpticalFlowMethod.h
                             NaryMeanImageFilter.h
                             NaryMeanVectorImageFilter.h
                             NaryMedianImageFilter.h

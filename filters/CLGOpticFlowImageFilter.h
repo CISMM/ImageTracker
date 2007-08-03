@@ -1,14 +1,13 @@
 #pragma once
 
 #include "itkImage.h"
-#include "itkImageToImageFilter.h"
-#include "itkInPlaceImageFilter.h"
 #include "itkVector.h"
+
+#include "OpticalFlowImageFilter.h"
 
 template <class TInputImage1, class TInputImage2, class TOutputValueType = float >
 class CLGOpticFlowImageFilter :
-    public itk::ImageToImageFilter< TInputImage1,
-        itk::Image< itk::Vector <TOutputValueType, itk::GetImageDimension<TInputImage1>::ImageDimension>, ::itk::GetImageDimension<TInputImage1>::ImageDimension> >
+    public OpticalFlowImageFilter< TInputImage1, TInputImage2, TOutputValueType >
 {
 public:
     /** Some convenient typedefs */
@@ -51,43 +50,13 @@ public:
 
     /** Standard itk class typedefs */
     typedef CLGOpticFlowImageFilter Self;
-    typedef itk::ImageToImageFilter<InputImageType, OutputImageType> Superclass;
+    typedef OpticalFlowImageFilter<Input1ImageType, Input2ImageType, OutputValueType > Superclass;
     typedef itk::SmartPointer<Self> Pointer;
     typedef itk::SmartPointer<const Self> ConstPointer;
 
     /** itk New factory method and type info. */
     itkNewMacro(Self);
-    itkTypeMacro(CLGOpticFlowImageFilter, InPlaceImageFilter);
-
-    TInputImage1 * GetInput1()
-    {
-        return const_cast<TInputImage1 *> (this->GetInput(0));
-    }
-
-    /** 
-    * Set the first (moving) image for Optic Flow. Note, the image
-    * data must be loaded (updated) before this filter's Update() 
-    * method is called.
-    */
-    void SetInput1(const TInputImage1 * image1)
-    {
-        this->SetNthInput(0, const_cast<TInputImage1 *>(image1));
-    }
-
-    TInputImage2 * GetInput2()
-    {
-        return const_cast<TInputImage2 *> (this->GetInput(1));
-    }
-
-    /** 
-    * Set the second (fixed) image for Optic Flow. Note, the image
-    * data must be loaded (updated) before this filter's Update() 
-    * method is called.
-    */
-    void SetInput2(const TInputImage2 * image2)
-    {
-        this->SetNthInput(1, const_cast<TInputImage2 *>(image2));
-    }
+    itkTypeMacro(CLGOpticFlowImageFilter, OpticalFlowImageFilter);
 
     /** 
      * Get/Set the spatial filter deviation. This is the smoothing
@@ -189,8 +158,8 @@ private:
 
 #include "Logger.h"
 
-template <class TInputImage1, class TInputImage2, class TOutputValueType>
-void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
+template < class TInputImage1, class TInputImage2, class TOutputValueType >
+void CLGOpticFlowImageFilter< TInputImage1, TInputImage2, TOutputValueType >
 ::GenerateInputRequestedRegion() throw (itk::InvalidRequestedRegionError)
 {
     Logger::logDebug("CLGOpticFlowImageFilter::GenerateInputRequestedRegion()");
