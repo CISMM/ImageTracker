@@ -11,6 +11,7 @@ SET (Pipelines_SRCS
     IntegrateFlowFieldPipeline.cxx          IntegrateFlowFieldPipeline.h
     ItkPipeline.cxx                         ItkPipeline.h
                                             ItkPipelineObserver.h
+    MultiResolutionOpticalFlowPipeline.cxx  MultiResolutionOpticalFlowPipeline.h
     MultiResolutionRegistrationPipeline.cxx MultiResolutionRegistrationPipeline.h
     RemovePartialOcclusionsPipeline.cxx     RemovePartialOcclusionsPipeline.h
     TextPipelineObserver.cxx                TextPipelineObserver.h
