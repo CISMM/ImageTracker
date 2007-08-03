@@ -49,6 +49,9 @@ TARGET_LINK_LIBRARIES(clgflow ITCommon ITImage ITFilters)
 ADD_EXECUTABLE(hornflow ComputeHornOpticalFlow.cxx)
 TARGET_LINK_LIBRARIES(hornflow ITCommon ITImage ITFilters ITPipelines)
 
+ADD_EXECUTABLE(mrflow MultiResolutionOpticalFlow.cxx)
+TARGET_LINK_LIBRARIES(mrflow ITCommon ITImage ITFilters ITPipelines)
+
 ADD_EXECUTABLE(flowerr ComputeFlowError.cxx)
 TARGET_LINK_LIBRARIES(flowerr ITCommon ITImage ITFilters)
 
