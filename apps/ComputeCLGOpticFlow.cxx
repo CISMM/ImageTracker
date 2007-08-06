@@ -15,7 +15,7 @@ int main(int argc, char** argv)
     if (argc < 10)
     {
         Logger::error << "Usage: " << std::endl;
-        Logger::error << "\t" << argv[0] << " dir formatIn start stop formatOut sigma regularization relaxation iterations" << std::endl;
+        Logger::error << "\t" << argv[0] << " dir formatIn start stop formatOut sigma regularization iterations relaxation" << std::endl;
         exit(1);
     }
     
@@ -28,8 +28,8 @@ int main(int argc, char** argv)
     std::string formatOut   = argv[5];
     double sigma            = atof(argv[6]);
     double reg              = atof(argv[7]);
-    double rel              = atof(argv[8]);
-    int iter                = atoi(argv[9]);
+    int iter                = atoi(argv[8]);
+    double rel              = atof(argv[9]);
     
     FileSet filesIn(FilePattern(dir, formatIn, start, stop));
     FileSet filesOut(FilePattern(dir, formatOut, start, stop-1));

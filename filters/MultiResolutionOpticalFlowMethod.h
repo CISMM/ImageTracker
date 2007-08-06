@@ -1,6 +1,7 @@
 #pragma once
 
 #include "OpticalFlowImageFilter.h"
+#include "CommonTypes.h"
 
 template < class TFixedImage, class TMovingImage >
 class MultiResolutionOpticalFlowMethod : 
@@ -63,7 +64,7 @@ private:
 
 #include "itkAddImageFilter.h"
 #include "itkImageRegionIterator.h"
-#include "itkMultiResolutionPyramidImageFilter.h"
+#include "itkRecursiveMultiResolutionPyramidImageFilter.h"
 #include "itkSimilarity2DTransform.h"
 #include "itkUnaryFunctorImageFilter.h"
 #include "itkVectorResampleImageFilter.h"
@@ -78,9 +79,8 @@ void MultiResolutionOpticalFlowMethod< TFixedImage, TMovingImage >::GenerateData
 {
     std::string function("MultiResolutionOpticalFlowMethod::GenerateData");
     
-    
-    typedef itk::MultiResolutionPyramidImageFilter< FixedImageType, ImageType > FixedPyramidType;
-    typedef itk::MultiResolutionPyramidImageFilter< MovingImageType, ImageType > MovingPyramidType;
+    typedef itk::RecursiveMultiResolutionPyramidImageFilter< FixedImageType, ImageType > FixedPyramidType;
+    typedef itk::RecursiveMultiResolutionPyramidImageFilter< MovingImageType, ImageType > MovingPyramidType;
     typedef itk::WarpImageFilter< ImageType, ImageType, OutputImageType > WarpType;
     typedef itk::AddImageFilter< OutputImageType, OutputImageType, OutputImageType > AddType;
     typedef itk::VectorResampleImageFilter< OutputImageType, OutputImageType > ResampleType;
@@ -102,15 +102,21 @@ void MultiResolutionOpticalFlowMethod< TFixedImage, TMovingImage >::GenerateData
     movingPyr->SetNumberOfLevels(this->GetNumberOfLevels());
     movingPyr->Update();
     
+    Logger::debug << function << ": Fixed pyramid has  " << fixedPyr->GetNumberOfOutputs() << " output images." << std::endl;
+    Logger::debug << function << ": Moving pyramid has " << movingPyr->GetNumberOfOutputs() << " output images." << std::endl;
+    
     Logger::debug << function << ": Creating initial flow field" << std::endl;
     // Create an initially empty flow field
     OutputImagePointer currentFlow = OutputImageType::New();
-    currentFlow->SetRegions(movingPyr->GetOutput(0)->GetLargestPossibleRegion());
+    MovingImagePointer lowresImg = movingPyr->GetOutput(0);
+    currentFlow->SetRegions(lowresImg->GetLargestPossibleRegion());
+    currentFlow->SetOrigin(lowresImg->GetOrigin());
+    currentFlow->SetSpacing(lowresImg->GetSpacing());
     currentFlow->Allocate();
     
+    // Fill initial flow field with [0,0] vectors
     typename OutputImageType::PixelType zero;
     zero.Fill(0.0);
-
     typedef itk::ImageRegionIterator< OutputImageType > IteratorType;
     IteratorType iter(currentFlow, currentFlow->GetLargestPossibleRegion());
     for (iter.GoToBegin(); !iter.IsAtEnd(); ++iter)
@@ -118,7 +124,7 @@ void MultiResolutionOpticalFlowMethod< TFixedImage, TMovingImage >::GenerateData
         iter.Set(zero);
     }
     
-    Logger::debug << function << ": Creating flow adder, resampler, and rescaler" << std::endl;
+    Logger::debug << function << ": Creating flow warper, adder, resampler, and rescaler" << std::endl;
     // Warp the moving image with the current optical flow estimate
     typename WarpType::Pointer warp = WarpType::New();
     
@@ -129,53 +135,95 @@ void MultiResolutionOpticalFlowMethod< TFixedImage, TMovingImage >::GenerateData
     
     // Upsample the current flow estimate for the next level
     typename ResampleType::Pointer resample = ResampleType::New();
-    resample->SetInput(add->GetOutput());
     typedef itk::Similarity2DTransform< double > TransformType;
     typename TransformType::Pointer transform = TransformType::New();
-    transform->SetScale(2.0);
+    // Somehow, I guess because the spacing halves and region size doubles at each
+    // step of the multi-res pyramid, the scaling we use in the transform is just 1.
+    transform->SetScale(1.0);
     resample->SetTransform(transform);
     
     // Rescale the flow estimate due to upsampling
     typename ScaleType::Pointer scale = ScaleType::New();
-    scale->SetInput(resample->GetOutput());
     scale->GetFunctor().SetFactor(2.0);
+    scale->SetInput(resample->GetOutput());
+    scale->InPlaceOff();
     
     Logger::debug << function << ": Compute multiple resolution optical flow..." << std::endl;
     // Perform optical flow computation at each level of the pyramid
     for (int level = 0; level < this->GetNumberOfLevels(); level++)
     {
-        int plevel = this->GetNumberOfLevels() - level;
-        PrintImageInfo(fixedPyr->GetOutput(level), "Fixed image", Logger::debug);
-        PrintImageInfo(movingPyr->GetOutput(level), "Moving image", Logger::debug);
-        PrintImageInfo< OutputImageType >(currentFlow, "Current flow", Logger::debug);
-//         typename InputImageType::RegionType region = fixedPyr->GetOutput(level)->GetLargestPossibleRegion();
-        
-        Logger::debug << function << ": Level => " << plevel << " setting up moving image warp" << std::endl;
+        FixedImagePointer fixedImg = fixedPyr->GetOutput(level);
+        MovingImagePointer movingImg = movingPyr->GetOutput(level);
+                
+        Logger::debug << function << ": Level => " << level << " warping moving image with current flow estimate" << std::endl;
         // Warp the moving image with the current optical flow estimate
-        warp->SetInput(movingPyr->GetOutput(level));
-        warp->SetDeformationField(currentFlow);
         
-        Logger::debug << function << ": Level => " << plevel << " setting up flow computation" << std::endl;
+        warp->SetInput(movingImg);
+        warp->SetDeformationField(currentFlow);
+        warp->SetOutputOrigin(movingImg->GetOrigin());
+        warp->SetOutputSpacing(movingImg->GetSpacing());
+        warp->UpdateLargestPossibleRegion();
+        
+        Logger::debug << function << ": Level => " << level << " Flow input image information:" << std::endl;
+        PrintImageInfo<FixedImageType>(fixedImg, "Fixed image", Logger::debug);
+        PrintImageInfo<MovingImageType>(movingImg, "Moving image", Logger::debug);
+        PrintImageInfo(warp->GetOutput(), "Warped image", Logger::debug);
+        PrintImageInfo<OutputImageType>(currentFlow, "Current flow", Logger::debug);
+        
+        char filename[80];
+        sprintf(filename, "warp-lev-%d.tif", level);
+        WriteImage< MovingImageType, CommonTypes::InputImageType >(warp->GetOutput(), std::string(filename));
+        
+        Logger::debug << function << ": Level => " << level << " setting up flow computation" << std::endl;
         // Compute optical flow at current resolution level using the optical flow method
         // provided by the caller
-        this->GetOpticalFlow()->SetInput1(fixedPyr->GetOutput(level));
+        this->GetOpticalFlow()->SetInput1(fixedImg);
         this->GetOpticalFlow()->SetInput2(warp->GetOutput());
+//         this->GetOpticalFlow()->UpdateLargestPossibleRegion();
         
-        Logger::debug << function << ": Level => " << plevel << " setting up flow addition" << std::endl;
+        Logger::debug << function << ": Level => " << level << " setting up flow addition" << std::endl;
         // Add the differential flow update to the current flow estimate
         add->SetInput1(currentFlow);
         add->SetInput2(this->GetOpticalFlow()->GetOutput());
         
-        Logger::debug << function << ": Level => " << plevel << " executing warp, flow, add" << std::endl;
-        add->Update();
+        Logger::debug << function << ": Level => " << level << " executing flow, add" << std::endl;
+        add->UpdateLargestPossibleRegion();
         
-        if (level == 1) break; // Done...no need to resample and rescale
+        sprintf(filename, "add-lev-%d.mha", level);
+        WriteImage< OutputImageType >(add->GetOutput(), std::string(filename));
         
-        Logger::debug << function << ": Level => " << plevel << " executing resample, rescale" << std::endl;
-        scale->Update();
+        if (level == this->GetNumberOfLevels()-1) break; // Done...no need to resample and rescale
+        
+        Logger::debug << function << ": Level => " << level << " resampling flow for next level" << std::endl;
+        // Setup region information for resampling
+        resample->SetInput(add->GetOutput());
+        FixedImagePointer nextImg = fixedPyr->GetOutput(level+1);
+        resample->SetOutputStartIndex(nextImg->GetLargestPossibleRegion().GetIndex());
+        resample->SetSize(nextImg->GetLargestPossibleRegion().GetSize());
+        resample->SetOutputOrigin(nextImg->GetOrigin());
+        resample->SetOutputSpacing(nextImg->GetSpacing());
+        resample->UpdateLargestPossibleRegion();
+        
+        sprintf(filename, "resample-lev-%d.mha", level);
+        WriteImage< OutputImageType >(resample->GetOutput(), std::string(filename));
+        
+        Logger::debug << function << ": Level => " << level << " rescaling flow for next level" << std::endl;
+        scale->UpdateLargestPossibleRegion();
+        
+        sprintf(filename, "rescale-lev-%d.mha", level);
+        WriteImage<OutputImageType>(scale->GetOutput(), std::string(filename));
+        
         currentFlow = scale->GetOutput();
         currentFlow->DisconnectPipeline();
+        
+        Logger::debug << function << ": Level => " << level << " Flow output image information:" << std::endl;
+        PrintImageInfo< OutputImageType >(this->GetOpticalFlow()->GetOutput(), "Flow output", Logger::debug);
+        PrintImageInfo< OutputImageType >(add->GetOutput(), "Add output", Logger::debug);
+        PrintImageInfo< OutputImageType >(resample->GetOutput(), "Resample output", Logger::debug);
+        PrintImageInfo< OutputImageType >(scale->GetOutput(), "Scale output", Logger::debug);
+        PrintImageInfo< OutputImageType >(currentFlow, "Updated flow", Logger::debug);
     }
     
-    this->GraftOutput(currentFlow);
+    this->GraftOutput(add->GetOutput());
+    PrintImageInfo< OutputImageType >(this->GetOutput(), "MR flow output", Logger::debug);
 }
