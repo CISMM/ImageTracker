@@ -179,7 +179,7 @@ void MultiResolutionOpticalFlowMethod< TFixedImage, TMovingImage >::GenerateData
         // provided by the caller
         this->GetOpticalFlow()->SetInput1(fixedImg);
         this->GetOpticalFlow()->SetInput2(warp->GetOutput());
-//         this->GetOpticalFlow()->UpdateLargestPossibleRegion();
+        this->GetOpticalFlow()->UpdateLargestPossibleRegion();
         
         Logger::debug << function << ": Level => " << level << " setting up flow addition" << std::endl;
         // Add the differential flow update to the current flow estimate
@@ -224,6 +224,10 @@ void MultiResolutionOpticalFlowMethod< TFixedImage, TMovingImage >::GenerateData
         PrintImageInfo< OutputImageType >(currentFlow, "Updated flow", Logger::debug);
     }
     
+    Logger::debug << function << "Final flow output image information:" << std::endl;
+    PrintImageInfo< OutputImageType >(this->GetOpticalFlow()->GetOutput(), "Flow output", Logger::debug);
+    PrintImageInfo< OutputImageType >(add->GetOutput(), "Add output", Logger::debug);
+
     this->GraftOutput(add->GetOutput());
     PrintImageInfo< OutputImageType >(this->GetOutput(), "MR flow output", Logger::debug);
 }

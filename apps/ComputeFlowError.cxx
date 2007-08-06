@@ -2,6 +2,7 @@
 #include <string>
 
 #include "itkImage.h"
+#include "itkRegionOfInterestImageFilter.h"
 #include "itkSquaredDifferenceImageFilter.h"
 #include "itkThresholdImageFilter.h"
 #include "itkVector.h"
@@ -34,7 +35,7 @@ int main(int argc, char** argv)
     std::string function("ComputeFlowError");
     if (argc < 8)
     {
-        Logger::warning << "Usage:\n\t" << argv[0] << " dir imgFormat flowFormat start end errFormat meanErr" << std::endl;
+        Logger::warning << "Usage:\n\t" << argv[0] << " dir imgFormat flowFormat start end errFormat meanErr [radius]" << std::endl;
         exit(1);
     }
     
@@ -42,6 +43,7 @@ int main(int argc, char** argv)
     typedef itk::Image< float, 2 > InternalImageType;
     typedef itk::Image< itk::Vector< float, 2 >, 2 > FlowImageType;
     typedef itk::WarpImageFilter< InternalImageType, InternalImageType, FlowImageType > WarpType;
+    typedef itk::RegionOfInterestImageFilter< InternalImageType, InternalImageType > ROIType;
     typedef itk::SquaredDifferenceImageFilter< InternalImageType, InternalImageType, InternalImageType > ErrorType;
     typedef NaryMeanImageFilter<InternalImageType, InternalImageType> MeanType;
     typedef itk::ThresholdImageFilter< InternalImageType > ThresholdType;
@@ -55,6 +57,7 @@ int main(int argc, char** argv)
     int end = atoi(argv[5]);
     std::string errFormat(argv[6]);
     std::string meanFile(argv[7]);
+    int radius = argc > 8 ? atoi(argv[8]) : 0;
     
     FileSet imageFiles(FilePattern(dir, imgFormat, start, end));
     FileSet flowFiles(FilePattern(dir, flowFormat, start, end-1));
@@ -65,6 +68,8 @@ int main(int argc, char** argv)
     ImageSetReader<FlowImageType, FlowImageType > flows(flowFiles);
     
     WarpType::Pointer warp = WarpType::New();
+    ROIType::Pointer roiOrig = ROIType::New();
+    ROIType::Pointer roiWarp = ROIType::New();
     ErrorType::Pointer error = ErrorType::New();
     MeanType::Pointer mean = MeanType::New();
     ThresholdType::Pointer threshold = ThresholdType::New();
@@ -74,13 +79,18 @@ int main(int argc, char** argv)
     warp->SetOutputOrigin(images[0]->GetOrigin());
     warp->SetOutputSpacing(images[0]->GetSpacing());
     
+    roiOrig->SetRegionOfInterest(PadRegionByRadius(images[0]->GetLargestPossibleRegion(), radius));
+    roiWarp->SetRegionOfInterest(PadRegionByRadius(images[0]->GetLargestPossibleRegion(), radius));
+    
     Logger::verbose << function << ": Computing error" << std::endl;
     for (int i = 0; i < flows.size(); i++)
     {
         warp->SetInput(images[i+1]);
         warp->SetDeformationField(flows[i]);
-        error->SetInput1(images[i]);
-        error->SetInput2(warp->GetOutput());
+        roiOrig->SetInput(images[i]);
+        roiWarp->SetInput(warp->GetOutput());
+        error->SetInput1(roiOrig->GetOutput());
+        error->SetInput2(roiWarp->GetOutput());
         WriteImage<InternalImageType, InputImageType>(error->GetOutput(), errorFiles[i]);
         mean->PushBackInput(error->GetOutput());
         
@@ -98,11 +108,16 @@ int main(int argc, char** argv)
         PrintImageInfo(error->GetOutput(), msg);
         
         // PSNR
-        psnr->SetSourceImage(images[i]);
-        psnr->SetReconstructImage(warp->GetOutput());
+        psnr->SetSourceImage(roiOrig->GetOutput());
+        psnr->SetReconstructImage(roiWarp->GetOutput());
         Logger::verbose << function << ": RMSE\t" << i << " - w:\t" << psnr->GetRMSE() << std::endl;
         Logger::verbose << function << ": PSNR\t" << i << " - w:\t" << psnr->GetPSNR() << std::endl;
-        psnr->SetReconstructImage(images[i+1]);
+        
+        // What would happen if we didn't compute flow?  Hopefully, we've gotten some improvement, right?
+        roiWarp->SetInput(images[i+1]);
+        // Not sure why, but update needs to be called on both of these filters
+        roiWarp->Update(); 
+        psnr->Update();
         Logger::verbose << function << ": RMSE\t" << i << " - " << (i+1) << ":\t" << psnr->GetRMSE() << std::endl;
         Logger::verbose << function << ": PSNR\t" << i << " - " << (i+1) << ":\t" << psnr->GetPSNR() << std::endl;
     }

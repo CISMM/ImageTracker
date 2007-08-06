@@ -49,7 +49,7 @@ void PrintImageInfo(const TImage* image, const std::string& label = "", LogStrea
         logger << "\t\tSize: \t" << region.GetSize()[0] << std::endl;
     }
     
-    typedef itk::StatisticsImageFilter< TImage> StatsType;
+    typedef itk::StatisticsImageFilter< TImage > StatsType;
     typename StatsType::Pointer stats = StatsType::New();
     stats->SetInput(image);
     stats->Update();
@@ -146,4 +146,34 @@ void CopyRegion(const typename TSourceImage::RegionType& source, typename TDestI
 
     destination.SetSize(size);
     destination.SetIndex(index);
+}
+
+template <class TRegionType>
+TRegionType PadRegionByRadius(const TRegionType& region, int radius)
+{
+    const unsigned int dimension = TRegionType::GetImageDimension();
+    
+    typename TRegionType::SizeType size;
+    typename TRegionType::IndexType index;
+    
+    for (unsigned int d = 0; d < dimension; d++)
+    {
+        index[d] = region.GetIndex()[d] - radius;
+        
+        // have to be careful if radius is negative...check to make sure we don't
+        // end up with a negative size
+        if ((int)region.GetSize()[d] + 2*radius < 0)
+        {
+            size[d] = region.GetSize()[d];
+        }
+        else
+        {
+            size[d] = region.GetSize()[d] + 2*radius;
+        }
+    }
+    
+    TRegionType regionOut;
+    regionOut.SetSize(size);
+    regionOut.SetIndex(index);
+    return regionOut;
 }
