@@ -1,8 +1,9 @@
 #pragma once
 
 #include "itkImage.h"
-#include "itkImageToImageFilter.h"
 #include "itkVector.h"
+
+#include "OpticalFlowImageFilter.h"
 
 /**
  * \class HornOpticalFlowImageFilter
@@ -21,10 +22,9 @@
  * derivatives are estimated by image differencing.  The user configures the spatial derivative scale,
  * the weighting of the smoothness term, and the number of iterations.
  */
-template < class TInputImage1, class TInputImage2 = TInputImage1, class TComponentType = float >
+template <class TInputImage1, class TInputImage2, class TOutputValueType = float >
 class HornOpticalFlowImageFilter :
-    public itk::ImageToImageFilter< TInputImage1, 
-        itk::Image< itk::Vector< TComponentType, itk::GetImageDimension<TInputImage1>::ImageDimension >, itk::GetImageDimension<TInputImage1>::ImageDimension > >
+    public OpticalFlowImageFilter< TInputImage1, TInputImage2, TOutputValueType >
 {
 public:
     /** Some convenient typedefs */
@@ -37,51 +37,26 @@ public:
     typedef typename Input2ImageType::RegionType Input2RegionType;
     typedef typename Input2ImageType::PixelType Input2PixelType;
     
+    /** Image typedef support */
     itkStaticConstMacro(ImageDimension, unsigned int, Input1ImageType::ImageDimension);
     typedef typename Input1ImageType::PixelType InputPixelType;
-    
-    typedef itk::Vector< TComponentType, ImageDimension > OutputPixelType;
-    typedef itk::Image< OutputPixelType, ImageDimension > OutputImageType;
-    typedef typename OutputImageType::Pointer OutputImagePointer;
-    typedef typename OutputImageType::RegionType OutputRegionType;
+    typedef Input1ImageType InputImageType;
 
+    typedef TOutputValueType OutputValueType;
+    typedef itk::Vector<OutputValueType, ImageDimension> OutputPixelType;
+    typedef itk::Image<OutputPixelType, ImageDimension> OutputImageType;
+    typedef typename InputImageType::Pointer InputImagePointer;
+    typedef typename OutputImageType::Pointer OutputImagePointer;
+    typedef typename OutputImageType::RegionType OutputImageRegionType;
+    typedef OutputPixelType VectorType;
+    
     /** Common ITK Typedefs */
     typedef HornOpticalFlowImageFilter Self;
-    typedef itk::ImageToImageFilter< Input1ImageType, OutputImageType > Superclass;
+    typedef OpticalFlowImageFilter< Input1ImageType, Input2ImageType, OutputValueType > Superclass;
     typedef itk::SmartPointer< Self > Pointer;
     typedef itk::SmartPointer< const Self > ConstPointer;
     itkNewMacro(Self);
     itkTypeMacro(HornOpticalFlowImageFilter, itk::ImageToImageFilter);
-    
-    TInputImage1 * GetInput1()
-    {
-        return const_cast<TInputImage1 *> (this->GetInput(0));
-    }
-
-    /** 
-     * Set the first (moving) image for optical flow. Note, the image
-     * data must be loaded (updated) before this filter's Update() 
-     * method is called.
-     */
-    void SetInput1(const TInputImage1 * image1)
-    {
-        this->SetNthInput(0, const_cast<TInputImage1 *>(image1));
-    }
-
-    TInputImage2 * GetInput2()
-    {
-        return const_cast<TInputImage2 *> (this->GetInput(1));
-    }
-
-    /** 
-     * Set the second (fixed) image for optical flow. Note, the image
-     * data must be loaded (updated) before this filter's Update() 
-     * method is called.
-     */
-    void SetInput2(const TInputImage2 * image2)
-    {
-        this->SetNthInput(1, const_cast<TInputImage2 *>(image2));
-    }
     
     /**
      * Get/Set the spatial scale, sigma, over which to compute image derivatives.
@@ -243,6 +218,19 @@ void HornOpticalFlowImageFilter< TInputImage1, TInputImage2, TComponentType >
     step->SetDerivativeX(dIdx);
     step->SetDerivativeY(dIdy);
     step->SetDerivativeT(dt->GetOutput());
+    
+    // If the initial flow is not set, use the zero'd flow created above.
+    // Otherwise, we are initializing the optical flow computation with an externally
+    // provided flow field.
+    typename Superclass::ConstOutputImagePointer initFlow = this->GetInitialFlow();
+    if (!initFlow || initFlow.IsNull())
+    {
+        step->SetInitialFlow(flow);
+    }
+    else
+    {
+        step->SetInitialFlow(initFlow);
+    }
     
     Logger::debug << function << ": Computing flow" << std::endl;
     for (unsigned int i = 0; i < this->GetIterations(); i++)

@@ -3,6 +3,7 @@
 #include <string>
 
 #include "CLGOpticFlowImageFilter.h"
+#include "HornOpticalFlowImageFilter.h"
 #include "ImageUtils.h"
 #include "MultiResolutionOpticalFlowMethod.h"
 #include "Logger.h"
@@ -23,13 +24,16 @@ void MultiResolutionOpticalFlowPipeline::Update()
     
     Logger::debug << function << ": Setting up flow computation" << std::endl;
     
-    typedef CLGOpticFlowImageFilter< InternalImageType, InternalImageType, float > FlowType;
+//     typedef CLGOpticFlowImageFilter< InternalImageType, InternalImageType, float > FlowType;
+    typedef HornOpticalFlowImageFilter< InternalImageType, InternalImageType, float > FlowType;
     typedef MultiResolutionOpticalFlowMethod< InternalImageType, InternalImageType > MRFlowType;
+    
     FlowType::Pointer method = FlowType::New();
     method->SetIterations(this->GetIterations());
     method->SetSpatialSigma(this->GetSpatialSigma());
-    method->SetRegularization(this->GetSmoothWeighting());
-    method->SetRelaxation(this->GetRelaxation());
+    method->SetSmoothWeighting(this->GetSmoothWeighting());
+//     method->SetRegularization(this->GetSmoothWeighting());
+//     method->SetRelaxation(this->GetRelaxation());
     
     MRFlowType::Pointer flow = MRFlowType::New();
     flow->SetNumberOfLevels(this->GetNumberOfLevels());

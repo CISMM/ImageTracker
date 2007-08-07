@@ -36,14 +36,6 @@ public:
     itkGetObjectMacro(OpticalFlow, OpticalFlowType);
     itkSetObjectMacro(OpticalFlow, OpticalFlowType);
     
-    /** Get/Set the fixed input image. */
-//     itkGetConstObjectMacro(FixedImage, FixedImageType);
-//     itkSetConstObjectMacro(FixedImage, FixedImageType);
-    
-    /** Get/Set the moving input image. */
-//     itkGetConstObjectMacro(MovingImage, MovingImageType);
-//     itkSetConstObjectMacro(MovingImage, MovingImageType);
-    
 protected:
     MultiResolutionOpticalFlowMethod() {}
     ~MultiResolutionOpticalFlowMethod() {}
@@ -66,6 +58,7 @@ private:
 #include "itkImageRegionIterator.h"
 #include "itkRecursiveMultiResolutionPyramidImageFilter.h"
 #include "itkSimilarity2DTransform.h"
+#include "itkStatisticsImageFilter.h"
 #include "itkUnaryFunctorImageFilter.h"
 #include "itkVectorResampleImageFilter.h"
 #include "itkVectorRescaleIntensityImageFilter.h"
@@ -82,6 +75,7 @@ void MultiResolutionOpticalFlowMethod< TFixedImage, TMovingImage >::GenerateData
     typedef itk::RecursiveMultiResolutionPyramidImageFilter< FixedImageType, ImageType > FixedPyramidType;
     typedef itk::RecursiveMultiResolutionPyramidImageFilter< MovingImageType, ImageType > MovingPyramidType;
     typedef itk::WarpImageFilter< ImageType, ImageType, OutputImageType > WarpType;
+    typedef itk::StatisticsImageFilter< ImageType > StatsType;
     typedef itk::AddImageFilter< OutputImageType, OutputImageType, OutputImageType > AddType;
     typedef itk::VectorResampleImageFilter< OutputImageType, OutputImageType > ResampleType;
     typedef itk::UnaryFunctorImageFilter< OutputImageType, OutputImageType, itk::Functor::VectorMagnitudeLinearTransform< OutputPixelType, OutputPixelType > > ScaleType;
@@ -127,6 +121,7 @@ void MultiResolutionOpticalFlowMethod< TFixedImage, TMovingImage >::GenerateData
     Logger::debug << function << ": Creating flow warper, adder, resampler, and rescaler" << std::endl;
     // Warp the moving image with the current optical flow estimate
     typename WarpType::Pointer warp = WarpType::New();
+    typename StatsType::Pointer stats = StatsType::New(); // used to compute warping outside value
     
     // Compute updated optical flow using in loop below
     
@@ -156,10 +151,13 @@ void MultiResolutionOpticalFlowMethod< TFixedImage, TMovingImage >::GenerateData
         MovingImagePointer movingImg = movingPyr->GetOutput(level);
                 
         Logger::debug << function << ": Level => " << level << " warping moving image with current flow estimate" << std::endl;
-        // Warp the moving image with the current optical flow estimate
         
+        stats->SetInput(movingImg);
+        stats->Update();
+        // Warp the moving image with the current optical flow estimate
         warp->SetInput(movingImg);
         warp->SetDeformationField(currentFlow);
+        warp->SetEdgePaddingValue(stats->GetMean());
         warp->SetOutputOrigin(movingImg->GetOrigin());
         warp->SetOutputSpacing(movingImg->GetSpacing());
         warp->UpdateLargestPossibleRegion();
@@ -172,13 +170,14 @@ void MultiResolutionOpticalFlowMethod< TFixedImage, TMovingImage >::GenerateData
         
         char filename[80];
         sprintf(filename, "warp-lev-%d.tif", level);
-        WriteImage< MovingImageType, CommonTypes::InputImageType >(warp->GetOutput(), std::string(filename));
+        WriteImage< MovingImageType, CommonTypes::InputImageType >(warp->GetOutput(), std::string(filename), false);
         
         Logger::debug << function << ": Level => " << level << " setting up flow computation" << std::endl;
         // Compute optical flow at current resolution level using the optical flow method
         // provided by the caller
         this->GetOpticalFlow()->SetInput1(fixedImg);
         this->GetOpticalFlow()->SetInput2(warp->GetOutput());
+        this->GetOpticalFlow()->SetInitialFlow(currentFlow);
         this->GetOpticalFlow()->UpdateLargestPossibleRegion();
         
         Logger::debug << function << ": Level => " << level << " setting up flow addition" << std::endl;
@@ -190,7 +189,7 @@ void MultiResolutionOpticalFlowMethod< TFixedImage, TMovingImage >::GenerateData
         add->UpdateLargestPossibleRegion();
         
         sprintf(filename, "add-lev-%d.mha", level);
-        WriteImage< OutputImageType >(add->GetOutput(), std::string(filename));
+        WriteImage<OutputImageType>(add->GetOutput(), std::string(filename));
         
         if (level == this->GetNumberOfLevels()-1) break; // Done...no need to resample and rescale
         
@@ -205,7 +204,7 @@ void MultiResolutionOpticalFlowMethod< TFixedImage, TMovingImage >::GenerateData
         resample->UpdateLargestPossibleRegion();
         
         sprintf(filename, "resample-lev-%d.mha", level);
-        WriteImage< OutputImageType >(resample->GetOutput(), std::string(filename));
+        WriteImage<OutputImageType>(resample->GetOutput(), std::string(filename));
         
         Logger::debug << function << ": Level => " << level << " rescaling flow for next level" << std::endl;
         scale->UpdateLargestPossibleRegion();

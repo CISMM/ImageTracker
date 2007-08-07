@@ -101,7 +101,7 @@ int main(int argc, char** argv)
         
         char file[80];
         sprintf(file, "warp-%04d.tif", i + start);
-        WriteImage<InternalImageType, InputImageType>(warp->GetOutput(), std::string(file));
+        WriteImage<InternalImageType, InputImageType>(warp->GetOutput(), std::string(file), false);
         
         char msg[80];
         sprintf(msg, "Error image %4d", i);

@@ -26,8 +26,6 @@ public:
     typedef Input1ImageType InputImageType;
 
     typedef TOutputValueType OutputValueType;
-    //typedef itk::Vector<OutputValueType, ImageDimension> InputPixelType;
-    //typedef itk::Image<InputPixelType, ImageDimension> InputImageType;
     typedef itk::Vector<OutputValueType, ImageDimension> OutputPixelType;
     typedef itk::Image<OutputPixelType, ImageDimension> OutputImageType;
     typedef typename InputImageType::Pointer InputImagePointer;

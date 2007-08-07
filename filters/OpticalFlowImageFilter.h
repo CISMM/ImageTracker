@@ -32,6 +32,7 @@ public:
     typedef itk::Image<OutputPixelType, ImageDimension> OutputImageType;
     typedef typename InputImageType::Pointer InputImagePointer;
     typedef typename OutputImageType::Pointer OutputImagePointer;
+    typedef typename OutputImageType::ConstPointer ConstOutputImagePointer;
     typedef typename OutputImageType::RegionType OutputImageRegionType;
     typedef OutputPixelType VectorType;
 
@@ -73,6 +74,15 @@ public:
         this->SetNthInput(1, const_cast<TInputImage2 *>(image2));
     }
     
+    /**
+     * Get/Set the initial estimate of optical flow.  This is useful if
+     * this optical flow image filter is used in a multi-step 
+     * (e.g. multiresolution) framework where each iteration modifies the 
+     * flow computed in a previous step.
+     */
+    itkGetConstObjectMacro(InitialFlow, OutputImageType);
+    itkSetConstObjectMacro(InitialFlow, OutputImageType);
+    
 protected:
     OpticalFlowImageFilter(){}
     ~OpticalFlowImageFilter(){}
@@ -80,4 +90,6 @@ protected:
 private:
     OpticalFlowImageFilter(const Self& other);
     void operator=(const Self& other);
+    
+    ConstOutputImagePointer m_InitialFlow;
 };
