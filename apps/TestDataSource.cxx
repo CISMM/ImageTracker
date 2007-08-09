@@ -25,11 +25,8 @@ int main(int argc, char** argv)
         exit(1);
     }
     
-    typedef itk::Image< unsigned short, 2 > InputImageType;
+    typedef itk::Image< unsigned char, 2 > InputImageType;
     typedef itk::Image< float, 2 > InternalImageType;
-    typedef itk::ImageFileReader< InputImageType > ReaderType;
-    typedef itk::CastImageFilter< InputImageType, InternalImageType > CasterType;
-    typedef itk::CastImageFilter< InternalImageType, InputImageType > RecastType;
     typedef itk::RecursiveGaussianImageFilter< InternalImageType, InternalImageType > FilterType;
     
     Logger::verbose << "Parsing inputs" << std::endl;
@@ -45,30 +42,18 @@ int main(int argc, char** argv)
     FileSet filesOut(FilePattern(dir, formatOut, start, stop));
     
     Logger::verbose << "Creating pipeline components" << std::endl;
-//     ImageSetReader< InputImageType, InternalImageType > data(filesIn);
     DataSource::Pointer data = DataSource::New();
     FilterType::Pointer filter = FilterType::New();
-    RecastType::Pointer recast = RecastType::New();
-    data->SetPixelDataType(ScalarShort);
+    data->SetPixelDataType(ScalarChar);
     data->SetFiles(filesIn);
     filter->SetZeroOrder();
     filter->SetSigma(sigma);
-    
-    Logger::verbose << "Linking pipeline" << std::endl;
-    recast->SetInput(filter->GetOutput());
     
     Logger::verbose << "Executing pipeline" << std::endl;
     for (int i = 0; i < filesIn.size(); i++)
     {
         filter->SetInput(dynamic_cast< InternalImageType* >(data->GetImage(i)));
-//         itk::DataObject* obj = data->GetImage(i);
-//         Logger::verbose << "Grabbed DataObject from ImageSetReader" << std::endl;
-//         InternalImageType* img = dynamic_cast< InternalImageType* >(obj);
-//         Logger::verbose << "Dyncast DataObject -> InternalImageType" << std::endl;
-//         filter->SetInput(img);
-//         Logger::verbose << "Set dyncast object to filter input" << std::endl;
-//         recast->Update();
-        WriteImage(recast->GetOutput(), filesOut[i]);
+        WriteImage< InternalImageType, InputImageType >(filter->GetOutput(), filesOut[i], false);
     }
     
     DataSource::Pointer empty = DataSource::New();

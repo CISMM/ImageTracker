@@ -37,6 +37,9 @@ TARGET_LINK_LIBRARIES(meanrepair ITFilters)
 ADD_EXECUTABLE(localrepair TestNeighborhoodAttenuationRepair.cxx)
 TARGET_LINK_LIBRARIES(localrepair ITFilters ITImage)
 
+ADD_EXECUTABLE(testread TestImageSetReader.cxx)
+TARGET_LINK_LIBRARIES(testread ITCommon ITImage ITFilters)
+
 ADD_EXECUTABLE(compare CompareVideos.cxx)
 TARGET_LINK_LIBRARIES(compare ITFilters ITImage)
 
