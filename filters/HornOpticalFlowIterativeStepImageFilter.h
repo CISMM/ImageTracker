@@ -45,14 +45,6 @@ public:
     itkNewMacro(Self);
     itkTypeMacro(HornOpticalFlowIterativeStepImageFilter, itk::ImageToImageFilter);
     
-//     void SetDerivativeX(const DerivativeImageType* image);
-//     void SetDerivativeY(const DerivativeImageType* image);
-//     void SetDerivativeT(const DerivativeImageType* image);
-//     
-//     DerivativeImageType* GetDerivativeX();
-//     DerivativeImageType* GetDerivativeY();
-//     DerivativeImageType* GetDerivativeT();
-    
     itkGetConstObjectMacro(DerivativeX, DerivativeImageType);
     itkSetConstObjectMacro(DerivativeX, DerivativeImageType);
     itkGetConstObjectMacro(DerivativeY, DerivativeImageType);
@@ -194,6 +186,8 @@ template < class TInputImage, class TDerivativeImage, class TOutputImage >
     OutputIteratorType outIt(output, outputRegion);
     
     double weight = this->GetSmoothWeighting() * this->GetSmoothWeighting();
+    double one6th = 1.0 / 6.0;
+    double one12th = 1.0 / 12.0;
     
     // Iterate over all iterators
     for (flowIt.GoToBegin(), initIt.GoToBegin(), dxIt.GoToBegin(), dyIt.GoToBegin(), dtIt.GoToBegin(), outIt.GoToBegin(); 
@@ -202,17 +196,13 @@ template < class TInputImage, class TDerivativeImage, class TOutputImage >
     {
         InputPixelType curr(flowIt.GetCenterPixel());
         // Logger::verbose << "[" << curr[0] << "," << curr[1] << "]";
-        OutputPixelType mean;
-        OutputPixelType next;
+        OutputPixelType laplace, next;
         
-        double one6th = 1.0 / 6.0;
-        double one12th = 1.0 / 12.0;
         for (int d = 0; d < curr.GetNumberOfComponents(); d++)
         {
             // The weighting here is like a Laplacian with the center taken out.
             // (smoothing term)
-            mean[d] = 
-                    one6th * (flowIt.GetPixel(1)[d] + initIt.GetPixel(1)[d] + 
+            laplace[d] = one6th * (flowIt.GetPixel(1)[d] + initIt.GetPixel(1)[d] + 
                     flowIt.GetPixel(3)[d] + initIt.GetPixel(3)[d] +
                     flowIt.GetPixel(5)[d] + initIt.GetPixel(5)[d] +
                     flowIt.GetPixel(7)[d] + initIt.GetPixel(7)[d]) +
@@ -220,13 +210,15 @@ template < class TInputImage, class TDerivativeImage, class TOutputImage >
                     flowIt.GetPixel(2)[d] + initIt.GetPixel(2)[d] +
                     flowIt.GetPixel(6)[d] + initIt.GetPixel(6)[d] +
                     flowIt.GetPixel(8)[d] + initIt.GetPixel(8)[d]);
+
         }
         // Logger::verbose << " + [" << mean[0] << "," << mean[1] << "]";
-        // Compute the next flow value (data term)
-        next[0] = mean[0] - dxIt.Get() * (dxIt.Get() * mean[0] + dyIt.Get() * mean[1] + dtIt.Get()) /
-                (weight + dxIt.Get() * dxIt.Get() + dyIt.Get() * dyIt.Get());
-        next[1] = mean[1] - dyIt.Get() * (dxIt.Get() * mean[0] + dyIt.Get() * mean[1] + dtIt.Get()) /
-                (weight + dxIt.Get() * dxIt.Get() + dyIt.Get() * dyIt.Get());
+        // Compute the next flow value (data term); note that we subtract out the value from the initial flow
+        // field...this is because we may be calculating the u,v incrementally
+        next[0] = laplace[0] - dxIt.Get() * (dxIt.Get() * laplace[0] + dyIt.Get() * laplace[1] + dtIt.Get()) /
+                (weight + dxIt.Get() * dxIt.Get() + dyIt.Get() * dyIt.Get()) - initIt.GetCenterPixel()[0];
+        next[1] = laplace[1] - dyIt.Get() * (dxIt.Get() * laplace[0] + dyIt.Get() * laplace[1] + dtIt.Get()) /
+                (weight + dxIt.Get() * dxIt.Get() + dyIt.Get() * dyIt.Get()) - initIt.GetCenterPixel()[1];
         
         // Set the next flow value
         // Logger::verbose << " => [" << next[0] << "," << next[1] << "]" << std::endl;;
@@ -234,46 +226,3 @@ template < class TInputImage, class TDerivativeImage, class TOutputImage >
     }
 }
 
-// Getters and setters.
-
-// template < class TInputImage, class TDerivativeImage, class TOutputImage >
-//     void HornOpticalFlowIterativeStepImageFilter< TInputImage, TDerivativeImage, TOutputImage >
-//     ::SetDerivativeX(const DerivativeImageType* image)
-// {
-//     this->m_dx = const_cast<DerivativeImageType*>(image);
-// }
-// 
-// template < class TInputImage, class TDerivativeImage, class TOutputImage >
-//     void HornOpticalFlowIterativeStepImageFilter< TInputImage, TDerivativeImage, TOutputImage >
-//     ::SetDerivativeY(const DerivativeImageType* image)
-// {
-//     this->m_dy = const_cast<DerivativeImageType*>(image);
-// }
-// 
-// template < class TInputImage, class TDerivativeImage, class TOutputImage >
-//     void HornOpticalFlowIterativeStepImageFilter< TInputImage, TDerivativeImage, TOutputImage >
-//     ::SetDerivativeT(const DerivativeImageType* image)
-// {
-//     this->m_dt = const_cast<DerivativeImageType*>(image);
-// }
-// 
-// template < class TInputImage, class TDerivativeImage, class TOutputImage >
-//     TDerivativeImage* HornOpticalFlowIterativeStepImageFilter< TInputImage, TDerivativeImage, TOutputImage >
-//     ::GetDerivativeX()
-// {
-//     return this->m_dx;
-// }
-// 
-// template < class TInputImage, class TDerivativeImage, class TOutputImage >
-//     TDerivativeImage* HornOpticalFlowIterativeStepImageFilter< TInputImage, TDerivativeImage, TOutputImage >
-//     ::GetDerivativeY()
-// {
-//     return this->m_dy;
-// }
-// 
-// template < class TInputImage, class TDerivativeImage, class TOutputImage >
-//     TDerivativeImage* HornOpticalFlowIterativeStepImageFilter< TInputImage, TDerivativeImage, TOutputImage >
-//     ::GetDerivativeT()
-// {
-//     return this->m_dt;
-// }
