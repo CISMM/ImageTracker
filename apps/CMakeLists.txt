@@ -61,6 +61,9 @@ TARGET_LINK_LIBRARIES(flowerr ITCommon ITImage ITFilters)
 ADD_EXECUTABLE(intflow IntegrateOpticalFlow.cxx)
 TARGET_LINK_LIBRARIES(intflow ITCommon ITImage ITFilters ITPipelines)
 
+ADD_EXECUTABLE(applyscale ApplyScale.cxx)
+TARGET_LINK_LIBRARIES(applyscale ITCommon ITImage ITFilters)
+
 ADD_EXECUTABLE(findback FindBackground.cxx)
 TARGET_LINK_LIBRARIES(findback ITCommon ITImage ITFilters)
 
