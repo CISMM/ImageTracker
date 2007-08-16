@@ -84,7 +84,7 @@ public:
 
     const std::string operator[](unsigned int index) const
     {
-        return this->fileNames[index];
+        return index < this->size() ? this->fileNames[index] : "FileSet index exceeded";
     }
     
     void Add(const std::string file)

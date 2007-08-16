@@ -199,9 +199,6 @@ public:
     unsigned int GetCacheRadius() 
     { return this->m_CacheRadius; }
     void SetCacheRadius(unsigned int radius);
-    
-    int GetCacheSize() 
-    { return this->images.size(); }
 
 private:
     
@@ -306,7 +303,7 @@ ImageSetReader<TInput, TOutput>::operator[](unsigned int idx)
     this->m_Index = idx;
     this->m_MinIndex = minIndex;
     this->m_MaxIndex = maxIndex;
-    this->maxCount = std::max(this->maxCount, (int) this->GetCacheSize());
+    this->maxCount = std::max(this->maxCount, (int) this->images.size());
     
 //     Logger::verbose << function << ": image cache size " << this->images.size() << std::endl;
 //     Logger::verbose << function << ": returning image at index " << (this->m_Index - this->m_MinIndex) << std::endl;
@@ -318,7 +315,6 @@ typename ImageSetReader<TInput, TOutput>::CasterPointer
 ImageSetReader<TInput, TOutput>::LoadImage(unsigned int index)
 {
     this->readCount++;
-    index = std::min((int) index, this->size() - 1); // ensure the index if valid;
     
     // Cast the image to the output image type
     CasterPointer cast = CasterType::New();

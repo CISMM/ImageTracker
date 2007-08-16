@@ -130,7 +130,7 @@ DataSourceDialog::DataSourceDialog(wxWindow* parent, int id, const wxString& tit
     
     // TODO: implement vector float support
     // Disable vector floats, for now
-    rbxPixelType->Enable(3, false);
+    // rbxPixelType->Enable(3, false);
     
     // This is pretty messed up right here.  Windows complains if the choices array for a
     // list box is empty.  If you pass an empty wxString as the only element, everything

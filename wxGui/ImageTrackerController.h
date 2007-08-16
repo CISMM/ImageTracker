@@ -59,11 +59,16 @@ public:
     void RemoveDataSource(unsigned int i);
     
     /**
-     * Sets the index into the DataSources managed by this controller. This specifies
-     * the active data item within all the DataSources.  (As opposed to the index into
-     * the list of DataSources managed by this controller.)
+     * Sets the index into the DataSources managed by this controller. This 
+     * specifies the active data item within all the DataSources.  (As opposed 
+     * to the index into the list of DataSources managed by this controller.)
      */
-    void SetIndex(unsigned int index);
+    void SetFrameIndex(unsigned int index);
+    
+    /**
+     * Sets the index of the active DataSource managed by this controller.
+     */
+    void SetDataIndex(unsigned int index);
     
     /**
      * Returns the size of the largest data source set managed by this controller.
@@ -90,7 +95,7 @@ public:
     /**
      * Sets the ImageTracker window referring to this controller.
      */
-    void SetParent(wxWindow* parent, int id = -1);
+    void SetParent(wxWindow* parent);
     
     /**
      * Populate a list of the data sources managed by this controller.  We
@@ -115,7 +120,6 @@ public:
 protected:
     ImageTrackerController();
     virtual ~ImageTrackerController();
-    void OnDataSourceChange();
     
 private:
     // Not implemented
@@ -123,17 +127,18 @@ private:
     void operator=(const Self& other);
     
     // Data members
+    
     // The current data frame index.
-    unsigned int index;
+    unsigned int frameIndex;
 
+    // The current data source index
+    unsigned int dataIndex;
+    
     // The set of data and visualization pairs.
     DataVisualList datavis;
 
     // A flag indicating if the camera should be reset.
     bool resetCamera;
-
-    // This controller's wxWidget's id.
-    int wxId;
 
     // The VTK Renderer in which visualizations are displayed
     vtkRenderer* renderer;

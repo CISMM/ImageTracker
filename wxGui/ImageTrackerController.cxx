@@ -12,10 +12,10 @@
 wxMutex ImageTrackerController::s_ControllerMutex;
 
 ImageTrackerController::ImageTrackerController() :
-    index(0),
+    frameIndex(0),
+    dataIndex(0),
     datavis(),
     resetCamera(false),
-    wxId(-1),
     isControllerChanged(false)
 {
     this->renderer = NULL;
@@ -48,15 +48,21 @@ void ImageTrackerController::SetIsControllerChanged(bool changed)
 
 void ImageTrackerController::AddDataSource(DataSource::Pointer source)
 {
+    std::string function("ImageTrackerController::AddDataSource");
+    Logger::verbose << function << ": generating visualization pipeline for data source" << std::endl;
     ItkVtkPipeline::Pointer view = GenerateVisualPipeline(source);
+    
+    Logger::verbose << function << ": adding data source and visualization to managed data-vis pairs" << std::endl;
     this->datavis.push_back(std::make_pair(source, view));
     if (view.IsNotNull())
     {
+        Logger::verbose << function << ": adding visualization output to renderer" << std::endl;
         this->GetRenderer()->AddActor(view->GetOutput());
         this->resetCamera = true;
     }
 
     this->SetIsControllerChanged(true);
+    Logger::verbose << function << ": done" << std::endl;
 }
 
 void ImageTrackerController::RemoveDataSource(unsigned int i)
@@ -81,10 +87,17 @@ void ImageTrackerController::GetDataSourceNames(wxArrayString& names)
     } 
 }
 
-void ImageTrackerController::SetIndex(unsigned int index)
+void ImageTrackerController::SetFrameIndex(unsigned int index)
 {
     // Logger::verbose << "ImageTrackerController::SetIndex: " << index << std::endl;
-    this->index = index;
+    this->frameIndex = index;
+    this->SetIsControllerChanged(true);
+}
+
+void ImageTrackerController::SetDataIndex(unsigned int index)
+{
+    index = std::min(index, this->datavis.size()-1);
+    this->dataIndex = index;
     this->SetIsControllerChanged(true);
 }
 
@@ -100,19 +113,9 @@ unsigned int ImageTrackerController::GetMaxSize()
     return (unsigned int) max;
 }
 
-void ImageTrackerController::SetParent(wxWindow* parent, int id)
+void ImageTrackerController::SetParent(wxWindow* parent)
 {
     this->parent = parent;
-    this->wxId = id;
-}
-
-void ImageTrackerController::OnDataSourceChange()
-{
-    //if (this->parent)
-    //{
-    //    wxCommandEvent evt(wxEVT_COMMAND_ENTER, wxId);
-    //    this->parent->GetEventHandler()->ProcessEvent(evt);
-    //}
 }
 
 /**
@@ -121,29 +124,29 @@ void ImageTrackerController::OnDataSourceChange()
  */
 void ImageTrackerController::UpdateView()
 {
-    Logger::verbose << "ImageTrackerController::UpdateViewPipelines: " << this->datavis.size() << " data/vis pairs" << std::endl;
-    for (unsigned int i = 0;
-         i < this->datavis.size();
-         i++)
+    std::string function("ImageTrackerController::UpdateView");
+    Logger::verbose << function << ": " << this->datavis.size() << " data/vis pairs" << std::endl;
+    
+    for (DataVisualList::size_type i = 0; i < this->datavis.size(); i++)
     {
         DataSource::Pointer data = this->datavis[i].first;
         ItkVtkPipeline::Pointer view = this->datavis[i].second;
         
-        if (data.IsNull() || data->size() == 0) // no objects in the datasource
+        if (data.IsNull() || data->size() == 0)
         {
-            Logger::info << "ImageTrackerController::UpdateViewPipelines: datasource " << i << " is empty...skipping" << std::endl;
+            Logger::info << function << ": datasource " << this->dataIndex << " is empty...skipping" << std::endl;
         }
-        else if (view.IsNull())                      // no valid visualization
+        else if (view.IsNull())
         {
-            Logger::info << "ImageTrackerController::UpdateViewPipelines: visualization " << i << " is null...skipping" << std::endl;
+            Logger::info << function << ": visualization " << this->dataIndex << " is null...skipping" << std::endl;
         }
-        else                                    // should be able to render this
+        else
         {
-            Logger::debug << "ImageTrackerController::UpdateViewPipelines: requesting file " << data->GetFiles()[this->index] << std::endl;
-            view->SetInput(data->GetImage(this->index));
+            Logger::debug << function << ": requesting file " << data->GetFiles()[this->frameIndex] << std::endl;
+            view->SetInput(data->GetImage(this->frameIndex));
         }
     }
-    
+        
     // Render
     if (this->resetCamera)
     {    

@@ -25,7 +25,6 @@ bool ITApp::OnInit()
 }
 
 BEGIN_EVENT_TABLE(ImageTracker, wxFrame)
-    EVT_COMMAND_ENTER(IMAGE_TRACKER_CONTROLLER, ImageTracker::OnDataSourceChange)
     EVT_IDLE(           ImageTracker::OnIdle)
     EVT_MENU(MENU_OPEN, ImageTracker::OnOpen)
     EVT_MENU(MENU_EXIT, ImageTracker::OnExit)
@@ -84,10 +83,11 @@ void ImageTracker::OnAbout(wxCommandEvent &event)
 
 void ImageTracker::OnImageInfo(wxCommandEvent &event)
 {
+    std::string function("ImageTracker::OnImageInfo");
     // Make sure we at least have a data source to work with
     if (this->lbxSources->GetCount() == 0)
     {
-        Logger::warning << "There are no images open for which to provide information.  Please load some data." << std::endl;
+        Logger::warning << function << "There are no images open for which to provide information.  Please load some data." << std::endl;
         return;
     }
     
@@ -95,7 +95,18 @@ void ImageTracker::OnImageInfo(wxCommandEvent &event)
     dsIdx = (dsIdx == wxNOT_FOUND) ? 0 : dsIdx;
     int imgIdx = this->sldImageIndex->GetValue();
     
-    PrintImageInfo(dynamic_cast<ImageTypeF2*>(this->controller->GetDataSource(dsIdx)->GetImage(imgIdx)), "", Logger::info);
+    if (dynamic_cast<ImageTypeF2*>(this->controller->GetDataSource(dsIdx)->GetImage(imgIdx)) != 0)
+    {    
+        PrintImageInfo(dynamic_cast<ImageTypeF2*>(this->controller->GetDataSource(dsIdx)->GetImage(imgIdx)), "", Logger::info);
+    }
+    else if (dynamic_cast<ImageTypeV2F2*>(this->controller->GetDataSource(dsIdx)->GetImage(imgIdx)) != 0)
+    {
+        PrintImageInfo(dynamic_cast<ImageTypeV2F2*>(this->controller->GetDataSource(dsIdx)->GetImage(imgIdx)), "", Logger::info);
+    }
+    else
+    {
+        Logger::info << function << "Unknown image type." << std::endl;
+    }
 }
 
 void ImageTracker::OnLoggingMenu(wxCommandEvent &event)
@@ -285,6 +296,15 @@ void ImageTracker::OnAddDataSource(wxCommandEvent &event)
     }
 }
 
+void ImageTracker::OnDataSourceSelect(wxCommandEvent &event)
+{
+    int idx = this->lbxSources->GetSelection();
+    if (idx != wxNOT_FOUND)
+    {
+        this->controller->SetDataIndex(idx);
+    }
+}
+
 void ImageTracker::OnEditDataSource(wxCommandEvent &event)
 {
     this->theStatusBar->SetStatusText(wxT("Editing data source..."),0);
@@ -296,8 +316,9 @@ void ImageTracker::OnEditDataSource(wxCommandEvent &event)
         this->dlgDataSource->SetDataSource(this->controller->GetDataSource(idx));
         if (this->dlgDataSource->ShowModal() == wxID_OK)
         {
-            this->controller->UpdateView();
-            this->UpdateDataSources();
+            this->controller->SetIsControllerChanged(true);
+//             this->controller->UpdateView();
+//             this->UpdateDataSources();
             this->theStatusBar->SetStatusText(wxT("Edited data source"));
         }
         else
@@ -310,7 +331,7 @@ void ImageTracker::OnEditDataSource(wxCommandEvent &event)
 void ImageTracker::OnImageIndexScroll(wxScrollEvent &event)
 {
     Logger::verbose << "ImageTracker::OnImageIndexScroll: " << this->sldImageIndex->GetValue() << std::endl;
-    this->controller->SetIndex(this->sldImageIndex->GetValue());
+    this->controller->SetFrameIndex(this->sldImageIndex->GetValue());
 }
 
 void ImageTracker::OnFirstFrame(wxCommandEvent &event)
@@ -345,11 +366,6 @@ void ImageTracker::OnLastFrame(wxCommandEvent &event)
 
 // wxGlade: add ImageTracker event handlers
 
-void ImageTracker::OnDataSourceChange(wxCommandEvent &event)
-{
-    this->UpdateDataSources();
-}
-
 void ImageTracker::UpdatePlayState()
 {
     // Get the current and maximum index
@@ -364,7 +380,7 @@ void ImageTracker::UpdatePlayState()
         if (idx < maxIdx)
         {
             this->sldImageIndex->SetValue(idx+1);
-            this->controller->SetIndex(idx+1);
+            this->controller->SetFrameIndex(idx+1);
         }
         else
         {
@@ -375,7 +391,7 @@ void ImageTracker::UpdatePlayState()
         if (idx > 0)
         {
             this->sldImageIndex->SetValue(idx-1);
-            this->controller->SetIndex(idx-1);
+            this->controller->SetFrameIndex(idx-1);
         }
         else
         {
@@ -386,7 +402,7 @@ void ImageTracker::UpdatePlayState()
         if (maxIdx > 0) // when no data is loaded, max idx is negative
         {
             this->sldImageIndex->SetValue(0);
-            this->controller->SetIndex(0);
+            this->controller->SetFrameIndex(0);
         }
         this->SetPlayState(Pause);
         break;
@@ -394,7 +410,7 @@ void ImageTracker::UpdatePlayState()
         if (maxIdx > 0) // when no data is loaded, max idx is negative
         {
             this->sldImageIndex->SetValue(maxIdx);
-            this->controller->SetIndex(maxIdx);
+            this->controller->SetFrameIndex(maxIdx);
         }
         this->SetPlayState(Pause);
         break;
@@ -497,7 +513,7 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     
     // Set up the ImageTracker controller
     this->controller = ImageTrackerController::New();
-    this->controller->SetParent(this, IMAGE_TRACKER_CONTROLLER);
+    this->controller->SetParent(this);
     this->controller->SetRenderWindow(this->rwiView->GetRenderWindow());
     
     // This is pretty messed up right here.  Windows complains if the choices array for a

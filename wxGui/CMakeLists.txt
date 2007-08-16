@@ -23,11 +23,12 @@ SET (Gui_SRCS
                                                 ItkVtkPipeline.h
     wxIntSlider.cxx                             wxIntSlider.h
     LoggerPanel.cxx                             LoggerPanel.h
-    MultiResolutionRegistrationDialog.cpp	MultiResolutionRegistrationDialog.h
+    MultiResolutionRegistrationDialog.cpp	    MultiResolutionRegistrationDialog.h
     PipelineExecutor.cxx                        PipelineExecutor.h
     RegistrationDesign_wdr.cpp                  RegistrationDesign_wdr.h
     RemoveOcclusionsDialog.cpp                  RemoveOcclusionsDialog.h
     ScalarImageItkVtkPipeline.cxx               ScalarImageItkVtkPipeline.h
+    Vector2DGlyphItkVtkPipeline.cxx             Vector2DGlyphItkVtkPipeline.h
     WxPipelineObserver.cxx                      WxPipelineObserver.h
     wxCore_wdr.cpp                              wxCore_wdr.h
     wxGui.rc

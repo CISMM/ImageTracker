@@ -76,8 +76,7 @@ public:
         BTN_PLAY,
         BTN_LAST,
         LBX_DATASOURCES,
-        SLD_IMAGE_INDEX,
-        IMAGE_TRACKER_CONTROLLER = 1000000
+        SLD_IMAGE_INDEX
     };
 
     // Possible playing states (controls a state machine)
@@ -95,6 +94,9 @@ public:
      */
     void UpdateDataSources();
 
+    /**
+     * Get/Set the play state of the ImageTracker data window.
+     */
     PlayState GetPlayState() { return this->playState; }
     void SetPlayState(PlayState state) { this->playState = state; }
     
@@ -157,7 +159,6 @@ public:
     void OnApplyTransform(wxCommandEvent &event);
     void OnCLGOpticFlow(wxCommandEvent &event);
     void OnHornOpticalFlow(wxCommandEvent &event);
-    void OnDataSourceChange(wxCommandEvent &event);
     void OnLoggingMenu(wxCommandEvent &event);
     void OnImageInfo(wxCommandEvent &event);
     void OnAddDataSource(wxCommandEvent &event); // wxGlade: <event_handler>
@@ -169,6 +170,7 @@ public:
     void OnRewind(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnLastFrame(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnPause(wxCommandEvent &event); // wxGlade: <event_handler>
+    void OnDataSourceSelect(wxCommandEvent &event); // wxGlade: <event_handler>
 }; // wxGlade: end class
 
 
