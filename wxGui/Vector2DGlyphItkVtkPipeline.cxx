@@ -55,6 +55,7 @@ Vector2DGlyphItkVtkPipeline::Vector2DGlyphItkVtkPipeline()
     this->glyph->SetInputConnection(this->mask->GetOutputPort());
     this->mapper->SetInput(this->glyph->GetOutput());
     this->actor->SetMapper(this->mapper);
+    this->GetProps().push_back(this->actor);
     Logger::verbose << function << ": done" << std::endl;
 }
 
@@ -108,7 +109,3 @@ void Vector2DGlyphItkVtkPipeline::Update()
     this->glyph->Update();
 }
 
-vtkProp* Vector2DGlyphItkVtkPipeline::GetOutput()
-{
-    return this->actor;
-}

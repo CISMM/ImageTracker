@@ -34,7 +34,6 @@ class Vector2DGlyphItkVtkPipeline :
         typedef itk::VTKImageExport< InputImageType > ExportType;
     
         virtual void SetInput(itk::DataObject* input);
-        virtual vtkProp* GetOutput();
         virtual void Update();
     
     protected:

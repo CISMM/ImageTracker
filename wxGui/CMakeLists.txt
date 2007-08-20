@@ -20,7 +20,7 @@ SET (Gui_SRCS
     ImageTracker.cpp                            ImageTracker.h
     ImageTrackerController.cxx                  ImageTrackerController.h
 #    ImageViewer.cxx                             ImageViewer.h
-                                                ItkVtkPipeline.h
+    ItkVtkPipeline.cxx                          ItkVtkPipeline.h
     wxIntSlider.cxx                             wxIntSlider.h
     LoggerPanel.cxx                             LoggerPanel.h
     MultiResolutionRegistrationDialog.cpp	    MultiResolutionRegistrationDialog.h

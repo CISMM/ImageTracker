@@ -33,7 +33,6 @@ public:
     typedef itk::VTKImageExport< DisplayImageType > ExportType;
     
     virtual void SetInput(itk::DataObject* input);
-    virtual vtkProp* GetOutput();
     virtual void Update();
     
 protected:

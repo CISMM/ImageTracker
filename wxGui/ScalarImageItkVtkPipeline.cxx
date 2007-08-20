@@ -20,6 +20,7 @@ ScalarImageItkVtkPipeline::ScalarImageItkVtkPipeline()
     this->flipper->SetInputConnection(this->importer->GetOutputPort());
     this->rescaler->SetInputConnection(this->flipper->GetOutputPort());
     this->actor->SetInput(this->rescaler->GetOutput());
+    this->GetProps().push_back(this->actor);
 }
 
 ScalarImageItkVtkPipeline::~ScalarImageItkVtkPipeline()
@@ -59,9 +60,4 @@ void ScalarImageItkVtkPipeline::Update()
     this->importer->UpdateWholeExtent();
     this->flipper->UpdateWholeExtent();
     this->rescaler->UpdateWholeExtent();
-}
-
-vtkProp* ScalarImageItkVtkPipeline::GetOutput()
-{
-    return this->actor;
 }

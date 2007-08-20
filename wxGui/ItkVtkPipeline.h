@@ -1,8 +1,12 @@
 #pragma once
 
+#include <vector>
+
 #include "itkDataObject.h"
 #include "itkLightObject.h"
 #include "vtkProp.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
 
 #include "Logger.h"
 
@@ -20,24 +24,33 @@ public:
     typedef itk::SmartPointer< Self > Pointer;
     typedef itk::SmartPointer< const Self > ConstPointer;
     
+    typedef std::vector< vtkProp* > PropCollectionType;
+    
     virtual void SetInput(itk::DataObject* input) {}
-    virtual vtkProp* GetOutput()
-    {
-        Logger::warning << "ItkVtkPipeline::GetOutput(): Base class method called, but should be overriden." << std::endl;
-		return NULL;
-    }
     virtual void Update() {}
+    
+    PropCollectionType& GetProps();
+    
+    /**
+     * Adds the vtkProp objects managed by this pipeline to the given renderer.
+     */
+    void AddPropsTo(vtkRenderer* renderer);
+    
+    /**
+     * Removes the vtkProp objects managed by this pipeline from the given renderer.
+     */
+    void RemovePropsFrom(vtkRenderer* renderer);
     
     // TODO: add visibility, opacity
     
 protected:
-    ItkVtkPipeline()
-    {}
-    virtual ~ItkVtkPipeline()
-    {}
+    ItkVtkPipeline();
+    virtual ~ItkVtkPipeline();
     
 private:
     // Purposefully not implemented
     ItkVtkPipeline(const Self& other);
     void operator=(const Self& other);
+    
+    PropCollectionType props;
 };

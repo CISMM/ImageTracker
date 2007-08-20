@@ -57,7 +57,7 @@ void ImageTrackerController::AddDataSource(DataSource::Pointer source)
     if (view.IsNotNull())
     {
         Logger::verbose << function << ": adding visualization output to renderer" << std::endl;
-        this->GetRenderer()->AddActor(view->GetOutput());
+        view->AddPropsTo(this->GetRenderer());
         this->resetCamera = true;
     }
 
@@ -70,7 +70,7 @@ void ImageTrackerController::RemoveDataSource(unsigned int i)
     if (i < this->datavis.size())
     {
         // Remove actor from renderer
-        this->GetRenderer()->RemoveActor(this->datavis[i].second->GetOutput());
+        this->datavis[i].second->RemovePropsFrom(this->GetRenderer());
         this->datavis.erase(this->datavis.begin() + i);
     }
     this->SetIsControllerChanged(true);

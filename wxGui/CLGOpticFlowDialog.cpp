@@ -72,13 +72,13 @@ void CLGOpticFlowDialog::ViewPreview(bool show)
     {
         Logger::debug << function << ": Setting up previewing." << std::endl;
         this->visual->SetInput(this->pipeline->GetPreviewImage());
-        this->controller->GetRenderer()->AddActor(this->visual->GetOutput());
+        this->visual->AddPropsTo(this->controller->GetRenderer());
         this->preview = true;
         this->UpdatePreview();
     }
     else
     {
-        this->controller->GetRenderer()->RemoveActor(this->visual->GetOutput());
+        this->visual->RemovePropsFrom(this->controller->GetRenderer());
         this->UpdatePreview();
         this->preview = false;
         
