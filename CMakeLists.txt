@@ -2,8 +2,10 @@ PROJECT (ImageTracker)
 
 SET (EXECUTABLE_OUTPUT_PATH "${ImageTracker_BINARY_DIR}/bin")
 SET (LIBRARY_OUTPUT_PATH "${ImageTracker_BINARY_DIR}/lib")
-SET (CMAKE_VERBOSE_MAKEFILE ON)
-SET (CMAKE_COLOR_MAKEFILE ON)
+
+OPTION (CMAKE_VERBOSE_MAKEFILE  "Enable/Disable verbose compiler output" ON)
+OPTION (CMAKE_COLOR_MAKEFILE "Enable/Disable color cues when building" ON)
+MARK_AS_ADVANCED (CLEAR CMAKE_VERBOSE_MAKEFILE CMAKE_COLOR_MAKEFILE)
 
 #######################################
 # Include ITK
