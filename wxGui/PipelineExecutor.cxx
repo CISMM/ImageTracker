@@ -2,13 +2,13 @@
 
 #include "DataSource.h"
 #include "FileSet.h"
+#include "ImageTrackerController.h"
 #include "Logger.h"
 
 PipelineExecutor::PipelineExecutor(ItkPipeline* pipeline, wxThreadKind kind) :
     wxThread(kind),
 	openResult(false)
 {
-    this->controller = NULL;
     Logger::verbose << "PipelineExecutor::PipelineExecutor" << std::endl;
     this->pipeline = pipeline;
     if (this->pipeline != NULL)
@@ -27,10 +27,9 @@ PipelineExecutor::~PipelineExecutor()
      }
 }
 
-void PipelineExecutor::SetOpenFiles(bool open, ImageTrackerController* controller)
+void PipelineExecutor::SetOpenFiles(bool open)
 {
 	this->openResult = open;
-	this->controller = controller;
 }
 
 PipelineExecutor::ExitCode PipelineExecutor::Entry()
@@ -44,15 +43,14 @@ PipelineExecutor::ExitCode PipelineExecutor::Entry()
 
     // Open the result, if we're supposed to
     if (this->openResult &&
-        this->pipeline->GetSuccess() && 
-        this->controller != NULL)
+        this->pipeline->GetSuccess())
     {
         DataSource::Pointer source = DataSource::New();
         source->SetName("Result");
         source->SetFiles(this->pipeline->GetOutputFiles());
         
         // Add the new data source to the controller
-        this->controller->AddDataSource(source);
+        ImageTrackerController::Instance()->AddDataSource(source);
     }
 
     Logger::verbose << "PipelineExecutor::Entry: done" << std::endl;

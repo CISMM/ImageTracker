@@ -6,6 +6,7 @@
 #include "vtkRenderWindow.h"
 
 #include "FileSet.h"
+#include "ImageTrackerController.h"
 #include "Logger.h"
 #include "PipelineExecutor.h"
 #include "wxUtils.h"
@@ -72,7 +73,7 @@ bool MultiResolutionRegistrationDialog::TransferDataFromWindow()
     
     Logger::verbose << function << ": Creating executor thread" << std::endl;
     PipelineExecutor* exec = new PipelineExecutor(this->pipeline);
-    exec->SetOpenFiles(this->checkOpenOutput->IsChecked(), this->controller);
+    exec->SetOpenFiles(this->checkOpenOutput->IsChecked());
     if (exec->Create() == wxTHREAD_NO_ERROR)
     {
         Logger::verbose << function << ": Running exectutor thread" << std::endl;
@@ -89,11 +90,6 @@ bool MultiResolutionRegistrationDialog::TransferDataFromWindow()
     return true;
 }
 
-void MultiResolutionRegistrationDialog::SetController(ImageTrackerController::Pointer controller)
-{
-    this->controller = controller;
-}
-
 void MultiResolutionRegistrationDialog::SetInput(DataSource::Pointer input)
 {
     this->input = input;
@@ -103,21 +99,20 @@ void MultiResolutionRegistrationDialog::SetInput(DataSource::Pointer input)
 void MultiResolutionRegistrationDialog::ViewPreview(bool show)
 {
     std::string function("MultiResolutionRegistrationDialog::ViewPreview()");
-    if (this->controller && 
-        this->input.IsNotNull() &&
+    if (this->input.IsNotNull() &&
         this->input->size() > 0)
     {
         if (show)
         {
             Logger::debug << function << ": Setting up previewing." << std::endl;
             this->visual->SetInput(this->pipeline->GetPreviewImage());
-            this->visual->AddPropsTo(this->controller->GetRenderer());
+            this->visual->AddPropsTo(ImageTrackerController::Instance()->GetRenderer());
             this->preview = true;
             this->UpdatePreview();
         }
         else
         {
-            this->visual->RemovePropsFrom(this->controller->GetRenderer());
+            this->visual->RemovePropsFrom(ImageTrackerController::Instance()->GetRenderer());
             this->UpdatePreview();
             this->preview = false;
         }
@@ -129,7 +124,7 @@ void MultiResolutionRegistrationDialog::UpdatePreview()
     if (this->preview)
     {
         this->visual->Update();
-        this->controller->GetRenderWindow()->Render();
+        ImageTrackerController::Instance()->Render();
     }
 }
 

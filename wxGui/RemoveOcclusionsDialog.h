@@ -4,7 +4,6 @@
 #include <wx/image.h>
         
 #include "DataSource.h"
-#include "ImageTrackerController.h"
 #include "RemovePartialOcclusionsPipeline.h"
 #include "wxDoubleSlider.h"
         
@@ -72,13 +71,9 @@ public:
     void SetInput(DataSource::Pointer input)
     { this->input = input; }
     
-    void SetController(ImageTrackerController::Pointer controller)
-    { this->controller = controller; }
-
 private:
     RemovePartialOcclusionsPipeline::Pointer pipeline;
     DataSource::Pointer input;
-    ImageTrackerController::Pointer controller;
 }; // wxGlade: end class
 
 

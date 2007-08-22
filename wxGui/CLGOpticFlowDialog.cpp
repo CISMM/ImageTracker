@@ -2,6 +2,7 @@
 
 #include "CLGOpticFlowDialog.h"
 #include "FileSet.h"
+#include "ImageTrackerController.h"
 #include "Logger.h"
 #include "MathUtils.h"
 #include "PipelineExecutor.h"
@@ -52,11 +53,6 @@ bool CLGOpticFlowDialog::TransferDataFromWindow()
     return true;
 }
 
-void CLGOpticFlowDialog::SetController(ImageTrackerController::Pointer controller)
-{
-    this->controller = controller;
-}
-
 void CLGOpticFlowDialog::SetInput(DataSource::Pointer input)
 {
     this->input = input;
@@ -67,18 +63,17 @@ void CLGOpticFlowDialog::ViewPreview(bool show)
 {
     std::string function("CLGOpticFlowDialog::ViewPreview");
     if (show &&
-       this->controller.IsNotNull() &&
        this->input.IsNotNull())
     {
         Logger::debug << function << ": Setting up previewing." << std::endl;
         this->visual->SetInput(this->pipeline->GetPreviewImage());
-        this->visual->AddPropsTo(this->controller->GetRenderer());
+        this->visual->AddPropsTo(ImageTrackerController::Instance()->GetRenderer());
         this->preview = true;
         this->UpdatePreview();
     }
     else
     {
-        this->visual->RemovePropsFrom(this->controller->GetRenderer());
+        this->visual->RemovePropsFrom(ImageTrackerController::Instance()->GetRenderer());
         this->UpdatePreview();
         this->preview = false;
         
@@ -90,7 +85,7 @@ void CLGOpticFlowDialog::UpdatePreview()
     if (this->preview)
     {
         this->visual->Update();
-        this->controller->GetRenderWindow()->Render();
+        ImageTrackerController::Instance()->Render();
     }
 }
         

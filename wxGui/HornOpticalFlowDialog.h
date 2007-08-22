@@ -8,7 +8,6 @@
 
 #include "DataSource.h"
 #include "HornOpticalFlowPipeline.h"
-#include "ImageTrackerController.h"
 #include "wxDoubleSlider.h"
 #include "wxIntSlider.h"
 
@@ -62,14 +61,12 @@ public:
     void OnHide(wxCommandEvent &event); // wxGlade: <event_handler>
     
     void SetInput(DataSource::Pointer input);
-    void SetController(ImageTrackerController::Pointer controller);
     virtual bool TransferDataToWindow();
     virtual bool TransferDataFromWindow();
     
 private:
     HornOpticalFlowPipeline::Pointer pipeline;
     DataSource::Pointer input;
-    ImageTrackerController::Pointer controller;
     
 }; // wxGlade: end class
 

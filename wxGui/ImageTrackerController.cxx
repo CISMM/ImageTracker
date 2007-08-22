@@ -10,6 +10,15 @@
 #include "wxUtils.h"
 
 wxMutex ImageTrackerController::s_ControllerMutex;
+ImageTrackerController::Pointer ImageTrackerController::s_instance;
+
+ImageTrackerController::Pointer ImageTrackerController::Instance()
+{
+    if (ImageTrackerController::s_instance.IsNull())
+        ImageTrackerController::s_instance = ImageTrackerController::New();
+    
+    return ImageTrackerController::s_instance;
+}
 
 ImageTrackerController::ImageTrackerController() :
     frameIndex(0),
@@ -44,6 +53,16 @@ void ImageTrackerController::SetIsControllerChanged(bool changed)
 {
     wxMutexLocker lock(ImageTrackerController::s_ControllerMutex);
     this->isControllerChanged = changed;
+}
+
+DataSource::Pointer ImageTrackerController::GetDataSource(unsigned int i)
+{
+    return i >= this->datavis.size() ? NULL : this->datavis[i].first;
+}
+
+ItkVtkPipeline::Pointer ImageTrackerController::GetVisualization(unsigned int i)
+{
+    return i >= this->datavis.size() ? NULL : this->datavis[i].second;
 }
 
 void ImageTrackerController::AddDataSource(DataSource::Pointer source)
@@ -153,6 +172,29 @@ void ImageTrackerController::UpdateView()
         this->GetRenderer()->ResetCamera();
         this->resetCamera = false;
     }
-    this->renderWindow->Render();
+    this->GetRenderWindow()->Render();
 }
 
+void ImageTrackerController::SetRenderWindow(vtkRenderWindow* rw)
+{
+    this->renderWindow = rw;
+    this->renderWindow->AddRenderer(this->GetRenderer());
+}
+
+vtkRenderWindow* ImageTrackerController::GetRenderWindow()
+{ 
+    return this->renderWindow; 
+}
+
+vtkRenderer* ImageTrackerController::GetRenderer()
+{
+    if (this->renderer == NULL)
+        this->renderer = vtkRenderer::New();
+        
+    return this->renderer;
+}
+
+void ImageTrackerController::Render()
+{
+    this->GetRenderWindow()->Render();
+}

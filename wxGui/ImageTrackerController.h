@@ -22,7 +22,9 @@
  * /brief Key moderator of the ImageTracker application.
  * Maintains data sources and visualization pipelines. Provides methods for
  * querying and managing the data and visualization objects that exist in
- * the system.
+ * the system. This object is a singleton--only one of these is
+ * expected to exist at a time, and many objects need to access controller
+ * methods for dealing with rendering and obtaining data objects.
  */
 class ImageTrackerController :
     public itk::LightObject
@@ -33,7 +35,6 @@ public:
     typedef itk::LightObject Superclass;
     typedef itk::SmartPointer< Self > Pointer;
     typedef itk::SmartPointer< const Self > ConstPointer;
-    itkNewMacro(Self);
     
     // Type to tie each DataSource to an ItkVtkPipeline for visualization.
     typedef std::pair< DataSource::Pointer, ItkVtkPipeline::Pointer > DataVisualPair;
@@ -41,20 +42,19 @@ public:
     typedef std::vector< DataVisualPair > DataVisualList;
     
     /**
+     * Obtain the singleton instance of this ImageTrackerController.
+     */
+    static ImageTrackerController::Pointer Instance();
+    
+    /**
      * Retrieves a reference to the DataSource at the specified index.
      */
-    DataSource::Pointer GetDataSource(unsigned int i)
-    {
-        return i >= this->datavis.size() ? NULL : this->datavis[i].first;
-    }
+    DataSource::Pointer GetDataSource(unsigned int i);
     
     /**
      *
      */
-    ItkVtkPipeline::Pointer GetVisualization(unsigned int i)
-    {
-        return i >= this->datavis.size() ? NULL : this->datavis[i].second;
-    }
+    ItkVtkPipeline::Pointer GetVisualization(unsigned int i);
     
     /**
      * Adds a DataSource to the list managed by this controller.
@@ -91,14 +91,9 @@ public:
     /**
      * Sets the vtkRenderWindow drawn to by this controller.
      */
-    void SetRenderWindow(vtkRenderWindow* rw)
-    {
-        this->renderWindow = rw;
-        this->renderWindow->AddRenderer(this->GetRenderer());
-    }
+    void SetRenderWindow(vtkRenderWindow* rw);
     
-    vtkRenderWindow* GetRenderWindow()
-    { return this->renderWindow; }
+    vtkRenderWindow* GetRenderWindow();
     
     /**
      * Sets the ImageTracker window referring to this controller.
@@ -114,18 +109,19 @@ public:
     /**
      * Returns a handle to the renderer this controller manages.
      */
-    vtkRenderer* GetRenderer()
-    {
-        if (this->renderer == NULL)
-            this->renderer = vtkRenderer::New();
-        
-        return this->renderer;
-    }
+    vtkRenderer* GetRenderer();
 
+    /**
+     * Convenience method to update the renderer managed by this controller.
+     */
+    void Render();
+    
     bool IsControllerChanged();
     void SetIsControllerChanged(bool changed);
 
 protected:
+    // Making the New() method protected ensures this is a singleton.
+    itkNewMacro(Self);
     ImageTrackerController();
     virtual ~ImageTrackerController();
     
@@ -160,4 +156,7 @@ private:
     // A flag indicating if this controller has new data sources.
     bool isControllerChanged;
     static wxMutex s_ControllerMutex;
+    
+    /// The singleton instance of this controller
+    static ImageTrackerController::Pointer s_instance;
 };

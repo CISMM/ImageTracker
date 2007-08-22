@@ -6,6 +6,7 @@
 #include "vtkProperty.h"
 
 #include "ConnectVTKITK.h"
+#include "ImageTrackerController.h"
 #include "Logger.h"
 #include "VectorGlyphControlPanel.h"
 
@@ -115,4 +116,36 @@ wxWindow* VectorGlyphPipeline::CreateWxControl(wxWindow* parent)
     VectorGlyphControlPanel* control = new VectorGlyphControlPanel(parent, -1);
     control->SetPipeline(this);
     return control;
+}
+
+void VectorGlyphPipeline::SetMaskRatio(int ratio) 
+{ 
+    this->mask->SetOnRatio(ratio); 
+    this->mask->Modified();
+    ImageTrackerController::Instance()->Render();
+}
+int VectorGlyphPipeline::GetMaskRatio() 
+{ 
+    return this->mask->GetOnRatio(); 
+}
+
+void VectorGlyphPipeline::SetScaleFactor(double factor) 
+{
+    this->glyph->SetScaleFactor(factor);
+    this->glyph->Modified();
+    ImageTrackerController::Instance()->Render();
+}
+double VectorGlyphPipeline::GetScaleFactor() 
+{
+    return this->glyph->GetScaleFactor();
+}
+
+void VectorGlyphPipeline::SetVisibility(int visible) 
+{
+    this->actor->SetVisibility(visible);
+    ImageTrackerController::Instance()->Render();
+}
+int VectorGlyphPipeline::GetVisibility()
+{
+    return this->actor->GetVisibility();
 }

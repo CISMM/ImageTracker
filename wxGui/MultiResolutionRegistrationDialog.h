@@ -6,7 +6,7 @@
 #include "itkStatisticsImageFilter.h"
 #include "vtkRenderer.h"
 
-#include "ImageTrackerController.h"
+#include "DataSource.h"
 #include "MultiResolutionRegistrationPipeline.h"
 #include "ScalarImageItkVtkPipeline.h"
 #include "wxDoubleSlider.h"
@@ -101,7 +101,6 @@ public:
     virtual bool TransferDataToWindow();
     virtual bool TransferDataFromWindow();
     
-    void SetController(ImageTrackerController::Pointer controller);
     void SetInput(DataSource::Pointer input);
     
 protected:
@@ -112,7 +111,6 @@ private:
     DataSource::Pointer input;
     MultiResolutionRegistrationPipeline::Pointer pipeline;
     ScalarImageItkVtkPipeline::Pointer visual;
-    ImageTrackerController::Pointer controller;
     // Need to keep track of the first time the dialog is displayed
     // for setting up threshold sliders
     bool firstTime;

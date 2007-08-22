@@ -52,11 +52,6 @@ void HornOpticalFlowDialog::SetInput(DataSource::Pointer input)
     this->pipeline->SetInput(this->input->GetImages());
 }
 
-void HornOpticalFlowDialog::SetController(ImageTrackerController::Pointer controller)
-{
-    this->controller = controller;
-}
-
 HornOpticalFlowDialog::HornOpticalFlowDialog(wxWindow* parent, int id, const wxString& title, const wxPoint& pos, const wxSize& size, long style):
     wxDialog(parent, id, title, pos, size, wxDEFAULT_DIALOG_STYLE)
 {

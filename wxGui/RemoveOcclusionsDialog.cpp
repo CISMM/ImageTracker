@@ -64,7 +64,7 @@ bool RemoveOcclusionsDialog::TransferDataFromWindow()
     
     // Create and launch a pipeline executor on another thread
     PipelineExecutor* exec = new PipelineExecutor(this->pipeline);
-    exec->SetOpenFiles(this->checkOpenOutput->IsChecked(), this->controller);
+    exec->SetOpenFiles(this->checkOpenOutput->IsChecked());
     if (exec->Create() == wxTHREAD_NO_ERROR)
     {
         exec->Run();

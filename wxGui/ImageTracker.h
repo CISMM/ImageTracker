@@ -106,7 +106,6 @@ private:
     void do_layout();
     // end wxGlade
     
-    ImageTrackerController::Pointer controller;
     DataSourceDialog* dlgDataSource;
     RemoveOcclusionsDialog* dlgRemoveOcclusions;
     MultiResolutionRegistrationDialog* dlgRegistration;

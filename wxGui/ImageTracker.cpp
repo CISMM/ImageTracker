@@ -9,7 +9,6 @@
 #include "ImageUtils.h"
 #include "Logger.h"
 #include "wxUtils.h"
-#include "VectorGlyphControlPanel.h"
 
 static const std::string APP_NAME("ImageTracker");
 static const std::string APP_VERSION("v 2.05");
@@ -58,10 +57,10 @@ END_EVENT_TABLE();
 void ImageTracker::OnIdle(wxIdleEvent &event)
 {
     this->UpdatePlayState();
-    if (this->controller->IsControllerChanged())
+    if (ImageTrackerController::Instance()->IsControllerChanged())
     {
-        this->controller->SetIsControllerChanged(false);
-        this->controller->UpdateView();
+        ImageTrackerController::Instance()->SetIsControllerChanged(false);
+        ImageTrackerController::Instance()->UpdateView();
         this->UpdateDataSources();
     }
 }
@@ -97,13 +96,13 @@ void ImageTracker::OnImageInfo(wxCommandEvent &event)
     dsIdx = (dsIdx == wxNOT_FOUND) ? 0 : dsIdx;
     int imgIdx = this->sldImageIndex->GetValue();
     
-    if (dynamic_cast<ImageTypeF2*>(this->controller->GetDataSource(dsIdx)->GetImage(imgIdx)) != 0)
+    if (dynamic_cast<ImageTypeF2*>(ImageTrackerController::Instance()->GetDataSource(dsIdx)->GetImage(imgIdx)) != 0)
     {    
-        PrintImageInfo(dynamic_cast<ImageTypeF2*>(this->controller->GetDataSource(dsIdx)->GetImage(imgIdx)), "", Logger::info);
+        PrintImageInfo(dynamic_cast<ImageTypeF2*>(ImageTrackerController::Instance()->GetDataSource(dsIdx)->GetImage(imgIdx)), "", Logger::info);
     }
-    else if (dynamic_cast<ImageTypeV2F2*>(this->controller->GetDataSource(dsIdx)->GetImage(imgIdx)) != 0)
+    else if (dynamic_cast<ImageTypeV2F2*>(ImageTrackerController::Instance()->GetDataSource(dsIdx)->GetImage(imgIdx)) != 0)
     {
-        PrintImageInfo(dynamic_cast<ImageTypeV2F2*>(this->controller->GetDataSource(dsIdx)->GetImage(imgIdx)), "", Logger::info);
+        PrintImageInfo(dynamic_cast<ImageTypeV2F2*>(ImageTrackerController::Instance()->GetDataSource(dsIdx)->GetImage(imgIdx)), "", Logger::info);
     }
     else
     {
@@ -151,8 +150,7 @@ void ImageTracker::OnOcclusions(wxCommandEvent &event)
     // Find the user's selected DataSource
     int idx = this->lbxSources->GetSelection();
     idx = (idx == wxNOT_FOUND) ? 0 : idx;
-    this->dlgRemoveOcclusions->SetInput(this->controller->GetDataSource(idx));
-    this->dlgRemoveOcclusions->SetController(this->controller);
+    this->dlgRemoveOcclusions->SetInput(ImageTrackerController::Instance()->GetDataSource(idx));
     this->dlgRemoveOcclusions->Show(true);
 }
 
@@ -172,15 +170,14 @@ void ImageTracker::OnStabilize(wxCommandEvent &event)
     // Find the user's selected DataSource
     int idx = this->lbxSources->GetSelection();
     idx = (idx == wxNOT_FOUND) ? 0 : idx;
-    if (this->controller->GetDataSource(idx)->size() < 2) // Need at least two images to register.
+    if (ImageTrackerController::Instance()->GetDataSource(idx)->size() < 2) // Need at least two images to register.
     {
         wxMessageDialog alert(this, wxT("This operation requires at least two images in the data source."),
                               wxT("Not enough images."), wxOK);
         alert.ShowModal();
         return;
     }
-    this->dlgRegistration->SetInput(this->controller->GetDataSource(idx));
-    this->dlgRegistration->SetController(this->controller);
+    this->dlgRegistration->SetInput(ImageTrackerController::Instance()->GetDataSource(idx));
     this->dlgRegistration->Show(true);
 }
 
@@ -200,8 +197,7 @@ void ImageTracker::OnApplyTransform(wxCommandEvent &event)
     // Find the user's selected DataSource
     int idx = this->lbxSources->GetSelection();
     idx = (idx == wxNOT_FOUND) ? 0 : idx;
-    this->dlgApplyTransform->SetInput(this->controller->GetDataSource(idx));
-    this->dlgApplyTransform->SetController(this->controller);
+    this->dlgApplyTransform->SetInput(ImageTrackerController::Instance()->GetDataSource(idx));
     this->dlgApplyTransform->Show(true);
 }
 
@@ -222,7 +218,7 @@ void ImageTracker::OnCLGOpticFlow(wxCommandEvent &event)
     // Find the user's selected DataSource
     int idx = this->lbxSources->GetSelection();
     idx = (idx == wxNOT_FOUND) ? 0 : idx;
-    if (this->controller->GetDataSource(idx)->size() < 2) // Need at least two images to register.
+    if (ImageTrackerController::Instance()->GetDataSource(idx)->size() < 2) // Need at least two images to register.
     {
         wxMessageDialog alert(this, wxT("This operation requires at least two images in the data source."),
                               wxT("Not enough images."), wxOK);
@@ -230,8 +226,7 @@ void ImageTracker::OnCLGOpticFlow(wxCommandEvent &event)
         return;
     }
     
-    this->dlgCLGOpticFlow->SetInput(this->controller->GetDataSource(idx));
-    this->dlgCLGOpticFlow->SetController(this->controller);
+    this->dlgCLGOpticFlow->SetInput(ImageTrackerController::Instance()->GetDataSource(idx));
     this->dlgCLGOpticFlow->Show(true);
 }
 
@@ -252,7 +247,7 @@ void ImageTracker::OnHornOpticalFlow(wxCommandEvent &event)
     // Find the user's selected DataSource
     int idx = this->lbxSources->GetSelection();
     idx = (idx == wxNOT_FOUND) ? 0 : idx;
-    if (this->controller->GetDataSource(idx)->size() < 2) // Need at least two images to register.
+    if (ImageTrackerController::Instance()->GetDataSource(idx)->size() < 2) // Need at least two images to register.
     {
         wxMessageDialog alert(this, wxT("This operation requires at least two images in the data source."),
                               wxT("Not enough images."), wxOK);
@@ -260,8 +255,7 @@ void ImageTracker::OnHornOpticalFlow(wxCommandEvent &event)
         return;
     }
     
-    this->dlgHornOpticalFlow->SetInput(this->controller->GetDataSource(idx));
-    this->dlgHornOpticalFlow->SetController(this->controller);
+    this->dlgHornOpticalFlow->SetInput(ImageTrackerController::Instance()->GetDataSource(idx));
     this->dlgHornOpticalFlow->Show(true);
 }
 
@@ -272,7 +266,7 @@ void ImageTracker::OnRemoveDataSource(wxCommandEvent &event)
     int idx = this->lbxSources->GetSelection();
     if (idx != wxNOT_FOUND)
     {
-        this->controller->RemoveDataSource(idx);
+        ImageTrackerController::Instance()->RemoveDataSource(idx);
         this->theStatusBar->SetStatusText(wxT("Data source removed"),0);
     }
     else
@@ -289,7 +283,7 @@ void ImageTracker::OnAddDataSource(wxCommandEvent &event)
     
     if (this->dlgDataSource->ShowModal() == wxID_OK)
     {
-        this->controller->AddDataSource(this->dlgDataSource->GetDataSource());
+        ImageTrackerController::Instance()->AddDataSource(this->dlgDataSource->GetDataSource());
         this->theStatusBar->SetStatusText(wxT("Added data source"));
     }
     else
@@ -304,7 +298,7 @@ void ImageTracker::OnSelectDataSource(wxCommandEvent &event)
     if (idx != wxNOT_FOUND)
     {
         // Create an appropriate visualization control panel for the selected visualization
-        wxWindow* panel = this->controller->GetVisualization(idx)->CreateWxControl(this->panelVisualization);
+        wxWindow* panel = ImageTrackerController::Instance()->GetVisualization(idx)->CreateWxControl(this->panelVisualization);
         
         // Get the sizer for the visualization panel
         wxSizer* sizer = this->panelVisualization->GetSizer();
@@ -331,10 +325,10 @@ void ImageTracker::OnEditDataSource(wxCommandEvent &event)
     if (idx != wxNOT_FOUND)
     {
         this->dlgDataSource->SetNewSource(false);
-        this->dlgDataSource->SetDataSource(this->controller->GetDataSource(idx));
+        this->dlgDataSource->SetDataSource(ImageTrackerController::Instance()->GetDataSource(idx));
         if (this->dlgDataSource->ShowModal() == wxID_OK)
         {
-            this->controller->SetIsControllerChanged(true);
+            ImageTrackerController::Instance()->SetIsControllerChanged(true);
             this->theStatusBar->SetStatusText(wxT("Edited data source"));
         }
         else
@@ -347,7 +341,7 @@ void ImageTracker::OnEditDataSource(wxCommandEvent &event)
 void ImageTracker::OnImageIndexScroll(wxScrollEvent &event)
 {
     Logger::verbose << "ImageTracker::OnImageIndexScroll: " << this->sldImageIndex->GetValue() << std::endl;
-    this->controller->SetFrameIndex(this->sldImageIndex->GetValue());
+    ImageTrackerController::Instance()->SetFrameIndex(this->sldImageIndex->GetValue());
 }
 
 void ImageTracker::OnFirstFrame(wxCommandEvent &event)
@@ -396,7 +390,7 @@ void ImageTracker::UpdatePlayState()
         if (idx < maxIdx)
         {
             this->sldImageIndex->SetValue(idx+1);
-            this->controller->SetFrameIndex(idx+1);
+            ImageTrackerController::Instance()->SetFrameIndex(idx+1);
         }
         else
         {
@@ -407,7 +401,7 @@ void ImageTracker::UpdatePlayState()
         if (idx > 0)
         {
             this->sldImageIndex->SetValue(idx-1);
-            this->controller->SetFrameIndex(idx-1);
+            ImageTrackerController::Instance()->SetFrameIndex(idx-1);
         }
         else
         {
@@ -418,7 +412,7 @@ void ImageTracker::UpdatePlayState()
         if (maxIdx > 0) // when no data is loaded, max idx is negative
         {
             this->sldImageIndex->SetValue(0);
-            this->controller->SetFrameIndex(0);
+            ImageTrackerController::Instance()->SetFrameIndex(0);
         }
         this->SetPlayState(Pause);
         break;
@@ -426,7 +420,7 @@ void ImageTracker::UpdatePlayState()
         if (maxIdx > 0) // when no data is loaded, max idx is negative
         {
             this->sldImageIndex->SetValue(maxIdx);
-            this->controller->SetFrameIndex(maxIdx);
+            ImageTrackerController::Instance()->SetFrameIndex(maxIdx);
         }
         this->SetPlayState(Pause);
         break;
@@ -440,10 +434,10 @@ void ImageTracker::UpdateDataSources()
 {
     int idx = this->lbxSources->GetSelection();
     wxArrayString names;
-    this->controller->GetDataSourceNames(names);
+    ImageTrackerController::Instance()->GetDataSourceNames(names);
     this->lbxSources->Set(names);
     this->lbxSources->SetSelection(std::min(idx, ((int)this->lbxSources->GetCount())-1));
-    this->sldImageIndex->SetRange(0, this->controller->GetMaxSize()-1);
+    this->sldImageIndex->SetRange(0, ImageTrackerController::Instance()->GetMaxSize()-1);
 }
 
 ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, const wxPoint& pos, const wxSize& size, long style):
@@ -533,9 +527,8 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     this->rwiView->SetInteractorStyle(inter);
     
     // Set up the ImageTracker controller
-    this->controller = ImageTrackerController::New();
-    this->controller->SetParent(this);
-    this->controller->SetRenderWindow(this->rwiView->GetRenderWindow());
+    ImageTrackerController::Instance()->SetParent(this);
+    ImageTrackerController::Instance()->SetRenderWindow(this->rwiView->GetRenderWindow());
     
     // This is pretty messed up right here.  Windows complains if the choices array for a
     // list box is empty.  If you pass an empty wxString as the only element, everything

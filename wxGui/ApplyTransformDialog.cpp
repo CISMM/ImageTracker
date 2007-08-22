@@ -32,7 +32,7 @@ bool ApplyTransformDialog::TransferDataFromWindow()
     
     // Create and launch a pipeline executor (uses another thread)
     PipelineExecutor* exec = new PipelineExecutor(this->pipeline);
-    exec->SetOpenFiles(this->checkOpenOutput->IsChecked(), this->controller);
+    exec->SetOpenFiles(this->checkOpenOutput->IsChecked());
     if (exec->Create() == wxTHREAD_NO_ERROR)
     {
         exec->Run();
@@ -50,11 +50,6 @@ bool ApplyTransformDialog::TransferDataFromWindow()
 void ApplyTransformDialog::SetInput(DataSource::Pointer input)
 {
     this->input = input;
-}
-
-void ApplyTransformDialog::SetController(ImageTrackerController::Pointer controller)
-{
-    this->controller = controller;
 }
 
 ApplyTransformDialog::ApplyTransformDialog(wxWindow* parent, int id, const wxString& title, const wxPoint& pos, const wxSize& size, long style):
@@ -81,9 +76,7 @@ ApplyTransformDialog::ApplyTransformDialog(wxWindow* parent, int id, const wxStr
     
     //----- Custom code -----//
     this->pipeline = ApplyTransformsPipeline::New();
-    this->controller = NULL;
 }
-
 
 BEGIN_EVENT_TABLE(ApplyTransformDialog, wxDialog)
     // begin wxGlade: ApplyTransformDialog::event_table
@@ -94,7 +87,6 @@ BEGIN_EVENT_TABLE(ApplyTransformDialog, wxDialog)
     // end wxGlade
 END_EVENT_TABLE();
 
-
 void ApplyTransformDialog::OnBrowseTransform(wxCommandEvent &event)
 {
     wxFileDialog open(this, wxT("Choose a transform file"), wxT(""), wxT(""), wxT("All Files|*.*|Text Files|*.txt"));
@@ -103,7 +95,6 @@ void ApplyTransformDialog::OnBrowseTransform(wxCommandEvent &event)
         this->textTransform->SetValue(open.GetFilename());
     }
 }
-
 
 void ApplyTransformDialog::OnBrowseDirectory(wxCommandEvent &event)
 {
@@ -126,7 +117,6 @@ void ApplyTransformDialog::OnHide(wxCommandEvent &event)
 
 // wxGlade: add ApplyTransformDialog event handlers
 
-
 void ApplyTransformDialog::set_properties()
 {
     // begin wxGlade: ApplyTransformDialog::set_properties
@@ -144,7 +134,6 @@ void ApplyTransformDialog::set_properties()
     btnHide->SetToolTip(wxT("Close this dialog"));
     // end wxGlade
 }
-
 
 void ApplyTransformDialog::do_layout()
 {

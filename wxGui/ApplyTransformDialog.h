@@ -5,7 +5,6 @@
 
 #include "ApplyTransformsPipeline.h"
 #include "DataSource.h"
-#include "ImageTrackerController.h"
         
 #ifndef APPLYTRANSFORMDIALOG_H
 #define APPLYTRANSFORMDIALOG_H
@@ -14,7 +13,8 @@
 // end wxGlade
 
 
-class ApplyTransformDialog: public wxDialog {
+class ApplyTransformDialog
+    : public wxDialog {
 public:
     // begin wxGlade: ApplyTransformDialog::ids
     // end wxGlade
@@ -61,13 +61,11 @@ public:
     virtual bool TransferDataToWindow();
     virtual bool TransferDataFromWindow();
     void SetInput(DataSource::Pointer input);
-    void SetController(ImageTrackerController::Pointer controller);
     
 protected:
     
 private:
     DataSource::Pointer input;
-    ImageTrackerController::Pointer controller;
     ApplyTransformsPipeline::Pointer pipeline;
     
 }; // wxGlade: end class

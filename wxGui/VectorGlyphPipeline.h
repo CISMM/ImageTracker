@@ -36,38 +36,28 @@ class VectorGlyphPipeline :
         virtual void SetInput(itk::DataObject* input);
         virtual void Update();
         
+        /**
+         * Creates a wxWindow (panel) that can control the parameters of this vector glyph pipeline.
+         */
         virtual wxWindow* CreateWxControl(wxWindow* parent);
     
         /**
          * Get/Set the ratio between data set pixels and masked glyphs.
          */
-        void SetMaskRatio(int ratio) 
-        { 
-            this->mask->SetOnRatio(ratio); 
-            this->mask->Modified();
-        }
-        int GetMaskRatio() 
-        { 
-            return this->mask->GetOnRatio(); 
-        }
+        void SetMaskRatio(int ratio);
+        int GetMaskRatio();
         
         /**
          * Get/Set the vector magnitude scale factor.
          */
-        void SetScaleFactor(double factor) 
-        { 
-            this->glyph->SetScaleFactor(factor);
-            this->glyph->Modified();
-        }
-        double GetScaleFactor() { return this->glyph->GetScaleFactor(); }
+        void SetScaleFactor(double factor);
+        double GetScaleFactor();
         
         /**
          * Get/Set the visibility of the glyphs.
          */
-        void SetVisibility(int visible) 
-        { this->actor->SetVisibility(visible); }
-        int GetVisibility() 
-        { return this->actor->GetVisibility(); }
+        void SetVisibility(int visible);
+        int GetVisibility();
         
     protected:
         VectorGlyphPipeline();

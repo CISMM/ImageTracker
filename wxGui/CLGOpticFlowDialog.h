@@ -5,7 +5,6 @@
 
 #include "CLGOpticFlowPipeline.h"
 #include "DataSource.h"
-#include "ImageTrackerController.h"
 #include "ScalarImageItkVtkPipeline.h"
 #include "wxDoubleSlider.h"
 #include "wxIntSlider.h"
@@ -69,7 +68,6 @@ public:
 public:
     virtual bool TransferDataToWindow();
     virtual bool TransferDataFromWindow();
-    void SetController(ImageTrackerController::Pointer controller);
     void SetInput(DataSource::Pointer input);
 
 protected:
@@ -80,7 +78,6 @@ private:
     DataSource::Pointer input;
     CLGOpticFlowPipeline::Pointer pipeline;
     ScalarImageItkVtkPipeline::Pointer visual;
-    ImageTrackerController::Pointer controller;
     bool preview;
 
 }; // wxGlade: end class
