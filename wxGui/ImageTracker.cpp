@@ -9,6 +9,7 @@
 #include "ImageUtils.h"
 #include "Logger.h"
 #include "wxUtils.h"
+#include "VectorGlyphControlPanel.h"
 
 static const std::string APP_NAME("ImageTracker");
 static const std::string APP_VERSION("v 2.05");
@@ -42,6 +43,7 @@ BEGIN_EVENT_TABLE(ImageTracker, wxFrame)
     EVT_MENU(MENU_LOG_VERBOSE, ImageTracker::OnLoggingMenu)
     // begin wxGlade: ImageTracker::event_table
     EVT_LISTBOX_DCLICK(LBX_DATASOURCES, ImageTracker::OnEditDataSource)
+    EVT_LISTBOX(LBX_DATASOURCES, ImageTracker::OnSelectDataSource)
     EVT_BUTTON(BTN_ADD_DATASOURCE, ImageTracker::OnAddDataSource)
     EVT_BUTTON(BTN_REMOVE_DATASOURCE, ImageTracker::OnRemoveDataSource)
     EVT_COMMAND_SCROLL(SLD_IMAGE_INDEX, ImageTracker::OnImageIndexScroll)
@@ -296,13 +298,29 @@ void ImageTracker::OnAddDataSource(wxCommandEvent &event)
     }
 }
 
-void ImageTracker::OnDataSourceSelect(wxCommandEvent &event)
+void ImageTracker::OnSelectDataSource(wxCommandEvent &event)
 {
     int idx = this->lbxSources->GetSelection();
     if (idx != wxNOT_FOUND)
     {
-        this->controller->SetDataIndex(idx);
+        // Create an appropriate visualization control panel for the selected visualization
+        wxWindow* panel = this->controller->GetVisualization(idx)->CreateWxControl(this->panelVisualization);
+        
+        // Get the sizer for the visualization panel
+        wxSizer* sizer = this->panelVisualization->GetSizer();
+        
+        // The visualization controls will always be placed in the first position of 
+        // the visualization panel's sizer.
+        sizer->Remove(0);
+        sizer->Add(panel, 1, wxADJUST_MINSIZE|wxEXPAND, 0);
+        
+        // Make sure control panel changes are seen
+        this->Layout();
     }
+    
+    // We want to skip the select event on the data source list box because a double click
+    // event means we want to edit the data source.
+    event.Skip();
 }
 
 void ImageTracker::OnEditDataSource(wxCommandEvent &event)
@@ -317,8 +335,6 @@ void ImageTracker::OnEditDataSource(wxCommandEvent &event)
         if (this->dlgDataSource->ShowModal() == wxID_OK)
         {
             this->controller->SetIsControllerChanged(true);
-//             this->controller->UpdateView();
-//             this->UpdateDataSources();
             this->theStatusBar->SetStatusText(wxT("Edited data source"));
         }
         else
@@ -435,12 +451,17 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
 {
     // begin wxGlade: ImageTracker::ImageTracker
     hsplitDataLogger = new wxSplitterWindow(this, -1, wxDefaultPosition, wxDefaultSize, wxSP_3D|wxSP_BORDER);
-    window_1_pane_2 = new wxPanel(hsplitDataLogger, -1);
-    window_1_pane_1 = new wxPanel(hsplitDataLogger, -1);
-    vsplitDataView = new wxSplitterWindow(window_1_pane_1, -1, wxDefaultPosition, wxDefaultSize, wxSP_3D|wxSP_BORDER);
-    window_2_pane_2 = new wxPanel(vsplitDataView, -1);
-    window_2_pane_1 = new wxPanel(vsplitDataView, -1);
-    sizer_4_staticbox = new wxStaticBox(window_2_pane_1, -1, wxT("Data Sources"));
+    panelMainLower = new wxPanel(hsplitDataLogger, -1);
+    panelMainUpper = new wxPanel(hsplitDataLogger, -1);
+    vsplitDataView = new wxSplitterWindow(panelMainUpper, -1, wxDefaultPosition, wxDefaultSize, wxSP_3D|wxSP_BORDER);
+    panelRight = new wxPanel(vsplitDataView, -1);
+    panelLeft = new wxPanel(vsplitDataView, -1);
+    hsplitSourceVisControl = new wxSplitterWindow(panelLeft, -1, wxDefaultPosition, wxDefaultSize, wxSP_3D|wxSP_BORDER);
+    panelLeftLower = new wxPanel(hsplitSourceVisControl, -1);
+    panelVisualization = new wxPanel(panelLeftLower, -1);
+    panelLeftUpper = new wxPanel(hsplitSourceVisControl, -1);
+    sizerStaticVisualization_staticbox = new wxStaticBox(panelLeftLower, -1, wxT("Visualization"));
+    sizer_4_staticbox = new wxStaticBox(panelLeftUpper, -1, wxT("Data Sources"));
     itMenuBar = new wxMenuBar();
     SetMenuBar(itMenuBar);
     wxMenu* menuFile = new wxMenu();
@@ -471,17 +492,17 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     const wxString lbxSources_choices[] = {
         wxT("")
     };
-    lbxSources = new wxListBox(window_2_pane_1, LBX_DATASOURCES, wxDefaultPosition, wxDefaultSize, 1, lbxSources_choices, wxLB_SINGLE);
-    btnAddDataSource = new wxButton(window_2_pane_1, BTN_ADD_DATASOURCE, wxT("+"));
-    btnRemoveDataSource = new wxButton(window_2_pane_1, BTN_REMOVE_DATASOURCE, wxT("-"));
-    rwiView = new wxVTKRenderWindowInteractor(window_2_pane_2, -1);
-    sldImageIndex = new wxSlider(window_2_pane_2, SLD_IMAGE_INDEX, 0, 0, 0, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS);
-    btnFirst = new wxButton(window_2_pane_2, BTN_FIRST, wxT("|<"));
-    btnRewind = new wxButton(window_2_pane_2, BTN_REWIND, wxT("<"));
-    btnPause = new wxButton(window_2_pane_2, BTN_PAUSE, wxT("||"));
-    btnPlay = new wxButton(window_2_pane_2, BTN_PLAY, wxT(">"));
-    btnLast = new wxButton(window_2_pane_2, BTN_LAST, wxT(">|"));
-    txtLogger = new wxTextCtrl(window_1_pane_2, -1, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+    lbxSources = new wxListBox(panelLeftUpper, LBX_DATASOURCES, wxDefaultPosition, wxDefaultSize, 1, lbxSources_choices, wxLB_SINGLE);
+    btnAddDataSource = new wxButton(panelLeftUpper, BTN_ADD_DATASOURCE, wxT("+"));
+    btnRemoveDataSource = new wxButton(panelLeftUpper, BTN_REMOVE_DATASOURCE, wxT("-"));
+    rwiView = new wxVTKRenderWindowInteractor(panelRight, -1);
+    sldImageIndex = new wxSlider(panelRight, SLD_IMAGE_INDEX, 0, 0, 0, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS);
+    btnFirst = new wxButton(panelRight, BTN_FIRST, wxT("|<"));
+    btnRewind = new wxButton(panelRight, BTN_REWIND, wxT("<"));
+    btnPause = new wxButton(panelRight, BTN_PAUSE, wxT("||"));
+    btnPlay = new wxButton(panelRight, BTN_PLAY, wxT(">"));
+    btnLast = new wxButton(panelRight, BTN_LAST, wxT(">|"));
+    txtLogger = new wxTextCtrl(panelMainLower, -1, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
 
     set_properties();
     do_layout();
@@ -549,23 +570,40 @@ void ImageTracker::do_layout()
 {
     // begin wxGlade: ImageTracker::do_layout
     wxBoxSizer* sizer_1 = new wxBoxSizer(wxVERTICAL);
-    wxBoxSizer* sizer_14 = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer* sizer_41 = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer* sizer_9 = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer* sizer_10 = new wxBoxSizer(wxVERTICAL);
     wxBoxSizer* sizer_32 = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer* sizer_33 = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer* sizer_3 = new wxBoxSizer(wxVERTICAL);
+    wxStaticBoxSizer* sizerStaticVisualization = new wxStaticBoxSizer(sizerStaticVisualization_staticbox, wxVERTICAL);
+    wxBoxSizer* sizerVisualization = new wxBoxSizer(wxHORIZONTAL);
     wxStaticBoxSizer* sizer_4 = new wxStaticBoxSizer(sizer_4_staticbox, wxVERTICAL);
     wxBoxSizer* sizer_6 = new wxBoxSizer(wxHORIZONTAL);
     sizer_4->Add(lbxSources, 1, wxEXPAND|wxADJUST_MINSIZE, 0);
     sizer_6->Add(btnAddDataSource, 1, wxALIGN_CENTER_HORIZONTAL|wxADJUST_MINSIZE, 0);
     sizer_6->Add(btnRemoveDataSource, 1, wxALIGN_CENTER_HORIZONTAL, 0);
     sizer_4->Add(sizer_6, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 1);
-    sizer_3->Add(sizer_4, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxADJUST_MINSIZE, 0);
-    window_2_pane_1->SetAutoLayout(true);
-    window_2_pane_1->SetSizer(sizer_3);
-    sizer_3->Fit(window_2_pane_1);
-    sizer_3->SetSizeHints(window_2_pane_1);
+    panelLeftUpper->SetAutoLayout(true);
+    panelLeftUpper->SetSizer(sizer_4);
+    sizer_4->Fit(panelLeftUpper);
+    sizer_4->SetSizeHints(panelLeftUpper);
+    sizerVisualization->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
+    panelVisualization->SetAutoLayout(true);
+    panelVisualization->SetSizer(sizerVisualization);
+    sizerVisualization->Fit(panelVisualization);
+    sizerVisualization->SetSizeHints(panelVisualization);
+    sizerStaticVisualization->Add(panelVisualization, 1, wxEXPAND, 0);
+    panelLeftLower->SetAutoLayout(true);
+    panelLeftLower->SetSizer(sizerStaticVisualization);
+    sizerStaticVisualization->Fit(panelLeftLower);
+    sizerStaticVisualization->SetSizeHints(panelLeftLower);
+    hsplitSourceVisControl->SplitHorizontally(panelLeftUpper, panelLeftLower);
+    sizer_3->Add(hsplitSourceVisControl, 1, wxEXPAND, 0);
+    panelLeft->SetAutoLayout(true);
+    panelLeft->SetSizer(sizer_3);
+    sizer_3->Fit(panelLeft);
+    sizer_3->SetSizeHints(panelLeft);
     sizer_10->Add(rwiView, 8, wxALL|wxEXPAND, 0);
     sizer_32->Add(sldImageIndex, 3, wxEXPAND|wxADJUST_MINSIZE, 0);
     sizer_33->Add(btnFirst, 0, wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 0);
@@ -575,22 +613,22 @@ void ImageTracker::do_layout()
     sizer_33->Add(btnLast, 0, wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 0);
     sizer_32->Add(sizer_33, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     sizer_10->Add(sizer_32, 1, wxEXPAND, 0);
-    window_2_pane_2->SetAutoLayout(true);
-    window_2_pane_2->SetSizer(sizer_10);
-    sizer_10->Fit(window_2_pane_2);
-    sizer_10->SetSizeHints(window_2_pane_2);
-    vsplitDataView->SplitVertically(window_2_pane_1, window_2_pane_2, 10);
-    sizer_9->Add(vsplitDataView, 5, wxEXPAND, 0);
-    window_1_pane_1->SetAutoLayout(true);
-    window_1_pane_1->SetSizer(sizer_9);
-    sizer_9->Fit(window_1_pane_1);
-    sizer_9->SetSizeHints(window_1_pane_1);
-    sizer_14->Add(txtLogger, 1, wxEXPAND, 0);
-    window_1_pane_2->SetAutoLayout(true);
-    window_1_pane_2->SetSizer(sizer_14);
-    sizer_14->Fit(window_1_pane_2);
-    sizer_14->SetSizeHints(window_1_pane_2);
-    hsplitDataLogger->SplitHorizontally(window_1_pane_1, window_1_pane_2, 580);
+    panelRight->SetAutoLayout(true);
+    panelRight->SetSizer(sizer_10);
+    sizer_10->Fit(panelRight);
+    sizer_10->SetSizeHints(panelRight);
+    vsplitDataView->SplitVertically(panelLeft, panelRight, 200);
+    sizer_9->Add(vsplitDataView, 2, wxEXPAND, 0);
+    panelMainUpper->SetAutoLayout(true);
+    panelMainUpper->SetSizer(sizer_9);
+    sizer_9->Fit(panelMainUpper);
+    sizer_9->SetSizeHints(panelMainUpper);
+    sizer_41->Add(txtLogger, 1, wxEXPAND|wxADJUST_MINSIZE, 0);
+    panelMainLower->SetAutoLayout(true);
+    panelMainLower->SetSizer(sizer_41);
+    sizer_41->Fit(panelMainLower);
+    sizer_41->SetSizeHints(panelMainLower);
+    hsplitDataLogger->SplitHorizontally(panelMainUpper, panelMainLower, 600);
     sizer_1->Add(hsplitDataLogger, 2, wxEXPAND, 0);
     SetAutoLayout(true);
     SetSizer(sizer_1);

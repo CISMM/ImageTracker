@@ -49,6 +49,14 @@ public:
     }
     
     /**
+     *
+     */
+    ItkVtkPipeline::Pointer GetVisualization(unsigned int i)
+    {
+        return i >= this->datavis.size() ? NULL : this->datavis[i].second;
+    }
+    
+    /**
      * Adds a DataSource to the list managed by this controller.
      */
     void AddDataSource(DataSource::Pointer source);

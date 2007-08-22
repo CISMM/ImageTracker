@@ -12,6 +12,7 @@ SET (Gui_SRCS
     DataSourceDialog.cpp                        DataSourceDialog.h
     DoubleSlider.cxx                            DoubleSlider.h
     wxDoubleSlider.cxx                          wxDoubleSlider.h
+    EmptyVisualizationControl.cpp               EmptyVisualizationControl.h
     FileSetDialog.cxx                           FileSetDialog.h
     GlobalRegistrationDialog.cxx                GlobalRegistrationDialog.h
     GuiUtils.cxx                                GuiUtils.h
@@ -28,7 +29,8 @@ SET (Gui_SRCS
     RegistrationDesign_wdr.cpp                  RegistrationDesign_wdr.h
     RemoveOcclusionsDialog.cpp                  RemoveOcclusionsDialog.h
     ScalarImageItkVtkPipeline.cxx               ScalarImageItkVtkPipeline.h
-    Vector2DGlyphItkVtkPipeline.cxx             Vector2DGlyphItkVtkPipeline.h
+    VectorGlyphPipeline.cxx                     VectorGlyphPipeline.h
+    VectorGlyphControlPanel.cpp                 VectorGlyphControlPanel.h
     WxPipelineObserver.cxx                      WxPipelineObserver.h
     wxCore_wdr.cpp                              wxCore_wdr.h
     wxGui.rc

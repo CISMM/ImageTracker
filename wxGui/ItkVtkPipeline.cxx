@@ -1,5 +1,7 @@
 #include "ItkVtkPipeline.h"
-#include "vtkCollectionIterator.h"
+
+#include "EmptyVisualizationControl.h"
+
 
 ItkVtkPipeline::ItkVtkPipeline()
     : props()
@@ -33,4 +35,9 @@ void ItkVtkPipeline::RemovePropsFrom(vtkRenderer* renderer)
     {
         renderer->RemoveActor(*it);
     }
+}
+
+wxWindow* ItkVtkPipeline::CreateWxControl(wxWindow* parent)
+{
+    return (new EmptyVisualizationControl(parent, -1));
 }

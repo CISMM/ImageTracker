@@ -1,4 +1,4 @@
-#include "Vector2DGlyphItkVtkPipeline.h"
+#include "VectorGlyphPipeline.h"
 
 #include "vtkArrowSource.h"
 #include "vtkIndent.h"
@@ -7,10 +7,11 @@
 
 #include "ConnectVTKITK.h"
 #include "Logger.h"
+#include "VectorGlyphControlPanel.h"
 
-Vector2DGlyphItkVtkPipeline::Vector2DGlyphItkVtkPipeline()
+VectorGlyphPipeline::VectorGlyphPipeline()
 {
-    std::string function("Vector2DGlyphItkVtkPipeline::Vector2DGlyphItkVtkPipeline");
+    std::string function("VectorGlyphPipeline::VectorGlyphPipeline");
     Logger::verbose << function << ": creating pipeline components" << std::endl;
     this->exporter      = ExportType::New();
     this->importer      = vtkImageImport::New();
@@ -59,16 +60,16 @@ Vector2DGlyphItkVtkPipeline::Vector2DGlyphItkVtkPipeline()
     Logger::verbose << function << ": done" << std::endl;
 }
 
-Vector2DGlyphItkVtkPipeline::~Vector2DGlyphItkVtkPipeline()
+VectorGlyphPipeline::~VectorGlyphPipeline()
 {
     // TODO: Do we need to delete all elements of the pipeline?
     if (this->actor)
         this->actor->Delete();;
 }
 
-void Vector2DGlyphItkVtkPipeline::SetInput(itk::DataObject* input)
+void VectorGlyphPipeline::SetInput(itk::DataObject* input)
 {
-    std::string function("Vector2DGlyphItkVtkPipeline::SetInput");
+    std::string function("VectorGlyphPipeline::SetInput");
     
     Logger::verbose << function << ": checking input image type" << std::endl;
     InputImageType* image;
@@ -95,9 +96,9 @@ void Vector2DGlyphItkVtkPipeline::SetInput(itk::DataObject* input)
     this->Update();
 }
 
-void Vector2DGlyphItkVtkPipeline::Update()
+void VectorGlyphPipeline::Update()
 {
-    std::string function("ScalarImageItkVtkPipeline::Update");
+    std::string function("VectorGlyphPipeline::Update");
     // TODO: Do we need to update all pipeline components?
     // I feel like this would defeat the purpose of having a pipeline architecture...
     Logger::verbose << function << ": updating image exporter (itk) and importer (vtk)" << std::endl;
@@ -109,3 +110,9 @@ void Vector2DGlyphItkVtkPipeline::Update()
     this->glyph->Update();
 }
 
+wxWindow* VectorGlyphPipeline::CreateWxControl(wxWindow* parent)
+{
+    VectorGlyphControlPanel* control = new VectorGlyphControlPanel(parent, -1);
+    control->SetPipeline(this);
+    return control;
+}

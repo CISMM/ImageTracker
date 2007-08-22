@@ -119,13 +119,18 @@ private:
     
 protected:
     // begin wxGlade: ImageTracker::attributes
+    wxStaticBox* sizerStaticVisualization_staticbox;
     wxStaticBox* sizer_4_staticbox;
     wxMenuBar* itMenuBar;
     wxStatusBar* theStatusBar;
     wxListBox* lbxSources;
     wxButton* btnAddDataSource;
     wxButton* btnRemoveDataSource;
-    wxPanel* window_2_pane_1;
+    wxPanel* panelLeftUpper;
+    wxPanel* panelVisualization;
+    wxPanel* panelLeftLower;
+    wxSplitterWindow* hsplitSourceVisControl;
+    wxPanel* panelLeft;
     wxVTKRenderWindowInteractor* rwiView;
     wxSlider* sldImageIndex;
     wxButton* btnFirst;
@@ -133,11 +138,11 @@ protected:
     wxButton* btnPause;
     wxButton* btnPlay;
     wxButton* btnLast;
-    wxPanel* window_2_pane_2;
+    wxPanel* panelRight;
     wxSplitterWindow* vsplitDataView;
-    wxPanel* window_1_pane_1;
+    wxPanel* panelMainUpper;
     wxTextCtrl* txtLogger;
-    wxPanel* window_1_pane_2;
+    wxPanel* panelMainLower;
     wxSplitterWindow* hsplitDataLogger;
     // end wxGlade
     
@@ -170,7 +175,7 @@ public:
     void OnRewind(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnLastFrame(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnPause(wxCommandEvent &event); // wxGlade: <event_handler>
-    void OnDataSourceSelect(wxCommandEvent &event); // wxGlade: <event_handler>
+    void OnSelectDataSource(wxCommandEvent &event); // wxGlade: <event_handler>
 }; // wxGlade: end class
 
 

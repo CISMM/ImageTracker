@@ -1,7 +1,7 @@
 #include "GuiUtils.h"
 
 #include "ScalarImageItkVtkPipeline.h"
-#include "Vector2DGlyphItkVtkPipeline.h"
+#include "VectorGlyphPipeline.h"
 #include "Logger.h"
 
 ItkVtkPipeline::Pointer GenerateVisualPipeline(DataSource::Pointer source)
@@ -17,8 +17,8 @@ ItkVtkPipeline::Pointer GenerateVisualPipeline(DataSource::Pointer source)
             view = ScalarImageItkVtkPipeline::New();
             break;
         case VectorFloat:
-            Logger::verbose << function << ": making Vector2DGlyphItkVtkPipeline" << std::endl;
-            view = Vector2DGlyphItkVtkPipeline::New();
+            Logger::verbose << function << ": making VectorGlyphPipeline" << std::endl;
+            view = VectorGlyphPipeline::New();
             break;
         default:
             Logger::warning << "ImageTrackerController::GenerateViewPipeline: DataSource not recognized!" << std::endl;

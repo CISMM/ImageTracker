@@ -20,11 +20,11 @@
  * This class provides vector image visualization options such glyph type,
  * density, and color mapping.
  */
-class Vector2DGlyphItkVtkPipeline :
+class VectorGlyphPipeline :
     public ItkVtkPipeline
 {
     public:
-        typedef Vector2DGlyphItkVtkPipeline Self;
+        typedef VectorGlyphPipeline Self;
         typedef ItkVtkPipeline Superclass;
         typedef itk::SmartPointer< Self > Pointer;
         typedef itk::SmartPointer< const Self > ConstPointer;
@@ -35,10 +35,43 @@ class Vector2DGlyphItkVtkPipeline :
     
         virtual void SetInput(itk::DataObject* input);
         virtual void Update();
+        
+        virtual wxWindow* CreateWxControl(wxWindow* parent);
     
+        /**
+         * Get/Set the ratio between data set pixels and masked glyphs.
+         */
+        void SetMaskRatio(int ratio) 
+        { 
+            this->mask->SetOnRatio(ratio); 
+            this->mask->Modified();
+        }
+        int GetMaskRatio() 
+        { 
+            return this->mask->GetOnRatio(); 
+        }
+        
+        /**
+         * Get/Set the vector magnitude scale factor.
+         */
+        void SetScaleFactor(double factor) 
+        { 
+            this->glyph->SetScaleFactor(factor);
+            this->glyph->Modified();
+        }
+        double GetScaleFactor() { return this->glyph->GetScaleFactor(); }
+        
+        /**
+         * Get/Set the visibility of the glyphs.
+         */
+        void SetVisibility(int visible) 
+        { this->actor->SetVisibility(visible); }
+        int GetVisibility() 
+        { return this->actor->GetVisibility(); }
+        
     protected:
-        Vector2DGlyphItkVtkPipeline();
-        virtual ~Vector2DGlyphItkVtkPipeline();
+        VectorGlyphPipeline();
+        virtual ~VectorGlyphPipeline();
     
     private:
         ExportType::Pointer exporter;
