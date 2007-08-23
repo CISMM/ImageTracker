@@ -295,22 +295,28 @@ void ImageTracker::OnAddDataSource(wxCommandEvent &event)
 void ImageTracker::OnSelectDataSource(wxCommandEvent &event)
 {
     int idx = this->lbxSources->GetSelection();
-    if (idx != wxNOT_FOUND)
+    wxWindow* panel;
+    
+    if (idx == wxNOT_FOUND) // No data source is selected
     {
-        // Create an appropriate visualization control panel for the selected visualization
-        wxWindow* panel = ImageTrackerController::Instance()->GetVisualization(idx)->CreateWxControl(this->panelVisualization);
-        
-        // Get the sizer for the visualization panel
-        wxSizer* sizer = this->panelVisualization->GetSizer();
-        
-        // The visualization controls will always be placed in the first position of 
-        // the visualization panel's sizer.
-        sizer->Remove(0);
-        sizer->Add(panel, 1, wxADJUST_MINSIZE|wxEXPAND, 0);
-        
-        // Make sure control panel changes are seen
-        this->Layout();
+        panel = new wxPanel(this->panelVisualization, -1);
     }
+    else
+    {
+        // Create an appropriate visualization control panel for the selected data source
+        panel = ImageTrackerController::Instance()->GetVisualization(idx)->CreateWxControl(this->panelVisualization);
+    }
+    
+    // Get the sizer for the visualization panel
+    wxSizer* sizer = this->panelVisualization->GetSizer();
+    
+    // The visualization controls will always be placed in the first position of 
+    // the visualization panel's sizer.
+    sizer->Remove(0);
+    sizer->Add(panel, 1, wxADJUST_MINSIZE|wxEXPAND, 0);
+    
+    // Make sure control panel changes are seen
+    this->Layout();
     
     // We want to skip the select event on the data source list box because a double click
     // event means we want to edit the data source.
@@ -392,6 +398,11 @@ void ImageTracker::UpdatePlayState()
             this->sldImageIndex->SetValue(idx+1);
             ImageTrackerController::Instance()->SetFrameIndex(idx+1);
         }
+        else if (this->loopPlay)
+        {
+            this->sldImageIndex->SetValue(0);
+            ImageTrackerController::Instance()->SetFrameIndex(0);
+        }
         else
         {
             this->SetPlayState(Pause);
@@ -402,6 +413,11 @@ void ImageTracker::UpdatePlayState()
         {
             this->sldImageIndex->SetValue(idx-1);
             ImageTrackerController::Instance()->SetFrameIndex(idx-1);
+        }
+        else if (this->loopPlay)
+        {
+            this->sldImageIndex->SetValue(maxIdx);
+            ImageTrackerController::Instance()->SetFrameIndex(maxIdx);
         }
         else
         {
@@ -438,6 +454,14 @@ void ImageTracker::UpdateDataSources()
     this->lbxSources->Set(names);
     this->lbxSources->SetSelection(std::min(idx, ((int)this->lbxSources->GetCount())-1));
     this->sldImageIndex->SetRange(0, ImageTrackerController::Instance()->GetMaxSize()-1);
+    
+    // Fake a data source selection event, so that the correct visualization control
+    // is displayed in the visualization control panel.
+    if (this->lbxSources->GetSelection() != idx)
+    {
+        wxCommandEvent evt(wxEVT_COMMAND_LISTBOX_SELECTED);
+        this->OnSelectDataSource(evt);
+    }
 }
 
 ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, const wxPoint& pos, const wxSize& size, long style):
@@ -505,6 +529,7 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     // ----- Custom code! ----- //
     // Initialize play state
     this->SetPlayState(Pause);
+    this->loopPlay = true;
 
     // Select log level, and redirect output to log panel
     menuHelp->Check(MENU_LOG_INFO, true);

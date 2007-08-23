@@ -115,6 +115,7 @@ private:
     AboutDialog* dlgAbout;
     wxStreamToTextRedirector* coutRedirect;
     PlayState playState;
+    bool loopPlay;
     
 protected:
     // begin wxGlade: ImageTracker::attributes
