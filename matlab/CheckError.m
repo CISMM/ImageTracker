@@ -1,4 +1,4 @@
-function [ err, val ] = CheckError( imgs, feat, tolerance, radius )
+function [ err, val ] = CheckError( imgs, feat, tolerance, radius, prev )
 % CheckError(imgs, feat, tolerance, radius) Computes the error in tracking
 % a feature.
 %
@@ -12,12 +12,17 @@ function [ err, val ] = CheckError( imgs, feat, tolerance, radius )
 % feat        - The set of features
 % tolerance   - The error tolerance threshold (0.85)
 % radius      - The image patch radius (2)
+% prev        - Indicates that a feature should be compared to the previous
+% frame instead of the first frame in which the feature appeared (0)
 %
 % Output
 % err         - The set of errors corresponding to each feature patch
 % val         - A flag indicating whether each feature patch was within the
 % error tolerance
 
+if (nargin < 5)
+    prev = 0;
+end;
 if (nargin < 4)
     radius = 2;
 end;
@@ -38,7 +43,11 @@ for i=1:length(fidx)
     idx = fidx(i); % the current valid feature index
     
     % Find the feature's first frame
-    fframe = find(feat(idx,4,:), 1);
+    if (prev)
+        fframe = cframe - 1;
+    else
+        fframe = find(feat(idx,4,:), 1);
+    end;
     
     % Create an image patch by sampling I2 using the computed
     % displacement for each image feature.

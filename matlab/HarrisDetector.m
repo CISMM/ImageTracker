@@ -1,5 +1,5 @@
 function [ features, himg ] = HarrisDetector( img, scaleD, scaleI, count, fRadius, fExist, cutoff )
-% [ features, himg ] = HarrisDetector( img, count, scaleD, scaleI ) - Harris
+% [ features, himg ] = HarrisDetector( img, scaleD, scaleI, count ) - Harris
 % interest feature point detector.
 % Finds Harris corner features in a given image. If feats is supplied only
 % new features not near existing valid features are added to the feature
@@ -48,10 +48,17 @@ dG = GaussianKernel1D(scaleD, 1, 3);
 Ix = filter2(G'*dG, img);
 Iy = filter2(dG'*G, img);
 
+% figure; dispimg(Ix, 'Ix');
+% figure; dispimg(Iy, 'Iy');
+
 % Compute the components of the structure tensor
 Ixx = Ix.*Ix;
 Iyy = Iy.*Iy;
 Ixy = Ix.*Iy;
+
+% figure; dispimg(Ixx, 'Ixx');
+% figure; dispimg(Iyy, 'Iyy');
+% figure; dispimg(Ixy, 'Ixy');
 
 % Integrate the components of the structure tensor over the integration
 % window, weighted with a Gaussian function.
@@ -61,9 +68,15 @@ Gxx = filter2(GG, Ixx);
 Gyy = filter2(GG, Iyy);
 Gxy = filter2(GG, Ixy);
 
+% figure; dispimg(Gxx, 'Gxx');
+% figure; dispimg(Gyy, 'Gyy');
+% figure; dispimg(Gxy, 'Gxy');
+
 % Harris feature image function
 himg = (Gxx.*Gyy - Gxy.*Gxy) - 0.04*(Gxx + Gyy).^2;
 hcutoff = max(himg(:)) * cutoff;
+
+% figure; dispimg(himg, 'Harris');
 
 % Find local maxima in the Harris feature image
 [h, w] = size(img);
@@ -72,7 +85,7 @@ ii = 1+fRadius:h-fRadius;
 jj = 1+fRadius:w-fRadius;
 % M marks the possible location of Harris features--local maxima
 % (himg(ii,jj)>hcutoff).*
-M(ii,jj) = (himg(ii,jj)>hcutoff).*(himg(ii,jj)>himg(ii-1,jj-1)).*(himg(ii,jj)>himg(ii-1,jj)).*(himg(ii,jj)>himg(ii-1,jj+1)).*(himg(ii,jj)>himg(ii,jj-1)).*(himg(ii,jj)>himg(ii,jj+1)).*(himg(ii,jj)>himg(ii+1,jj-1)).*(himg(ii,jj)>himg(ii+1,jj)).*(himg(ii,jj)>himg(ii+1,jj+1));
+M(ii,jj) = (himg(ii,jj)>himg(ii-1,jj-1)).*(himg(ii,jj)>himg(ii-1,jj)).*(himg(ii,jj)>himg(ii-1,jj+1)).*(himg(ii,jj)>himg(ii,jj-1)).*(himg(ii,jj)>himg(ii,jj+1)).*(himg(ii,jj)>himg(ii+1,jj-1)).*(himg(ii,jj)>himg(ii+1,jj)).*(himg(ii,jj)>himg(ii+1,jj+1));
 
 % Handle existing features
 if (~isempty(fExist))  

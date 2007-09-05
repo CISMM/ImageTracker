@@ -34,6 +34,8 @@ else
     end
     
     %normalize
+    % The norm below computes the variance of the original data.
+    % Clever Marc Pollefeys.
     I1=double(I1); I2=double(I2);
     I1=I1-mean(I1); I1=I1/norm(I1);
     I2=I2-mean(I2); I2=I2/norm(I2);

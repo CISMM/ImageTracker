@@ -95,7 +95,7 @@ for i=1:t-1
     d = TrackFeatures(imgs(:,:,i), imgs(:,:,i+1), features(:,:,i), windRadius, sigmaS, iters);
     features(:,1:2,i+1) = features(:,1:2,i) + d;
     % Check the error on tracked features
-    [err, val] = CheckError(imgs, features, 0.85, windRadius);
+    [err, val] = CheckError(imgs, features, 0.45, windRadius, 1);
     features(:,3:4,i+1) = [err val];
     
     % Progress update
