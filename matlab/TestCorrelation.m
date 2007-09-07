@@ -9,22 +9,47 @@ img = img(50:305,50:305);
 % img = y'*x;
 
 % create a template
-c = [164,207];
-r = 3;
+c = [140,207];
+r = 10;
 tem = img(c(1)-r:c(1)+r,c(2)-r:c(2)+r);
 
 % add noise
-% img = img + 0.10*(max(img(:))-min(img(:)))*randn(size(img));
+img = img + 0.30*(max(img(:))-min(img(:)))*randn(size(img));
 % brighten
-img = 1.05 * (img - min(img(:))) + 50;
+%img = 1.05 * (img - min(img(:))) + 50;
 
 figure; dispimg(img);
 figure; dispimg(tem);
 
 % compute correlation, find maximum
 nccmap = CorrMap(img,tem);
-[i,j] = find(nccmap >= max(nccmap(:))-0.005)
+[i,j] = find(nccmap >= max(nccmap(:))-0.005);
+disp(sprintf('ncc max: [%d, %d] (y, x)', i, j));
 figure; dispimg(nccmap);
+hold on;
+plot(j,i,'r+');
+hold off;
+
+fftmap = CorrMapFFT(img, tem);
+[i,j] = find(fftmap >= max(fftmap(:))-0.005);
+disp(sprintf('fft max: [%d, %d] (y, x)', i, j));
+figure; dispimg(fftmap);
+hold on;
+plot(j,i,'r+');
+hold off;
+
+filtmap = filter2(tem, img, 'same');
+[i,j] = find(filtmap >= max(filtmap(:))-0.005);
+disp(sprintf('filt max: [%d, %d] (y, x)', i, j));
+figure; dispimg(filtmap);
+hold on;
+plot(j,i,'r+');
+hold off;
+
+convmap = conv2(img, tem, 'same');
+[i,j] = find(convmap >= max(convmap(:))-0.005);
+disp(sprintf('conv max: [%d, %d] (y, x)', i, j));
+figure; dispimg(convmap);
 hold on;
 plot(j,i,'r+');
 hold off;
