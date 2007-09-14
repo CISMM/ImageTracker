@@ -312,7 +312,8 @@ void ImageTracker::OnSelectDataSource(wxCommandEvent &event)
     
     // The visualization controls will always be placed in the first position of 
     // the visualization panel's sizer.
-    sizer->Remove(0);
+    sizer->Clear(true);
+    // sizer->Remove(0);
     sizer->Add(panel, 1, wxADJUST_MINSIZE|wxEXPAND, 0);
     
     // Make sure control panel changes are seen
