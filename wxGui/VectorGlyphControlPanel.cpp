@@ -54,6 +54,8 @@ bool VectorGlyphControlPanel::TransferDataToWindow()
         this->slideGlyphScaleFactor->SetValue(this->pipeline->GetScaleFactor());
         this->slideGlyphMaskRatio->SetValue(this->pipeline->GetMaskRatio());
     }
+
+    return true;
 }
 
 void VectorGlyphControlPanel::OnVisibility(wxCommandEvent &event)
