@@ -68,6 +68,8 @@ bool ScalarImageControlPanel::TransferDataToWindow()
         this->slideWindowMax->SetValue(this->pipeline->GetWindowMaximum());
         this->slideWindowMin->SetValue(this->pipeline->GetWindowMinimum());
     }
+
+    return true;
 }
 
 void ScalarImageControlPanel::OnWindowMax(wxCommandEvent &event)
