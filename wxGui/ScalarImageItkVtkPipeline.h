@@ -1,6 +1,7 @@
 #pragma once
 
 #include "itkImage.h"
+#include "itkIntensityWindowingImageFilter.h"
 #include "itkRescaleIntensityImageFilter.h"
 #include "itkVTKImageExport.h"
 
@@ -29,21 +30,42 @@ public:
     
     typedef itk::Image< float, 2 > InputImageType;
     typedef itk::Image< unsigned char, 2 > DisplayImageType;
-    typedef itk::RescaleIntensityImageFilter< InputImageType, DisplayImageType > RescaleType;
+    typedef InputImageType::PixelType InputPixelType;
+    typedef DisplayImageType::PixelType DisplayPixelType;
+    typedef itk::IntensityWindowingImageFilter< InputImageType, DisplayImageType > WindowType;
     typedef itk::VTKImageExport< DisplayImageType > ExportType;
+    
+    void SetVisibility(int visible);
+    int GetVisibility() const;
+    
+    void SetWindowMinimum(const InputPixelType min);
+    void SetWindowMaximum(const InputPixelType max);
+    InputPixelType GetWindowMinimum() const;
+    InputPixelType GetWindowMaximum() const;
+    
+//     void SetDisplayMinimum(const DisplayPixelType min);
+//     void SetDisplayMaximum(const DisplayPixelType max);
     
     virtual void SetInput(itk::DataObject* input);
     virtual void Update();
+    
+    /**
+     * Creates a wxWindow (panel) that can control the parameters of this vector glyph pipeline.
+     */
+    virtual wxWindow* CreateWxControl(wxWindow* parent);
+    
+    InputImageType::Pointer GetInput();
     
 protected:
     ScalarImageItkVtkPipeline();
     virtual ~ScalarImageItkVtkPipeline();
     
 private:
-    RescaleType::Pointer normalize;
+    WindowType::Pointer window;
     ExportType::Pointer exporter;
     vtkImageImport* importer;
     vtkImageFlip* flipper;
     vtkImageShiftScale* rescaler;
     vtkImageActor* actor;
+    bool firstTime;
 };

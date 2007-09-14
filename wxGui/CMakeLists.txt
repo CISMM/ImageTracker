@@ -28,6 +28,7 @@ SET (Gui_SRCS
     PipelineExecutor.cxx                        PipelineExecutor.h
     RegistrationDesign_wdr.cpp                  RegistrationDesign_wdr.h
     RemoveOcclusionsDialog.cpp                  RemoveOcclusionsDialog.h
+    ScalarImageControlPanel.cpp                 ScalarImageControlPanel.h
     ScalarImageItkVtkPipeline.cxx               ScalarImageItkVtkPipeline.h
     VectorGlyphPipeline.cxx                     VectorGlyphPipeline.h
     VectorGlyphControlPanel.cpp                 VectorGlyphControlPanel.h
