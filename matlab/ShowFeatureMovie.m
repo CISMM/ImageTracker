@@ -84,7 +84,7 @@ for i=2:min(ti,tf)
             tidx = tidx.*(tidx <= i); 
             tt = find(tidx);
             % display track
-            plot(squeeze(feats(fidx(f),2,tidx(tt))), squeeze(feats(fidx(f),1,tidx(tt))), 'b-');
+            plot(squeeze(feats(fidx(f),2,tidx(tt))), squeeze(feats(fidx(f),1,tidx(tt))), 'y-');
         end;
     end;
     

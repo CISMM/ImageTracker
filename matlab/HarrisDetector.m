@@ -85,7 +85,7 @@ ii = 1+fRadius:h-fRadius;
 jj = 1+fRadius:w-fRadius;
 % M marks the possible location of Harris features--local maxima
 % (himg(ii,jj)>hcutoff).*
-M(ii,jj) = (himg(ii,jj)>himg(ii-1,jj-1)).*(himg(ii,jj)>himg(ii-1,jj)).*(himg(ii,jj)>himg(ii-1,jj+1)).*(himg(ii,jj)>himg(ii,jj-1)).*(himg(ii,jj)>himg(ii,jj+1)).*(himg(ii,jj)>himg(ii+1,jj-1)).*(himg(ii,jj)>himg(ii+1,jj)).*(himg(ii,jj)>himg(ii+1,jj+1));
+M(ii,jj) = (himg(ii,jj)>hcutoff).*(himg(ii,jj)>himg(ii-1,jj-1)).*(himg(ii,jj)>himg(ii-1,jj)).*(himg(ii,jj)>himg(ii-1,jj+1)).*(himg(ii,jj)>himg(ii,jj-1)).*(himg(ii,jj)>himg(ii,jj+1)).*(himg(ii,jj)>himg(ii+1,jj-1)).*(himg(ii,jj)>himg(ii+1,jj)).*(himg(ii,jj)>himg(ii+1,jj+1));
 
 % Handle existing features
 if (~isempty(fExist))  

@@ -1,4 +1,4 @@
-function [ features ] = KLTTracker( imgs, sigmaS, sigmaT, count, featRadius, featFrame, windRadius, iters )
+function [ features ] = KLTTracker( imgs, sigmaS, sigmaT, count, featRadius, featFrame, windRadius, iters, trackError, comparePrev )
 % KLTTracker( imgs, sigmaS, sigmaT, count, featRadius, featFrame ) Tracks
 % features in an image sequence.
 %
@@ -44,12 +44,22 @@ function [ features ] = KLTTracker( imgs, sigmaS, sigmaT, count, featRadius, fea
 % windRadius  - The radius of the feature window
 % iters       - The number of linear equation iterations to use when
 % tracking features
+% trackError  - The error threshold for accepting a tracked feature, based
+% on NCC (0.5)
+% comparePrev - Whether to compare features to the previous frame instead
+% of the first frame in which the feature appeared (0, false).
 %
 % Output:
 % features    - The Fx4xN feature tracking matrix, as described above
 
 display(sprintf('KLTTracker: %s \t Starting', datestr(now, 'HH:MM:SS')));
 
+if (nargin < 10)
+    comparePrev = 0;
+end;
+if (nargin < 9)
+    trackError = 0.50;
+end;
 if (nargin < 8)
     iters = 1;
 end;
@@ -95,7 +105,7 @@ for i=1:t-1
     d = TrackFeatures(imgs(:,:,i), imgs(:,:,i+1), features(:,:,i), windRadius, sigmaS, iters);
     features(:,1:2,i+1) = features(:,1:2,i) + d;
     % Check the error on tracked features
-    [err, val] = CheckError(imgs, features, 0.45, windRadius, 1);
+    [err, val] = CheckError(imgs, features, trackError, windRadius, comparePrev);
     features(:,3:4,i+1) = [err val];
     
     % Progress update
