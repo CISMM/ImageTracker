@@ -33,7 +33,7 @@ for i = 1:steps
     % inverse transform--this is for tear-free image warping
     invTran = inv(tran);
     
-    pos = zeros(outSize(1),outSize(2),2); % initialize sampling matrix
+    pos = zeros(outSize(1),outSize(2),3); % initialize sampling matrix
     for y = 1:outSize(1)
         for x = 1:outSize(2)
             % find the index from the original image corresponding to the
