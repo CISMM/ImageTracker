@@ -116,7 +116,7 @@ while ((isempty(features) || sum(features(:,4)) < count) && idx <= length(sortId
     pos = [si(sortIdx(idx)) sj(sortIdx(idx))];
     % Check if feature is still valid
     if (M(pos(1),pos(2)) > 0)
-        features(end+1,:) = [(pos) 0 1];
+        features(end+1,:) = [(pos) 1 1];
         % clear the neigborhood
         ii = max(1,features(end,1)-fRadius):min(h,features(end,1)+fRadius);
         jj = max(1,features(end,2)-fRadius):min(w, features(end,2)+fRadius);

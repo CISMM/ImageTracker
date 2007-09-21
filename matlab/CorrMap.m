@@ -1,7 +1,7 @@
 function [ map ] = CorrMap( img, template )
 
 [h,w] = size(template);
-map = zeros(size(img));
+map = -1 * ones(size(img));
 
 % find the middle index of the template in each direction
 mtx = ceil(w/2);

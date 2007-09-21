@@ -1,6 +1,28 @@
-function [ feat, meanFeat ] = NCCFlow( imgs, cFrame, tempRadius, searchRadius, feat, errTolerance, meanFeat )
+function [ feat, meanFeat ] = NCCFlow( imgs, cFrame, tempRadius, searchRadius, feat, errTolerance, meanFeat, evolve )
 % NCCFlow Computes the flow between two images using normalized
-% cross-correlation block matching.
+% cross-correlation (NCC) block matching.
+% Input (default)
+%   imgs            - the images to track
+%   cFrame          - the index of the current frame
+%   tempRadius      - the radius of each feature template
+%   searchRadius    - the radius of the image region in which to search for
+%   each feature
+%   feat            - feature list, a Nx4xF matrix, where N is the feature
+%   index, F is the frame index, and the 4-vector specifies position (y,x),
+%   error metric, and an active tracking flag (an even selection of points)
+%   errTolerance    - the NCC error threshold below which features are
+%   considered lost (0.95)
+%   meanFeat        - a set of images of the feature templates [zeros]
+%   evolve          - indicates whether the meanFeat images should be
+%   updated with matched image regions from the current frame. 1 for
+%   feature evolution, 0 for no evolution (0)
+%
+% Output
+%   feat            - the updated feature matrix--will grow by one in the
+%   frame direction
+%   meanFeat        - the updated feature templates, updated only if
+%   evolution is on
+%
 
 pFrame = cFrame - 1;
 I1 = squeeze(imgs(:,:,pFrame));
@@ -11,6 +33,9 @@ I2 = squeeze(imgs(:,:,cFrame));
 % feat should be an Fx4xT matrix;
 fs = size(feat,1);
 
+if (nargin < 8)
+    evolve = 0;
+end;
 if (nargin < 7)
     meanFeat = zeros(2*tempRadius(1)+1, 2*tempRadius(2)+1, fs);
 end;
@@ -32,10 +57,6 @@ for fidx = 1:length(ff)
     y = feat(ff(fidx),1,pFrame);
     x = feat(ff(fidx),2,pFrame);
     
-    if (ff(fidx) == 30 && cFrame == 6)
-        disp('I am a jelly donut.');
-    end;
-    
     % compute the indices of the search window and template
     yySearch = max(y-searchRadius(1),1):min(y+searchRadius(1), h);
     xxSearch = max(x-searchRadius(2),1):min(x+searchRadius(2), w);
@@ -52,13 +73,26 @@ for fidx = 1:length(ff)
     imgTemp = squeeze(meanFeat(:,:,ff(fidx)));
     corr = CorrMap(imgSearch, imgTemp);
 
+    if (y - searchRadius(1) < 1)
+        dp(1) = 2*searchRadius(1) + 1 - size(yySearch,2);
+    else
+        dp(1) = 0;
+    end;
+    if (x - searchRadius(2) < 1)
+        dp(2) = 2*searchRadius(2) + 1 - size(xxSearch,2);
+    else
+        dp(2) = 0;
+    end;
+    
     % find the maximum ncc response
     maxresp = max(corr(:));
-    [i,j] = find(corr == maxresp);
-    feat(ff(fidx), 1:2, cFrame) = [y+(j(1)-(searchRadius(1)+1)) x+(i(1)-(searchRadius(2)+1))];
+    [j,i] = find(corr == maxresp); % find returns row, col
+    feat(ff(fidx), 1:2, cFrame) = [y+(j(1)-(searchRadius(1)+1)) x+(i(1)-(searchRadius(2)+1))] + dp;
     feat(ff(fidx), 3:4, cFrame) = [maxresp maxresp >= errTolerance];
     
-%     if (feat(ff(fidx), 4)) % accepted feature
-%         meanFeat(:,:,ff(fidx)) = (meanFeat(:,:,ff(fidx))*pFrame + imgTemp) / cFrame;
-%     end;
+    % Evolve the tracked feature
+    if (evolve && feat(ff(fidx), 4)) % accepted feature
+        match = imgSearch(j-tempRadius(1):j+tempRadius(1),i-tempRadius(2):i+tempRadius(2));
+        meanFeat(:,:,ff(fidx)) = (meanFeat(:,:,ff(fidx))*pFrame + match) / cFrame;
+    end;
 end;
