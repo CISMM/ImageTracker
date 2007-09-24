@@ -7,6 +7,7 @@
 
 #include "ImageUtils.h"
 #include "Logger.h"
+#include "RungeKuttaSolver.h"
 
 void IntegrateFlowFieldPipeline::Update()
 {
@@ -48,11 +49,10 @@ void IntegrateFlowFieldPipeline::Update()
     }
     
     CopyType::Pointer copy = CopyType::New();
-    FlowImageType::Pointer position = FlowImageType::New();
     copy->SetInputImage(pos0);
     copy->Update();
-    position = copy->GetOutput();
-    PrintRegionInfo<FlowImageType>(position->GetLargestPossibleRegion(), "Initial position region");
+    FlowImageType::Pointer position = copy->GetOutput();
+    PrintImageInfo<FlowImageType>(position, "Initial position image");
     
     // Save the intitial displacement information
     Logger::debug << function << ": Saving initial displacement image" << std::endl;
@@ -67,24 +67,25 @@ void IntegrateFlowFieldPipeline::Update()
     flows->PushBackInput(dynamic_cast<FlowImageType*>(this->input->GetImage(0)));
     flows->PushBackInput(dynamic_cast<FlowImageType*>(this->input->GetImage(1)));
     flows->PushBackInput(dynamic_cast<FlowImageType*>(this->input->GetImage(2)));
+    flows->Update();
     
     // Setup displacement integrator
     IntegratorType::Pointer integrate = IntegratorType::New();
     integrate->SetStepSize(this->GetStepSize());
     
-    int steps = (int)(this->input->size() / this->GetStepSize());
+    int steps = (int)((this->input->size()-1) / this->GetStepSize());
     
     // Integration time = 0
     unsigned int step = 0;
     unsigned int idx = 0;
-    double intTime = -this->GetStepSize();
+    double intTime = 0.0;
     bool doContinue = true;
     
     Logger::debug << function << ": Integrating flow" << std::endl;
     this->NotifyProgress(0.0, "Integrating flow");
-    while (doContinue) // From frame index idx=0 to the end of the flow field at StepSize intervals:
+    for (step = 1; step <= steps; step++) // From frame index idx=0 to the end of the flow field at StepSize intervals:
     {
-        intTime += this->GetStepSize();
+        Logger::verbose << function << ": intTime =  " << intTime << "\tindex = " << idx << "\tstep = " << step << " of " << steps << std::endl;
         
         // Evaluate the next step using Runge Kutta integration
         integrate->SetInput(position);
@@ -93,9 +94,9 @@ void IntegrateFlowFieldPipeline::Update()
         integrate->Update();
         position = integrate->GetOutput();
         
-        doContinue == !(idx + 3 > this->input->size() && intTime > 1);
+        intTime += this->GetStepSize();
         
-        if (intTime > 1.0) // Whenever the integration time value is greater than 1:
+        if (intTime >= 1.0) // Whenever the integration time value is greater than 1:
         {
             // Subtract 1 from the integration time value
             intTime -= 1.0;
@@ -111,11 +112,12 @@ void IntegrateFlowFieldPipeline::Update()
             {
                 flows->PopFrontInput();
                 flows->PushBackInput(dynamic_cast<FlowImageType*>(this->input->GetImage(idx+2)));
+                flows->Update();
             }
         }
         
         // Progress notification
-        this->NotifyProgress(((double)step++/steps), "Integrating flow");
+        this->NotifyProgress(((double)step/steps), "Integrating flow");
     }
     Logger::debug << function << ": done." << std::endl;
 }
