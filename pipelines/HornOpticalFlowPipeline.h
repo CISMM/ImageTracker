@@ -5,10 +5,7 @@
 #include "itkVector.h"
 
 #include "CommonTypes.h"
-#include "FileSet.h"
-#include "ImageSetReader.h"
 #include "ItkPipeline.h"
-#include "Logger.h"
 
 class HornOpticalFlowPipeline :
     public ItkPipeline
@@ -35,10 +32,6 @@ public:
     itkSetMacro(SpatialSigma, float);
     itkGetMacro(SmoothWeighting, float);
     itkSetMacro(SmoothWeighting, float);
-            
-    //const FileSet& GetOutputFiles() { return this->outputFiles; }
-    //void SetOutputFiles(const FileSet& files) { this->outputFiles = files; }
-    //void SetInput(ImageSetReaderBase* input) { this->input = input; }
     
     virtual void Update();
     
@@ -54,9 +47,6 @@ private:
     // Not implemented
     HornOpticalFlowPipeline(const Self& other);
     void operator=(const Self& other);
-    
-    //ImageSetReaderBase* input;
-    //FileSet outputFiles;
     
     unsigned int m_Iterations;
     float m_SpatialSigma;

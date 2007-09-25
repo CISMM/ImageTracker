@@ -3,6 +3,8 @@
 #include <string>
 
 #include "HornOpticalFlowImageFilter.h"
+#include "FileSet.h"
+#include "ImageSetReader.h"
 #include "ImageUtils.h"
 #include "Logger.h"
 

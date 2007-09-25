@@ -58,8 +58,14 @@ TARGET_LINK_LIBRARIES(mrflow ITCommon ITImage ITFilters ITPipelines)
 ADD_EXECUTABLE(flowerr ComputeFlowError.cxx)
 TARGET_LINK_LIBRARIES(flowerr ITCommon ITImage ITFilters)
 
+ADD_EXECUTABLE(integrate IntegrateFlowField.cxx)
+TARGET_LINK_LIBRARIES(integrate ITCommon ITImage ITFilters)
+
 ADD_EXECUTABLE(intflow IntegrateOpticalFlow.cxx)
 TARGET_LINK_LIBRARIES(intflow ITCommon ITImage ITFilters ITPipelines)
+
+ADD_EXECUTABLE(strain ComputeStrain.cxx)
+TARGET_LINK_LIBRARIES(strain ITCommon ITImage ITFilters ITPipelines)
 
 ADD_EXECUTABLE(applyscale ApplyScale.cxx)
 TARGET_LINK_LIBRARIES(applyscale ITCommon ITImage ITFilters)
@@ -90,9 +96,6 @@ TARGET_LINK_LIBRARIES(testfft ITCommon ITImage ITFilters)
         
 ADD_EXECUTABLE(testpad TestPadImageFilter.cxx)
 TARGET_LINK_LIBRARIES(testpad ITCommon ITImage ITFilters)
-
-ADD_EXECUTABLE(integrate IntegrateFlowField.cxx)
-TARGET_LINK_LIBRARIES(integrate ITCommon ITImage ITFilters)
 
 ADD_EXECUTABLE(datasource TestDataSource.cxx)
 TARGET_LINK_LIBRARIES(datasource ITCommon ITImage ITFilters ITGui)

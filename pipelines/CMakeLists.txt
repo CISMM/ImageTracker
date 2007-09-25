@@ -14,6 +14,7 @@ SET (Pipelines_SRCS
     MultiResolutionOpticalFlowPipeline.cxx  MultiResolutionOpticalFlowPipeline.h
     MultiResolutionRegistrationPipeline.cxx MultiResolutionRegistrationPipeline.h
     RemovePartialOcclusionsPipeline.cxx     RemovePartialOcclusionsPipeline.h
+    StrainTensorPipeline.cxx                StrainTensorPipeline.h
     TextPipelineObserver.cxx                TextPipelineObserver.h
 )
 

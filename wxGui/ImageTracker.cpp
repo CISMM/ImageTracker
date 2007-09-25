@@ -312,6 +312,7 @@ void ImageTracker::OnSelectDataSource(wxCommandEvent &event)
     
     // The visualization controls will always be placed in the first position of 
     // the visualization panel's sizer.
+    // But Windows prefers Clear() over Remove(idx)...why, we don't know.
     sizer->Clear(true);
     // sizer->Remove(0);
     sizer->Add(panel, 1, wxADJUST_MINSIZE|wxEXPAND, 0);

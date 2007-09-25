@@ -138,7 +138,7 @@ int main(int argc, char** argv)
         Logger::verbose << function << ": Gradient filter: " << i << std::endl;
         grad[i] = GradientType::New();
         grad[i]->SetInput(component[i]->GetOutput());
-        grad[i]->SetSigma(1.0);
+        grad[i]->SetSigma(strainSigma);
     }
     
     int steps = int ((timeEnd - timeStart) / timeStep);
