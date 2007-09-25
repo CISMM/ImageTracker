@@ -33,9 +33,10 @@
 int main(int argc, char** argv)
 {
     std::string function("ComputeFlowError");
-    if (argc < 8)
+    if (argc < 9)
     {
-        Logger::warning << "Usage:\n\t" << argv[0] << " dir imgFormat flowFormat start end errFormat meanErr [radius]" << std::endl;
+        Logger::warning << "Usage:\n\t" << argv[0] << " dir imgFormat flowFormat start end warpFormat errFormat meanErr [radius] [compareToFirst]"
+                << "\n\tcompareToFirst - 0 or 1; indicates whether to perform error comparison against the first image in the series (for net displacement fields)" << std::endl;
         exit(1);
     }
     
@@ -55,12 +56,15 @@ int main(int argc, char** argv)
     std::string flowFormat(argv[3]);
     int start = atoi(argv[4]);
     int end = atoi(argv[5]);
-    std::string errFormat(argv[6]);
-    std::string meanFile(argv[7]);
-    int radius = argc > 8 ? atoi(argv[8]) : 0;
+    std::string warpFormat(argv[6]);
+    std::string errFormat(argv[7]);
+    std::string meanFile(argv[8]);
+    int radius = argc > 9 ? atoi(argv[9]) : 0;
+    bool compareToFirst = argc > 10 ? (bool) atoi(argv[10]) : false;
     
     FileSet imageFiles(FilePattern(dir, imgFormat, start, end));
     FileSet flowFiles(FilePattern(dir, flowFormat, start, end-1));
+    FileSet warpFiles(FilePattern(dir, warpFormat, start, end-1));
     FileSet errorFiles(FilePattern(dir, errFormat, start, end-1));
     
     Logger::verbose << function << ": Setting up pipeline" << std::endl;
@@ -72,7 +76,6 @@ int main(int argc, char** argv)
     ROIType::Pointer roiWarp = ROIType::New();
     ErrorType::Pointer error = ErrorType::New();
     MeanType::Pointer mean = MeanType::New();
-    ThresholdType::Pointer threshold = ThresholdType::New();
     PSNRType::Pointer psnr = PSNRType::New();
     
     images[0]->Update();
@@ -82,26 +85,28 @@ int main(int argc, char** argv)
     roiOrig->SetRegionOfInterest(PadRegionByRadius(images[0]->GetLargestPossibleRegion(), radius));
     roiWarp->SetRegionOfInterest(PadRegionByRadius(images[0]->GetLargestPossibleRegion(), radius));
     
+    int cIdx = 0;
+    
     Logger::verbose << function << ": Computing error" << std::endl;
     for (int i = 0; i < flows.size(); i++)
     {
+        cIdx = compareToFirst ? 0 : i;
+        
         warp->SetInput(images[i+1]);
         warp->SetDeformationField(flows[i]);
-        roiOrig->SetInput(images[i]);
+        
+        roiOrig->SetInput(images[cIdx]);
         roiWarp->SetInput(warp->GetOutput());
         error->SetInput1(roiOrig->GetOutput());
         error->SetInput2(roiWarp->GetOutput());
-        WriteImage<InternalImageType, InputImageType>(error->GetOutput(), errorFiles[i]);
+        WriteImage<InternalImageType, InputImageType>(warp->GetOutput(), warpFiles[i], false);
+        WriteImage<InternalImageType, InternalImageType>(error->GetOutput(), errorFiles[i], false);
         mean->PushBackInput(error->GetOutput());
         
 //         PrintImageInfo<InternalImageType>(images[i], "Reference image");
 //         PrintImageInfo<InternalImageType>(images[i+1], "Moving image");
 //         PrintImageInfo(warp->GetOutput(), "Warped image");
 //         PrintImageInfo<FlowImageType>(flows[i], "Deformation image");
-        
-        char file[80];
-        sprintf(file, "warp-%04d.tif", i + start);
-        WriteImage<InternalImageType, InputImageType>(warp->GetOutput(), std::string(file), false);
         
         char msg[80];
         sprintf(msg, "Error image %4d", i);
@@ -110,16 +115,16 @@ int main(int argc, char** argv)
         // PSNR
         psnr->SetSourceImage(roiOrig->GetOutput());
         psnr->SetReconstructImage(roiWarp->GetOutput());
-        Logger::verbose << function << ": RMSE\t" << i << " - w:\t" << psnr->GetRMSE() << std::endl;
-        Logger::verbose << function << ": PSNR\t" << i << " - w:\t" << psnr->GetPSNR() << std::endl;
+        Logger::verbose << function << ": RMSE\tI(" << cIdx << ") - W(" << (i+1) << "):\t" << psnr->GetRMSE() << std::endl;
+        Logger::verbose << function << ": PSNR\tI(" << cIdx << ") - W(" << (i+1) << "):\t" << psnr->GetPSNR() << std::endl;
         
         // What would happen if we didn't compute flow?  Hopefully, we've gotten some improvement, right?
         roiWarp->SetInput(images[i+1]);
         // Not sure why, but update needs to be called on both of these filters
         roiWarp->Update(); 
         psnr->Update();
-        Logger::verbose << function << ": RMSE\t" << i << " - " << (i+1) << ":\t" << psnr->GetRMSE() << std::endl;
-        Logger::verbose << function << ": PSNR\t" << i << " - " << (i+1) << ":\t" << psnr->GetPSNR() << std::endl;
+        Logger::verbose << function << ": RMSE\tI(" << cIdx << ") - I(" << (i+1) << "):\t" << psnr->GetRMSE() << std::endl;
+        Logger::verbose << function << ": PSNR\tI(" << cIdx << ") - I(" << (i+1) << "):\t" << psnr->GetPSNR() << std::endl;
     }
     
     Logger::verbose << "Computing mean error" << std::endl;
@@ -127,10 +132,11 @@ int main(int argc, char** argv)
     
     PrintImageInfo(mean->GetOutput(), "Mean error");
     
-    threshold->SetInput(mean->GetOutput());
-    threshold->SetOutsideValue(std::numeric_limits<InputImageType::PixelType>::max());
-    threshold->ThresholdAbove(std::numeric_limits<InputImageType::PixelType>::max());
-    WriteImage<InternalImageType, InputImageType>(threshold->GetOutput(), meanFile);
+//     ThresholdType::Pointer threshold = ThresholdType::New();
+//     threshold->SetInput(mean->GetOutput());
+//     threshold->SetOutsideValue(std::numeric_limits<InputImageType::PixelType>::max());
+//     threshold->ThresholdAbove(std::numeric_limits<InputImageType::PixelType>::max());
+    WriteImage<InternalImageType>(mean->GetOutput(), meanFile);
     
     Logger::verbose << function << ": Done." << std::endl;
 }

@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "itkCastImageFilter.h"
 #include "itkImage.h"
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
@@ -102,20 +103,31 @@ template < class TImageIn, class TImageOut >
 void WriteImage(const TImageIn* image, const std::string& filename, bool rescale = true)
 {
     Logger::verbose << "Writing:\t" << filename << std::endl;
-    typedef itk::RescaleIntensityImageFilter< TImageIn, TImageOut > CastType;
+    typedef itk::RescaleIntensityImageFilter< TImageIn, TImageOut > RescaleType;
+    typedef itk::CastImageFilter< TImageIn, TImageOut > CastType;
     typedef itk::ImageFileWriter< TImageOut > WriterType;
     typedef typename TImageOut::PixelType OutputPixelType;
     
+    // We set up two pipelines, but we only execute one
     typename CastType::Pointer caster = CastType::New();
+    typename RescaleType::Pointer rescaler = RescaleType::New();
     typename WriterType::Pointer writer = WriterType::New();
     caster->SetInput(image);
-    writer->SetInput(caster->GetOutput());
+    rescaler->SetInput(image);
     writer->SetFileName(filename.c_str());
-    if (rescale)
+    
+    rescaler->SetOutputMinimum(std::numeric_limits<OutputPixelType>::min());
+    rescaler->SetOutputMaximum(std::numeric_limits<OutputPixelType>::max());
+    
+    if (rescale) // here we choose whether to rescale, or just cast
     {
-        caster->SetOutputMinimum(std::numeric_limits<OutputPixelType>::min());
-        caster->SetOutputMaximum(std::numeric_limits<OutputPixelType>::max());
+        writer->SetInput(rescaler->GetOutput());
     }
+    else
+    {
+        writer->SetInput(caster->GetOutput());
+    }
+    
     writer->Update();
 }
 
