@@ -107,11 +107,11 @@ void RungeKuttaSolver< TInput, TOutput, TDerivative >
     typedef typename InterpolateType::OutputType DerivativeValueType;
     
     // Allocate output buffer
-    Logger::verbose << function << ": Allocating output" << std::endl;
+    // Logger::verbose << function << ": Allocating output" << std::endl;
     Superclass::AllocateOutputs();
     
     // Grab inital image and final image
-    Logger::verbose << function << ": Retreiving input" << std::endl;
+    // Logger::verbose << function << ": Retreiving input" << std::endl;
     InputPointerType input = const_cast<InputImageType *>(this->GetInput());
     OutputPointerType output = this->GetOutput();
     
@@ -122,14 +122,14 @@ void RungeKuttaSolver< TInput, TOutput, TDerivative >
     }
     
     // Set up derivative interpolation
-    Logger::verbose << function << ": Setting up interpolator" << std::endl;
+    // Logger::verbose << function << ": Setting up interpolator" << std::endl;
     typename DerivativeType::SizeType dsize = this->GetDerivative()->GetLargestPossibleRegion().GetSize();
-    Logger::verbose << function << "Derivative size: " << dsize[0] << ", " << dsize[1] << ", " << dsize[2] << std::endl;
+    // Logger::verbose << function << ": Derivative size: " << dsize[0] << ", " << dsize[1] << ", " << dsize[2] << std::endl;
     typename InterpolateType::Pointer interpolate = InterpolateType::New();
     interpolate->SetInputImage(this->GetDerivative());
     
     // Determine the region over which to solve the differential equation
-    Logger::verbose << function << ": Setting up iterators" << std::endl;
+    // Logger::verbose << function << ": Setting up iterators" << std::endl;
     typename OutputImageType::RegionType outRegion = output->GetRequestedRegion();
     InputIteratorType inIt(input, outRegion);
     OutputIteratorType outIt(output, outRegion);
@@ -145,6 +145,14 @@ void RungeKuttaSolver< TInput, TOutput, TDerivative >
     unsigned int d;
     // Logger::verbose << function << ": Point dimension => " << pointDim << std::endl;
     
+    // We sometimes need a zero-value derivative for areas where the integration has pushed
+    // sample points outside of the derivative image buffer.
+    // TODO: Is there a more graceful and efficient way of doing this?  We could maybe pad the
+    // input derivative image, but how much would we pad it?
+    DerivativeValueType zero;
+    for (d = 0; d < pointDim-1; d++)
+        zero[d] = 0;
+
     // Compute RK4 at each image location
     for (inIt.GoToBegin(), outIt.GoToBegin();
          !(inIt.IsAtEnd() || outIt.IsAtEnd());
@@ -170,8 +178,9 @@ void RungeKuttaSolver< TInput, TOutput, TDerivative >
             dPoint[d] = xn[d];
         }
         dPoint[pointDim-1] = this->GetStartTime();
-        dValue = interpolate->Evaluate(dPoint);
-        // Logger::verbose << "Deriv (" << dPoint[0] << ", " << dPoint[1] << ", " << dPoint[2] << ") = (" << dValue[0] << ", " << dValue[1] << ")" << std::endl;
+        
+        dValue = interpolate->IsInsideBuffer(dPoint) ? interpolate->Evaluate(dPoint) : zero;
+        // Logger::verbose << function << ": Deriv (" << dPoint[0] << ", " << dPoint[1] << ", " << dPoint[2] << ") = (" << dValue[0] << ", " << dValue[1] << ")" << std::endl;
         
         for (d = 0; d < pointDim-1; d++)
         {
@@ -179,18 +188,18 @@ void RungeKuttaSolver< TInput, TOutput, TDerivative >
             dPoint[d] = xn[d] + 0.5 * k1[d];
         }
         dPoint[pointDim-1] = this->GetStartTime() + halfStep;
-        dValue = interpolate->Evaluate(dPoint);
+        dValue = interpolate->IsInsideBuffer(dPoint) ? interpolate->Evaluate(dPoint) : zero;
         
-        // Logger::verbose << "Deriv (" << dPoint[0] << ", " << dPoint[1] << ", " << dPoint[2] << ") = (" << dValue[0] << ", " << dValue[1] << ")" << std::endl;
+        // Logger::verbose << function << ": Deriv (" << dPoint[0] << ", " << dPoint[1] << ", " << dPoint[2] << ") = (" << dValue[0] << ", " << dValue[1] << ")" << std::endl;
         
         for (d = 0; d < pointDim-1; d++)
         {
             k2[d] = this->GetStepSize() * dValue[d];
             dPoint[d] = xn[d] + 0.5 * k2[d];
         }
-        dValue = interpolate->Evaluate(dPoint);
+        dValue = interpolate->IsInsideBuffer(dPoint) ? interpolate->Evaluate(dPoint) : zero;
         
-        // Logger::verbose << "Deriv (" << dPoint[0] << ", " << dPoint[1] << ", " << dPoint[2] << ") = (" << dValue[0] << ", " << dValue[1] << ")" << std::endl;
+        // Logger::verbose << function << ": Deriv (" << dPoint[0] << ", " << dPoint[1] << ", " << dPoint[2] << ") = (" << dValue[0] << ", " << dValue[1] << ")" << std::endl;
         
         for (d = 0; d < pointDim-1; d++)
         {
@@ -198,9 +207,9 @@ void RungeKuttaSolver< TInput, TOutput, TDerivative >
             dPoint[d] = xn[d] + k3[d];
         }
         dPoint[pointDim-1] = this->GetStartTime() + this->GetStepSize();
-        dValue = interpolate->Evaluate(dPoint);
+        dValue = interpolate->IsInsideBuffer(dPoint) ? interpolate->Evaluate(dPoint) : zero;
         
-        // Logger::verbose << "Deriv (" << dPoint[0] << ", " << dPoint[1] << ", " << dPoint[2] << ") = (" << dValue[0] << ", " << dValue[1] << ")" << std::endl;
+        // Logger::verbose << function << ": Deriv (" << dPoint[0] << ", " << dPoint[1] << ", " << dPoint[2] << ") = (" << dValue[0] << ", " << dValue[1] << ")" << std::endl;
         
         for (d = 0; d < pointDim-1; d++)
         {
@@ -212,6 +221,6 @@ void RungeKuttaSolver< TInput, TOutput, TDerivative >
         outIt.Set(outPixel);
     }
     
-    Logger::verbose << function << ": Grafting output" << std::endl;
+    // Logger::verbose << function << ": Grafting output" << std::endl;
     this->GraftOutput(output);
 }
