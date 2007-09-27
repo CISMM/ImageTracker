@@ -57,6 +57,7 @@ public:
         MENU_EXIT           = 1000,
         MENU_ABOUT,
         MENU_OPEN,
+        MENU_SAVE_IMAGES,
         MENU_OCCLUSIONS,
         MENU_STABILIZE,
         MENU_APPLY_TRANSFORM,
@@ -156,6 +157,7 @@ protected:
 
 public:
     void OnIdle(wxIdleEvent &event);
+    void OnSaveViewImages(wxCommandEvent &event);
     void OnOpen(wxCommandEvent &event);
     void OnExit(wxCommandEvent &event);
     void OnAbout(wxCommandEvent &event);

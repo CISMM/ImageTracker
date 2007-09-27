@@ -6,6 +6,8 @@
 
 #include "vtkInteractorStyleSwitch.h"
 
+#include "FilePattern.h"
+#include "FileSet.h"
 #include "ImageUtils.h"
 #include "Logger.h"
 #include "wxUtils.h"
@@ -27,6 +29,7 @@ bool ITApp::OnInit()
 BEGIN_EVENT_TABLE(ImageTracker, wxFrame)
     EVT_IDLE(           ImageTracker::OnIdle)
     EVT_MENU(MENU_OPEN, ImageTracker::OnOpen)
+    EVT_MENU(MENU_SAVE_IMAGES, ImageTracker::OnSaveViewImages)
     EVT_MENU(MENU_EXIT, ImageTracker::OnExit)
     EVT_MENU(MENU_ABOUT, ImageTracker::OnAbout)
     EVT_MENU(MENU_OCCLUSIONS, ImageTracker::OnOcclusions)
@@ -69,6 +72,14 @@ void ImageTracker::OnOpen(wxCommandEvent &event)
 {
     // Pass this off to another event handler
     this->OnAddDataSource(event);
+}
+
+void ImageTracker::OnSaveViewImages(wxCommandEvent &event)
+{
+    int start = this->sldImageIndex->GetMin();
+    int end = this->sldImageIndex->GetMax();
+    FileSet files(FilePattern(std::string("."), std::string("visualization-%04d.tif"), start, end));
+    ImageTrackerController::Instance()->SaveViewImages(files, start, end);
 }
 
 void ImageTracker::OnExit(wxCommandEvent &event)
@@ -486,6 +497,7 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     SetMenuBar(itMenuBar);
     wxMenu* menuFile = new wxMenu();
     menuFile->Append(MENU_OPEN, wxT("&Open"), wxT("Open a set of image files"), wxITEM_NORMAL);
+    menuFile->Append(MENU_SAVE_IMAGES, wxT("&Save View Images"), wxT("Save data visualizations as a set of images"), wxITEM_NORMAL);
     menuFile->Append(MENU_EXIT, wxT("E&xit"), wxT("Quit ImageTracker"), wxITEM_NORMAL);
     itMenuBar->Append(menuFile, wxT("&File"));
     wxMenu* menuEnhance = new wxMenu();
@@ -637,7 +649,7 @@ void ImageTracker::do_layout()
     panelRight->SetSizer(sizer_10);
     sizer_10->Fit(panelRight);
     sizer_10->SetSizeHints(panelRight);
-    vsplitDataView->SplitVertically(panelLeft, panelRight, 200);
+    vsplitDataView->SplitVertically(panelLeft, panelRight, 10);
     sizer_9->Add(vsplitDataView, 2, wxEXPAND, 0);
     panelMainUpper->SetAutoLayout(true);
     panelMainUpper->SetSizer(sizer_9);

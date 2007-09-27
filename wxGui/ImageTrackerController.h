@@ -118,6 +118,12 @@ public:
     
     bool IsControllerChanged();
     void SetIsControllerChanged(bool changed);
+    
+    /**
+     * Cycles through all frames of the data managed by this ImageTrackerControler,
+     * and saves them as tiffs in files specified by a FileSet.
+     */
+    void SaveViewImages(const FileSet& files, unsigned int start, unsigned int end);
 
 protected:
     // Making the New() method protected ensures this is a singleton.

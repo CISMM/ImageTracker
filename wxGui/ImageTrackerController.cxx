@@ -4,6 +4,10 @@
 
 #include <wx/thread.h>
 
+#include "vtkTIFFWriter.h"
+#include "vtkWindowToImageFilter.h"
+
+#include "FileSet.h"
 #include "ImageUtils.h"
 #include "GuiUtils.h"
 #include "Logger.h"
@@ -173,6 +177,33 @@ void ImageTrackerController::UpdateView()
         this->resetCamera = false;
     }
     this->GetRenderWindow()->Render();
+}
+
+void ImageTrackerController::SaveViewImages(const FileSet& files, unsigned int start, unsigned int end)
+{
+    // Create image saving pipeline
+    vtkWindowToImageFilter* capture = vtkWindowToImageFilter::New();
+    vtkTIFFWriter* writer = vtkTIFFWriter::New();
+    capture->SetInput(this->GetRenderWindow());
+    writer->SetInputConnection(capture->GetOutputPort());
+    writer->SetCompressionToNoCompression();
+    
+    // Save all specified frames
+    for (int i = start; i <= end && i-start < files.size(); i++)
+    {
+        this->SetFrameIndex(i);
+        this->UpdateView();
+        
+        // Required step: according to VTK docs, windowws don't get updated like other vtk objects
+        this->GetRenderWindow()->Modified();
+        capture->Modified();
+        writer->SetFileName(files[i-start].c_str());
+        writer->Update();
+    }
+    
+    // Clean up
+    capture->Delete();
+    writer->Delete();
 }
 
 void ImageTrackerController::SetRenderWindow(vtkRenderWindow* rw)
