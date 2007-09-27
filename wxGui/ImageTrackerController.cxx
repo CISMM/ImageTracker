@@ -4,9 +4,6 @@
 
 #include <wx/thread.h>
 
-#include "vtkTIFFWriter.h"
-#include "vtkWindowToImageFilter.h"
-
 #include "FileSet.h"
 #include "ImageUtils.h"
 #include "GuiUtils.h"
@@ -34,6 +31,12 @@ ImageTrackerController::ImageTrackerController() :
     this->renderer = NULL;
     this->renderWindow = NULL;
     this->parent = NULL;
+
+    // Setup view saving pipeline
+    this->capture = vtkWindowToImageFilter::New();
+    this->writer = vtkTIFFWriter::New();
+    this->writer->SetInputConnection(this->capture->GetOutputPort());
+    this->writer->SetCompressionToNoCompression();
 }
     
 ImageTrackerController::~ImageTrackerController()
@@ -45,6 +48,10 @@ ImageTrackerController::~ImageTrackerController()
     // Other components should delete these:
     this->parent = NULL;
     this->renderWindow = NULL;
+
+    // Delete our own vtk objects
+    this->capture->Delete();
+    this->writer->Delete();
 }
 
 bool ImageTrackerController::IsControllerChanged()
@@ -179,42 +186,24 @@ void ImageTrackerController::UpdateView()
     this->GetRenderWindow()->Render();
 }
 
-void ImageTrackerController::SaveViewImages(const FileSet& files, unsigned int start, unsigned int end)
+void ImageTrackerController::SaveViewImage(const std::string& fileName)
 {
-    // Create image saving pipeline
-    vtkWindowToImageFilter* capture = vtkWindowToImageFilter::New();
-    vtkTIFFWriter* writer = vtkTIFFWriter::New();
-    capture->SetInput(this->GetRenderWindow());
-    writer->SetInputConnection(capture->GetOutputPort());
-    writer->SetCompressionToNoCompression();
-    
-    // Save all specified frames
-    for (int i = start; i <= end && i-start < files.size(); i++)
-    {
-        this->SetFrameIndex(i);
-        this->UpdateView();
-        
-        // Required step: according to VTK docs, windowws don't get updated like other vtk objects
-        this->GetRenderWindow()->Modified();
-        capture->Modified();
-        writer->SetFileName(files[i-start].c_str());
-        writer->Update();
-    }
-    
-    // Clean up
-    capture->Delete();
-    writer->Delete();
+    this->GetRenderWindow()->Modified();
+    this->capture->Modified();
+    writer->SetFileName(fileName.c_str());
+    writer->Update();
 }
 
 void ImageTrackerController::SetRenderWindow(vtkRenderWindow* rw)
 {
     this->renderWindow = rw;
     this->renderWindow->AddRenderer(this->GetRenderer());
+    this->capture->SetInput(this->renderWindow);
 }
 
 vtkRenderWindow* ImageTrackerController::GetRenderWindow()
 { 
-    return this->renderWindow; 
+    return this->renderWindow;
 }
 
 vtkRenderer* ImageTrackerController::GetRenderer()

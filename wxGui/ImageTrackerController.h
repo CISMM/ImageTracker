@@ -13,6 +13,8 @@
 
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
+#include "vtkTIFFWriter.h"
+#include "vtkWindowToImageFilter.h"
 
 #include "DataSource.h"
 #include "ItkVtkPipeline.h"
@@ -72,6 +74,8 @@ public:
      * to the index into the list of DataSources managed by this controller.)
      */
     void SetFrameIndex(unsigned int index);
+
+    unsigned int GetFrameIndex() { return this->frameIndex; }
     
     /**
      * Sets the index of the active DataSource managed by this controller.
@@ -123,7 +127,7 @@ public:
      * Cycles through all frames of the data managed by this ImageTrackerControler,
      * and saves them as tiffs in files specified by a FileSet.
      */
-    void SaveViewImages(const FileSet& files, unsigned int start, unsigned int end);
+    void SaveViewImage(const std::string& fileName);
 
 protected:
     // Making the New() method protected ensures this is a singleton.
@@ -155,6 +159,10 @@ private:
 
     // The VTK RenderWindow that houses the vtk renderer.
     vtkRenderWindow* renderWindow;
+
+    // Objects for saving view images to disk
+    vtkWindowToImageFilter* capture;
+    vtkTIFFWriter* writer;
 
     // The wxWidgets window that created this controller.
     wxWindow* parent;

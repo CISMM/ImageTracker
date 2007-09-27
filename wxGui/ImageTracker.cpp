@@ -76,14 +76,17 @@ void ImageTracker::OnOpen(wxCommandEvent &event)
 
 void ImageTracker::OnSaveViewImages(wxCommandEvent &event)
 {
-    int start = this->sldImageIndex->GetMin();
-    int end = this->sldImageIndex->GetMax();
-    FileSet files(FilePattern(std::string("."), std::string("visualization-%04d.tif"), start, end));
-    ImageTrackerController::Instance()->SaveViewImages(files, start, end);
+    Logger::info << "Please do not put anything on top of the image window while the visualizations are being saved!" << std::endl;
+    this->SetPlayState(AboutToRecord);
 }
 
 void ImageTracker::OnExit(wxCommandEvent &event)
 {
+    // It seems the contents of the visualization panel sizer
+    // may not get deleted properly, because the app started crashing
+    // on exit on Windows when this was added.
+    // wxSizer* sizer = this->panelVisualization->GetSizer();
+    // sizer->Clear(true);
     this->Destroy();
 }
 
@@ -405,6 +408,34 @@ void ImageTracker::UpdatePlayState()
     // based on the current state; like a state machine.
     switch (this->GetPlayState())
     {
+    case AboutToRecord:
+        if (maxIdx > 0) // when no data is loaded, max idx is negative
+        {
+            this->sldImageIndex->SetValue(0);
+            ImageTrackerController::Instance()->SetFrameIndex(0);
+            this->SetPlayState(Record);
+        }
+        else
+        {
+            this->SetPlayState(Pause);
+        }
+        break;
+    case Record:
+        // Save the current view image
+        char fileName[80];
+        sprintf(fileName, saveFormat.c_str(), ImageTrackerController::Instance()->GetFrameIndex());
+        ImageTrackerController::Instance()->SaveViewImage(std::string(fileName));
+        if (idx < maxIdx)
+        {
+            this->sldImageIndex->SetValue(idx+1);
+            ImageTrackerController::Instance()->SetFrameIndex(idx+1);
+        }
+        else // done recording
+        {
+            Logger::info << "Finished saving view images" << std::endl;
+            this->SetPlayState(Pause);
+        }
+        break;
     case Play:      // advance one frame
         if (idx < maxIdx)
         {
@@ -544,6 +575,7 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     // Initialize play state
     this->SetPlayState(Pause);
     this->loopPlay = true;
+    this->saveFormat = "visualization-%04d.tif";
 
     // Select log level, and redirect output to log panel
     menuHelp->Check(MENU_LOG_INFO, true);

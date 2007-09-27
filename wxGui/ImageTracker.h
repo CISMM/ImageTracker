@@ -87,7 +87,9 @@ public:
         Play,
         Rewind,
         SkipFirst,
-        SkipLast
+        SkipLast,
+        AboutToRecord,
+        Record
     };
     
     /**
@@ -117,6 +119,7 @@ private:
     wxStreamToTextRedirector* coutRedirect;
     PlayState playState;
     bool loopPlay;
+    std::string saveFormat;
     
 protected:
     // begin wxGlade: ImageTracker::attributes
