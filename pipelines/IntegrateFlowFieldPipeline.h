@@ -34,7 +34,7 @@ public:
     
 protected:
     IntegrateFlowFieldPipeline():
-        m_StepSize(0.1)
+        m_StepSize(0.5)
     {}
     
     virtual ~IntegrateFlowFieldPipeline(){}

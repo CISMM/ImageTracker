@@ -49,44 +49,30 @@ ENDIF(CMAKE_USE_PTHREADS_INIT)
 
 #######################################
 # Personal filter library and support classes.
+#
+# ImageTracker is split up into several logical groups.
+# Common    - contains application architecture components
+# Image     - contains image handling components
+# Filters   - contains image processing filters--typically ITK-based templated classes
+# Pipelines - contains classes that perform specific image processing tasks on sets of
+# images--this usually combines multiple itk and custom filters
 #######################################
 INCLUDE_DIRECTORIES (
-	${ImageTracker_SOURCE_DIR}/common
-	${ImageTracker_SOURCE_DIR}/image
-	${ImageTracker_SOURCE_DIR}/filters
-        ${ImageTracker_SOURCE_DIR}/pipelines)
+    ${ImageTracker_SOURCE_DIR}/common
+    ${ImageTracker_SOURCE_DIR}/image
+    ${ImageTracker_SOURCE_DIR}/filters
+    ${ImageTracker_SOURCE_DIR}/pipelines)
 SUBDIRS (common image filters pipelines)
 
 #######################################
-# Image processing library
+# Windowing components and executables
 #######################################
-SET (Algorithms_SRCS
-    BlurFilterSchedule.cxx                      BlurFilterSchedule.h
-    DemonsPipeline.cxx                          DemonsPipeline.h
-                                                Feature.h
-    FeatureTrackingPipeline.cxx                 FeatureTrackingPipeline.h
-    GlobalRegistrationPipeline.cxx              GlobalRegistrationPipeline.h
-    HarrisFeatureDetector.cxx                   HarrisFeatureDetector.h
-    ImageRegistration.cxx                       ImageRegistration.h
-    ImageStatistics.cxx                         ImageStatistics.h
-    MultiRegionRegistration.cxx                 MultiRegionRegistration.h
-    MultiRegionRegistrationPipeline.cxx         MultiRegionRegistrationPipeline.h
-                                                MultiResolutionRegistration.h
-    RegistrationOutput.cxx                      RegistrationOutput.h
-)
-
-ADD_LIBRARY(ITAlgorithms ${Algorithms_SRCS})
-TARGET_LINK_LIBRARIES(ITAlgorithms ITCommon ITImage ITFilters ITKCommon ITKBasicFilters ITKIO ITKAlgorithms )
-
 INCLUDE_DIRECTORIES(
     ${ImageTracker_SOURCE_DIR}
     ${ImageTracker_SOURCE_DIR}/apps
     ${ImageTracker_SOURCE_DIR}/vtkView 
     ${ImageTracker_SOURCE_DIR}/wxGui )
 
-#######################################
-# Windowing components and executables
-#######################################
 SUBDIRS(vtkView wxGui apps)
 
 #######################################

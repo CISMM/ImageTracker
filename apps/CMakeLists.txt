@@ -5,7 +5,7 @@ PROJECT (apps)
 ##############################
 
 ADD_EXECUTABLE(transform TransformImages.cxx)
-TARGET_LINK_LIBRARIES(transform ITFilters ITImage ITAlgorithms ITPipelines)
+TARGET_LINK_LIBRARIES(transform ITFilters ITImage ITPipelines)
 
 ADD_EXECUTABLE(translate TranslationGenerator.cxx)
 TARGET_LINK_LIBRARIES(translate ITFilters)
@@ -120,8 +120,5 @@ IF (WIN32)
     # SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:msvcrt")
 ENDIF (WIN32)
 
-ADD_EXECUTABLE(viewer ${GUI_EXE} VtkViewerApp.cxx)
-TARGET_LINK_LIBRARIES(viewer ITView)
-
 ADD_EXECUTABLE(ImageTracker ${GUI_EXE} ImageTrackerApp.cxx)
-TARGET_LINK_LIBRARIES(ImageTracker ITCommon ITImage ITFilters ITAlgorithms ITPipelines ITView ITGui)
+TARGET_LINK_LIBRARIES(ImageTracker ITCommon ITImage ITFilters ITPipelines ITView ITGui)

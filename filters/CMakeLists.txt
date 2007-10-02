@@ -23,11 +23,11 @@ LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
 # The ITK libraries seem to be buggy (e.g. two forward transforms do not yeild the same image)
 #######################################
 IF (WIN32)
-INCLUDE_DIRECTORIES(C:/Nano/bin/fftw)
-LINK_DIRECTORIES(C:/Nano/bin/fftw)
-SET (FFTW_LIBS  libfftw3l-3 libfftw3f-3)
+    INCLUDE_DIRECTORIES(C:/Nano/bin/fftw)
+    LINK_DIRECTORIES(C:/Nano/bin/fftw)
+    SET (FFTW_LIBS  libfftw3l-3 libfftw3f-3)
 ELSE (WIN32)
-LINK_LIBRARIES(fftw3 fftw3f)
+    LINK_LIBRARIES(fftw3 fftw3f)
 ENDIF (WIN32)
 
 # Note: the Dummy.cpp file is here to force cmake to use c++ linking for this project
@@ -50,6 +50,7 @@ SET (Filters_SRCS
                             LocalContrastImageFilter.h
                             ModulateRegionImageFilter.h
                             MultiResolutionOpticalFlowMethod.h
+                            MultiResolutionRegistration.h
                             NaryMeanImageFilter.h
                             NaryMeanVectorImageFilter.h
                             NaryMedianImageFilter.h

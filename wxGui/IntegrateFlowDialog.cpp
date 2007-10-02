@@ -78,7 +78,7 @@ IntegrateFlowDialog::IntegrateFlowDialog(wxWindow* parent, int id, const wxStrin
     // end wxGlade
     
     this->pipeline = IntegrateFlowFieldPipeline::New();
-    this->slideStepSize->SetRange(0.01, 1.0, 0.01);
+    this->slideStepSize->SetRange(0.1, 1.0, 0.1);
     this->slideStepSize->SetValue(0.5);
 }
 
