@@ -11,14 +11,40 @@
 #include "wxUtils.h"
 
 wxMutex ImageTrackerController::s_ControllerMutex;
-ImageTrackerController::Pointer ImageTrackerController::s_instance;
 
 ImageTrackerController::Pointer ImageTrackerController::Instance()
 {
-    if (ImageTrackerController::s_instance.IsNull())
-        ImageTrackerController::s_instance = ImageTrackerController::New();
+    // The singleton instance of this controller
+    // Note that making this method-static means we have to be sure
+    // to call DeleteInstance() when the application closes!!!
+    static ImageTrackerController::Pointer s_instance;
+
+    if (s_instance.IsNull())
+        s_instance = ImageTrackerController::New();
     
-    return ImageTrackerController::s_instance;
+    return s_instance;
+}
+
+void ImageTrackerController::DeleteInstance()
+{
+    ImageTrackerController::Pointer instance = ImageTrackerController::Instance();
+    
+    instance->datavis.clear();
+    
+    // Because the visualization capture filter has a reference to the renderer
+    // window, if the renderer window is deleted first, we get a seg fault for 
+    // trying to delete an object with non-zero reference count.  
+    // So, here we reset the input to the capture object.  This method should 
+    // be called before the renderer window is deleted.
+    if (instance->capture)
+        instance->capture->SetInput(NULL);
+    
+    // Delete the vtk renderer, which we create
+    if (instance->renderer)
+        instance->renderer->Delete();
+
+    instance->renderWindow = NULL;
+    instance = NULL;
 }
 
 ImageTrackerController::ImageTrackerController() :
@@ -31,7 +57,6 @@ ImageTrackerController::ImageTrackerController() :
 {
     this->renderer = NULL;
     this->renderWindow = NULL;
-    this->parent = NULL;
 
     // Setup view saving pipeline
     this->capture = vtkWindowToImageFilter::New();
@@ -42,31 +67,6 @@ ImageTrackerController::ImageTrackerController() :
     
 ImageTrackerController::~ImageTrackerController()
 {
-    // Delete our own vtk objects
-    if (this->writer)
-        this->writer->Delete();
-    if (this->capture)
-        this->capture->Delete();
-    if (this->renderer)
-        this->renderer->Delete();
-    
-    this->datavis.clear();
-    
-    // Other components should delete these:
-    this->parent = NULL;
-    this->renderWindow = NULL;
-}
-
-void ImageTrackerController::FreeResources()
-{
-    // There is a problem with deleting the objects related to this resource.
-    // Because the visualization capture filter has a reference to the renderer
-    // window, if the renderer window is deleted first, we get a seg fault for 
-    // trying to delete an object with non-zero reference count.  
-    // So, here we reset the input to the caputre object.  This method should 
-    // be called before the renderer window is deleted.
-    if (this->capture)
-        this->capture->SetInput(NULL);
 }
 
 bool ImageTrackerController::IsDataChanged()
@@ -168,11 +168,6 @@ unsigned int ImageTrackerController::GetMaxSize()
 unsigned int ImageTrackerController::GetMaxIndex()
 {
     return this->GetMaxSize() - 1;
-}
-
-void ImageTrackerController::SetParent(wxWindow* parent)
-{
-    this->parent = parent;
 }
 
 /**

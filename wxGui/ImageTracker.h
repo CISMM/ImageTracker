@@ -38,24 +38,7 @@ public:
 
     ImageTracker(wxWindow* parent, int id, const wxString& title, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_FRAME_STYLE);
 
-    virtual ~ImageTracker()
-    {
-        this->rwiView->Delete();
-
-        // Not sure why we have to do this...seems to be only on Windows.
-        // wx should be deleting all child objects, which these dialogs are.
-        // But, without deleting these, the ImageTracker app sticks around
-        // after closing.
-        delete dlgDataSource;
-        delete dlgRemoveOcclusions;
-        delete dlgRegistration;
-        delete dlgApplyTransform;
-        delete dlgCLGOpticFlow;
-        delete dlgHornOpticalFlow;
-        delete dlgIntegrateFlow;
-        delete dlgSaveVisualization;
-        delete dlgAbout;
-    }
+    virtual ~ImageTracker();
     
     enum IDs
     { 

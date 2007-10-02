@@ -7,7 +7,6 @@
 #include <wx/arrstr.h>
 #include <wx/event.h>
 #include <wx/thread.h>
-#include <wx/window.h>
 
 #include "itkLightObject.h"
 
@@ -20,13 +19,25 @@
 #include "ItkVtkPipeline.h"
 
 /**
- * /class ImageTrackerController
- * /brief Key moderator of the ImageTracker application.
+ * \class ImageTrackerController
+ * \brief Key moderator of the ImageTracker application.
+ *
  * Maintains data sources and visualization pipelines. Provides methods for
  * querying and managing the data and visualization objects that exist in
  * the system. This object is a singleton--only one of these is
  * expected to exist at a time, and many objects need to access controller
  * methods for dealing with rendering and obtaining data objects.
+ *
+ * The singleton implementation of this ImageTrackerController is method-static.
+ * That is, the singleton object returned is a static variable in the Instance()
+ * method. For this reason, DeleteInstance() needs to be called at a "safe" time
+ * when the application is closing. A safe time means when the data and visualization
+ * objects to which this controller refers can be cleaned up.
+ *
+ * This implementation was adopted after the global static approach was found to fail
+ * on Windows platforms.  As the datavis pair was being cleared, itk would request
+ * Mutex locks to delete these objects.  These requests failed, presumably because the
+ * application was shutting down.
  */
 class ImageTrackerController :
     public itk::LightObject
@@ -47,6 +58,12 @@ public:
      * Obtain the singleton instance of this ImageTrackerController.
      */
     static ImageTrackerController::Pointer Instance();
+
+    /**
+     * Delete the singleton instance of this ImageTrackerController. Use this method carefully--
+     * typically, right before the application closes.
+     */
+    static void DeleteInstance();
     
     /**
      * Retrieves a reference to the DataSource at the specified index.
@@ -102,11 +119,6 @@ public:
     vtkRenderWindow* GetRenderWindow();
     
     /**
-     * Sets the ImageTracker window referring to this controller.
-     */
-    void SetParent(wxWindow* parent);
-    
-    /**
      * Populate a list of the data sources managed by this controller.  We
      * use a wxArrayString for using this list in wx widgets.
      */
@@ -133,11 +145,6 @@ public:
      * and saves them as tiffs in files specified by a FileSet.
      */
     void SaveViewImage(const std::string& fileName);
-    
-    /**
-     * Free the application resources held onto by this ImageTrackerController.
-     */
-    void FreeResources();
 
 protected:
     // Making the New() method protected ensures this is a singleton.
@@ -183,7 +190,4 @@ private:
     bool isIndexChanged;
     
     static wxMutex s_ControllerMutex;
-    
-    /// The singleton instance of this controller
-    static ImageTrackerController::Pointer s_instance;
 };

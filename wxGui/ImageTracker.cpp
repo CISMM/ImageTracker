@@ -16,7 +16,7 @@ static const std::string APP_NAME("ImageTracker");
 static const std::string APP_VERSION("v 2.06");
 static const std::string APP_AUTHOR("Brian Eastwood");
 static const std::string APP_COPYRIGHT("(c) 2007");
-static const std::string APP_WEBSITE("http://www.cs.unc.edu/research/Nano/imagetracker");
+static const std::string APP_WEBSITE("http://www.cs.unc.edu/Research/nano/cismm/download/imagetracker");
 
 bool ITApp::OnInit()
 {
@@ -98,17 +98,13 @@ bool ImageTracker::Destroy()
     // We need to tell the ImageTrackerController isntance that we are
     // closing first, because it's a static object that holds onto
     // application resources.
-    ImageTrackerController::Instance()->FreeResources();
+    ImageTrackerController::DeleteInstance();
     wxFrame::Destroy();
+    return true;
 }
 
 void ImageTracker::OnExit(wxCommandEvent &event)
 {
-    // It seems the contents of the visualization panel sizer
-    // may not get deleted properly, because the app started crashing
-    // on exit on Windows when this was added.
-    // wxSizer* sizer = this->panelVisualization->GetSizer();
-    // sizer->Clear(true);
     this->Destroy();
 }
 
@@ -578,6 +574,27 @@ void ImageTracker::UpdateDataSources()
     }
 }
 
+ImageTracker::~ImageTracker()
+{
+    if (this->rwiView)
+        this->rwiView->Delete();
+
+    // Not sure why we have to do this...seems to be only on Windows.
+    // wx should be deleting all child objects, which these dialogs are.
+    // But, without deleting these, the ImageTracker app sticks around
+    // after closing.
+    delete dlgDataSource;
+    delete dlgRemoveOcclusions;
+    delete dlgRegistration;
+    delete dlgApplyTransform;
+    delete dlgCLGOpticFlow;
+    delete dlgHornOpticalFlow;
+    delete dlgIntegrateFlow;
+    delete dlgSaveVisualization;
+    delete dlgAbout;
+}
+
+
 ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, const wxPoint& pos, const wxSize& size, long style):
     wxFrame(parent, id, title, pos, size, wxDEFAULT_FRAME_STYLE)
 {
@@ -678,7 +695,6 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     this->rwiView->SetInteractorStyle(inter);
     
     // Set up the ImageTracker controller
-    ImageTrackerController::Instance()->SetParent(this);
     ImageTrackerController::Instance()->SetRenderWindow(this->rwiView->GetRenderWindow());
     
     // This is pretty messed up right here.  Windows complains if the choices array for a
