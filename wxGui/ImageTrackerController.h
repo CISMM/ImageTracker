@@ -77,6 +77,8 @@ public:
 
     unsigned int GetFrameIndex() { return this->frameIndex; }
     
+    unsigned int GetMaxIndex();
+    
     /**
      * Sets the index of the active DataSource managed by this controller.
      */
@@ -120,14 +122,22 @@ public:
      */
     void Render();
     
-    bool IsControllerChanged();
-    void SetIsControllerChanged(bool changed);
+    bool IsIndexChanged();
+    void SetIsIndexChanged(bool changed);
+    
+    bool IsDataChanged();
+    void SetIsDataChanged(bool changed);
     
     /**
      * Cycles through all frames of the data managed by this ImageTrackerControler,
      * and saves them as tiffs in files specified by a FileSet.
      */
     void SaveViewImage(const std::string& fileName);
+    
+    /**
+     * Free the application resources held onto by this ImageTrackerController.
+     */
+    void FreeResources();
 
 protected:
     // Making the New() method protected ensures this is a singleton.
@@ -168,7 +178,10 @@ private:
     wxWindow* parent;
 
     // A flag indicating if this controller has new data sources.
-    bool isControllerChanged;
+    bool isDataChanged;
+    // A flag indicating if the controller's index has changed recently
+    bool isIndexChanged;
+    
     static wxMutex s_ControllerMutex;
     
     /// The singleton instance of this controller

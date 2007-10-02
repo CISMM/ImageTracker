@@ -11,7 +11,7 @@ SET (Gui_SRCS
     CLGOpticFlowDialog.cpp                      CLGOpticFlowDialog.h
     DataSourceDialog.cpp                        DataSourceDialog.h
     DoubleSlider.cxx                            DoubleSlider.h
-    wxDoubleSlider.cxx                          wxDoubleSlider.h
+    wxDoubleSlider.cpp                          wxDoubleSlider.h
     EmptyVisualizationControl.cpp               EmptyVisualizationControl.h
     FileSetDialog.cxx                           FileSetDialog.h
     GlobalRegistrationDialog.cxx                GlobalRegistrationDialog.h
@@ -22,12 +22,14 @@ SET (Gui_SRCS
     ImageTrackerController.cxx                  ImageTrackerController.h
 #    ImageViewer.cxx                             ImageViewer.h
     ItkVtkPipeline.cxx                          ItkVtkPipeline.h
-    wxIntSlider.cxx                             wxIntSlider.h
+    wxIntSlider.cpp                             wxIntSlider.h
+    IntegrateFlowDialog.cpp                     IntegrateFlowDialog.h
     LoggerPanel.cxx                             LoggerPanel.h
     MultiResolutionRegistrationDialog.cpp	    MultiResolutionRegistrationDialog.h
     PipelineExecutor.cxx                        PipelineExecutor.h
     RegistrationDesign_wdr.cpp                  RegistrationDesign_wdr.h
     RemoveOcclusionsDialog.cpp                  RemoveOcclusionsDialog.h
+    SaveVisualizationDialog.cpp                 SaveVisualizationDialog.h
     ScalarImageControlPanel.cpp                 ScalarImageControlPanel.h
     ScalarImageItkVtkPipeline.cxx               ScalarImageItkVtkPipeline.h
     VectorGlyphPipeline.cxx                     VectorGlyphPipeline.h

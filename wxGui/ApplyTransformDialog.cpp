@@ -82,8 +82,6 @@ BEGIN_EVENT_TABLE(ApplyTransformDialog, wxDialog)
     // begin wxGlade: ApplyTransformDialog::event_table
     EVT_BUTTON(BTN_BROWSE_TRANSFORM, ApplyTransformDialog::OnBrowseTransform)
     EVT_BUTTON(BTN_BROWSE_DIRECTORY, ApplyTransformDialog::OnBrowseDirectory)
-    EVT_BUTTON(wxID_OK, ApplyTransformDialog::OnRun)
-    EVT_BUTTON(wxID_CANCEL, ApplyTransformDialog::OnHide)
     // end wxGlade
 END_EVENT_TABLE();
 
@@ -103,16 +101,6 @@ void ApplyTransformDialog::OnBrowseDirectory(wxCommandEvent &event)
     {
 		this->textDirectory->SetValue(dir.GetPath().Append(std2wx(FileSet::PATH_DELIMITER)));
     }
-}
-
-void ApplyTransformDialog::OnRun(wxCommandEvent &event)
-{
-	event.Skip();
-}
-
-void ApplyTransformDialog::OnHide(wxCommandEvent &event)
-{
-	event.Skip();
 }
 
 // wxGlade: add ApplyTransformDialog event handlers

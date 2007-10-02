@@ -18,8 +18,11 @@
 #include "DataSourceDialog.h"
 #include "HornOpticalFlowDialog.h"
 #include "ImageTrackerController.h"
+#include "IntegrateFlowDialog.h"
 #include "MultiResolutionRegistrationDialog.h"
 #include "RemoveOcclusionsDialog.h"
+#include "SaveVisualizationDialog.h"
+#include "wxIntSlider.h"
 #include "wxVTKRenderWindowInteractor.h"
 
 class ITApp : public wxApp
@@ -49,6 +52,8 @@ public:
         delete dlgApplyTransform;
         delete dlgCLGOpticFlow;
         delete dlgHornOpticalFlow;
+        delete dlgIntegrateFlow;
+        delete dlgSaveVisualization;
         delete dlgAbout;
     }
     
@@ -63,6 +68,7 @@ public:
         MENU_APPLY_TRANSFORM,
         MENU_CLG_OPTIC_FLOW,
         MENU_HORN_OPTICAL_FLOW,
+        MENU_INTEGRATE_FLOW,
         MENU_IMAGE_INFO,
         MENU_LOG_ERROR,
         MENU_LOG_WARN,
@@ -72,9 +78,11 @@ public:
         BTN_ADD_DATASOURCE  = 2000,
         BTN_REMOVE_DATASOURCE,
         BTN_FIRST,
+        BTN_PREVIOUS,
         BTN_REWIND,
         BTN_PAUSE,
         BTN_PLAY,
+        BTN_NEXT,
         BTN_LAST,
         LBX_DATASOURCES,
         SLD_IMAGE_INDEX
@@ -86,6 +94,7 @@ public:
         Pause = 0,
         Play,
         Rewind,
+        GoToFrame,
         SkipFirst,
         SkipLast,
         AboutToRecord,
@@ -103,6 +112,9 @@ public:
     PlayState GetPlayState() { return this->playState; }
     void SetPlayState(PlayState state) { this->playState = state; }
     
+    // We override Destroy to make sure we clean up resources in the right order.
+    virtual bool Destroy();
+    
 private:
     // begin wxGlade: ImageTracker::methods
     void set_properties();
@@ -115,11 +127,17 @@ private:
     ApplyTransformDialog* dlgApplyTransform;
     CLGOpticFlowDialog* dlgCLGOpticFlow;
     HornOpticalFlowDialog* dlgHornOpticalFlow;
+    IntegrateFlowDialog* dlgIntegrateFlow;
+    SaveVisualizationDialog* dlgSaveVisualization;
     AboutDialog* dlgAbout;
     wxStreamToTextRedirector* coutRedirect;
     PlayState playState;
     bool loopPlay;
+    int targetFrame;
+    
     std::string saveFormat;
+    unsigned int saveFrom;
+    unsigned int saveTo;
     
 protected:
     // begin wxGlade: ImageTracker::attributes
@@ -136,11 +154,13 @@ protected:
     wxSplitterWindow* hsplitSourceVisControl;
     wxPanel* panelLeft;
     wxVTKRenderWindowInteractor* rwiView;
-    wxSlider* sldImageIndex;
+    wxIntSlider* sldImageIndex;
     wxButton* btnFirst;
+    wxButton* btnPrevious;
     wxButton* btnRewind;
     wxButton* btnPause;
     wxButton* btnPlay;
+    wxButton* btnNext;
     wxButton* btnLast;
     wxPanel* panelRight;
     wxSplitterWindow* vsplitDataView;
@@ -169,18 +189,21 @@ public:
     void OnApplyTransform(wxCommandEvent &event);
     void OnCLGOpticFlow(wxCommandEvent &event);
     void OnHornOpticalFlow(wxCommandEvent &event);
+    void OnIntegrateFlow(wxCommandEvent &event);
     void OnLoggingMenu(wxCommandEvent &event);
     void OnImageInfo(wxCommandEvent &event);
+    void OnImageIndex(wxCommandEvent &event);
     void OnAddDataSource(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnRemoveDataSource(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnEditDataSource(wxCommandEvent &event); // wxGlade: <event_handler>
-    void OnImageIndexScroll(wxScrollEvent &event); // wxGlade: <event_handler>
     void OnPlay(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnFirstFrame(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnRewind(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnLastFrame(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnPause(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnSelectDataSource(wxCommandEvent &event); // wxGlade: <event_handler>
+    void OnPrevious(wxCommandEvent &event); // wxGlade: <event_handler>
+    void OnNext(wxCommandEvent &event); // wxGlade: <event_handler>
 }; // wxGlade: end class
 
 

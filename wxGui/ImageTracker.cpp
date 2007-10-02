@@ -13,10 +13,10 @@
 #include "wxUtils.h"
 
 static const std::string APP_NAME("ImageTracker");
-static const std::string APP_VERSION("v 2.05");
+static const std::string APP_VERSION("v 2.06");
 static const std::string APP_AUTHOR("Brian Eastwood");
 static const std::string APP_COPYRIGHT("(c) 2007");
-static const std::string APP_WEBSITE("http://www.cs.unc.edu/research/Nano/ImageTracker");
+static const std::string APP_WEBSITE("http://www.cs.unc.edu/research/Nano/imagetracker");
 
 bool ITApp::OnInit()
 {
@@ -37,34 +37,41 @@ BEGIN_EVENT_TABLE(ImageTracker, wxFrame)
     EVT_MENU(MENU_APPLY_TRANSFORM, ImageTracker::OnApplyTransform)
     EVT_MENU(MENU_CLG_OPTIC_FLOW, ImageTracker::OnCLGOpticFlow)
     EVT_MENU(MENU_HORN_OPTICAL_FLOW, ImageTracker::OnHornOpticalFlow)
+    EVT_MENU(MENU_INTEGRATE_FLOW, ImageTracker::OnIntegrateFlow)
     EVT_MENU(MENU_IMAGE_INFO, ImageTracker::OnImageInfo)
     EVT_MENU(MENU_LOG_ERROR, ImageTracker::OnLoggingMenu)
     EVT_MENU(MENU_LOG_WARN, ImageTracker::OnLoggingMenu)
     EVT_MENU(MENU_LOG_INFO, ImageTracker::OnLoggingMenu)
     EVT_MENU(MENU_LOG_DEBUG, ImageTracker::OnLoggingMenu)
     EVT_MENU(MENU_LOG_VERBOSE, ImageTracker::OnLoggingMenu)
+    EVT_SLIDER(SLD_IMAGE_INDEX, ImageTracker::OnImageIndex)
     // begin wxGlade: ImageTracker::event_table
     EVT_LISTBOX_DCLICK(LBX_DATASOURCES, ImageTracker::OnEditDataSource)
     EVT_LISTBOX(LBX_DATASOURCES, ImageTracker::OnSelectDataSource)
     EVT_BUTTON(BTN_ADD_DATASOURCE, ImageTracker::OnAddDataSource)
     EVT_BUTTON(BTN_REMOVE_DATASOURCE, ImageTracker::OnRemoveDataSource)
-    EVT_COMMAND_SCROLL(SLD_IMAGE_INDEX, ImageTracker::OnImageIndexScroll)
     EVT_BUTTON(BTN_FIRST, ImageTracker::OnFirstFrame)
+    EVT_BUTTON(BTN_PREVIOUS, ImageTracker::OnPrevious)
     EVT_BUTTON(BTN_REWIND, ImageTracker::OnRewind)
     EVT_BUTTON(BTN_PAUSE, ImageTracker::OnPause)
     EVT_BUTTON(BTN_PLAY, ImageTracker::OnPlay)
+    EVT_BUTTON(BTN_NEXT, ImageTracker::OnNext)
     EVT_BUTTON(BTN_LAST, ImageTracker::OnLastFrame)
     // end wxGlade
 END_EVENT_TABLE();
 
 void ImageTracker::OnIdle(wxIdleEvent &event)
 {
-    this->UpdatePlayState();
-    if (ImageTrackerController::Instance()->IsControllerChanged())
+    if (ImageTrackerController::Instance()->IsDataChanged())
     {
-        ImageTrackerController::Instance()->SetIsControllerChanged(false);
-        ImageTrackerController::Instance()->UpdateView();
+        ImageTrackerController::Instance()->SetIsDataChanged(false);
         this->UpdateDataSources();
+    }
+    this->UpdatePlayState();
+    if (ImageTrackerController::Instance()->IsIndexChanged())
+    {
+        ImageTrackerController::Instance()->SetIsIndexChanged(false);
+        ImageTrackerController::Instance()->UpdateView();
     }
 }
 
@@ -77,7 +84,22 @@ void ImageTracker::OnOpen(wxCommandEvent &event)
 void ImageTracker::OnSaveViewImages(wxCommandEvent &event)
 {
     Logger::info << "Please do not put anything on top of the image window while the visualizations are being saved!" << std::endl;
-    this->SetPlayState(AboutToRecord);
+    if (this->dlgSaveVisualization->ShowModal() == wxID_OK)
+    {
+        this->saveFormat = this->dlgSaveVisualization->GetFileFormat();
+        this->saveFrom = this->dlgSaveVisualization->GetIndexStart();
+        this->saveTo = this->dlgSaveVisualization->GetIndexEnd();
+        this->SetPlayState(AboutToRecord);
+    }
+}
+
+bool ImageTracker::Destroy()
+{
+    // We need to tell the ImageTrackerController isntance that we are
+    // closing first, because it's a static object that holds onto
+    // application resources.
+    ImageTrackerController::Instance()->FreeResources();
+    wxFrame::Destroy();
 }
 
 void ImageTracker::OnExit(wxCommandEvent &event)
@@ -102,7 +124,7 @@ void ImageTracker::OnImageInfo(wxCommandEvent &event)
     // Make sure we at least have a data source to work with
     if (this->lbxSources->GetCount() == 0)
     {
-        Logger::warning << function << "There are no images open for which to provide information.  Please load some data." << std::endl;
+        Logger::warning << function << ": There are no images open for which to provide information.  Please load some data." << std::endl;
         return;
     }
     
@@ -257,7 +279,6 @@ void ImageTracker::OnHornOpticalFlow(wxCommandEvent &event)
     
     this->theStatusBar->SetStatusText(wxT("Computing H&S optical flow..."));
     
-    // Find the user's selected DataSource.
     // Find the user's selected DataSource
     int idx = this->lbxSources->GetSelection();
     idx = (idx == wxNOT_FOUND) ? 0 : idx;
@@ -271,6 +292,33 @@ void ImageTracker::OnHornOpticalFlow(wxCommandEvent &event)
     
     this->dlgHornOpticalFlow->SetInput(ImageTrackerController::Instance()->GetDataSource(idx));
     this->dlgHornOpticalFlow->Show(true);
+}
+
+void ImageTracker::OnIntegrateFlow(wxCommandEvent &event)
+{
+    if (this->lbxSources->GetCount() == 0)
+    {
+        wxMessageDialog alert(this, wxT("Please add a data source on which to operate first."), 
+                              wxT("No data sources."), wxOK);
+        alert.ShowModal();
+        return;
+    }
+    
+    this->theStatusBar->SetStatusText(wxT("Integrating flow field..."));
+    
+    // Find the user's selected DataSource
+    int idx = this->lbxSources->GetSelection();
+    idx = (idx == wxNOT_FOUND) ? 0 : idx;
+    if (ImageTrackerController::Instance()->GetDataSource(idx)->size() < 2) // Need at least two images to register.
+    {
+        wxMessageDialog alert(this, wxT("This operation requires at least two images in the data source."),
+                              wxT("Not enough images."), wxOK);
+        alert.ShowModal();
+        return;
+    }
+    
+    this->dlgIntegrateFlow->SetInput(ImageTrackerController::Instance()->GetDataSource(idx));
+    this->dlgIntegrateFlow->Show(true);
 }
 
 void ImageTracker::OnRemoveDataSource(wxCommandEvent &event)
@@ -350,7 +398,7 @@ void ImageTracker::OnEditDataSource(wxCommandEvent &event)
         this->dlgDataSource->SetDataSource(ImageTrackerController::Instance()->GetDataSource(idx));
         if (this->dlgDataSource->ShowModal() == wxID_OK)
         {
-            ImageTrackerController::Instance()->SetIsControllerChanged(true);
+            ImageTrackerController::Instance()->SetIsDataChanged(true);
             this->theStatusBar->SetStatusText(wxT("Edited data source"));
         }
         else
@@ -360,16 +408,24 @@ void ImageTracker::OnEditDataSource(wxCommandEvent &event)
     }
 }
 
-void ImageTracker::OnImageIndexScroll(wxScrollEvent &event)
+void ImageTracker::OnImageIndex(wxCommandEvent &event)
 {
-    Logger::verbose << "ImageTracker::OnImageIndexScroll: " << this->sldImageIndex->GetValue() << std::endl;
+    // We don't update the render window through the state machine here because we want
+    // responses to the scroll bar to be really, really, fast...don't want to wait for Idle.
     ImageTrackerController::Instance()->SetFrameIndex(this->sldImageIndex->GetValue());
+    ImageTrackerController::Instance()->Render();
 }
 
 void ImageTracker::OnFirstFrame(wxCommandEvent &event)
 {
     Logger::verbose << "ImageTracker::OnFirstFrame" << std::endl;
     this->SetPlayState(SkipFirst);
+}
+
+void ImageTracker::OnPrevious(wxCommandEvent &event)
+{
+    this->targetFrame = this->sldImageIndex->GetValue() - 1;
+    this->SetPlayState(GoToFrame);
 }
 
 void ImageTracker::OnRewind(wxCommandEvent &event)
@@ -388,6 +444,12 @@ void ImageTracker::OnPlay(wxCommandEvent &event)
 {
     Logger::verbose << "ImageTracker::OnPlay" << std::endl;
     this->SetPlayState(Play);
+}
+
+void ImageTracker::OnNext(wxCommandEvent &event)
+{
+    this->targetFrame = this->sldImageIndex->GetValue() + 1;
+    this->SetPlayState(GoToFrame);
 }
 
 void ImageTracker::OnLastFrame(wxCommandEvent &event)
@@ -411,8 +473,8 @@ void ImageTracker::UpdatePlayState()
     case AboutToRecord:
         if (maxIdx > 0) // when no data is loaded, max idx is negative
         {
-            this->sldImageIndex->SetValue(0);
-            ImageTrackerController::Instance()->SetFrameIndex(0);
+            this->sldImageIndex->SetValue(this->saveFrom);
+            ImageTrackerController::Instance()->SetFrameIndex(this->saveFrom);
             this->SetPlayState(Record);
         }
         else
@@ -423,9 +485,9 @@ void ImageTracker::UpdatePlayState()
     case Record:
         // Save the current view image
         char fileName[80];
-        sprintf(fileName, saveFormat.c_str(), ImageTrackerController::Instance()->GetFrameIndex());
+        sprintf(fileName, this->saveFormat.c_str(), ImageTrackerController::Instance()->GetFrameIndex());
         ImageTrackerController::Instance()->SaveViewImage(std::string(fileName));
-        if (idx < maxIdx)
+        if (idx < this->saveTo)
         {
             this->sldImageIndex->SetValue(idx+1);
             ImageTrackerController::Instance()->SetFrameIndex(idx+1);
@@ -468,6 +530,14 @@ void ImageTracker::UpdatePlayState()
             this->SetPlayState(Pause);
         }
         break;
+    case GoToFrame: // go to a specific frame number
+        if (this->targetFrame >= 0 && this->targetFrame <= maxIdx)
+        {
+            this->sldImageIndex->SetValue(this->targetFrame);
+            ImageTrackerController::Instance()->SetFrameIndex(this->targetFrame);
+        }
+        this->SetPlayState(Pause);
+        break;
     case SkipFirst: // go to the first frame
         if (maxIdx > 0) // when no data is loaded, max idx is negative
         {
@@ -497,7 +567,7 @@ void ImageTracker::UpdateDataSources()
     ImageTrackerController::Instance()->GetDataSourceNames(names);
     this->lbxSources->Set(names);
     this->lbxSources->SetSelection(std::min(idx, ((int)this->lbxSources->GetCount())-1));
-    this->sldImageIndex->SetRange(0, ImageTrackerController::Instance()->GetMaxSize()-1);
+    this->sldImageIndex->SetRange(0, ImageTrackerController::Instance()->GetMaxIndex());
     
     // Fake a data source selection event, so that the correct visualization control
     // is displayed in the visualization control panel.
@@ -539,6 +609,7 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     wxMenu* menuCompute = new wxMenu();
     menuCompute->Append(MENU_CLG_OPTIC_FLOW, wxT("CLG &Optical Flow"), wxT("Combined local and global optical flow computation"), wxITEM_NORMAL);
     menuCompute->Append(MENU_HORN_OPTICAL_FLOW, wxT("Horn O&ptical Flow"), wxT("Horn and Schunck global optical flow computation"), wxITEM_NORMAL);
+    menuCompute->Append(MENU_INTEGRATE_FLOW, wxT("&Integrate Flow"), wxT("Integrate flow fields into displacement fields"), wxITEM_NORMAL);
     itMenuBar->Append(menuCompute, wxT("&Compute"));
     wxMenu* menuHelp = new wxMenu();
     menuHelp->Append(MENU_IMAGE_INFO, wxT("&Image Info"), wxT("Print information about the current image"), wxITEM_NORMAL);
@@ -559,12 +630,14 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     btnAddDataSource = new wxButton(panelLeftUpper, BTN_ADD_DATASOURCE, wxT("+"));
     btnRemoveDataSource = new wxButton(panelLeftUpper, BTN_REMOVE_DATASOURCE, wxT("-"));
     rwiView = new wxVTKRenderWindowInteractor(panelRight, -1);
-    sldImageIndex = new wxSlider(panelRight, SLD_IMAGE_INDEX, 0, 0, 0, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS);
-    btnFirst = new wxButton(panelRight, BTN_FIRST, wxT("|<"));
+    sldImageIndex = new wxIntSlider(panelRight, SLD_IMAGE_INDEX);
+    btnFirst = new wxButton(panelRight, BTN_FIRST, wxT("[<"));
+    btnPrevious = new wxButton(panelRight, BTN_PREVIOUS, wxT("|<"));
     btnRewind = new wxButton(panelRight, BTN_REWIND, wxT("<"));
     btnPause = new wxButton(panelRight, BTN_PAUSE, wxT("||"));
     btnPlay = new wxButton(panelRight, BTN_PLAY, wxT(">"));
-    btnLast = new wxButton(panelRight, BTN_LAST, wxT(">|"));
+    btnNext = new wxButton(panelRight, BTN_NEXT, wxT(">|"));
+    btnLast = new wxButton(panelRight, BTN_LAST, wxT(">]"));
     txtLogger = new wxTextCtrl(panelMainLower, -1, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
 
     set_properties();
@@ -576,6 +649,11 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     this->SetPlayState(Pause);
     this->loopPlay = true;
     this->saveFormat = "visualization-%04d.tif";
+    this->targetFrame = 0;
+    
+    // Setup frame slider
+    this->sldImageIndex->SetRange(0,0);
+    this->sldImageIndex->SetEnforceRange(true);
 
     // Select log level, and redirect output to log panel
     menuHelp->Check(MENU_LOG_INFO, true);
@@ -589,8 +667,10 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     this->dlgApplyTransform = new ApplyTransformDialog(this, -1, wxT("Apply Transform"));
     this->dlgCLGOpticFlow = new CLGOpticFlowDialog(this, -1, wxT("CLG Optical Flow"));
     this->dlgHornOpticalFlow = new HornOpticalFlowDialog(this, -1, wxT("Horn and Schunck Optical Flow"));
+    this->dlgIntegrateFlow = new IntegrateFlowDialog(this, -1, wxT("Integrate Flow Fields"));
+    this->dlgSaveVisualization = new SaveVisualizationDialog(this, -1, wxT("Save View Images"));
     this->dlgAbout = new AboutDialog(this, -1, wxT("About"));
-	this->dlgAbout->SetMessage(APP_NAME + " " + APP_VERSION + "\n" + APP_AUTHOR + " " + APP_COPYRIGHT); // + "\n" + APP_WEBSITE);
+	this->dlgAbout->SetMessage(APP_NAME + " " + APP_VERSION + "\n" + APP_AUTHOR + " " + APP_COPYRIGHT + "\n" + APP_WEBSITE);
     
     // Set up the interactor style...we like the trackball camera
     vtkInteractorStyleSwitch* inter = vtkInteractorStyleSwitch::New();
@@ -621,11 +701,23 @@ void ImageTracker::set_properties()
         theStatusBar->SetStatusText(theStatusBar_fields[i], i);
     }
     lbxSources->SetSelection(0);
-    btnFirst->SetMinSize(wxSize(40, 35));
-    btnRewind->SetMinSize(wxSize(40, 35));
-    btnPause->SetMinSize(wxSize(40, 35));
-    btnPlay->SetMinSize(wxSize(40, 35));
-    btnLast->SetMinSize(wxSize(40, 35));
+    btnAddDataSource->SetMinSize(wxSize(30, 30));
+    btnRemoveDataSource->SetMinSize(wxSize(30, 30));
+    sldImageIndex->SetToolTip(wxT("Frame index"));
+    btnFirst->SetMinSize(wxSize(30, 30));
+    btnFirst->SetToolTip(wxT("Skip to beginning"));
+    btnPrevious->SetMinSize(wxSize(30, 30));
+    btnPrevious->SetToolTip(wxT("Back one frame"));
+    btnRewind->SetMinSize(wxSize(30, 30));
+    btnRewind->SetToolTip(wxT("Rewind"));
+    btnPause->SetMinSize(wxSize(30, 30));
+    btnPause->SetToolTip(wxT("Pause"));
+    btnPlay->SetMinSize(wxSize(30, 30));
+    btnPlay->SetToolTip(wxT("Play"));
+    btnNext->SetMinSize(wxSize(30, 30));
+    btnNext->SetToolTip(wxT("Forward one frame"));
+    btnLast->SetMinSize(wxSize(30, 30));
+    btnLast->SetToolTip(wxT("Skip to end"));
     // end wxGlade
 }
 
@@ -645,9 +737,9 @@ void ImageTracker::do_layout()
     wxStaticBoxSizer* sizer_4 = new wxStaticBoxSizer(sizer_4_staticbox, wxVERTICAL);
     wxBoxSizer* sizer_6 = new wxBoxSizer(wxHORIZONTAL);
     sizer_4->Add(lbxSources, 1, wxEXPAND|wxADJUST_MINSIZE, 0);
-    sizer_6->Add(btnAddDataSource, 1, wxALIGN_CENTER_HORIZONTAL|wxADJUST_MINSIZE, 0);
-    sizer_6->Add(btnRemoveDataSource, 1, wxALIGN_CENTER_HORIZONTAL, 0);
-    sizer_4->Add(sizer_6, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 1);
+    sizer_6->Add(btnAddDataSource, 0, 0, 0);
+    sizer_6->Add(btnRemoveDataSource, 0, 0, 0);
+    sizer_4->Add(sizer_6, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 2);
     panelLeftUpper->SetAutoLayout(true);
     panelLeftUpper->SetSizer(sizer_4);
     sizer_4->Fit(panelLeftUpper);
@@ -669,19 +761,21 @@ void ImageTracker::do_layout()
     sizer_3->Fit(panelLeft);
     sizer_3->SetSizeHints(panelLeft);
     sizer_10->Add(rwiView, 8, wxALL|wxEXPAND, 0);
-    sizer_32->Add(sldImageIndex, 3, wxEXPAND|wxADJUST_MINSIZE, 0);
-    sizer_33->Add(btnFirst, 0, wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 0);
+    sizer_32->Add(sldImageIndex, 1, wxEXPAND|wxALIGN_BOTTOM, 0);
+    sizer_33->Add(btnFirst, 0, wxLEFT|wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 5);
+    sizer_33->Add(btnPrevious, 0, wxADJUST_MINSIZE, 0);
     sizer_33->Add(btnRewind, 0, wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 0);
     sizer_33->Add(btnPause, 0, wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 0);
     sizer_33->Add(btnPlay, 0, wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 0);
+    sizer_33->Add(btnNext, 0, wxADJUST_MINSIZE, 0);
     sizer_33->Add(btnLast, 0, wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 0);
-    sizer_32->Add(sizer_33, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    sizer_32->Add(sizer_33, 0, wxALIGN_CENTER_HORIZONTAL, 0);
     sizer_10->Add(sizer_32, 1, wxEXPAND, 0);
     panelRight->SetAutoLayout(true);
     panelRight->SetSizer(sizer_10);
     sizer_10->Fit(panelRight);
     sizer_10->SetSizeHints(panelRight);
-    vsplitDataView->SplitVertically(panelLeft, panelRight, 10);
+    vsplitDataView->SplitVertically(panelLeft, panelRight, 200);
     sizer_9->Add(vsplitDataView, 2, wxEXPAND, 0);
     panelMainUpper->SetAutoLayout(true);
     panelMainUpper->SetSizer(sizer_9);

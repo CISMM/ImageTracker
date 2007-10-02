@@ -36,8 +36,7 @@ bool CLGOpticFlowDialog::TransferDataFromWindow()
     
     // Create and launch a pipeline executor (uses another thread)
     PipelineExecutor* exec = new PipelineExecutor(this->pipeline);
-    // TODO: When we support flow field visualization, uncomment next line.
-    // exec->SetOpenFiles(this->checkOpenOutput->IsChecked(), this->controller);
+    exec->SetOpenFiles(this->checkOpenOutput->IsChecked());
     if (exec->Create() == wxTHREAD_NO_ERROR)
     {
         exec->Run();
@@ -49,7 +48,7 @@ bool CLGOpticFlowDialog::TransferDataFromWindow()
     }
     
     this->ViewPreview(false);
-    this->Show(false);
+    // this->Show(false);
     return true;
 }
 

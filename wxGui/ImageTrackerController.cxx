@@ -26,7 +26,8 @@ ImageTrackerController::ImageTrackerController() :
     dataIndex(0),
     datavis(),
     resetCamera(false),
-    isControllerChanged(false)
+    isDataChanged(false),
+    isIndexChanged(false)
 {
     this->renderer = NULL;
     this->renderWindow = NULL;
@@ -41,29 +42,55 @@ ImageTrackerController::ImageTrackerController() :
     
 ImageTrackerController::~ImageTrackerController()
 {
-    this->datavis.clear();
+    // Delete our own vtk objects
+    if (this->writer)
+        this->writer->Delete();
+    if (this->capture)
+        this->capture->Delete();
     if (this->renderer)
         this->renderer->Delete();
+    
+    this->datavis.clear();
     
     // Other components should delete these:
     this->parent = NULL;
     this->renderWindow = NULL;
-
-    // Delete our own vtk objects
-    this->capture->Delete();
-    this->writer->Delete();
 }
 
-bool ImageTrackerController::IsControllerChanged()
+void ImageTrackerController::FreeResources()
 {
-    wxMutexLocker lock(ImageTrackerController::s_ControllerMutex);
-    return this->isControllerChanged;
+    // There is a problem with deleting the objects related to this resource.
+    // Because the visualization capture filter has a reference to the renderer
+    // window, if the renderer window is deleted first, we get a seg fault for 
+    // trying to delete an object with non-zero reference count.  
+    // So, here we reset the input to the caputre object.  This method should 
+    // be called before the renderer window is deleted.
+    if (this->capture)
+        this->capture->SetInput(NULL);
 }
 
-void ImageTrackerController::SetIsControllerChanged(bool changed)
+bool ImageTrackerController::IsDataChanged()
 {
     wxMutexLocker lock(ImageTrackerController::s_ControllerMutex);
-    this->isControllerChanged = changed;
+    return this->isDataChanged;
+}
+
+bool ImageTrackerController::IsIndexChanged()
+{
+    wxMutexLocker lock(ImageTrackerController::s_ControllerMutex);
+    return this->isIndexChanged;
+}
+
+void ImageTrackerController::SetIsDataChanged(bool changed)
+{
+    wxMutexLocker lock(ImageTrackerController::s_ControllerMutex);
+    this->isDataChanged = changed;
+}
+
+void ImageTrackerController::SetIsIndexChanged(bool changed)
+{
+    wxMutexLocker lock(ImageTrackerController::s_ControllerMutex);
+    this->isIndexChanged = changed;
 }
 
 DataSource::Pointer ImageTrackerController::GetDataSource(unsigned int i)
@@ -91,7 +118,8 @@ void ImageTrackerController::AddDataSource(DataSource::Pointer source)
         this->resetCamera = true;
     }
 
-    this->SetIsControllerChanged(true);
+    this->SetIsDataChanged(true);
+    this->SetIsIndexChanged(true);
     Logger::verbose << function << ": done" << std::endl;
 }
 
@@ -103,7 +131,8 @@ void ImageTrackerController::RemoveDataSource(unsigned int i)
         this->datavis[i].second->RemovePropsFrom(this->GetRenderer());
         this->datavis.erase(this->datavis.begin() + i);
     }
-    this->SetIsControllerChanged(true);
+    this->SetIsDataChanged(true);
+    this->SetIsIndexChanged(true);
 }
 
 void ImageTrackerController::GetDataSourceNames(wxArrayString& names)
@@ -121,14 +150,7 @@ void ImageTrackerController::SetFrameIndex(unsigned int index)
 {
     // Logger::verbose << "ImageTrackerController::SetIndex: " << index << std::endl;
     this->frameIndex = index;
-    this->SetIsControllerChanged(true);
-}
-
-void ImageTrackerController::SetDataIndex(unsigned int index)
-{
-    index = std::min(index, this->datavis.size()-1);
-    this->dataIndex = index;
-    this->SetIsControllerChanged(true);
+    this->SetIsIndexChanged(true);
 }
 
 unsigned int ImageTrackerController::GetMaxSize()
@@ -141,6 +163,11 @@ unsigned int ImageTrackerController::GetMaxSize()
         max = std::max(max, it->first->size());
     }
     return (unsigned int) max;
+}
+
+unsigned int ImageTrackerController::GetMaxIndex()
+{
+    return this->GetMaxSize() - 1;
 }
 
 void ImageTrackerController::SetParent(wxWindow* parent)
