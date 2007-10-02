@@ -33,8 +33,6 @@ public:
     double GetRegularization() { return this->flowFilter->GetRegularization(); }
     double GetRelaxation() { return this->flowFilter->GetRelaxation(); }
     unsigned int GetIterations() { return this->flowFilter->GetIterations(); }
-
-    //const FileSet& GetOutputFiles() { return this->outputFiles; }
     
     ImageType::Pointer GetPreviewImage();
 
@@ -44,7 +42,6 @@ public:
     void SetIterations(unsigned int iter);
     
     virtual void SetInput(ReaderType input);
-    virtual void SetOutputFiles(const FileSet& dest);
 
     bool UpdateOne();
     void UpdateAll();
@@ -55,11 +52,8 @@ protected:
     virtual ~CLGOpticFlowPipeline(void) {}
 
 private:
-    void InitializePipeline();
-
-    bool init;
-    unsigned int index;
-    //FileSet outputFiles;
+    CLGOpticFlowPipeline(const Self& other);
+    void operator=(const Self& other);
     
     FlowFilterType::Pointer flowFilter;
     SmoothFilterType::Pointer smooth;
