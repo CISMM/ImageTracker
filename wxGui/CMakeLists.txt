@@ -10,11 +10,11 @@ SET (Gui_SRCS
     ApplyTransformDialog.cpp                    ApplyTransformDialog.h
     CLGOpticFlowDialog.cpp                      CLGOpticFlowDialog.h
     DataSourceDialog.cpp                        DataSourceDialog.h
-    DoubleSlider.cxx                            DoubleSlider.h
+#    DoubleSlider.cxx                            DoubleSlider.h
     wxDoubleSlider.cpp                          wxDoubleSlider.h
     EmptyVisualizationControl.cpp               EmptyVisualizationControl.h
-    FileSetDialog.cxx                           FileSetDialog.h
-    GlobalRegistrationDialog.cxx                GlobalRegistrationDialog.h
+#    FileSetDialog.cxx                           FileSetDialog.h
+#    GlobalRegistrationDialog.cxx                GlobalRegistrationDialog.h
     GuiUtils.cxx                                GuiUtils.h
     HornOpticalFlowDialog.cpp                   HornOpticalFlowDialog.h
 #    HarrisFeatureDialog.cxx                     HarrisFeatureDialog.h
@@ -24,10 +24,10 @@ SET (Gui_SRCS
     ItkVtkPipeline.cxx                          ItkVtkPipeline.h
     wxIntSlider.cpp                             wxIntSlider.h
     IntegrateFlowDialog.cpp                     IntegrateFlowDialog.h
-    LoggerPanel.cxx                             LoggerPanel.h
+#    LoggerPanel.cxx                             LoggerPanel.h
     MultiResolutionRegistrationDialog.cpp	    MultiResolutionRegistrationDialog.h
     PipelineExecutor.cxx                        PipelineExecutor.h
-    RegistrationDesign_wdr.cpp                  RegistrationDesign_wdr.h
+#    RegistrationDesign_wdr.cpp                  RegistrationDesign_wdr.h
     RemoveOcclusionsDialog.cpp                  RemoveOcclusionsDialog.h
     SaveVisualizationDialog.cpp                 SaveVisualizationDialog.h
     ScalarImageControlPanel.cpp                 ScalarImageControlPanel.h
@@ -35,8 +35,8 @@ SET (Gui_SRCS
     VectorGlyphPipeline.cxx                     VectorGlyphPipeline.h
     VectorGlyphControlPanel.cpp                 VectorGlyphControlPanel.h
     WxPipelineObserver.cxx                      WxPipelineObserver.h
-    wxCore_wdr.cpp                              wxCore_wdr.h
-    wxGui.rc
+#    wxCore_wdr.cpp                              wxCore_wdr.h
+#    wxGui.rc
 )
 
 # A library, so others can use the GUI tools
