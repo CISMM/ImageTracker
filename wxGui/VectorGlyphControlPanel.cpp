@@ -19,7 +19,7 @@ VectorGlyphControlPanel::VectorGlyphControlPanel(wxWindow* parent, int id, const
 {
     // begin wxGlade: VectorGlyphControlPanel::VectorGlyphControlPanel
     sizer_40_staticbox = new wxStaticBox(this, -1, wxT("Vector Glyphs"));
-    checkVisibility = new wxCheckBox(this, CBX_VISIBILITY, wxT("Visibility"));
+    checkVisibility = new wxCheckBox(this, CBX_VISIBILITY, wxT("Visible"));
     label_33 = new wxStaticText(this, -1, wxT("Scale Factor"));
     slideGlyphScaleFactor = new wxDoubleSlider(this, SLD_SCALE_FACTOR);
     label_34 = new wxStaticText(this, -1, wxT("Mask Ratio"));
@@ -85,7 +85,7 @@ void VectorGlyphControlPanel::OnGlyphMaskRatio(wxCommandEvent &event)
 void VectorGlyphControlPanel::set_properties()
 {
     // begin wxGlade: VectorGlyphControlPanel::set_properties
-    checkVisibility->SetToolTip(wxT("Turn on/off visibility of this visualization"));
+    checkVisibility->SetToolTip(wxT("Show or hide this data set"));
     checkVisibility->SetValue(1);
     slideGlyphScaleFactor->SetToolTip(wxT("Scaling to apply to the vector glyphs."));
     slideGlyphMaskRatio->SetToolTip(wxT("Spacing between visible glyphs (larger number means fewer glyphs)"));
@@ -99,8 +99,8 @@ void VectorGlyphControlPanel::do_layout()
     wxBoxSizer* sizer_38 = new wxBoxSizer(wxVERTICAL);
     wxStaticBoxSizer* sizer_40 = new wxStaticBoxSizer(sizer_40_staticbox, wxVERTICAL);
     wxFlexGridSizer* grid_sizer_13 = new wxFlexGridSizer(3, 2, 5, 5);
-    grid_sizer_13->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
     grid_sizer_13->Add(checkVisibility, 0, wxADJUST_MINSIZE, 0);
+    grid_sizer_13->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
     grid_sizer_13->Add(label_33, 0, wxADJUST_MINSIZE, 0);
     grid_sizer_13->Add(slideGlyphScaleFactor, 1, wxEXPAND, 0);
     grid_sizer_13->Add(label_34, 0, wxADJUST_MINSIZE, 0);

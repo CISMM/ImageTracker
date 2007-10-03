@@ -169,10 +169,20 @@ void SaveVisualizationDialog::set_properties()
 {
     // begin wxGlade: SaveVisualizationDialog::set_properties
     SetTitle(wxT("Save Visualizations"));
-    SetSize(wxSize(450, 380));
+    SetSize(wxSize(466, 380));
     label_42->SetMinSize(wxSize(80, 17));
     label_43->SetMinSize(wxSize(80, 17));
+    label_49->SetMinSize(wxSize(75, 25));
+    radFramesAll->SetMinSize(wxSize(75, 25));
     radFramesAll->SetValue(1);
+    radFramesRange->SetMinSize(wxSize(75, 25));
+    radFramesCurrent->SetMinSize(wxSize(75, 25));
+    label_50->SetMinSize(wxSize(32, 25));
+    textRangeFrom->SetMinSize(wxSize(80, 27));
+    label_51->SetMinSize(wxSize(13, 25));
+    textRangeTo->SetMinSize(wxSize(80, 27));
+    labelRangeMax->SetMinSize(wxSize(38, 25));
+    labelFrameCurrent->SetMinSize(wxSize(10, 25));
     text_ctrl_1->Enable(false);
     // end wxGlade
 }
@@ -206,13 +216,13 @@ void SaveVisualizationDialog::do_layout()
     sizer_48->Add(radFramesRange, 0, wxADJUST_MINSIZE, 0);
     sizer_48->Add(radFramesCurrent, 0, wxADJUST_MINSIZE, 0);
     grid_sizer_16->Add(sizer_48, 1, wxEXPAND, 0);
-    sizer_49->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
-    sizer_49->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
-    sizer_50->Add(label_50, 0, wxADJUST_MINSIZE, 0);
-    sizer_50->Add(textRangeFrom, 0, wxADJUST_MINSIZE, 0);
-    sizer_50->Add(label_51, 0, wxADJUST_MINSIZE, 0);
-    sizer_50->Add(textRangeTo, 0, wxADJUST_MINSIZE, 0);
-    sizer_50->Add(labelRangeMax, 0, wxADJUST_MINSIZE, 0);
+    sizer_49->Add(75, 25, 0, wxADJUST_MINSIZE, 0);
+    sizer_49->Add(75, 25, 0, wxADJUST_MINSIZE, 0);
+    sizer_50->Add(label_50, 0, wxALIGN_BOTTOM|wxADJUST_MINSIZE, 0);
+    sizer_50->Add(textRangeFrom, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 5);
+    sizer_50->Add(label_51, 0, wxALIGN_BOTTOM|wxADJUST_MINSIZE, 0);
+    sizer_50->Add(textRangeTo, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 5);
+    sizer_50->Add(labelRangeMax, 0, wxALIGN_BOTTOM|wxADJUST_MINSIZE, 0);
     sizer_49->Add(sizer_50, 1, wxEXPAND, 0);
     sizer_49->Add(labelFrameCurrent, 0, wxADJUST_MINSIZE, 0);
     grid_sizer_16->Add(sizer_49, 1, wxEXPAND, 0);
