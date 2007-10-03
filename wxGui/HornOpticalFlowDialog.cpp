@@ -53,7 +53,7 @@ void HornOpticalFlowDialog::SetInput(DataSource::Pointer input)
 }
 
 HornOpticalFlowDialog::HornOpticalFlowDialog(wxWindow* parent, int id, const wxString& title, const wxPoint& pos, const wxSize& size, long style):
-    wxDialog(parent, id, title, pos, size, wxDEFAULT_DIALOG_STYLE)
+    wxDialog(parent, id, title, pos, size, style)
 {
     // begin wxGlade: HornOpticalFlowDialog::HornOpticalFlowDialog
     sizer_36_staticbox = new wxStaticBox(this, -1, wxT("Output"));

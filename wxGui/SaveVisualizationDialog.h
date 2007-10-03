@@ -15,7 +15,7 @@ public:
     // begin wxGlade: SaveVisualizationDialog::ids
     // end wxGlade
 
-    SaveVisualizationDialog(wxWindow* parent, int id, const wxString& title, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE);
+    SaveVisualizationDialog(wxWindow* parent, int id, const wxString& title, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxTHICK_FRAME);
     
     enum IDs
     {

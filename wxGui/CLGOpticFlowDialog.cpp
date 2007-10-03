@@ -89,7 +89,7 @@ void CLGOpticFlowDialog::UpdatePreview()
 }
         
 CLGOpticFlowDialog::CLGOpticFlowDialog(wxWindow* parent, int id, const wxString& title, const wxPoint& pos, const wxSize& size, long style):
-    wxDialog(parent, id, title, pos, size, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxTHICK_FRAME)
+    wxDialog(parent, id, title, pos, size, style)
 {
     // begin wxGlade: CLGOpticFlowDialog::CLGOpticFlowDialog
     sizer_26_staticbox = new wxStaticBox(this, -1, wxT("Output"));

@@ -37,7 +37,7 @@ bool SaveVisualizationDialog::TransferDataFromWindow()
 }
 
 SaveVisualizationDialog::SaveVisualizationDialog(wxWindow* parent, int id, const wxString& title, const wxPoint& pos, const wxSize& size, long style):
-    wxDialog(parent, id, title, pos, size, wxDEFAULT_DIALOG_STYLE),
+    wxDialog(parent, id, title, pos, size, style),
     firstTime(true)
 {
     // begin wxGlade: SaveVisualizationDialog::SaveVisualizationDialog
@@ -181,8 +181,8 @@ void SaveVisualizationDialog::set_properties()
     textRangeFrom->SetMinSize(wxSize(80, 27));
     label_51->SetMinSize(wxSize(13, 25));
     textRangeTo->SetMinSize(wxSize(80, 27));
-    labelRangeMax->SetMinSize(wxSize(38, 25));
-    labelFrameCurrent->SetMinSize(wxSize(10, 25));
+    labelRangeMax->SetMinSize(wxSize(60, 25));
+    labelFrameCurrent->SetMinSize(wxSize(80, 25));
     text_ctrl_1->Enable(false);
     // end wxGlade
 }
