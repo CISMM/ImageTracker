@@ -19,14 +19,17 @@ SET (Gui_SRCS
     ItkVtkPipeline.cxx                          ItkVtkPipeline.h
     wxIntSlider.cpp                             wxIntSlider.h
     IntegrateFlowDialog.cpp                     IntegrateFlowDialog.h
+    LookupTableUtil.cxx                         LookupTableUtil.h
     MultiResolutionRegistrationDialog.cpp	    MultiResolutionRegistrationDialog.h
     PipelineExecutor.cxx                        PipelineExecutor.h
     RemoveOcclusionsDialog.cpp                  RemoveOcclusionsDialog.h
     SaveVisualizationDialog.cpp                 SaveVisualizationDialog.h
     ScalarImageControlPanel.cpp                 ScalarImageControlPanel.h
     ScalarImageItkVtkPipeline.cxx               ScalarImageItkVtkPipeline.h
-    VectorGlyphPipeline.cxx                     VectorGlyphPipeline.h
     VectorGlyphControlPanel.cpp                 VectorGlyphControlPanel.h
+    VectorGlyphPipeline.cxx                     VectorGlyphPipeline.h
+    VectorHeightMapControlPanel.cpp             VectorHeightMapControlPanel.h
+    VectorHeightMapPipeline.cxx                 VectorHeightMapPipeline.h
     WxPipelineObserver.cxx                      WxPipelineObserver.h
 )
 
