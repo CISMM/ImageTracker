@@ -16,8 +16,6 @@ public:
     typedef std::vector<std::string> FileVector;
     typedef FileVector::iterator FileIterator;
 
-	const static std::string PATH_DELIMITER;
-
     /*
      * Default constructor.
      */ 
@@ -93,9 +91,5 @@ public:
     }
 
 private:
-    std::string::size_type DirectoryIndex(const std::string& filename) const;
-    std::string DirectoryPart(const std::string& filename) const;
-    std::string FilePart(const std::string& filename) const;
-
     FileVector fileNames;
 };
