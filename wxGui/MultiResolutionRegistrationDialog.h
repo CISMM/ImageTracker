@@ -7,6 +7,7 @@
 #include "vtkRenderer.h"
 
 #include "DataSource.h"
+#include "FilePatternPanel.h"
 #include "MultiResolutionRegistrationPipeline.h"
 #include "ScalarImageItkVtkPipeline.h"
 #include "wxDoubleSlider.h"
@@ -29,9 +30,7 @@ public:
         SLD_LOWER_BOUND,
         CMB_RANGE,
         SLD_MAX_SMOOTH,
-        SLD_MIN_SMOOTH,
-        BTN_BROWSE_DIR,
-        BTN_BROWSE_TRANSFORM
+        SLD_MIN_SMOOTH
     };
 
     MultiResolutionRegistrationDialog(wxWindow* parent, int id, const wxString& title, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE);
@@ -47,7 +46,7 @@ private:
 
 protected:
     // begin wxGlade: MultiResolutionRegistrationDialog::attributes
-    wxStaticBox* sizer_21_staticbox;
+    wxStaticBox* sizer_17_staticbox;
     wxStaticBox* sizer_23_staticbox;
     wxStaticBox* sizer_20_staticbox;
     wxStaticBox* sizer_22_staticbox;
@@ -70,14 +69,9 @@ protected:
     wxDoubleSlider* slideMinStepLength;
     wxStaticText* label_24;
     wxDoubleSlider* slideStepScale;
-    wxStaticText* label_10;
-    wxTextCtrl* textDirectory;
-    wxButton* btnBrowseDir;
-    wxStaticText* label_11;
+    FilePatternPanel* panelFilePattern;
+    wxStaticText* label_6;
     wxTextCtrl* textTransform;
-    wxButton* btnBrowseTransform;
-    wxStaticText* label_12;
-    wxTextCtrl* textPrefix;
     wxCheckBox* checkOpenOutput;
     wxButton* btnRun;
     wxButton* btnHide;
@@ -92,8 +86,6 @@ public:
     void OnMinSmooth(wxCommandEvent &event);
     void OnThresholdEnabled(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnRange(wxCommandEvent &event); // wxGlade: <event_handler>
-    void OnBrowseDir(wxCommandEvent &event); // wxGlade: <event_handler>
-    void OnBrowseTransform(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnRun(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnHide(wxCommandEvent &event); // wxGlade: <event_handler>
     

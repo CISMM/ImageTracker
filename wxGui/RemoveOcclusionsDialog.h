@@ -4,6 +4,7 @@
 #include <wx/image.h>
         
 #include "DataSource.h"
+#include "FilePatternPanel.h"
 #include "RemovePartialOcclusionsPipeline.h"
 #include "wxDoubleSlider.h"
         
@@ -20,11 +21,6 @@ public:
     // end wxGlade
 
     RemoveOcclusionsDialog(wxWindow* parent, int id, const wxString& title, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE);
-
-    enum IDs
-    {
-        BTN_BROWSE       = 3010
-    };
     
 private:
     // begin wxGlade: RemoveOcclusionsDialog::methods
@@ -34,7 +30,7 @@ private:
 
 protected:
     // begin wxGlade: RemoveOcclusionsDialog::attributes
-    wxStaticBox* sizer_17_staticbox;
+    wxStaticBox* sizer_58_staticbox;
     wxStaticBox* sizer_18_staticbox;
     wxStaticText* label_1;
     wxComboBox* comboMetric;
@@ -42,13 +38,9 @@ protected:
     wxSlider* slidePercentile;
     wxStaticText* label_4;
     wxDoubleSlider* slidePadding;
+    FilePatternPanel* panelFilePattern;
     wxStaticText* label_5;
-    wxTextCtrl* textDirectory;
-    wxButton* btnBrowse;
-    wxStaticText* label_6;
     wxTextCtrl* textTransmission;
-    wxStaticText* label_7;
-    wxTextCtrl* textPrefix;
     wxCheckBox* checkOpenOutput;
     wxButton* btnRun;
     wxButton* btnHide;
@@ -59,7 +51,6 @@ protected:
 public:
     void OnRun(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnHide(wxCommandEvent &event); // wxGlade: <event_handler>
-    void OnBrowse(wxCommandEvent &event); // wxGlade: <event_handler>
     
 public:
     virtual bool TransferDataToWindow();

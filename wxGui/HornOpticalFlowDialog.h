@@ -7,6 +7,7 @@
 #define HORNOPTICALFLOWDIALOG_H
 
 #include "DataSource.h"
+#include "FilePatternPanel.h"
 #include "HornOpticalFlowPipeline.h"
 #include "wxDoubleSlider.h"
 #include "wxIntSlider.h"
@@ -22,11 +23,6 @@ public:
 
     HornOpticalFlowDialog(wxWindow* parent, int id, const wxString& title, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxTHICK_FRAME);
     
-    enum IDs
-    {
-        BTN_BROWSE = 3060
-    };
-
 private:
     // begin wxGlade: HornOpticalFlowDialog::methods
     void set_properties();
@@ -43,11 +39,7 @@ protected:
     wxDoubleSlider* sldRegularization;
     wxStaticText* label_30;
     wxIntSlider* sldIterations;
-    wxStaticText* label_31;
-    wxTextCtrl* textDirectory;
-    wxButton* btnBrowse;
-    wxStaticText* label_32;
-    wxTextCtrl* textPrefix;
+    FilePatternPanel* panelFilePattern;
     wxCheckBox* checkOpenOutput;
     wxButton* btnRun;
     wxButton* btnHide;
@@ -56,7 +48,6 @@ protected:
     DECLARE_EVENT_TABLE();
 
 public:
-    void OnBrowse(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnRun(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnHide(wxCommandEvent &event); // wxGlade: <event_handler>
     

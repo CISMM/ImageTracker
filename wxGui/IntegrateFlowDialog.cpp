@@ -3,6 +3,7 @@
 #include "IntegrateFlowDialog.h"
 
 #include "FileSet.h"
+#include "FileUtils.h"
 #include "Logger.h"
 #include "PipelineExecutor.h"
 #include "wxUtils.h"
@@ -15,7 +16,15 @@ bool IntegrateFlowDialog::TransferDataToWindow()
         this->input.IsNotNull())
     {
         this->slideStepSize->SetValue(this->pipeline->GetStepSize());
-        this->textDirectory->SetValue(std2wx(this->input->GetFiles().GetDirectory()));
+        
+        // create an output file pattern from the input files
+        std::string dir(this->input->GetFiles().GetDirectory());
+        std::string format("disp-%04d.mha");
+        unsigned int start = NumberPart(this->input->GetFiles()[0]);
+        unsigned int end = start + this->input->size() - 1;
+        this->panelFilePattern->SetFilePattern(FilePattern(dir, format, start, end));
+        this->panelFilePattern->TransferDataToWindow();
+        
         return true;
     }
     else
@@ -31,9 +40,8 @@ bool IntegrateFlowDialog::TransferDataFromWindow()
     this->pipeline->SetStepSize(this->slideStepSize->GetValue());
     
     // Create an output file set
-    FileSet outputFiles(this->input->GetFiles(), wx2std(this->textPrefix->GetValue()));
-    outputFiles.SetDirectory(wx2std(this->textDirectory->GetValue()));
-    this->pipeline->SetOutputFiles(outputFiles);
+    FileSet outFiles(this->panelFilePattern->GetFilePattern());
+    this->pipeline->SetOutputFiles(outFiles);
     
     // Create and launch a pipeline executor (uses another thread)
     PipelineExecutor* exec = new PipelineExecutor(this->pipeline);
@@ -64,11 +72,7 @@ IntegrateFlowDialog::IntegrateFlowDialog(wxWindow* parent, int id, const wxStrin
     sizer_52_staticbox = new wxStaticBox(this, -1, wxT("Parameters"));
     label_39 = new wxStaticText(this, -1, wxT("Step size"));
     slideStepSize = new wxDoubleSlider(this, -1);
-    label_40 = new wxStaticText(this, -1, wxT("Directory"));
-    textDirectory = new wxTextCtrl(this, -1, wxT("."));
-    btnBrowse = new wxButton(this, BTN_BROWSE, wxT("&Browse..."));
-    label_41 = new wxStaticText(this, -1, wxT("Prefix"));
-    textPrefix = new wxTextCtrl(this, -1, wxT("disp-"));
+    panelFilePattern = new FilePatternPanel(this, -1);
     checkOpenOutput = new wxCheckBox(this, -1, wxT("Open output when finished"));
     btnRun = new wxButton(this, wxID_OK, wxT("&Run"));
     btnHide = new wxButton(this, wxID_CANCEL, wxT("&Hide"));
@@ -80,6 +84,9 @@ IntegrateFlowDialog::IntegrateFlowDialog(wxWindow* parent, int id, const wxStrin
     this->pipeline = IntegrateFlowFieldPipeline::New();
     this->slideStepSize->SetRange(0.1, 1.0, 0.1);
     this->slideStepSize->SetValue(0.5);
+    
+    this->panelFilePattern->SetRangeEnabled(false);
+    this->panelFilePattern->SetExtensionEnabled(false);
 }
 
 IntegrateFlowDialog::~IntegrateFlowDialog()
@@ -87,32 +94,24 @@ IntegrateFlowDialog::~IntegrateFlowDialog()
 
 BEGIN_EVENT_TABLE(IntegrateFlowDialog, wxDialog)
     // begin wxGlade: IntegrateFlowDialog::event_table
-    EVT_BUTTON(BTN_BROWSE, IntegrateFlowDialog::OnBrowse)
+    EVT_BUTTON(wxID_OK, IntegrateFlowDialog::OnRun)
     // end wxGlade
 END_EVENT_TABLE();
 
 
-void IntegrateFlowDialog::OnBrowse(wxCommandEvent &event)
+void IntegrateFlowDialog::OnRun(wxCommandEvent &event)
 {
-    wxDirDialog dir(this, wxT("Choose an output directory"), this->textDirectory->GetValue());
-    if (dir.ShowModal() == wxID_OK)
-    {
-        this->textDirectory->SetValue(dir.GetPath().Append(std2wx(FileSet::PATH_DELIMITER)));
-    }
+    event.Skip();
 }
 
-
 // wxGlade: add IntegrateFlowDialog event handlers
-
 
 void IntegrateFlowDialog::set_properties()
 {
     // begin wxGlade: IntegrateFlowDialog::set_properties
     SetTitle(wxT("Integrate Flow"));
+    SetSize(wxSize(550, 400));
     slideStepSize->SetToolTip(wxT("Size of an integration step"));
-    textDirectory->SetToolTip(wxT("Directory in which to save output"));
-    btnBrowse->SetToolTip(wxT("Find a directory"));
-    textPrefix->SetToolTip(wxT("Prefix to append to each integrated result image"));
     checkOpenOutput->SetToolTip(wxT("Create a new data source and open it when finished"));
     checkOpenOutput->Enable(false);
     btnRun->SetDefault();
@@ -125,21 +124,15 @@ void IntegrateFlowDialog::do_layout()
     // begin wxGlade: IntegrateFlowDialog::do_layout
     wxBoxSizer* sizer_51 = new wxBoxSizer(wxVERTICAL);
     wxBoxSizer* sizer_54 = new wxBoxSizer(wxHORIZONTAL);
-    wxStaticBoxSizer* sizer_53 = new wxStaticBoxSizer(sizer_53_staticbox, wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_19 = new wxFlexGridSizer(3, 3, 5, 5);
+    wxStaticBoxSizer* sizer_53 = new wxStaticBoxSizer(sizer_53_staticbox, wxVERTICAL);
+    wxFlexGridSizer* grid_sizer_19 = new wxFlexGridSizer(1, 2, 5, 5);
     wxStaticBoxSizer* sizer_52 = new wxStaticBoxSizer(sizer_52_staticbox, wxHORIZONTAL);
     sizer_52->Add(label_39, 0, wxADJUST_MINSIZE, 0);
     sizer_52->Add(slideStepSize, 1, wxEXPAND, 0);
     sizer_51->Add(sizer_52, 0, wxEXPAND, 0);
-    grid_sizer_19->Add(label_40, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_19->Add(textDirectory, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    grid_sizer_19->Add(btnBrowse, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_19->Add(label_41, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_19->Add(textPrefix, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    grid_sizer_19->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_19->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
+    sizer_53->Add(panelFilePattern, 0, wxEXPAND, 0);
+    grid_sizer_19->Add(110, 20, 0, wxADJUST_MINSIZE, 0);
     grid_sizer_19->Add(checkOpenOutput, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_19->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
     grid_sizer_19->AddGrowableCol(1);
     sizer_53->Add(grid_sizer_19, 1, wxEXPAND, 0);
     sizer_51->Add(sizer_53, 1, wxEXPAND, 0);
@@ -148,8 +141,6 @@ void IntegrateFlowDialog::do_layout()
     sizer_51->Add(sizer_54, 0, wxALIGN_CENTER_HORIZONTAL, 0);
     SetAutoLayout(true);
     SetSizer(sizer_51);
-    sizer_51->Fit(this);
-    sizer_51->SetSizeHints(this);
     Layout();
     // end wxGlade
 }

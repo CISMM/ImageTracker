@@ -3,6 +3,7 @@
 #include "RemoveOcclusionsDialog.h"
 
 #include "FileSet.h"
+#include "FileUtils.h"
 #include "PipelineExecutor.h"
 #include "wxUtils.h"
 
@@ -26,7 +27,14 @@ bool RemoveOcclusionsDialog::TransferDataToWindow()
         this->slidePercentile->SetValue(this->pipeline->GetTransmitPercentile());
         this->slidePadding->SetValue(this->pipeline->GetFourierPadding());
         
-        this->textDirectory->SetValue(std2wx(this->input->GetFiles().GetDirectory()));
+        // create an output file pattern from the input files
+        std::string dir(this->input->GetFiles().GetDirectory());
+        std::string format("rpo-%04d.tif");
+        unsigned int start = NumberPart(this->input->GetFiles()[0]);
+        unsigned int end = start + this->input->size() - 1;
+        this->panelFilePattern->SetFilePattern(FilePattern(dir, format, start, end));
+        this->panelFilePattern->TransferDataToWindow();
+        
         return true;
     }
     else
@@ -47,12 +55,11 @@ bool RemoveOcclusionsDialog::TransferDataFromWindow()
     this->pipeline->SetInput(this->input->GetImages());
     
     // Create an output file set
-    FileSet outFiles(this->input->GetFiles(), wx2std(this->textPrefix->GetValue()));
-    outFiles.SetDirectory(wx2std(this->textDirectory->GetValue()));
-    
+    FileSet outFiles(this->panelFilePattern->GetFilePattern());
     this->pipeline->SetOutputFiles(outFiles);
-    this->pipeline->SetTransmissionFile(wx2std(
-        this->textDirectory->GetValue() + wxT("/") + this->textTransmission->GetValue()));
+    this->pipeline->SetTransmissionFile(
+        this->panelFilePattern->GetFilePattern().directory +
+        wx2std(this->textTransmission->GetValue()));
     
     std::string metric = wx2std(this->comboMetric->GetValue());
     if (metric == "Mean")
@@ -84,7 +91,7 @@ RemoveOcclusionsDialog::RemoveOcclusionsDialog(wxWindow* parent, int id, const w
     wxDialog(parent, id, title, pos, size, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxTHICK_FRAME)
 {
     // begin wxGlade: RemoveOcclusionsDialog::RemoveOcclusionsDialog
-    sizer_17_staticbox = new wxStaticBox(this, -1, wxT("Output"));
+    sizer_58_staticbox = new wxStaticBox(this, -1, wxT("Output"));
     sizer_18_staticbox = new wxStaticBox(this, -1, wxT("Parameters"));
     label_1 = new wxStaticText(this, -1, wxT("Metric"));
     const wxString comboMetric_choices[] = {
@@ -96,13 +103,9 @@ RemoveOcclusionsDialog::RemoveOcclusionsDialog(wxWindow* parent, int id, const w
     slidePercentile = new wxSlider(this, -1, 100, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS);
     label_4 = new wxStaticText(this, -1, wxT("Fourier Padding"));
     slidePadding = new wxDoubleSlider(this, -1);
-    label_5 = new wxStaticText(this, -1, wxT("Directory"));
-    textDirectory = new wxTextCtrl(this, -1, wxT(""));
-    btnBrowse = new wxButton(this, BTN_BROWSE, wxT("&Browse..."));
-    label_6 = new wxStaticText(this, -1, wxT("Transmission Map"));
+    panelFilePattern = new FilePatternPanel(this, -1);
+    label_5 = new wxStaticText(this, -1, wxT("Transmission Map"));
     textTransmission = new wxTextCtrl(this, -1, wxT("transmission.mha"));
-    label_7 = new wxStaticText(this, -1, wxT("Output Prefix"));
-    textPrefix = new wxTextCtrl(this, -1, wxT("rpo-"));
     checkOpenOutput = new wxCheckBox(this, -1, wxT("Open output when finished"));
     btnRun = new wxButton(this, wxID_OK, wxT("&Run"));
     btnHide = new wxButton(this, wxID_CANCEL, wxT("&Hide"));
@@ -116,12 +119,13 @@ RemoveOcclusionsDialog::RemoveOcclusionsDialog(wxWindow* parent, int id, const w
     // Set up the Fourier padding parameter
     this->slidePadding->SetRange(0.0, 1.0, 0.1);
     this->slidePadding->SetValue(0.5);
+    
+    this->panelFilePattern->SetRangeEnabled(false);
 }
 
 
 BEGIN_EVENT_TABLE(RemoveOcclusionsDialog, wxDialog)
     // begin wxGlade: RemoveOcclusionsDialog::event_table
-    EVT_BUTTON(BTN_BROWSE, RemoveOcclusionsDialog::OnBrowse)
     EVT_BUTTON(wxID_OK, RemoveOcclusionsDialog::OnRun)
     EVT_BUTTON(wxID_CANCEL, RemoveOcclusionsDialog::OnHide)
     // end wxGlade
@@ -139,15 +143,6 @@ void RemoveOcclusionsDialog::OnHide(wxCommandEvent &event)
     event.Skip();
 }
 
-void RemoveOcclusionsDialog::OnBrowse(wxCommandEvent &event)
-{
-    wxDirDialog dir(this, wxT("Choose a directory"), this->textDirectory->GetValue());
-    if (dir.ShowModal() == wxID_OK)
-    {
-		this->textDirectory->SetValue(dir.GetPath().Append(std2wx(FileSet::PATH_DELIMITER)));
-    }
-}
-
 // wxGlade: add RemoveOcclusionsDialog event handlers
 
 
@@ -155,18 +150,12 @@ void RemoveOcclusionsDialog::set_properties()
 {
     // begin wxGlade: RemoveOcclusionsDialog::set_properties
     SetTitle(wxT("Remove Partial Occlusions"));
-    SetSize(wxSize(550, 360));
+    SetSize(wxSize(550, 550));
     comboMetric->SetToolTip(wxT("The metric to use to extimate the gradient of the fixed trasmission map"));
     comboMetric->SetSelection(0);
     label_3->SetMinSize(wxSize(120, 17));
     slidePercentile->SetToolTip(wxT("Percentile of the transmission map to set to 1 (total transmission)"));
     slidePadding->SetToolTip(wxT("Multiples of the image width by which to pad Fourier Transforms"));
-    textDirectory->SetToolTip(wxT("The directory in which to store the output files"));
-    btnBrowse->SetToolTip(wxT("Find an output directory"));
-    label_6->SetMinSize(wxSize(120, 27));
-    textTransmission->SetToolTip(wxT("A file to hold the computed transmission map (must support float pixel type)"));
-    textPrefix->SetToolTip(wxT("A prefix to append to every output file"));
-    checkOpenOutput->SetToolTip(wxT("Create a new data source and open it when complete"));
     checkOpenOutput->SetValue(1);
     btnRun->SetToolTip(wxT("Run this task"));
     btnRun->SetDefault();
@@ -180,8 +169,8 @@ void RemoveOcclusionsDialog::do_layout()
     // begin wxGlade: RemoveOcclusionsDialog::do_layout
     wxBoxSizer* sizer_2 = new wxBoxSizer(wxVERTICAL);
     wxBoxSizer* sizer_15 = new wxBoxSizer(wxHORIZONTAL);
-    wxStaticBoxSizer* sizer_17 = new wxStaticBoxSizer(sizer_17_staticbox, wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_2 = new wxFlexGridSizer(4, 3, 5, 0);
+    wxStaticBoxSizer* sizer_58 = new wxStaticBoxSizer(sizer_58_staticbox, wxVERTICAL);
+    wxFlexGridSizer* grid_sizer_2 = new wxFlexGridSizer(2, 2, 5, 5);
     wxStaticBoxSizer* sizer_18 = new wxStaticBoxSizer(sizer_18_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_3 = new wxFlexGridSizer(3, 3, 5, 0);
     grid_sizer_3->Add(label_1, 0, wxADJUST_MINSIZE, 0);
@@ -195,25 +184,18 @@ void RemoveOcclusionsDialog::do_layout()
     grid_sizer_3->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
     grid_sizer_3->AddGrowableCol(1);
     sizer_18->Add(grid_sizer_3, 1, wxEXPAND, 0);
-    sizer_2->Add(sizer_18, 1, wxALL|wxEXPAND, 5);
-    grid_sizer_2->Add(label_5, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    grid_sizer_2->Add(textDirectory, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    grid_sizer_2->Add(btnBrowse, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_2->Add(label_6, 0, wxEXPAND, 0);
+    sizer_2->Add(sizer_18, 0, wxALL|wxEXPAND, 5);
+    sizer_58->Add(panelFilePattern, 0, wxBOTTOM|wxEXPAND, 10);
+    grid_sizer_2->Add(label_5, 0, wxADJUST_MINSIZE, 0);
     grid_sizer_2->Add(textTransmission, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
     grid_sizer_2->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_2->Add(label_7, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    grid_sizer_2->Add(textPrefix, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    grid_sizer_2->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_2->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_2->Add(checkOpenOutput, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    grid_sizer_2->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
+    grid_sizer_2->Add(checkOpenOutput, 0, wxADJUST_MINSIZE, 0);
     grid_sizer_2->AddGrowableCol(1);
-    sizer_17->Add(grid_sizer_2, 1, wxEXPAND, 0);
-    sizer_2->Add(sizer_17, 1, wxALL|wxEXPAND, 5);
-    sizer_15->Add(btnRun, 0, wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 0);
-    sizer_15->Add(btnHide, 0, wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 0);
-    sizer_2->Add(sizer_15, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 0);
+    sizer_58->Add(grid_sizer_2, 0, wxEXPAND, 0);
+    sizer_2->Add(sizer_58, 1, wxEXPAND, 0);
+    sizer_15->Add(btnRun, 0, wxALIGN_BOTTOM|wxADJUST_MINSIZE, 0);
+    sizer_15->Add(btnHide, 0, wxALIGN_BOTTOM|wxADJUST_MINSIZE, 0);
+    sizer_2->Add(sizer_15, 0, wxALIGN_CENTER_HORIZONTAL, 0);
     SetAutoLayout(true);
     SetSizer(sizer_2);
     Layout();

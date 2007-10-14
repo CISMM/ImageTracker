@@ -10,6 +10,7 @@
 // end wxGlade
 
 #include "DataSource.h"
+#include "FilePatternPanel.h"
 #include "wxDoubleSlider.h"
 #include "IntegrateFlowFieldPipeline.h"
 
@@ -18,11 +19,6 @@ class IntegrateFlowDialog :
 public:
     // begin wxGlade: IntegrateFlowDialog::ids
     // end wxGlade
-
-    enum IDs
-    {
-        BTN_BROWSE = 3080
-    };
     
     IntegrateFlowDialog(wxWindow* parent, int id, const wxString& title, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxTHICK_FRAME);
 
@@ -47,11 +43,7 @@ protected:
     wxStaticBox* sizer_52_staticbox;
     wxStaticText* label_39;
     wxDoubleSlider* slideStepSize;
-    wxStaticText* label_40;
-    wxTextCtrl* textDirectory;
-    wxButton* btnBrowse;
-    wxStaticText* label_41;
-    wxTextCtrl* textPrefix;
+    FilePatternPanel* panelFilePattern;
     wxCheckBox* checkOpenOutput;
     wxButton* btnRun;
     wxButton* btnHide;
@@ -60,7 +52,8 @@ protected:
     DECLARE_EVENT_TABLE();
 
 public:
-    void OnBrowse(wxCommandEvent &event); // wxGlade: <event_handler>
+    // wxGlade: <event_handler>
+    void OnRun(wxCommandEvent &event); // wxGlade: <event_handler>
 }; // wxGlade: end class
 
 

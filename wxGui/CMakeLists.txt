@@ -12,6 +12,8 @@ SET (Gui_SRCS
     DataSourceDialog.cpp                        DataSourceDialog.h
     wxDoubleSlider.cpp                          wxDoubleSlider.h
     EmptyVisualizationControl.cpp               EmptyVisualizationControl.h
+    FilePatternDialog.cpp                       FilePatternDialog.h
+    FilePatternPanel.cpp                        FilePatternPanel.h
     GuiUtils.cxx                                GuiUtils.h
     HornOpticalFlowDialog.cpp                   HornOpticalFlowDialog.h
     ImageTracker.cpp                            ImageTracker.h

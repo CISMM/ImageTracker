@@ -10,6 +10,7 @@
 // end wxGlade
 
 #include "DataSource.h"
+#include "FilePatternDialog.h"
 
 class DataSourceDialog: public wxDialog {
 public:
@@ -20,8 +21,10 @@ public:
 
     enum IDs
     {
-        BTN_ADD_FILES       = 3000,
-        BTN_REMOVE_FILES
+        BTN_ADD_EXAMPLE       = 3000,
+        BTN_ADD_PATTERN,
+        BTN_ADD_SELECTION,
+        BTN_REMOVE
     };
     
 private:
@@ -37,17 +40,23 @@ protected:
     wxTextCtrl* txtName;
     wxRadioBox* rbxPixelType;
     wxListBox* lbxFiles;
-    wxButton* btnAddFiles;
-    wxButton* btnRemoveFiles;
+    wxButton* btnAddExample;
+    wxButton* btnAddPattern;
+    wxButton* btnAddSelection;
+    wxButton* btnRemove;
     wxButton* btnOk;
     wxButton* btnCancel;
     // end wxGlade
 
+    FilePatternDialog* dlgFilePattern;
+    
     DECLARE_EVENT_TABLE();
 
 public:
-    void OnAddFiles(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnRemoveFiles(wxCommandEvent &event); // wxGlade: <event_handler>
+    void OnAddExample(wxCommandEvent &event); // wxGlade: <event_handler>
+    void OnAddPattern(wxCommandEvent &event); // wxGlade: <event_handler>
+    void OnAddSelection(wxCommandEvent &event); // wxGlade: <event_handler>
     
 public:
     virtual bool TransferDataToWindow();

@@ -2,6 +2,7 @@
 
 #include "HornOpticalFlowDialog.h"
 
+#include "FileUtils.h"
 #include "Logger.h"
 #include "PipelineExecutor.h"
 #include "wxUtils.h"
@@ -12,7 +13,13 @@ bool HornOpticalFlowDialog::TransferDataToWindow()
     this->sldRegularization->SetValue(this->pipeline->GetSmoothWeighting());
     this->sldIterations->SetValue(this->pipeline->GetIterations());
     
-    this->textDirectory->SetValue(std2wx(this->input->GetFiles().GetDirectory()));
+    // create an output file pattern from the input files
+    std::string dir(this->input->GetFiles().GetDirectory());
+    std::string format("horn-%04d.mha");
+    unsigned int start = NumberPart(this->input->GetFiles()[0]);
+    unsigned int end = start + this->input->size() - 2;
+    this->panelFilePattern->SetFilePattern(FilePattern(dir, format, start, end));
+    this->panelFilePattern->TransferDataToWindow();
     
     return true;
 }
@@ -24,9 +31,8 @@ bool HornOpticalFlowDialog::TransferDataFromWindow()
     this->pipeline->SetSmoothWeighting(this->sldRegularization->GetValue());
     this->pipeline->SetIterations(this->sldIterations->GetValue());
     
-    FileSet outputFiles(this->input->GetFiles(), wx2std(this->textPrefix->GetValue()), "mha");
-    outputFiles.SetDirectory(wx2std(this->textDirectory->GetValue()));
-    this->pipeline->SetOutputFiles(outputFiles);
+    FileSet outFiles(this->panelFilePattern->GetFilePattern());
+    this->pipeline->SetOutputFiles(outFiles);
     
     // Create and launch a pipeline executor (uses another thread)
     PipelineExecutor* exec = new PipelineExecutor(this->pipeline);
@@ -64,11 +70,7 @@ HornOpticalFlowDialog::HornOpticalFlowDialog(wxWindow* parent, int id, const wxS
     sldRegularization = new wxDoubleSlider(this, -1);
     label_30 = new wxStaticText(this, -1, wxT("Iterations"));
     sldIterations = new wxIntSlider(this, -1);
-    label_31 = new wxStaticText(this, -1, wxT("Directory"));
-    textDirectory = new wxTextCtrl(this, -1, wxT(""));
-    btnBrowse = new wxButton(this, BTN_BROWSE, wxT("&Browse..."));
-    label_32 = new wxStaticText(this, -1, wxT("Prefix"));
-    textPrefix = new wxTextCtrl(this, -1, wxT("horn-"));
+    panelFilePattern = new FilePatternPanel(this, -1);
     checkOpenOutput = new wxCheckBox(this, -1, wxT("Open output when done"));
     btnRun = new wxButton(this, wxID_OK, wxT("&Run"));
     btnHide = new wxButton(this, wxID_CANCEL, wxT("&Hide"));
@@ -87,26 +89,18 @@ HornOpticalFlowDialog::HornOpticalFlowDialog(wxWindow* parent, int id, const wxS
     this->sldRegularization->SetRange(1.0, 4000.0, 1.0);
     this->sldRegularization->SetFormat("%0.02f");
     this->sldIterations->SetRange(200, 4000);
+    
+    panelFilePattern->SetRangeEnabled(false);
+    panelFilePattern->SetExtensionEnabled(false);
 }
 
 
 BEGIN_EVENT_TABLE(HornOpticalFlowDialog, wxDialog)
     // begin wxGlade: HornOpticalFlowDialog::event_table
-    EVT_BUTTON(BTN_BROWSE, HornOpticalFlowDialog::OnBrowse)
     EVT_BUTTON(wxID_OK, HornOpticalFlowDialog::OnRun)
     EVT_BUTTON(wxID_CANCEL, HornOpticalFlowDialog::OnHide)
     // end wxGlade
 END_EVENT_TABLE();
-
-
-void HornOpticalFlowDialog::OnBrowse(wxCommandEvent &event)
-{
-    wxDirDialog dlg(this, wxT("Choose a directory"), this->textDirectory->GetValue());
-    if (dlg.ShowModal() == wxID_OK)
-    {
-        this->textDirectory->SetValue(dlg.GetPath().Append(std2wx(FileSet::PATH_DELIMITER)));
-    }
-}
 
 void HornOpticalFlowDialog::OnRun(wxCommandEvent &event)
 {
@@ -118,7 +112,6 @@ void HornOpticalFlowDialog::OnHide(wxCommandEvent &event)
     event.Skip();
 }
 
-
 // wxGlade: add HornOpticalFlowDialog event handlers
 
 
@@ -126,13 +119,10 @@ void HornOpticalFlowDialog::set_properties()
 {
     // begin wxGlade: HornOpticalFlowDialog::set_properties
     SetTitle(wxT("Horn & Schunck Optical Flow"));
-    SetSize(wxSize(640, 450));
+    SetSize(wxSize(550, 550));
     sldSmoothing->SetToolTip(wxT("Amount to smooth each input image"));
     sldRegularization->SetToolTip(wxT("A higher value enforces a smoother optical flow field"));
     sldIterations->SetToolTip(wxT("How many iterations to perform on each image pair; more iterations is slower but may be more accurate"));
-    textDirectory->SetToolTip(wxT("The directory in which to save the output flow fields"));
-    btnBrowse->SetToolTip(wxT("Search for an output directory on this computer"));
-    textPrefix->SetToolTip(wxT("A prefix to add to all output image file names"));
     checkOpenOutput->SetToolTip(wxT("Indicates whether ImageTracker should open the output files when finished"));
     checkOpenOutput->Enable(false);
     btnRun->SetToolTip(wxT("Execute the optical flow algorithm"));
@@ -147,7 +137,7 @@ void HornOpticalFlowDialog::do_layout()
     wxBoxSizer* sizer_34 = new wxBoxSizer(wxVERTICAL);
     wxBoxSizer* sizer_37 = new wxBoxSizer(wxHORIZONTAL);
     wxStaticBoxSizer* sizer_36 = new wxStaticBoxSizer(sizer_36_staticbox, wxVERTICAL);
-    wxFlexGridSizer* grid_sizer_12 = new wxFlexGridSizer(3, 3, 5, 5);
+    wxFlexGridSizer* grid_sizer_12 = new wxFlexGridSizer(1, 2, 5, 5);
     wxStaticBoxSizer* sizer_35 = new wxStaticBoxSizer(sizer_35_staticbox, wxVERTICAL);
     wxFlexGridSizer* grid_sizer_11 = new wxFlexGridSizer(3, 2, 5, 5);
     grid_sizer_11->Add(label_28, 0, wxADJUST_MINSIZE, 0);
@@ -157,20 +147,14 @@ void HornOpticalFlowDialog::do_layout()
     grid_sizer_11->Add(label_30, 0, wxADJUST_MINSIZE, 0);
     grid_sizer_11->Add(sldIterations, 1, wxEXPAND, 0);
     grid_sizer_11->AddGrowableCol(1);
-    sizer_35->Add(grid_sizer_11, 1, wxEXPAND, 0);
-    sizer_34->Add(sizer_35, 3, wxEXPAND, 0);
-    grid_sizer_12->Add(label_31, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_12->Add(textDirectory, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    grid_sizer_12->Add(btnBrowse, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_12->Add(label_32, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_12->Add(textPrefix, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    grid_sizer_12->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_12->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
+    sizer_35->Add(grid_sizer_11, 0, wxEXPAND, 0);
+    sizer_34->Add(sizer_35, 0, wxEXPAND, 0);
+    sizer_36->Add(panelFilePattern, 0, wxEXPAND, 0);
+    grid_sizer_12->Add(110, 20, 0, wxADJUST_MINSIZE, 0);
     grid_sizer_12->Add(checkOpenOutput, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_12->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
     grid_sizer_12->AddGrowableCol(1);
     sizer_36->Add(grid_sizer_12, 1, wxEXPAND, 0);
-    sizer_34->Add(sizer_36, 0, wxEXPAND, 0);
+    sizer_34->Add(sizer_36, 1, wxEXPAND, 0);
     sizer_37->Add(btnRun, 0, wxADJUST_MINSIZE, 0);
     sizer_37->Add(btnHide, 0, wxADJUST_MINSIZE, 0);
     sizer_34->Add(sizer_37, 0, wxALIGN_CENTER_HORIZONTAL, 0);

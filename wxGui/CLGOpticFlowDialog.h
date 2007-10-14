@@ -5,6 +5,7 @@
 
 #include "CLGOpticFlowPipeline.h"
 #include "DataSource.h"
+#include "FilePatternPanel.h"
 #include "ScalarImageItkVtkPipeline.h"
 #include "wxDoubleSlider.h"
 #include "wxIntSlider.h"
@@ -23,8 +24,7 @@ public:
     
     enum IDs
     {
-        BTN_BROWSE = 3050,
-        SLD_SMOOTHING
+        SLD_SMOOTHING = 3050
     };
 
     CLGOpticFlowDialog(wxWindow* parent, int id, const wxString& title, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxTHICK_FRAME);
@@ -47,11 +47,7 @@ protected:
     wxDoubleSlider* slideRelaxation;
     wxStaticText* label_20;
     wxIntSlider* slideIterations;
-    wxStaticText* label_13;
-    wxTextCtrl* textDirectory;
-    wxButton* btnBrowse;
-    wxStaticText* label_14;
-    wxTextCtrl* textPrefix;
+    FilePatternPanel* panelFilePattern;
     wxCheckBox* checkOpenOutput;
     wxButton* btnRun;
     wxButton* btnHide;
@@ -61,7 +57,6 @@ protected:
 
 public:
     void OnSlideSmoothing(wxCommandEvent &event);
-    void OnBrowse(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnRun(wxCommandEvent &event); // wxGlade: <event_handler>
     void OnHide(wxCommandEvent &event); // wxGlade: <event_handler>
     

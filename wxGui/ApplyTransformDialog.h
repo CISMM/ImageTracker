@@ -5,6 +5,7 @@
 
 #include "ApplyTransformsPipeline.h"
 #include "DataSource.h"
+#include "FilePatternPanel.h"
         
 #ifndef APPLYTRANSFORMDIALOG_H
 #define APPLYTRANSFORMDIALOG_H
@@ -20,8 +21,7 @@ public:
     // end wxGlade
     enum IDs
     {
-        BTN_BROWSE_TRANSFORM = 3060,
-        BTN_BROWSE_DIRECTORY
+        BTN_BROWSE_TRANSFORM = 3060
     };
     
     ApplyTransformDialog(wxWindow* parent, int id, const wxString& title, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE);
@@ -34,16 +34,12 @@ private:
 
 protected:
     // begin wxGlade: ApplyTransformDialog::attributes
-    wxStaticBox* sizer_31_staticbox;
+    wxStaticBox* sizer_21_staticbox;
     wxStaticBox* sizer_30_staticbox;
     wxStaticText* label_25;
     wxTextCtrl* textTransform;
     wxButton* btnBrowse;
-    wxStaticText* label_26;
-    wxTextCtrl* textDirectory;
-    wxButton* btnBrowseDirectory;
-    wxStaticText* label_27;
-    wxTextCtrl* textPrefix;
+    FilePatternPanel* panelFilePattern;
     wxCheckBox* checkOpenOutput;
     wxButton* btnRun;
     wxButton* btnHide;
@@ -53,7 +49,6 @@ protected:
 
 public:
     void OnBrowseTransform(wxCommandEvent &event); // wxGlade: <event_handler>
-    void OnBrowseDirectory(wxCommandEvent &event); // wxGlade: <event_handler>
     
 public:
     virtual bool TransferDataToWindow();

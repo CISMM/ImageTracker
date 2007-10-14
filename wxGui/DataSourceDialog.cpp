@@ -2,7 +2,15 @@
 
 #include "DataSourceDialog.h"
 
+#include <string>
+#include <vector>
+
+#include "wx/filename.h"
+
+#include "file_list.h"
+#include "FilePattern.h"
 #include "FileSet.h"
+#include "Logger.h"
 #include "wxUtils.h"
 
 static const std::string IMAGE_FILE_FILTER(
@@ -37,7 +45,7 @@ bool DataSourceDialog::TransferDataToWindow()
     if (this->IsNewSource())
     {
         wxCommandEvent evt;
-        this->OnAddFiles(evt);
+        this->OnAddExample(evt);
     }
     
     return true;
@@ -119,8 +127,10 @@ DataSourceDialog::DataSourceDialog(wxWindow* parent, int id, const wxString& tit
         wxT("")
     };
     lbxFiles = new wxListBox(this, -1, wxDefaultPosition, wxDefaultSize, 1, lbxFiles_choices, wxLB_EXTENDED);
-    btnAddFiles = new wxButton(this, BTN_ADD_FILES, wxT("+"));
-    btnRemoveFiles = new wxButton(this, BTN_REMOVE_FILES, wxT("-"));
+    btnAddExample = new wxButton(this, BTN_ADD_EXAMPLE, wxT("&Example"));
+    btnAddPattern = new wxButton(this, BTN_ADD_PATTERN, wxT("&Pattern"));
+    btnAddSelection = new wxButton(this, BTN_ADD_SELECTION, wxT("&Selection"));
+    btnRemove = new wxButton(this, BTN_REMOVE, wxT("&Remove"));
     btnOk = new wxButton(this, wxID_OK, wxT("&OK"));
     btnCancel = new wxButton(this, wxID_CANCEL, wxT("&Cancel"));
 
@@ -137,20 +147,25 @@ DataSourceDialog::DataSourceDialog(wxWindow* parent, int id, const wxString& tit
     // is ok.  But, then you have a list item by default, which is bad.  So, we have to 
     // clear it here.  Wow.
     this->lbxFiles->Clear();
+    
+    this->dlgFilePattern = new FilePatternDialog(this, -1, wxT("Specify a file naming pattern"));
 }
 
 
 BEGIN_EVENT_TABLE(DataSourceDialog, wxDialog)
     // begin wxGlade: DataSourceDialog::event_table
-    EVT_BUTTON(BTN_ADD_FILES, DataSourceDialog::OnAddFiles)
-    EVT_BUTTON(BTN_REMOVE_FILES, DataSourceDialog::OnRemoveFiles)
+    EVT_BUTTON(BTN_ADD_EXAMPLE, DataSourceDialog::OnAddExample)
+    EVT_BUTTON(BTN_ADD_PATTERN, DataSourceDialog::OnAddPattern)
+    EVT_BUTTON(BTN_ADD_SELECTION, DataSourceDialog::OnAddSelection)
+    EVT_BUTTON(BTN_REMOVE, DataSourceDialog::OnRemoveFiles)
     // end wxGlade
 END_EVENT_TABLE();
 
 
-void DataSourceDialog::OnAddFiles(wxCommandEvent &event)
+void DataSourceDialog::OnAddSelection(wxCommandEvent &event)
 {
-    wxFileDialog open(this, wxT("Choose image files"), wxT(""), wxT(""), 
+    wxString defDir = wxFileName::GetCwd();
+    wxFileDialog open(this, wxT("Choose image files"), defDir, wxT(""), 
                       std2wx(IMAGE_FILE_FILTER), 
                       wxOPEN | wxFILE_MUST_EXIST | wxMULTIPLE | wxCHANGE_DIR);
     if (open.ShowModal() == wxID_OK)
@@ -177,6 +192,53 @@ void DataSourceDialog::OnRemoveFiles(wxCommandEvent &event)
     }
 }
 
+void DataSourceDialog::OnAddExample(wxCommandEvent &event)
+{
+    
+    wxString defDir = wxFileName::GetCwd();
+    
+    wxFileDialog open(this, wxT("Choose an image file"), defDir, wxT(""),
+                      std2wx(IMAGE_FILE_FILTER),
+                      wxOPEN | wxFILE_MUST_EXIST | wxCHANGE_DIR);
+    if (open.ShowModal() == wxID_OK)
+    {
+        // Get the selected file name
+        wxString file = open.GetPath();
+        
+        // Find other files in sequence based on example
+        typedef std::vector<std::string> StringVector;
+        StringVector files;
+        file_list(wx2std(file), files);
+        
+        // Convert list back for wx
+        StringVector::iterator it;
+        wxArrayString wxFiles;
+        for (it = files.begin(); it != files.end(); ++it)
+        {
+            wxFiles.Add(std2wx(*it));
+        }
+        
+        // Add to the list box
+        this->lbxFiles->Append(wxFiles);
+    }
+}
+
+void DataSourceDialog::OnAddPattern(wxCommandEvent &event)
+{
+    if (this->dlgFilePattern->ShowModal() == wxID_OK)
+    {
+        FileSet fileSet(this->dlgFilePattern->GetFilePattern());
+        FileSet::FileVector fileNames = fileSet.GetFileNames();
+        wxArrayString wxFiles;
+        FileSet::FileIterator it;
+        for (it = fileNames.begin(); it != fileNames.end(); ++it)
+        {
+            wxFiles.Add(std2wx(*it));
+        }
+        
+        this->lbxFiles->Append(wxFiles);
+    }
+}
 
 // wxGlade: add DataSourceDialog event handlers
 
@@ -185,14 +247,16 @@ void DataSourceDialog::set_properties()
 {
     // begin wxGlade: DataSourceDialog::set_properties
     SetTitle(wxT("Edit Data Source"));
-    SetSize(wxSize(380, 480));
+    SetSize(wxSize(534, 810));
     txtName->SetToolTip(wxT("A name to describe this data source"));
     rbxPixelType->SetToolTip(wxT("The pixel type of the images in this data source"));
     rbxPixelType->SetSelection(1);
     lbxFiles->SetToolTip(wxT("The image files in this data source"));
     lbxFiles->SetSelection(0);
-    btnAddFiles->SetToolTip(wxT("Add images to this data source"));
-    btnRemoveFiles->SetToolTip(wxT("Remove selected images from this data source"));
+    btnAddExample->SetToolTip(wxT("Add files in a sequence by selecting an example file in that sequence"));
+    btnAddPattern->SetToolTip(wxT("Add files by specifying a naming convention pattern"));
+    btnAddSelection->SetToolTip(wxT("Add files by explicitly selecting a group from a list"));
+    btnRemove->SetToolTip(wxT("Remove the selected files from the list"));
     btnOk->SetToolTip(wxT("Apply changes"));
     btnOk->SetDefault();
     btnCancel->SetToolTip(wxT("Reject changes"));
@@ -213,8 +277,10 @@ void DataSourceDialog::do_layout()
     sizer_5->Add(sizer_7, 0, wxTOP|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 10);
     sizer_5->Add(rbxPixelType, 0, wxTOP|wxBOTTOM|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxADJUST_MINSIZE, 10);
     sizer_11->Add(lbxFiles, 1, wxEXPAND|wxADJUST_MINSIZE, 0);
-    sizer_12->Add(btnAddFiles, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    sizer_12->Add(btnRemoveFiles, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
+    sizer_12->Add(btnAddExample, 0, wxADJUST_MINSIZE, 0);
+    sizer_12->Add(btnAddPattern, 0, wxADJUST_MINSIZE, 0);
+    sizer_12->Add(btnAddSelection, 0, wxADJUST_MINSIZE, 0);
+    sizer_12->Add(btnRemove, 0, wxADJUST_MINSIZE, 0);
     sizer_11->Add(sizer_12, 0, wxALIGN_CENTER_HORIZONTAL, 0);
     sizer_5->Add(sizer_11, 2, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 0);
     sizer_13->Add(btnOk, 0, wxADJUST_MINSIZE, 0);

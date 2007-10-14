@@ -5,6 +5,7 @@
 #include <cmath>
 
 #include "FileSet.h"
+#include "FileUtils.h"
 #include "ImageTrackerController.h"
 #include "Logger.h"
 #include "wxUtils.h"
@@ -81,10 +82,12 @@ END_EVENT_TABLE();
 
 void SaveVisualizationDialog::OnBrowse(wxCommandEvent &event)
 {
-    wxDirDialog dlg(this, wxT("Choose a directory"), this->textDirectory->GetValue());
-    if(dlg.ShowModal() == wxID_OK)
+    wxDirDialog dir(this, wxT("Choose a directory"), this->textDirectory->GetValue());
+    if (dir.ShowModal() == wxID_OK)
     {
-        this->textDirectory->SetValue(dlg.GetPath().Append(std2wx(FileSet::PATH_DELIMITER)));
+        std::string directory = wx2std(dir.GetPath());
+        CapDirectory(directory);
+        this->textDirectory->SetValue(std2wx(directory));
     }
 }
 
@@ -127,7 +130,10 @@ void SaveVisualizationDialog::OnHide(wxCommandEvent &event)
 
 std::string SaveVisualizationDialog::GetFileFormat()
 {
-    return wx2std(this->textDirectory->GetValue().append(std2wx(FileSet::PATH_DELIMITER)).append(this->textFilePattern->GetValue()).append(_("-%04d.tif")));
+    std::string directory(wx2std(this->textDirectory->GetValue()));
+    CapDirectory(directory);
+    wxString wxdir(std2wx(directory));
+    return wx2std(wxdir.append(this->textFilePattern->GetValue()).append(_("-%04d.tif")));
 }
 
 int SaveVisualizationDialog::GetIndexStart()

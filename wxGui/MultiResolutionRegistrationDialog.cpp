@@ -6,6 +6,7 @@
 #include "vtkRenderWindow.h"
 
 #include "FileSet.h"
+#include "FileUtils.h"
 #include "ImageTrackerController.h"
 #include "Logger.h"
 #include "PipelineExecutor.h"
@@ -45,7 +46,13 @@ bool MultiResolutionRegistrationDialog::TransferDataToWindow()
     this->slideMinStepLength->SetValue(this->pipeline->GetOptimizerInitialMinimumStepLength());
     this->slideStepScale->SetValue(this->pipeline->GetOptimizerStepLengthScale());
     
-    this->textDirectory->SetValue(std2wx(this->input->GetFiles().GetDirectory()));
+    // create an output file pattern from the input files
+    std::string dir(this->input->GetFiles().GetDirectory());
+    std::string format("reg-%04d.tif");
+    unsigned int start = NumberPart(this->input->GetFiles()[0]);
+    unsigned int end = start + this->input->size() - 1;
+    this->panelFilePattern->SetFilePattern(FilePattern(dir, format, start, end));
+    this->panelFilePattern->TransferDataToWindow();
     
     this->ViewPreview(true);
     
@@ -65,11 +72,13 @@ bool MultiResolutionRegistrationDialog::TransferDataFromWindow()
     this->pipeline->SetOptimizerInitialMinimumStepLength(this->slideMinStepLength->GetValue());
     this->pipeline->SetOptimizerStepLengthScale(this->slideStepScale->GetValue());
     
-    FileSet outputFiles(this->input->GetFiles(), wx2std(this->textPrefix->GetValue()));
-    outputFiles.SetDirectory(wx2std(this->textDirectory->GetValue()));
-    this->pipeline->SetOutputFiles(outputFiles);
+    // Create an output file set
+    FileSet outFiles(this->panelFilePattern->GetFilePattern());
+
+    this->pipeline->SetOutputFiles(outFiles);
     this->pipeline->SetTransformFile(
-            wx2std(this->textDirectory->GetValue() + this->textTransform->GetValue()));
+        this->panelFilePattern->GetFilePattern().directory +
+        wx2std(this->textTransform->GetValue()));
     
     Logger::verbose << function << ": Creating executor thread" << std::endl;
     PipelineExecutor* exec = new PipelineExecutor(this->pipeline);
@@ -134,7 +143,7 @@ MultiResolutionRegistrationDialog::MultiResolutionRegistrationDialog(wxWindow* p
     // begin wxGlade: MultiResolutionRegistrationDialog::MultiResolutionRegistrationDialog
     sizer_20_staticbox = new wxStaticBox(this, -1, wxT("Smoothing"));
     sizer_23_staticbox = new wxStaticBox(this, -1, wxT("Optimization"));
-    sizer_21_staticbox = new wxStaticBox(this, -1, wxT("Output"));
+    sizer_17_staticbox = new wxStaticBox(this, -1, wxT("Output"));
     sizer_22_staticbox = new wxStaticBox(this, -1, wxT("Thresholding"));
     checkEnabled = new wxCheckBox(this, CBX_ENABLE, wxT("Enabled"));
     label_17 = new wxStaticText(this, -1, wxT("Upper Bound"));
@@ -160,14 +169,9 @@ MultiResolutionRegistrationDialog::MultiResolutionRegistrationDialog(wxWindow* p
     slideMinStepLength = new wxDoubleSlider(this, -1);
     label_24 = new wxStaticText(this, -1, wxT("Inter-level\nStep Scale"));
     slideStepScale = new wxDoubleSlider(this, -1);
-    label_10 = new wxStaticText(this, -1, wxT("Directory"));
-    textDirectory = new wxTextCtrl(this, -1, wxT(""));
-    btnBrowseDir = new wxButton(this, BTN_BROWSE_DIR, wxT("Browse..."));
-    label_11 = new wxStaticText(this, -1, wxT("Transform File"));
+    panelFilePattern = new FilePatternPanel(this, -1);
+    label_6 = new wxStaticText(this, -1, wxT("Transform File"));
     textTransform = new wxTextCtrl(this, -1, wxT("transforms.txt"));
-    btnBrowseTransform = new wxButton(this, BTN_BROWSE_TRANSFORM, wxT("Browse..."));
-    label_12 = new wxStaticText(this, -1, wxT("Image Prefix"));
-    textPrefix = new wxTextCtrl(this, -1, wxT("reg-"));
     checkOpenOutput = new wxCheckBox(this, -1, wxT("Open output when finished"));
     btnRun = new wxButton(this, wxID_OK, wxT("&Run"));
     btnHide = new wxButton(this, wxID_CANCEL, wxT("&Hide"));
@@ -203,6 +207,8 @@ MultiResolutionRegistrationDialog::MultiResolutionRegistrationDialog(wxWindow* p
     this->slideStepScale->SetRange(1.0, 20.0, 0.5);
     this->slideStepScale->SetValue(10.0);
     this->slideStepScale->SetFormat("%0.1f");
+    
+    this->panelFilePattern->SetRangeEnabled(false);
 }
 
 
@@ -210,8 +216,6 @@ BEGIN_EVENT_TABLE(MultiResolutionRegistrationDialog, wxDialog)
     // begin wxGlade: MultiResolutionRegistrationDialog::event_table
     EVT_CHECKBOX(CBX_ENABLE, MultiResolutionRegistrationDialog::OnThresholdEnabled)
     EVT_COMBOBOX(CMB_RANGE, MultiResolutionRegistrationDialog::OnRange)
-    EVT_BUTTON(BTN_BROWSE_DIR, MultiResolutionRegistrationDialog::OnBrowseDir)
-    EVT_BUTTON(BTN_BROWSE_TRANSFORM, MultiResolutionRegistrationDialog::OnBrowseTransform)
     EVT_BUTTON(wxID_OK, MultiResolutionRegistrationDialog::OnRun)
     EVT_BUTTON(wxID_CANCEL, MultiResolutionRegistrationDialog::OnHide)
     // end wxGlade
@@ -286,26 +290,6 @@ void MultiResolutionRegistrationDialog::OnMinSmooth(wxCommandEvent &event)
     this->UpdatePreview();
 }
 
-void MultiResolutionRegistrationDialog::OnBrowseDir(wxCommandEvent &event)
-{
-    wxDirDialog dlg(this, wxT("Choose a directory"), this->textDirectory->GetValue());
-    if (dlg.ShowModal() == wxID_OK)
-    {
-		this->textDirectory->SetValue(dlg.GetPath().Append(std2wx(FileSet::PATH_DELIMITER)));
-    }
-}
-
-
-void MultiResolutionRegistrationDialog::OnBrowseTransform(wxCommandEvent &event)
-{
-    wxFileDialog dlg(this, wxT("Choose a transform file"));
-    if (dlg.ShowModal() == wxID_OK)
-    {
-        this->textTransform->SetValue(dlg.GetFilename());
-    }
-}
-
-
 void MultiResolutionRegistrationDialog::OnRun(wxCommandEvent &event)
 {	
     event.Skip();
@@ -326,7 +310,7 @@ void MultiResolutionRegistrationDialog::set_properties()
 {
     // begin wxGlade: MultiResolutionRegistrationDialog::set_properties
     SetTitle(wxT("Multi-Resolution Registration"));
-    SetSize(wxSize(550, 800));
+    SetSize(wxSize(550, 950));
     checkEnabled->Hide();
     checkEnabled->SetValue(1);
     slideUpperBound->SetToolTip(wxT("The upper threshold of image intensities to consider"));
@@ -340,12 +324,6 @@ void MultiResolutionRegistrationDialog::set_properties()
     slideMaxStepLength->SetToolTip(wxT("The maximum step size at the coarsest resolution level"));
     slideMinStepLength->SetToolTip(wxT("The minimum step size at the coarsest resolution"));
     slideStepScale->SetToolTip(wxT("Scale factor by which to reduce the max and min step size at each resolution level"));
-    textDirectory->SetToolTip(wxT("Directory in which to save registered images"));
-    btnBrowseDir->SetToolTip(wxT("Find an output directory"));
-    textTransform->SetToolTip(wxT("File in which to save the transform parameters"));
-    btnBrowseTransform->SetToolTip(wxT("Find a transform file"));
-    textPrefix->SetToolTip(wxT("Prefix to append to each output image"));
-    checkOpenOutput->SetToolTip(wxT("Create a new data source and open it when complete"));
     checkOpenOutput->SetValue(1);
     btnRun->SetToolTip(wxT("Run this task"));
     btnHide->SetToolTip(wxT("Close this dialog"));
@@ -358,8 +336,8 @@ void MultiResolutionRegistrationDialog::do_layout()
     // begin wxGlade: MultiResolutionRegistrationDialog::do_layout
     wxBoxSizer* sizer_16 = new wxBoxSizer(wxVERTICAL);
     wxBoxSizer* sizer_19 = new wxBoxSizer(wxHORIZONTAL);
-    wxStaticBoxSizer* sizer_21 = new wxStaticBoxSizer(sizer_21_staticbox, wxHORIZONTAL);
-    wxFlexGridSizer* grid_sizer_4 = new wxFlexGridSizer(4, 3, 5, 0);
+    wxStaticBoxSizer* sizer_17 = new wxStaticBoxSizer(sizer_17_staticbox, wxVERTICAL);
+    wxFlexGridSizer* grid_sizer_4 = new wxFlexGridSizer(2, 2, 5, 5);
     wxStaticBoxSizer* sizer_23 = new wxStaticBoxSizer(sizer_23_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_6 = new wxFlexGridSizer(4, 2, 5, 0);
     wxStaticBoxSizer* sizer_20 = new wxStaticBoxSizer(sizer_20_staticbox, wxHORIZONTAL);
@@ -395,21 +373,14 @@ void MultiResolutionRegistrationDialog::do_layout()
     grid_sizer_6->AddGrowableCol(1);
     sizer_23->Add(grid_sizer_6, 1, wxEXPAND, 0);
     sizer_16->Add(sizer_23, 0, wxALL|wxEXPAND, 2);
-    grid_sizer_4->Add(label_10, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_4->Add(textDirectory, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    grid_sizer_4->Add(btnBrowseDir, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_4->Add(label_11, 0, wxADJUST_MINSIZE, 0);
+    sizer_17->Add(panelFilePattern, 0, wxBOTTOM|wxEXPAND, 10);
+    grid_sizer_4->Add(label_6, 0, wxADJUST_MINSIZE, 0);
     grid_sizer_4->Add(textTransform, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    grid_sizer_4->Add(btnBrowseTransform, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_4->Add(label_12, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_4->Add(textPrefix, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    grid_sizer_4->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
     grid_sizer_4->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
     grid_sizer_4->Add(checkOpenOutput, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_4->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
     grid_sizer_4->AddGrowableCol(1);
-    sizer_21->Add(grid_sizer_4, 1, wxEXPAND, 0);
-    sizer_16->Add(sizer_21, 0, wxALL|wxEXPAND, 2);
+    sizer_17->Add(grid_sizer_4, 0, wxEXPAND, 0);
+    sizer_16->Add(sizer_17, 1, wxEXPAND, 0);
     sizer_19->Add(btnRun, 0, wxADJUST_MINSIZE, 0);
     sizer_19->Add(btnHide, 0, wxADJUST_MINSIZE, 0);
     sizer_16->Add(sizer_19, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxSHAPED, 0);
