@@ -42,7 +42,7 @@ VectorGlyphPipeline::VectorGlyphPipeline()
     // create an arrow glyph at each data point
     this->glyph->SetSourceConnection(this->glyphSource->GetOutputPort());
     this->glyph->SetScaleModeToScaleByVector();
-    this->glyph->SetScaleFactor(100.0);
+    this->glyph->SetScaleFactor(10.0);
     
     // Set the color properties of the glyph field
     this->mapper->ScalarVisibilityOff();
