@@ -99,6 +99,8 @@ bool VectorHeightMapControlPanel::TransferDataToWindow()
                 break;
         }
     }
+
+    return true;
 }
 
 void VectorHeightMapControlPanel::OnVisible(wxCommandEvent &event)
