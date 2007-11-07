@@ -28,15 +28,23 @@
 
 <div id="content">
 
+<p class="section">Table of Contents</p>
+<ul>
+<li class="menu-section"><a href="#windows">Windows XP</a></li>
+<li class="menu-section"><a href="#linux">Linux</a></li>
+</ul>
+
+<p class="section"><a name="windows"></a>Windows XP</p>
+
 <p>ImageTracker leverages a number of open-source software packages. To build ImageTracker from source, one first needs to build these packages. The following instructions create a build of ImageTracker on a Windows XP machine using Microsoft's Visual Studio 2003 .NET.</p>
 
-<p class="section">CMAKE</p>
+<p class="subsection">CMAKE</p>
 <p>CMAKE is a cross-platform, compiler-independent make system. It is available from Kitware at <a href="http://www.cmake.org">www.cmake.org</a>. Download and install the latest stable release for Windows.</p>
 
-<p class="section">fftw</p>
+<p class="subsection">fftw</p>
 <p>fftw is a fast Fourier transform library.  Download the Windows DLLs from <a href="http://www.fftw.org/">www.fftw.org</a>. Then, follow the instructions to create "lib import libraries."</p>
 
-<p class="section">ITK</p>
+<p class="subsection">ITK</p>
 <p>ITK is a powerful image processing and analysis library available from Kitware at <a href="http://www.itk.org">www.itk.org</a>. Download the latest source code release. Follow the instructions for using CMAKE to configure ITK for Visual Studio with the following important exceptions:</p>
 <ul>
 <li>In CMAKE, click on the &quot;Show Advanced Values&quot; checkbox to display advanced ITK configuration parameters</li>
@@ -47,10 +55,10 @@
 </ul>
 <p>Build &quot;Debug&quot; (if you plan to do any development) and &quot;Release&quot; versions of the generated ITK solution.</p>
 
-<p class="section">VTK</p>
+<p class="subsection">VTK</p>
 <p>VTK is a data visualization library available from Kitware at <a href="http://www.vtk.org">www.vtk.org</a>. Download, configure, and build the latest source code release using CMAKE and Visual Studio, or obtain the CVS version from the VTK repositories. Build both a &quot;Debug&quot; and &quot;Release&quot; version.</p>
 
-<p class="section">wxWidgets</p>
+<p class="subsection">wxWidgets</p>
 <p>wxWidgets is a platform-independent graphical user interface (GUI) development library. Download and install MSW version 2.6.3 from <a href="http://www.wxWidgets.org">www.wxwidgets.org</a>. ImageTracker uses a feature of wxWidgets that is disabled by default:</p>
 <ul>
 <li>Open wx.dsw and convert to a .NET solution</li>
@@ -59,13 +67,86 @@
 <li>Build a Release version of the .NET project.</li>
 </ul>
 
-<p class="section">ImageTracker</p>
+<p class="subsection">ImageTracker</p>
 <p>The ImageTracker source is available by request or from NSRG's CVS:</p>
 <ul>
 <li>CVSROOT: /afs/cs.unc.edu/proj/stm/src/</li>
 <li>Repository: ImageTracker </li>
 </ul>
 <p>Create an ImageTracker solution file using CMAKE. I would suggest an out-of-source build to keep the code and binaries separate. The CMakeLists.txt file provided from CVS should configure everything for you; you may need to point to the compiled ITK, VTK, wxWidgets, or fftw libraries. There is an advanced option to turn on or off building of test cases. Generate the solution file, and build the ImageTracker project! When you are done, you need to put the fftw dlls and the ImageTracker executable in the same directory.</p>
+
+<p class="section"><a name="linux"></a>Linux</p>
+<p>The following instructions build ImageTracker on a new Ubuntu 7.10 (Gutsy) install.</p>
+<p class="subsection">Prerequisites</p>
+<p>Install the following packages, e.g. with</p>
+<p class="code">$ sudo aptitude install <em>package</em></p>
+<p>For each package, I have included the list of dependencies that aptitude will likely automatically find.</p>
+<dl>
+<dt>build-essential:</dt><dd>dpkg-dev g++ g++-4.1 libc6-dev libstdc++6-4.1-dev linux-libc-dev patch</dd>
+
+<dt>libncurses5-dev:</dt><dd>(required for ccmake)</dd>
+
+<dt>fftw3-dev:</dt><dd>fftw3</dd>
+
+<dt>libgl1-mesa-dev:</dt><dd> libx11-dev libxau-dev libxdmcp-dev mesa-common-dev x11proto-core-dev x11proto-input-dev x11proto-kb-dev xtrans-dev</dd>
+
+<dt>libglu1-mesa-dev:</dt> <dd>&nbsp;</dd>
+
+<dt>libxt-dev:</dt><dd> libice-dev libsm-dev</dd>
+
+<dt>wx2.8-headers:</dt> <dd>&nbsp;</dd>
+
+<dt>libwxgtk2.8-dev:</dt><dd> libwxbase2.8-dev</dd>
+
+<dt>libgtk2.0-dev:</dt><dd> libatk1.0-dev libcairo2-dev libexpat1-dev libfontconfig1-dev libfreetype6-dev libglib2.0-dev libpango1.0-dev libpng12-dev libxcomposite-dev libxcursor-dev libxdamage-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxinerama-dev libxrandr-dev libxrender-dev x11proto-composite-dev x11proto-damage-dev x11proto-fixes-dev x11proto-randr-dev x11proto-render-dev x11proto-xext-dev x11proto-xinerama-dev zlib1g-dev</dd>
+
+<dt>python-wxglade:</dt><dd> libwxbase2.8-0 libwxgtk2.8-0 python-wxgtk2.8 python-wxversion </dd>
+</dl>
+
+<p class="subsection">CMake</p>
+<p>The cmake package for Ubuntu sometimes lags behind the latest release, so I suggest building from source.  Download the source from www.cmake.org.</p>
+<p class="code">
+$ tar -xvf cmake-2.4.7.tar.gz <br />
+$ cd cmake-2.4.7/ <br />
+$ ./bootstrap <br />
+$ make <br />
+$ sudo make install <br />
+$ cmake --version <br />
+cmake version 2.4-patch 7 <br />
+</p>
+
+<p class="subsection">InsightToolkit (ITK)</p>
+<p>Download the latest source code release from www.itk.org. Do an out-of-source build.</p>
+<p class="code">
+$ tar xvf InsightToolkit-3.4.0.tar.gz <br />
+$ ccmake (path to itk source)/InsightToolkit-3.4.0 <br />
+BUILD_EXAMPLES	OFF <br />
+BUILD_TESTING	OFF <br />
+USE_FFTWD	ON <br />
+USE_FFTWF	ON <br />
+Generate <br />
+$ make <br />
+</p>
+
+<p class="subsection">VisualizationToolkit (VTK)</p>
+<p>Download the latest source code from www.vtk.org. Do an out-of-source build.</p>
+<p class="code">
+$ tar xvf vtk-5.0.3.tar.gz<br />
+$ ccmake (path to vtk source)/VTK <br />
+$ make <br />
+</p>
+
+<p class="subsection">ImageTracker</p>
+<p>Checkout ImageTracker from CVS. Do an out-of-source build.</p>
+<p class="code">
+$ ccmake -G KDevelop3 ../../source/ImageTracker<br />
+(-G KDevelop3 generates project files for KDevelop.  Optional.  Make in KDevelop is not colored.)<br />
+CMAKE_BUILD_TYPE	Debug (optional) <br />
+ITK_DIR			path to itk <br />
+VTK_DIR			path to vtk <br />
+BUILD_IT_TESTS		OFF <br />
+$ make ImageTracker <br />
+</p>
 
 </div> <!-- end content -->
 </div> <!-- end container -->

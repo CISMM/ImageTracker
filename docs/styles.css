@@ -224,7 +224,7 @@ clear:right;
 .code
 {
 font-family: monospace,sans-serif;
-overflow: scroll;
+/* overflow: scroll; */
 background-color: #DDDDDD;
 margin: 0 0 10px 0;
 padding: 5px;
