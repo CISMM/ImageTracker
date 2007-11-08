@@ -33,6 +33,7 @@
 <li class="menu-section"><a href="#introduction">Introduction</a></li>
 <li class="menu-section"><a href="#installation">Installation</a></li>
 <li class="menu-section"><a href="#loadingdata">Loading Data</a></li>
+<li class="menu-section"><a href="#savingdata">Saving Data</a></li>
 <li class="menu-section"><a href="#visualization">Visualization</a></li>
 <li class="menu-section"><a href="#stabilization">Stabilization</a></li>
 <li class="menu-section"><a href="#transforms">Transforms</a></li>
@@ -44,6 +45,7 @@
 <li class="menu-section"><a href="#saveView">Saving View Images</a></li>
 <li class="menu-section"><a href="#visParaView">Visualization with ParaView</a></li>
 <li class="menu-section"><a href="#versionhistory">Version History</a></li>
+	<li class="menu-subsection"><a href="#v2.07">Version 2.07</a></li>
 	<li class="menu-subsection"><a href="#v2.06">Version 2.06</a></li>
 	<li class="menu-subsection"><a href="#v2.05">Version 2.05</a></li>
 	<li class="menu-subsection"><a href="#v2.04">Version 2.04</a></li>
@@ -77,12 +79,19 @@ When ImageTracker is performing an image processing task, a progress bar will ap
 <p>Program information will be written to the logging panel at various points during execution. This information may be useful for making sure the application is still running or troubleshooting the application if something goes wrong. You can change the levels of logging messages that appear from the menu Help--&gt;Logging. All messages at or above the selected logging level will be displayed. Info is the recommended logging level; lower levels can produce enough messages to noticably slow down the application.</p>
 
 <p class="section"><a name="loadingdata"></a>Loading Data</p>
-<p>ImageTracker operates on sets of image files, called &quot;data sources&quot;.  Currently, ImageTracker does not support metamorph stacks, video files, or raw image files. Although ImageTracker technically can read PNG, TIFF, and JPEG image files, there have been some problems reading certain types of TIFF images. This should be remedied as of version 2.00. Future releases may have support for a wider variety of image formats.</p>
+<p>ImageTracker operates on sets of image files, called &quot;data sources&quot;. A data source can contain files that share a common naming scheme or an arbitrary list of files.  Because each task in ImageTracker can generate a large number of image files, it is suggested that users place the image files for each data set in separate directories.  This way, files generated during image processing will not overwrite results from another experiment.</p>
 <p><span class="figure">
 <a href="img/OpenFiles.jpg"><img src="img/OpenFiles.jpg" width="300" alt="Open file dialog"/></a><br/>
 The Edit Data Source dialog specifies which image files are in a data source.
 </span>
-Open a set of image files by selecting the menu item File--&gt;Open or clicking on the &quot;+&quot; button on the data source panel. This launches the Edit Data Source dialog, and also opens a file browser. First, select the image files that constitute the data set. After closing the file selection dialog, configure the data source in the Edit Data Source Dialog. Choose a name for your data source (optional) and select the pixel data type. Add or remove files from the data source using the &quot;+&quot; and &quot;-&quot; buttons.</p>
+Open a set of image files by selecting the menu item File--&gt;Open or clicking on the &quot;+&quot; button on the data source panel. This launches the Edit Data Source dialog in example select mode, which also opens a file browser. Select a single image file to load all images in the same directory with the same naming convention. After closing the file selection dialog, configure the data source in the Edit Data Source Dialog. Choose a name for your data source (optional) and select the pixel data type. Add or remove files from the data source using the buttons at the bottom of the file list box:</p>
+<dl>
+<dt>Example</dt><dd>Select a single image, and let ImageTracker find files with the same naming convention</dd>
+<dt>Pattern</dt><dd>Explicitly specify a directory and naming convention for a data source (advanced)</dd>
+<dt>Selection</dt><dd>Select multiple files to add to the data source&mdash;a maximum of around 1000 file names can be selected at one time</dd>
+<dt>Remove</dt><dd>Remove the files selected in the file list from the data source</dd>
+</dl>
+<p>Currently, ImageTracker does not support metamorph stacks, video files, or raw image files. Although ImageTracker technically can read PNG, TIFF, and JPEG image files, there have been some problems reading certain types of TIFF images. This should be remedied as of version 2.00. Future releases may have support for a wider variety of image formats.</p>
 <p><span class="figure">
 <a href="img/ViewImage.jpg"><img src="img/ViewImage.jpg" width="300" alt="Image display"/></a><br/>
 ImageTracker displaying a sequence of fibrin sheet manipulation along with displacement information.
@@ -95,6 +104,21 @@ The data source frame control panel in ImageTracker.
 </span>
 Controls below the image display panel adjust the index of the frame that is displayed. Move the slider to quickly scan through the loaded data source. To jump to a specific frame, enter the frame index in the text box. A set of buttons to the right of the slider enables playing, rewinding, pausing, single frame advance and rewind, and skipping to either end of the image sequence. The frame index range is based on the length of the largest loaded data source. If two data sources of different sizes are loaded, the image from the smaller data source will no longer update once the frame index exceeds the size of that data source.</p>
 <p>In ImageTracker, image processing tasks are performed on the data source that is selected in the ImageTracker main window. If no data source is selected, ImageTracker will assume that the first data source in the list should be used.</p>
+
+<p class="section"><a name="savingdata"></a>Saving Data</p>
+<p><span class="figure">
+<a href="img/OutputControlPanel.jpg"><img src="img/OutputControlPanel.jpg" width="300" alt="Output control panel"/></a><br/>
+This control panel is common to all ImageTracker processing tasks that output images.
+</span>
+Whenever ImageTracker needs to save image data, a dialog box will prompt for output.  The output options are always the same.
+<dl>
+<dt>Directory</dt><dd>The directory in which to save all output files</dd>
+<dt>Prefix</dt><dd>The prefix to apply to saved images</dd>
+<dt>Number format</dt><dd>A C-style number format, e.g. %04d, which means a zero-padded 4 digit integer</dd>
+<dt>Extension</dt><dd>The file type extension to apply; ImageTracker will often choose this for you</dd>
+<dt>File index range</dt><dd>The beginning and ending index for the file sequence; ImageTracker will often choose this for you</dd>
+</dl>
+</p>
 
 <p class="section"><a name="visualization"></a>Visualization</p>
 <p>ImageTracker provides different data source visualizations based on the type of data loaded. Selecting a data source will display appropriate visualization controls in the panel below the data source panel. For all visualization controls, a check box turns on and off the visibility of the currently selected data source.</p>
@@ -154,7 +178,7 @@ The image pyramids used in the multiple resolution registration method are gener
 <a href="img/PostRegistration.jpg"><img src="img/PostRegistration.jpg" width="300" alt="Post registration"/></a><br/>
 Viewing the results of a registration. Note that the absolute black regions of the image were outside the view of the original image frame.
 </span>
-The output from image stabilization is a list of image transformations that describe how to align images in the sequence. In the output section of the multi-resolution registration dialog, specify the directory in which to save the transformed images, the text file that will contain a description of the computed transforms, and a prefix to apply to each transformed image. If &quot;Open output when finished&quot; is checked, ImageTracker will create a new data source containing the transformed images and open it when the alignment process completes.</p>
+The output from image stabilization is a list of image transformations that describe how to align images in the sequence. In the output section of the multi-resolution registration dialog, specify the directory and file pattern to use for the transformed images and the text file that will contain a description of the computed transforms. If &quot;Open output when finished&quot; is checked, ImageTracker will create a new data source containing the transformed images and open it when the alignment process completes.</p>
 <p><span class="warning">Please note</span>:</p>
 <ul>
 <li>ImageTracker saves images in 16 bit grayscale format. 16 bit images may appear completely dark in image viewers that only handle 8 bit images. ImageTracker, of course, is a 16 bit image viewer.</li>
@@ -185,12 +209,10 @@ A lot of factors can contribute to microscopy images that are not optically opti
 <dd>This setting adjusts the overall brightness of the final images. Select 100 to only increase the brightness of the image everywhere. Select 50 to maintain the average intensity between the input and output images. Note that some intensity values of the output images may become clipped to the maximum allowable output level. If this happens (the resulting images will looked washed out or saturated), decrease the value of this slider.</dd>
 <dt>Fourier Padding</dt>
 <dd>This slider corresponds to a windowing applied to images when using the Median transmission metric. The default value of 0.5 will use a window of half the image size on each boundary when computing Fourier transforms. This value is perfectly reasonable for most cases, and probably does not need to be changed.</dd>
-<dt>Output Directory</dt>
-<dd>Specifies the directory in which to put output images.</dd>
+<dt>Output</dt>
+<dd>The common output options are available.</dd>
 <dt>Transmission Map</dt>
 <dd>This is an image file that will hold the computed constant transmission factor at every location on the image plane. ImageTracker can open this type of image (it has floating point pixels), which can be useful to see where ImageTracker found occluding regions. In the transmission map, bright values indicate areas of the image plane that constantly transmitted a larger percentage of light than darker areas.</dd>
-<dt>Prefix</dt>
-<dd>Specifies a prefix to add to the input image file names to create the output file names.</dd>
 <dt>Open output when finished</dt>
 <dd>If this box is checked, ImageTracker will create an open a new data source containing the output images.</dd>
 </dl>
@@ -220,10 +242,8 @@ The implementation provided in ImageTracker is the single-resolution, simple tem
 <dd>The constant to use during the successive over-relaxation (SOR) step of the algorithm; this affects the speed of the iterative algorithm&nbsp;Bruhn et al suggest a value in the range 1.90-1.99</dd>
 <dt>Iterations</dt>
 <dd>Specifies the number of iterations to complete when minimizing the error functional; more iterations will presumably provide a lower error residual, but will take longer</dd>
-<dt>Directory</dt>
-<dd>Specifies where to save the flow field images computed</dd>
-<dt>Prefix</dt>
-<dd>Specifies the prefix to add to input file names to create output file names. The output file type is metaimage (.mha).</dd>
+<dt>Output</dt>
+<dd>The common output options are available.</dd>
 <dt>Open output when finished</dt>
 <dd>This option is disabled until flow visualization is included in ImageTracker.  See the section on <a href="#visualization">visualization</a> to find out how to view the output in ParaView.</dd>
 </dl>
@@ -238,10 +258,8 @@ The implementation provided in ImageTracker is the single-resolution, simple tem
 <dd>Controls how smooth the resulting flow field will be; larger values enforce a smoother flow field.  This is analoguous to the Regularization term in the CLG method.  Higher values seem to require more iterations to converge on an appropriate solution.</dd>
 <dt>Iterations</dt>
 <dd>Specifies the number of iterations to complete when minimizing the error functional; more iterations will presumably provide a lower error residual, but will take longer</dd>
-<dt>Directory</dt>
-<dd>Specifies where to save the flow field images computed</dd>
-<dt>Prefix</dt>
-<dd>Specifies the prefix to add to input file names to create output file names. The output file type is metaimage (.mha).</dd>
+<dt>Output</dt>
+<dd>The common output options are available.</dd>
 <dt>Open output when finished</dt>
 <dd>This option is disabled until flow visualization is included in ImageTracker.  See the section on <a href="#visualization">visualization</a> to find out how to view the output in ParaView.</dd>
 </dl>
@@ -254,10 +272,8 @@ The ImageTracker flow integration dialog.
 <dl>
 <dt>Step size</dt>
 <dd>Specifies the step size (in frames) of the Runge-Kutta 4th order integration. The integration process saves results at the nearest whole step size, to match the spacing of input flow data. So, with a step size of 0.1 frames, displacement images will be saved every 10 steps.</dd>
-<dt>Directory</dt>
-<dd>Specifies the directory in which to store integration results.</dd>
-<dt>Prefix</dt>
-<dd>Specifies the prefix to add to each input file name when saving integration results.</dd>
+<dt>Output</dt>
+<dd>The common output options are available.</dd>
 </dl>
 
 <p class="section"><a name="saveView"></a>Saving View Images</p>
@@ -301,6 +317,18 @@ Select the Calculator filter object, and change its input to ImageClip1. This wi
 <p class="section"><a name="versionhistory"></a>Version History</p>
 <p>The sections below outline the changes made to ImageTracker at each revision.</p>
 
+<p class="subsection"><a name="v2.07"></a>Version 2.07</p>
+<p>Features</p>
+<ul>
+<li>Data source selection based on matching single file naming convention</li>
+<li>Common control panel for specifying saved image file names</li>
+<li>Documentation includes instructions for compiling on Linux</li>
+</ul>
+<p>Known bugs</p>
+<ul>
+<li>The installer does not seem to work on some Windows machines</li>
+</ul>
+
 <p class="subsection"><a name="v2.06"></a>Version 2.06</p>
 <p>Features</p>
 <ul>
@@ -313,10 +341,10 @@ Select the Calculator filter object, and change its input to ImageClip1. This wi
 <p>Known bugs</p>
 <ul>
 <li>ImageTracker sometimes hesitates a long time after selecting many image files for a data source.</li>
-<li>wxWidgets truncates a data source file list if selecting more than ~1000 images. Loading large data sources may require selecting image files in chunks.</li>
+<li>wxWidgets truncates a data source file list if selecting more than ~1000 images. Loading large data sources may require selecting image files in chunks. (work around: v2.07)</li>
 <li>If the image window size changes after saving one set of visualization images ImageTracker may subsequently save corrupted visualizations.</li>
-<li>Image spacing information is not preserved on all operations (e.g. Occlusiton Removal).</li>
-<li>The default directory from which to load image data seems to get stuck&mdash;it should always use the most recently used directory. (Seems Windows-specific.)</li>
+<li>Image spacing information is not preserved on all operations (e.g. Occlusion Removal).</li>
+<li>The default directory from which to load image data seems to get stuck&mdash;it should always use the most recently used directory. (Seems Windows-specific.) (Partial solution: v2.07)</li>
 <li>There is no check that a processing task can be performed on a selected data source; this can lead to a crash for mismatched data sources and processes.</li>
 </ul>
 
