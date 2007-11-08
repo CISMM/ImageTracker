@@ -7,10 +7,10 @@
     <ROW Property="BannerBitmap" Value="default_banner.bmp" Type="1"/>
     <ROW Property="DialogBitmap" Value="default_dialog.bmp" Type="1"/>
     <ROW Property="Manufacturer" Value="NSRG" ValueLocId="*"/>
-    <ROW Property="ProductCode" Value="1033:{F9EDF22C-CF26-4098-9C83-E02C25FA1D21} "/>
+    <ROW Property="ProductCode" Value="1033:{CFFF0AEE-126F-4902-9DE6-8576626B8D49} "/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="ImageTracker" ValueLocId="*"/>
-    <ROW Property="ProductVersion" Value="2.06"/>
+    <ROW Property="ProductVersion" Value="2.07"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{3D6A5EE6-03FD-409E-9A8B-5924941CE0CD}"/>
   </COMPONENT>
