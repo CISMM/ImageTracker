@@ -65,6 +65,7 @@
     <ROW File="MultiResRegistration.jpg" Component_="ActionMenu.jpg" FileName="MultiR~1.jpg|MultiResRegistration.jpg" Attributes="0" SourcePath="..\docs\img\MultiResRegistration.jpg" SelfReg="false" Sequence="16"/>
     <ROW File="OpenFiles.jpg" Component_="ActionMenu.jpg" FileName="OpenFi~1.jpg|OpenFiles.jpg" Attributes="0" SourcePath="..\docs\img\OpenFiles.jpg" SelfReg="false" Sequence="17"/>
     <ROW File="Output.jpg" Component_="ActionMenu.jpg" FileName="Output.jpg" Attributes="0" SourcePath="..\docs\img\Output.jpg" SelfReg="false" Sequence="18"/>
+    <ROW File="OutputControlPanel.jpg" Component_="ActionMenu.jpg" FileName="Output~1.jpg|OutputControlPanel.jpg" Attributes="0" SourcePath="..\docs\img\OutputControlPanel.jpg" SelfReg="false" Sequence="47"/>
     <ROW File="ParaViewCropIce.jpg" Component_="ActionMenu.jpg" FileName="ParaVi~1.jpg|ParaViewCropIce.jpg" Attributes="0" SourcePath="..\docs\img\ParaViewCropIce.jpg" SelfReg="false" Sequence="19"/>
     <ROW File="ParaViewMucus.jpg" Component_="ActionMenu.jpg" FileName="ParaVi~2.jpg|ParaViewMucus.jpg" Attributes="0" SourcePath="..\docs\img\ParaViewMucus.jpg" SelfReg="false" Sequence="20"/>
     <ROW File="ParaViewSparseIce.jpg" Component_="ActionMenu.jpg" FileName="ParaVi~3.jpg|ParaViewSparseIce.jpg" Attributes="0" SourcePath="..\docs\img\ParaViewSparseIce.jpg" SelfReg="false" Sequence="21"/>
