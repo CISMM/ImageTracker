@@ -51,6 +51,7 @@ SET (Filters_SRCS
                             ModulateRegionImageFilter.h
                             MultiResolutionOpticalFlowMethod.h
                             MultiResolutionRegistration.h
+                            NaryJoinImageFilter.h
                             NaryMeanImageFilter.h
                             NaryMeanVectorImageFilter.h
                             NaryMedianImageFilter.h
@@ -64,6 +65,7 @@ SET (Filters_SRCS
                             itkRealToComplexImageFilter.h
                             RegistrationMotionFilter.h
                             RungeKuttaSolver.h
+                            StructureTensorImageFilter.h
                             WarpImageErrorFilter.h
 )
 
