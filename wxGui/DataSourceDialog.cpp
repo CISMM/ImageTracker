@@ -75,6 +75,7 @@ bool DataSourceDialog::TransferDataFromWindow()
     
     if (this->lbxFiles->GetCount() > 0)
     {    
+        // TODO: set the size of the file set.
         FileSet files;
         for (int i = 0; i < this->lbxFiles->GetCount(); i++)
         {
@@ -213,6 +214,7 @@ void DataSourceDialog::OnAddExample(wxCommandEvent &event)
         // Convert list back for wx
         StringVector::iterator it;
         wxArrayString wxFiles;
+        wxFiles.Alloc(files.size());
         for (it = files.begin(); it != files.end(); ++it)
         {
             wxFiles.Add(std2wx(*it));
@@ -230,6 +232,7 @@ void DataSourceDialog::OnAddPattern(wxCommandEvent &event)
         FileSet fileSet(this->dlgFilePattern->GetFilePattern());
         FileSet::FileVector fileNames = fileSet.GetFileNames();
         wxArrayString wxFiles;
+        wxFiles.Alloc(fileNames.size());
         FileSet::FileIterator it;
         for (it = fileNames.begin(); it != fileNames.end(); ++it)
         {
