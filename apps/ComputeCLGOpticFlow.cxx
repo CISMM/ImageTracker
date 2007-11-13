@@ -12,10 +12,10 @@
 int main(int argc, char** argv)
 {
     // Check inputs
-    if (argc < 10)
+    if (argc < 11)
     {
         Logger::error << "Usage: " << std::endl;
-        Logger::error << "\t" << argv[0] << " dir formatIn start stop formatOut sigma regularization iterations relaxation" << std::endl;
+        Logger::error << "\t" << argv[0] << " dir formatIn start stop formatOut sigmaDer sigmaInt regularization iterations relaxation" << std::endl;
         exit(1);
     }
     
@@ -26,10 +26,11 @@ int main(int argc, char** argv)
     int start               = atoi(argv[3]);
     int stop                = atoi(argv[4]);
     std::string formatOut   = argv[5];
-    double sigma            = atof(argv[6]);
-    double reg              = atof(argv[7]);
-    int iter                = atoi(argv[8]);
-    double rel              = atof(argv[9]);
+    double sigmaDer         = atof(argv[6]);
+    double sigmaInt         = atof(argv[7]);
+    double regular          = atof(argv[8]);
+    int iterations          = atoi(argv[9]);
+    double relax            = atof(argv[10]);
     
     FileSet filesIn(FilePattern(dir, formatIn, start, stop));
     FileSet filesOut(FilePattern(dir, formatOut, start, stop-1));
@@ -47,10 +48,11 @@ int main(int argc, char** argv)
     Logger::debug << "Setting up pipeline." << std::endl;
     ReaderType video(filesIn);
     OpticFlowType::Pointer flow = OpticFlowType::New();
-    flow->SetSpatialSigma(sigma);
-    flow->SetRegularization(reg);
-    flow->SetRelaxation(rel);
-    flow->SetIterations(iter);
+    flow->SetSpatialSigma(sigmaDer);
+    flow->SetIntegrationSigma(sigmaInt);
+    flow->SetRegularization(regular);
+    flow->SetRelaxation(relax);
+    flow->SetIterations(iterations);
     
     // Compute optic flow for each image pair
     Logger::debug << "Computing optic flow." << std::endl;
