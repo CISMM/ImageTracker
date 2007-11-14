@@ -134,6 +134,7 @@ private:
 /* Implementation                                                       */
 /************************************************************************/
 
+#include "ImageUtils.h"
 #include "Logger.h"
 
 template <class TInputImage1, class TInputImage2, class TOutputValueType>
@@ -147,13 +148,6 @@ void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
     // Allocate the output buffer
     Logger::debug << function << ": allocating output buffer" << std::endl;
     Superclass::AllocateOutputs();
-    typename OutputImageType::Pointer output = this->GetOutput();
-
-    // Initialize output to zero flow field
-    Logger::debug << function << ": initializing flow field" << std::endl;
-    typename OutputImageType::PixelType zero;
-    zero.Fill(0);
-    output->FillBuffer(zero);
 
     // Create the image structure tensor
     Logger::debug << function << ": computing image structure tensor" << std::endl;
@@ -170,6 +164,20 @@ void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
     step->SetStructureTensor(tensor->GetOutput());
     step->SetRegularization(this->GetRegularization());
     step->SetRelaxation(this->GetRelaxation());
+    // step->SetNumberOfThreads(4);
+    Logger::debug << function << ": iterative step filter threads: " << step->GetNumberOfThreads() << std::endl;
+
+    // Initialize output to zero flow field	
+    Logger::debug << function << ": initializing flow field" << std::endl;
+    typename OutputImageType::Pointer output = OutputImageType::New();
+    output->SetRegions(this->GetOutput()->GetLargestPossibleRegion());
+    output->SetSpacing(this->GetOutput()->GetSpacing());
+    output->SetOrigin(this->GetOutput()->GetOrigin());
+    output->Allocate();
+    typename OutputImageType::PixelType zero;
+    zero.Fill(0);
+    output->FillBuffer(zero);
+    PrintImageInfo<OutputImageType>(output, "Initial flow");
 
     // Iteratively calculate flow field
     Logger::debug << function << ": caluculating flow field" << std::endl;
@@ -179,6 +187,10 @@ void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
         step->Update();
         output = step->GetOutput();
         output->DisconnectPipeline();
+
+	char msg[80];
+	sprintf(msg, "Flow after step %d", i);
+	PrintImageInfo<OutputImageType>(output, std::string(msg));
     }
 
     // Call AfterGenerateData to calculate the confidence image.
