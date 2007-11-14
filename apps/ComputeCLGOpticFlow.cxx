@@ -58,7 +58,7 @@ int main(int argc, char** argv)
     Logger::debug << "Computing optic flow." << std::endl;
     for (int i = 0; i < video.size() - 1; i++)
     {
-        Logger::debug << "CLG:\t" << i << " / " << (video.size() - 1) << std::endl;
+        Logger::debug << "CLG:\t" << (i+1) << " / " << (video.size() - 1) << std::endl;
         flow->SetInput1(video[i]);
         flow->SetInput2(video[i+1]);
         flow->Update();
