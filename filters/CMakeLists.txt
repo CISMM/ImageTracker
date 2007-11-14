@@ -37,6 +37,7 @@ SET (Filters_SRCS
                             AddConstantImageFilter.h
                             BilateralVectorImageFilter.h
                             CentralDifferenceImageFilter.h
+                            CLGOpticalFlowIterativeStepImageFilter.h
                             CLGOpticFlowImageFilter.h
                             DerivativesToSurfaceImageFilter.h
                             itkFFTComplexToComplexImageFilter.h

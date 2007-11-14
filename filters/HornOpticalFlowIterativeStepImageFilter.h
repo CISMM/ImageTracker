@@ -13,7 +13,7 @@
  *
  * This filter uses threaded execution; the calling filter should not.  Otherwise, the iteration
  * in one portion of the image could get ahead of the iterations in another part of the image,
- * corrupting the result.  The value at on location in an iteration depend on the neighboring 
+ * corrupting the result.  The value at one location in an iteration depends on the neighboring 
  * values from the previous iteration.
  */
 template < class TInputImage, class TDerivativeImage, class TOutputImage = TInputImage >

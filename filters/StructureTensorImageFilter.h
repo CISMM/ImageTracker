@@ -51,7 +51,7 @@ public:
     typedef itk::SmartPointer< const Self > ConstPointer;
     
     itkNewMacro(Self);
-    itkTypeMacro(StructureTensorImageFilter, ImageToImageFilter);
+    itkTypeMacro(StructureTensorImageFilter, itk::ImageToImageFilter);
     
     /** 
      * Get/Set the spatial filter deviation. This is the smoothing
