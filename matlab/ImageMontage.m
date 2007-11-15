@@ -1,5 +1,5 @@
 function [ montage ] = ImageMontage( imgs, cols, pad, white )
-% ImageMontage(imgs, cols, rows) - Creates a montage of all the images in
+% ImageMontage(imgs, cols, pad, white) - Creates a montage of all the images in
 % the given image sequence
 % Inputs
 %   imgs        - The image sequence, nxmxF

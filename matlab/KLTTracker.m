@@ -85,7 +85,7 @@ end;
 [h w t] = size(imgs);
 
 % Find initial features
-features(:,:,1) = HarrisDetector(imgs(:,:,1), sigmaS, sigmaS, count, featRadius);
+features(:,:,1) = HarrisDetector(squeeze(imgs(:,:,1)), sigmaS, sigmaS, count, featRadius, [], 0.00);
 displayFeatures(imgs(:,:,1), features(:,:,1));
 
 for i=1:t-1

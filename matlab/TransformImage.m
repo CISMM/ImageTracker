@@ -33,14 +33,25 @@ for i = 1:steps
     % inverse transform--this is for tear-free image warping
     invTran = inv(tran);
     
-    pos = zeros(outSize(1),outSize(2),3); % initialize sampling matrix
-    for y = 1:outSize(1)
-        for x = 1:outSize(2)
-            % find the index from the original image corresponding to the
-            % warped [x, y, 1]
-            pos(y, x, :) = invTran * [x+offset(2) y+offset(1) 1]';
-        end;
-    end;
+    xx=(1:outSize(2)) + offset(2);
+    yy=(1:outSize(1)) + offset(1);
+    [xx,yy] = meshgrid(xx,yy);
+    hh=ones(outSize(1),outSize(2));
+    pos = [xx(:)'; yy(:)'; hh(:)'];
+    pos = invTran * pos;
+    
+    posX = reshape(pos(1,:), outSize(1), outSize(2));
+    posY = reshape(pos(2,:), outSize(1), outSize(2));
+    imgs(:,:,i) = interp2(img, posX, posY, 'linear', 0);
+    
+%     pos = zeros(outSize(1),outSize(2),3); % initialize sampling matrix
+%     for y = 1:outSize(1)
+%         for x = 1:outSize(2)
+%             % find the index from the original image corresponding to the
+%             warped [x, y, 1]
+%             pos(y, x, :) = invTran * [x+offset(2) y+offset(1) 1]';
+%         end;
+%     end;
 
-    imgs(:,:,i) = interp2(img, squeeze(pos(:,:,1)), squeeze(pos(:,:,2)), 'linear');
+%     imgs(:,:,i) = interp2(img, squeeze(pos(:,:,1)), squeeze(pos(:,:,2)), 'linear');
 end;

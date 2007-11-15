@@ -1,4 +1,4 @@
-function [ feat, meanFeat ] = NCCFlow( imgs, cFrame, tempRadius, searchRadius, feat, errTolerance, meanFeat, evolve )
+function [ feat, meanFeat, corrMaps ] = NCCFlow( imgs, cFrame, tempRadius, searchRadius, feat, errTolerance, meanFeat, evolve )
 % NCCFlow Computes the flow between two images using normalized
 % cross-correlation (NCC) block matching.
 % Input (default)
@@ -53,6 +53,8 @@ end;
 
 ff = find(feat(:,4,pFrame));
 
+corrMaps= zeros(2*searchRadius(1)+1, 2*searchRadius(2)+1, length(ff));
+
 for fidx = 1:length(ff)
     y = feat(ff(fidx),1,pFrame);
     x = feat(ff(fidx),2,pFrame);
@@ -73,6 +75,10 @@ for fidx = 1:length(ff)
     imgTemp = squeeze(meanFeat(:,:,ff(fidx)));
     corr = CorrMap(imgSearch, imgTemp);
 
+    corrMaps(1:size(corr,1),1:size(corr,2),fidx) = corr;
+    
+    % compute the index offset for search windows that are not full size,
+    % i.e. up against the boundary of the image
     if (y - searchRadius(1) < 1)
         dp(1) = 2*searchRadius(1) + 1 - size(yySearch,2);
     else
