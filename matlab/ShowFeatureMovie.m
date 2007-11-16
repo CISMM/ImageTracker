@@ -105,6 +105,6 @@ end;
 % Save the video file
 if (save)
     display(sprintf('Saving avi file to %s', filename));
-    movie2avi(mov,filename,'FPS',fps,'Quality',90);
-%     movie2avi(mov,filename,'FPS',fps,'Compression','None');
+%    movie2avi(mov,filename,'FPS',fps,'Quality',90);
+    movie2avi(mov,filename,'FPS',fps,'Compression','None');
 end;

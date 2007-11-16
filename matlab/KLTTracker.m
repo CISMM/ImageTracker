@@ -84,14 +84,16 @@ end;
 
 [h w t] = size(imgs);
 
+featCutoff = 0.01;
+
 % Find initial features
-features(:,:,1) = HarrisDetector(squeeze(imgs(:,:,1)), sigmaS, sigmaS, count, featRadius, [], 0.00);
+features(:,:,1) = HarrisDetector(squeeze(imgs(:,:,1)), sigmaS, sigmaS, count, featRadius, [], featCutoff);
 displayFeatures(imgs(:,:,1), features(:,:,1));
 
 for i=1:t-1
     % Find new features, if need be
     if (i > 1 && mod(i-1,featFrame) == 0)
-        newFeat = HarrisDetector(imgs(:,:,i), sigmaS, sigmaS, count, featRadius, features(:,:,i));
+        newFeat = HarrisDetector(imgs(:,:,i), sigmaS, sigmaS, count, featRadius, features(:,:,i), featCutoff);
         features(end:size(newFeat,1),:,:) = 0; % expand features
         features(:,:,i) = newFeat;
         clear newFeat;

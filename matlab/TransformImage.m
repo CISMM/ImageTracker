@@ -10,6 +10,7 @@ function [ imgs ] = TransformImage( img, outSize, offset, center, angle, transla
 % steps      - the number of steps to take
 
 % Parameters to increment at each step
+% We use negative because we're doing inverse warping.
 dAngle = (1/steps) * angle;
 dTran = (1/steps) * translate;
 

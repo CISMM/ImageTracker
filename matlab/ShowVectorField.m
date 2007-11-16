@@ -1,6 +1,6 @@
-function [ ] = ShowVectorField( field, count, scale )
-% ShowVectorField(field, count, scale) Depicts a vector field as a needle
-% diagram.
+function [ ] = ShowVectorField( field, count, scale, background )
+% ShowVectorField(field, count, scale, backgrnd) Depicts a vector field as
+% a needle diagram.
 % Displays a needle diagram for a vector field (e.g. a flow field).
 % Inputs (default):
 % field       - The vector field, as a h x w x 2 vector, where the 2 vector
@@ -9,7 +9,12 @@ function [ ] = ShowVectorField( field, count, scale )
 % denser plots (1000)
 % scale       - The scaling to apply to each vector; larger numbers create
 % longer needles (1)
+% backgnd     - A background image to display before drawing the needle
+% points.
 
+if (nargin < 4)
+    background = [];
+end;
 if (nargin < 3)
     scale = 1;
 end;
@@ -23,7 +28,11 @@ hw = h*w;
 stride = round(hw/count);
 
 % Displaying an image gets MATLAB in the imaging, not plotting, mood.
-dispimg(ones(h,w));
+if (sum(background(:)) == 0)
+    dispimg(ones(h,w));
+else
+    dispimg(background);
+end;
 
 % Create a grid of pixel locations
 xx = 1:w;
