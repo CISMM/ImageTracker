@@ -24,6 +24,8 @@ if (file == -1)
     return;
 end;
 
+% [fname,perm,form,enc] = fopen(file)
+
 % set defaults
 ndims = 0;
 dimsize = 0;
@@ -32,7 +34,7 @@ type = 'float32';
 datafile = '';
 
 % parse the header
-display(sprintf('Reading header...'));
+% display(sprintf('Reading header...'));
 name = 'junk';
 while ((~strcmp(name, 'ElementDataFile')))
     % read next line
@@ -40,7 +42,7 @@ while ((~strcmp(name, 'ElementDataFile')))
     idx = strfind(line, ' = ');
     name = line(1:idx-1);
     value = line(idx+3:end);
-    display(sprintf('Line:\t%s', line));
+    % display(sprintf('Line:\t%s', line));
 
     % parse the current parameter name
     if (strcmp(name, 'NDims'))
@@ -55,7 +57,7 @@ while ((~strcmp(name, 'ElementDataFile')))
         datafile = sscanf(value, '%s');
     end;
 end;
-display(sprintf('Done with header.\n'));
+% display(sprintf('Done with header.\n'));
 
 % makesure we have data
 if (ndims == 0 || sum(dimsize) == 0 || elems == 0 || strcmp(datafile, ''))
@@ -64,9 +66,9 @@ if (ndims == 0 || sum(dimsize) == 0 || elems == 0 || strcmp(datafile, ''))
 end;
 
 % Read the data
-vectors = zeros(dimsize(1), dimsize(2), elems);
-for y = 1:dimsize(1)
-    row = fread(file, [elems, dimsize(2)], type);
+vectors = zeros(dimsize(2), dimsize(1), elems);
+for y = 1:dimsize(2)
+    row = fread(file, [elems, dimsize(1)], type);
     vectors(y,:,:) = row';
 end;
 
