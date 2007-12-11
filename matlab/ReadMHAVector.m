@@ -24,7 +24,7 @@ if (file == -1)
     return;
 end;
 
-% [fname,perm,form,enc] = fopen(file)
+[fname,perm,form,enc] = fopen(file);
 
 % set defaults
 ndims = 0;
@@ -68,7 +68,7 @@ end;
 % Read the data
 vectors = zeros(dimsize(2), dimsize(1), elems);
 for y = 1:dimsize(2)
-    row = fread(file, [elems, dimsize(1)], type);
+    row = fread(file, [elems, dimsize(1)], type, 0, form);
     vectors(y,:,:) = row';
 end;
 
