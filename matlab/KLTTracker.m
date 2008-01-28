@@ -1,4 +1,4 @@
-function [ features ] = KLTTracker( imgs, sigmaS, sigmaT, count, featRadius, featFrame, windRadius, iters, trackError, comparePrev )
+function [ features ] = KLTTracker( imgs, sigmaS, count, featRadius, featFrame, windRadius, iters, trackError, comparePrev )
 % KLTTracker( imgs, sigmaS, sigmaT, count, featRadius, featFrame ) Tracks
 % features in an image sequence.
 %
@@ -33,9 +33,6 @@ function [ features ] = KLTTracker( imgs, sigmaS, sigmaT, count, featRadius, fea
 % imgs        - The image sequence on which to perform tracking
 % sigmaS      - The spatial scale to use for image smoothing and image
 % derivative computation (1.0)
-% sigmaT      - The temporal scale to use for image smoothing and image
-% derivative computation; NB: not currently used for anything; temporal
-% derivatives are computed using frame differences. (1.0)
 % count       - The maximum number of concurrent actively tracked features
 % (500)
 % featRadius  - The minimum distance in pixels between two features (5)
@@ -54,29 +51,26 @@ function [ features ] = KLTTracker( imgs, sigmaS, sigmaT, count, featRadius, fea
 
 display(sprintf('KLTTracker: %s \t Starting', datestr(now, 'HH:MM:SS')));
 
-if (nargin < 10)
+if (nargin < 9)
     comparePrev = 0;
 end;
-if (nargin < 9)
+if (nargin < 8)
     trackError = 0.50;
 end;
-if (nargin < 8)
+if (nargin < 7)
     iters = 1;
 end;
-if (nargin < 7)
+if (nargin < 6)
     windRadius = 2;
 end;
-if (nargin < 6)
+if (nargin < 5)
     featFrame = 5;
 end;
-if (nargin < 5)
+if (nargin < 4)
     featRadius = 5;
 end;
-if (nargin < 4)
-    count = 500;
-end;
 if (nargin < 3)
-    sigmaT = 1.0;
+    count = 500;
 end;
 if (nargin < 2)
     sigmaS = 1.0;
@@ -84,7 +78,7 @@ end;
 
 [h w t] = size(imgs);
 
-featCutoff = 0.01;
+featCutoff = 0.0025;
 
 % Find initial features
 features(:,:,1) = HarrisDetector(squeeze(imgs(:,:,1)), sigmaS, sigmaS, count, featRadius, [], featCutoff);

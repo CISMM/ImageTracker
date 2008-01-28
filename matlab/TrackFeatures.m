@@ -90,8 +90,9 @@ for idx=1:length(fidx) % for each valid feature
 
         A = [dxx(:), dyy(:)];
         b = -dtt(:);
+        v = A\b;
     %     v = inv((A'.*ww)*A)*A'.*ww*b;
-        v = inv(A'*A)*A'*b;
+        % v = inv(A'*A)*A'*b;
         d(i,:) = d(i,:) + [v(2) v(1)]; % have to swap order of x,y displacement
     end;
 end;
