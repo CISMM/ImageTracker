@@ -18,7 +18,8 @@ end;
 [h, w, l] = size(frames);
 
 for i = 1:l
-    dispimg(frames(:,:,i));
+    msg = sprintf('frame %d', i);
+    dispimg(frames(:,:,i), msg);    
     pause((1/fps));
 
     if (save)

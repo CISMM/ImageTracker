@@ -31,7 +31,7 @@ stride = round(hw/count);
 if (sum(background(:)) == 0)
     dispimg(ones(h,w));
 else
-    dispimg(background);
+    imagesc(background); axis image;
 end;
 
 % Create a grid of pixel locations
@@ -44,9 +44,9 @@ ii = 1:stride:(hw);
 
 hold on;
 % Plot dots at the image grid locations
-plot(xGrid(ii), yGrid(ii), 'b.');
+plot(xGrid(ii), yGrid(ii), 'r.', 'MarkerSize', 8);
 for i = 1:length(ii)
     % Plot a needle at each grid location, based on the vector field
-    plot([xGrid(ii(i)); xGrid(ii(i))+scale*field(ii(i))], [yGrid(ii(i)); yGrid(ii(i))+scale*field(hw+ii(i))], 'b-');
+    plot([xGrid(ii(i)); xGrid(ii(i))+scale*field(ii(i))], [yGrid(ii(i)); yGrid(ii(i))+scale*field(hw+ii(i))], 'r-');
 end;
 hold off;

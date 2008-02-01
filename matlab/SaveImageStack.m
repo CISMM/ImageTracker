@@ -1,6 +1,8 @@
 function [ ] = SaveImageStack( stack, format, varargin )
 % SaveImageStack Saves a set of images with names following the file
 % format.
+% Might we suggest for TIFF images, add the following args:
+% 'Resolution', [25.4 25.4]
 
 dims = ndims(stack);
 
