@@ -33,5 +33,6 @@ int main(int argc, char** argv)
     
     WriterType::Pointer writer = WriterType::New();
     writer->SetInput(reader->GetOutput());
+    writer->SetFileName(fileOut.c_str());
     writer->Update();
 }
