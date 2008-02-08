@@ -4,6 +4,9 @@ PROJECT (apps)
 # Command line and gui executables for the ImageTracker project
 ##############################
 
+ADD_EXECUTABLE(convertvol ConvertVolume.cxx)
+TARGET_LINK_LIBRARIES(convertvol ITFilters ITImage ITPipelines)
+
 ADD_EXECUTABLE(transform TransformImages.cxx)
 TARGET_LINK_LIBRARIES(transform ITFilters ITImage ITPipelines)
 
@@ -104,6 +107,10 @@ ADD_EXECUTABLE(harris TestHarrisFeatureDetector.cxx)
 TARGET_LINK_LIBRARIES(harris ITCommon ITImage ITFilters)
 
 INCLUDE (../LocalUsewxWidgets.cmake)
+#######################################
+# nanoWx
+#######################################
+INCLUDE_DIRECTORIES (../../nanoCommon/cpp/wx)
 
 ###################################
 # ImageTracker GUI executables.
@@ -121,4 +128,4 @@ IF (WIN32)
 ENDIF (WIN32)
 
 ADD_EXECUTABLE(ImageTracker ${GUI_EXE} ImageTrackerApp.cxx)
-TARGET_LINK_LIBRARIES(ImageTracker ITCommon ITImage ITFilters ITPipelines ITView ITGui)
+TARGET_LINK_LIBRARIES(ImageTracker ITCommon ITImage ITFilters ITPipelines ITView ITGui nanoWx)
