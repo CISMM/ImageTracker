@@ -21,9 +21,9 @@ int main(int argc, char** argv)
     std::string function("ComputeStrain");
     
     // Check args
-    if (argc < 7)
+    if (argc < 6)
     {
-        Logger::warning << "Usage:\n\t" << argv[0] << " dir formatIn start end strainXFormat strainYFormat [sigma]" << std::endl;
+        Logger::warning << "Usage:\n\t" << argv[0] << " dir formatIn start end formatOut [sigma]" << std::endl;
         exit(1);
     }
     
@@ -38,21 +38,20 @@ int main(int argc, char** argv)
     std::string formatIn(argv[2]);
     int start = atoi(argv[3]);
     int end = atoi(argv[4]);
-    std::string strainXFormat(argv[5]);
-    std::string strainYFormat(argv[6]);
-    float sigma = argc > 7 ? atof(argv[7]) : 1.0;
+    std::string formatOut(argv[5]);
+    float sigma = argc > 6 ? atof(argv[6]) : 1.0;
     
     // Create IO objects
     Logger::info << function << ": Initializing IO" << std::endl;
     FileSet filesIn(FilePattern(dir, formatIn, start, end));
+    FileSet filesOut(FilePattern(dir, formatOut, start, end));
     ImageSetReader< ImageType > video(filesIn);
     
     // Create processing pipeline
     Logger::info << function << ": Creating processing pipeline" << std::endl;
     StrainTensorPipeline::Pointer pipeline = StrainTensorPipeline::New();
     pipeline->SetInput(&video);
-    pipeline->SetStrainXFormat(strainXFormat);
-    pipeline->SetStrainYFormat(strainYFormat);
+    pipeline->SetOutputFiles(filesOut);
     pipeline->SetSigma(sigma);
     
     // Observe

@@ -33,6 +33,7 @@ int main(int argc, char** argv)
     float valueScale = argc > 7 ? atof(argv[7]) : 1.0;
     
     // Typedefs
+    // typedef unsigned short PixelType;
     typedef itk::Vector< float, 2 > PixelType;
     typedef itk::Image< PixelType, 2 > ImageType;
     typedef itk::UnaryFunctorImageFilter< ImageType, ImageType, itk::Functor::VectorMagnitudeLinearTransform< PixelType, PixelType > > ScaleType;
