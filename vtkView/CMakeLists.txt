@@ -48,7 +48,6 @@ INCLUDE (../LocalUsewxWidgets.cmake)
 
 SET (ITView_SRCS
                             ConnectVTKITK.h
-    wxUtils.cxx             wxUtils.h
     wxVTKRenderWindowInteractor.cxx	wxVTKRenderWindowInteractor.h
 )
 
