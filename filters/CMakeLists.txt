@@ -66,6 +66,7 @@ SET (Filters_SRCS
                             itkRealToComplexImageFilter.h
                             RegistrationMotionFilter.h
                             RungeKuttaSolver.h
+                            StrainTensorImageFilter.h
                             StructureTensorImageFilter.h
                             WarpImageErrorFilter.h
 )
