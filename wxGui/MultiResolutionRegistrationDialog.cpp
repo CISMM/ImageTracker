@@ -25,7 +25,7 @@ bool MultiResolutionRegistrationDialog::TransferDataToWindow()
         stats->Update();
         if (stats->GetMaximum() > 255)
         {
-            this->comboRange->SetValue(std2wx("16-bit"));
+            this->comboRange->SetValue(nano::std2wx("16-bit"));
             // setting the combo box programmatically does not trigger the event, 
             // so we do it here
             wxCommandEvent event;
@@ -34,7 +34,7 @@ bool MultiResolutionRegistrationDialog::TransferDataToWindow()
         }
         else
         {
-            this->comboRange->SetValue(std2wx("8-bit"));
+            this->comboRange->SetValue(nano::std2wx("8-bit"));
             wxCommandEvent event;
             this->OnRange(event);
             this->slideUpperBound->SetValue(255);
@@ -78,7 +78,7 @@ bool MultiResolutionRegistrationDialog::TransferDataFromWindow()
     this->pipeline->SetOutputFiles(outFiles);
     this->pipeline->SetTransformFile(
         this->panelFilePattern->GetFilePattern().directory +
-        wx2std(this->textTransform->GetValue()));
+        nano::wx2std(this->textTransform->GetValue()));
     
     Logger::verbose << function << ": Creating executor thread" << std::endl;
     PipelineExecutor* exec = new PipelineExecutor(this->pipeline);
@@ -237,7 +237,7 @@ void MultiResolutionRegistrationDialog::OnRange(wxCommandEvent &event)
     typedef unsigned short SixteenBit;
     
     std::string function("MultiResolutionRegistrationDialog::OnRange");
-    std::string val(wx2std(this->comboRange->GetValue()));
+    std::string val(nano::wx2std(this->comboRange->GetValue()));
     Logger::verbose << function << ": value = " << val << std::endl;
     if (val == "8-bit")
     {

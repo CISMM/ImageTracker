@@ -20,7 +20,7 @@ static const std::string APP_WEBSITE("http://www.cs.unc.edu/Research/nano/cismm/
 
 bool ITApp::OnInit()
 {
-    ImageTracker *it = new ImageTracker((wxWindow *) NULL, -1, std2wx(APP_NAME + " " + APP_VERSION));
+    ImageTracker *it = new ImageTracker((wxWindow *) NULL, -1, nano::std2wx(APP_NAME + " " + APP_VERSION));
     it->Show(true);
     SetTopWindow(it);
     return true;
@@ -577,7 +577,9 @@ void ImageTracker::UpdateDataSources()
 ImageTracker::~ImageTracker()
 {
     if (this->rwiView)
+    {
         this->rwiView->Delete();
+    }
 
     // Not sure why we have to do this...seems to be only on Windows.
     // wx should be deleting all child objects, which these dialogs are.
@@ -675,7 +677,8 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     // Select log level, and redirect output to log panel
     menuHelp->Check(MENU_LOG_INFO, true);
     Logger::setLevel(Info);
-    this->coutRedirect = new wxStreamToTextRedirector(this->txtLogger);
+    this->coutRedirect = NULL;
+//    this->coutRedirect = new wxStreamToTextRedirector(this->txtLogger);
     
     // Pre-create dialogs
     this->dlgDataSource = new DataSourceDialog(this, -1, wxT("Edit DataSource"));
@@ -809,4 +812,3 @@ void ImageTracker::do_layout()
     Layout();
     // end wxGlade
 }
-

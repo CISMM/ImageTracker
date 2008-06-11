@@ -59,9 +59,9 @@ bool RemoveOcclusionsDialog::TransferDataFromWindow()
     this->pipeline->SetOutputFiles(outFiles);
     this->pipeline->SetTransmissionFile(
         this->panelFilePattern->GetFilePattern().directory +
-        wx2std(this->textTransmission->GetValue()));
+        nano::wx2std(this->textTransmission->GetValue()));
     
-    std::string metric = wx2std(this->comboMetric->GetValue());
+    std::string metric = nano::wx2std(this->comboMetric->GetValue());
     if (metric == "Mean")
         this->pipeline->SetMetric(Mean);
     else

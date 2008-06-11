@@ -142,7 +142,7 @@ void ImageTrackerController::GetDataSourceNames(wxArrayString& names)
          it != this->datavis.end();
          ++it)
     {
-        names.Add(std2wx(it->first->GetName()));
+        names.Add(nano::std2wx(it->first->GetName()));
     } 
 }
 

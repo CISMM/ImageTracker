@@ -97,7 +97,7 @@ void ScalarImageControlPanel::OnRange(wxCommandEvent &event)
         typedef unsigned char EightBit;
         typedef unsigned short SixteenBit;
         
-        std::string val(wx2std(this->comboWindowRange->GetValue()));
+        std::string val(nano::wx2std(this->comboWindowRange->GetValue()));
         if (val == "8-bit")
         {
             this->slideWindowMax->SetRange(std::numeric_limits<EightBit>::min(), 

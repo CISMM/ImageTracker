@@ -19,15 +19,15 @@ bool SaveVisualizationDialog::TransferDataToWindow()
         this->firstTime = false;
 
         sprintf(text, "%d", ImageTrackerController::Instance()->GetFrameIndex());
-        this->textRangeFrom->SetValue(std2wx(std::string(text)));
+        this->textRangeFrom->SetValue(nano::std2wx(std::string(text)));
         sprintf(text, "%d", ImageTrackerController::Instance()->GetMaxIndex());
-        this->textRangeTo->SetValue(std2wx(std::string(text)));
+        this->textRangeTo->SetValue(nano::std2wx(std::string(text)));
     }
 
     sprintf(text, "(Max: %d)", ImageTrackerController::Instance()->GetMaxIndex());
-    this->labelRangeMax->SetLabel(std2wx(std::string(text)));
+    this->labelRangeMax->SetLabel(nano::std2wx(std::string(text)));
     sprintf(text, "(%d)", ImageTrackerController::Instance()->GetFrameIndex());
-    this->labelFrameCurrent->SetLabel(std2wx(std::string(text)));
+    this->labelFrameCurrent->SetLabel(nano::std2wx(std::string(text)));
     
     return true;
 }
@@ -85,9 +85,9 @@ void SaveVisualizationDialog::OnBrowse(wxCommandEvent &event)
     wxDirDialog dir(this, wxT("Choose a directory"), this->textDirectory->GetValue());
     if (dir.ShowModal() == wxID_OK)
     {
-        std::string directory = wx2std(dir.GetPath());
+        std::string directory = nano::wx2std(dir.GetPath());
         CapDirectory(directory);
-        this->textDirectory->SetValue(std2wx(directory));
+        this->textDirectory->SetValue(nano::std2wx(directory));
     }
 }
 
@@ -95,12 +95,12 @@ void SaveVisualizationDialog::OnRangeFrom(wxCommandEvent &event)
 {
     std::string function("SaveVisualizationDialog::OnRangeFrom");
     Logger::verbose << function << ": entering" << std::endl;
-    int value = atoi(wx2std(this->textRangeFrom->GetValue()).c_str());
+    int value = atoi(nano::wx2std(this->textRangeFrom->GetValue()).c_str());
     value = std::max(0, value);
     value = std::min(value, (int) ImageTrackerController::Instance()->GetMaxIndex());
     char text[80];
     sprintf(text, "%d", value);
-    this->textRangeFrom->SetValue(std2wx(std::string(text)));
+    this->textRangeFrom->SetValue(nano::std2wx(std::string(text)));
 }
 
 
@@ -108,12 +108,12 @@ void SaveVisualizationDialog::OnRangeTo(wxCommandEvent &event)
 {
     std::string function("SaveVisualizationDialog::OnRangeTo");
     Logger::verbose << function << ": entering" << std::endl;
-    int value = atoi(wx2std(this->textRangeTo->GetValue()).c_str());
+    int value = atoi(nano::wx2std(this->textRangeTo->GetValue()).c_str());
     value = std::max(0, value);
     value = std::min(value, (int) ImageTrackerController::Instance()->GetMaxIndex());
     char text[80];
     sprintf(text, "%d", value);
-    this->textRangeTo->SetValue(std2wx(std::string(text)));
+    this->textRangeTo->SetValue(nano::std2wx(std::string(text)));
 }
 
 
@@ -130,10 +130,10 @@ void SaveVisualizationDialog::OnHide(wxCommandEvent &event)
 
 std::string SaveVisualizationDialog::GetFileFormat()
 {
-    std::string directory(wx2std(this->textDirectory->GetValue()));
+    std::string directory(nano::wx2std(this->textDirectory->GetValue()));
     CapDirectory(directory);
-    wxString wxdir(std2wx(directory));
-    return wx2std(wxdir.append(this->textFilePattern->GetValue()).append(_("-%04d.tif")));
+    wxString wxdir(nano::std2wx(directory));
+    return nano::wx2std(wxdir.append(this->textFilePattern->GetValue()).append(_("-%04d.tif")));
 }
 
 int SaveVisualizationDialog::GetIndexStart()
@@ -142,7 +142,7 @@ int SaveVisualizationDialog::GetIndexStart()
     
     if (this->radFramesRange->GetValue())
     {
-        from = atoi(wx2std(this->textRangeFrom->GetValue()).c_str());
+        from = atoi(nano::wx2std(this->textRangeFrom->GetValue()).c_str());
     }
     else if (this->radFramesCurrent->GetValue())
     {
@@ -158,7 +158,7 @@ int SaveVisualizationDialog::GetIndexEnd()
     
     if (this->radFramesRange->GetValue())
     {
-        to = atoi(wx2std(this->textRangeTo->GetValue()).c_str());
+        to = atoi(nano::wx2std(this->textRangeTo->GetValue()).c_str());
     }
     else if (this->radFramesCurrent->GetValue())
     {

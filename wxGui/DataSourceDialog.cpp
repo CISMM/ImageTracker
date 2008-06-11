@@ -18,7 +18,7 @@ static const std::string IMAGE_FILE_FILTER(
 
 bool DataSourceDialog::TransferDataToWindow()
 {
-    this->txtName->SetValue(std2wx(this->dataSource->GetName()));
+    this->txtName->SetValue(nano::std2wx(this->dataSource->GetName()));
     switch (this->dataSource->GetPixelDataType())
     {
         case ScalarChar:
@@ -39,7 +39,7 @@ bool DataSourceDialog::TransferDataToWindow()
     FileSet files = this->dataSource->GetFiles();
     for (unsigned int i = 0; i < files.size(); i++)
     {
-        this->lbxFiles->Append(std2wx(files[i]));
+        this->lbxFiles->Append(nano::std2wx(files[i]));
     }
     
     if (this->IsNewSource())
@@ -56,7 +56,7 @@ bool DataSourceDialog::TransferDataFromWindow()
     bool success = false;
     
     // Update data source values
-    this->dataSource->SetName(wx2std(this->txtName->GetValue()));
+    this->dataSource->SetName(nano::wx2std(this->txtName->GetValue()));
     switch (rbxPixelType->GetSelection())
     {
         case 0:
@@ -79,7 +79,7 @@ bool DataSourceDialog::TransferDataFromWindow()
         FileSet files;
         for (int i = 0; i < this->lbxFiles->GetCount(); i++)
         {
-            files.Add(wx2std(this->lbxFiles->GetString(i)));
+            files.Add(nano::wx2std(this->lbxFiles->GetString(i)));
         }
         
         this->dataSource->SetFiles(files);
@@ -167,7 +167,7 @@ void DataSourceDialog::OnAddSelection(wxCommandEvent &event)
 {
     wxString defDir = wxFileName::GetCwd();
     wxFileDialog open(this, wxT("Choose image files"), defDir, wxT(""), 
-                      std2wx(IMAGE_FILE_FILTER), 
+                      nano::std2wx(IMAGE_FILE_FILTER), 
                       wxOPEN | wxFILE_MUST_EXIST | wxMULTIPLE | wxCHANGE_DIR);
     if (open.ShowModal() == wxID_OK)
     {
@@ -199,7 +199,7 @@ void DataSourceDialog::OnAddExample(wxCommandEvent &event)
     wxString defDir = wxFileName::GetCwd();
     
     wxFileDialog open(this, wxT("Choose an image file"), defDir, wxT(""),
-                      std2wx(IMAGE_FILE_FILTER),
+                      nano::std2wx(IMAGE_FILE_FILTER),
                       wxOPEN | wxFILE_MUST_EXIST | wxCHANGE_DIR);
     if (open.ShowModal() == wxID_OK)
     {
@@ -209,7 +209,7 @@ void DataSourceDialog::OnAddExample(wxCommandEvent &event)
         // Find other files in sequence based on example
         typedef std::vector<std::string> StringVector;
         StringVector files;
-        file_list(wx2std(file), files);
+        file_list(nano::wx2std(file), files);
         
         // Convert list back for wx
         StringVector::iterator it;
@@ -217,7 +217,7 @@ void DataSourceDialog::OnAddExample(wxCommandEvent &event)
         wxFiles.Alloc(files.size());
         for (it = files.begin(); it != files.end(); ++it)
         {
-            wxFiles.Add(std2wx(*it));
+            wxFiles.Add(nano::std2wx(*it));
         }
         
         // Add to the list box
@@ -236,7 +236,7 @@ void DataSourceDialog::OnAddPattern(wxCommandEvent &event)
         FileSet::FileIterator it;
         for (it = fileNames.begin(); it != fileNames.end(); ++it)
         {
-            wxFiles.Add(std2wx(*it));
+            wxFiles.Add(nano::std2wx(*it));
         }
         
         this->lbxFiles->Append(wxFiles);

@@ -15,7 +15,7 @@ bool ApplyTransformDialog::TransferDataToWindow()
     unsigned int end = start + this->input->size() - 1;
     this->panelFilePattern->SetFilePattern(FilePattern(dir, format, start, end));
 
-    this->textTransform->SetValue(std2wx(dir + "transforms.txt"));
+    this->textTransform->SetValue(nano::std2wx(dir + "transforms.txt"));
     
     this->panelFilePattern->TransferDataToWindow();
     
@@ -29,7 +29,7 @@ bool ApplyTransformDialog::TransferDataFromWindow()
     
     // Set up pipeline paramters
     this->pipeline->SetInput(this->input->GetImages());
-    this->pipeline->SetTransformFile(wx2std(this->textTransform->GetValue()));
+    this->pipeline->SetTransformFile(nano::wx2std(this->textTransform->GetValue()));
     
     // Create an output file set
     FileSet outFiles(this->panelFilePattern->GetFilePattern());

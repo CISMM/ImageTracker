@@ -35,15 +35,15 @@ FilePatternPanel::FilePatternPanel(wxWindow* parent, int id, const wxPoint& pos,
 
 bool FilePatternPanel::TransferDataToWindow()
 {
-    this->textDirectory->SetValue(std2wx(this->pattern.directory));
+    this->textDirectory->SetValue(nano::std2wx(this->pattern.directory));
 
     std::string prefix(PrefixPart(this->pattern.format));
     std::string format(FormatPart(this->pattern.format));
     std::string extension(ExtensionPart(this->pattern.format));
     
-    this->textPrefix->SetValue(std2wx(prefix));
-    this->textNumberFormat->SetValue(std2wx(format));
-    this->textExtension->SetValue(std2wx(extension));
+    this->textPrefix->SetValue(nano::std2wx(prefix));
+    this->textNumberFormat->SetValue(nano::std2wx(format));
+    this->textExtension->SetValue(nano::std2wx(extension));
     this->textRangeStart->SetValue(wxString::Format(wxT("%d"), this->pattern.start));
     this->textRangeEnd->SetValue(wxString::Format(wxT("%d"), this->pattern.end));
     
@@ -72,7 +72,7 @@ END_EVENT_TABLE();
 
 void FilePatternPanel::OnDirectory(wxCommandEvent &event)
 {
-    this->pattern.directory = wx2std(this->textDirectory->GetValue());
+    this->pattern.directory = nano::wx2std(this->textDirectory->GetValue());
     this->UpdateExample();
 }
 
@@ -83,7 +83,7 @@ void FilePatternPanel::OnBrowse(wxCommandEvent &event)
     if (dir.ShowModal() == wxID_OK)
     {
         this->textDirectory->SetValue(dir.GetPath());
-        this->pattern.directory = wx2std(this->textDirectory->GetValue());
+        this->pattern.directory = nano::wx2std(this->textDirectory->GetValue());
         this->UpdateExample();
     }
 }
@@ -91,7 +91,7 @@ void FilePatternPanel::OnBrowse(wxCommandEvent &event)
 
 void FilePatternPanel::OnPrefix(wxCommandEvent &event)
 {
-    this->pattern.format = wx2std(this->textPrefix->GetValue().
+    this->pattern.format = nano::wx2std(this->textPrefix->GetValue().
             Append(this->textNumberFormat->GetValue()).
             Append(this->textExtension->GetValue()));
     this->UpdateExample();
@@ -100,7 +100,7 @@ void FilePatternPanel::OnPrefix(wxCommandEvent &event)
 
 void FilePatternPanel::OnFormat(wxCommandEvent &event)
 {
-    this->pattern.format = wx2std(this->textPrefix->GetValue().
+    this->pattern.format = nano::wx2std(this->textPrefix->GetValue().
             Append(this->textNumberFormat->GetValue()).
             Append(this->textExtension->GetValue()));
     this->UpdateExample();
@@ -109,7 +109,7 @@ void FilePatternPanel::OnFormat(wxCommandEvent &event)
 
 void FilePatternPanel::OnExtension(wxCommandEvent &event)
 {
-    this->pattern.format = wx2std(this->textPrefix->GetValue().
+    this->pattern.format = nano::wx2std(this->textPrefix->GetValue().
             Append(this->textNumberFormat->GetValue()).
             Append(this->textExtension->GetValue()));
     this->UpdateExample();
@@ -153,8 +153,8 @@ void FilePatternPanel::OnRangeEnd(wxCommandEvent &event)
 
 void FilePatternPanel::UpdateExample()
 {
-    wxString format(std2wx(pattern.directory));
-    format.Append(std2wx(pattern.format));
+    wxString format(nano::std2wx(pattern.directory));
+    format.Append(nano::std2wx(pattern.format));
     this->labelExample->SetLabel(wxString::Format(format, pattern.start));
 }
 

@@ -20,7 +20,7 @@ public:
     
     void SetMessage(const std::string& message)
     {
-        this->txtLabel->SetLabel(std2wx(message));
+        this->txtLabel->SetLabel(nano::std2wx(message));
     }
 
 private:

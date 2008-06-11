@@ -20,8 +20,8 @@ ItkVtkPipeline::Pointer GenerateVisualPipeline(DataSource::Pointer source)
         case VectorFloat:
             Logger::verbose << function << ": making VectorGlyphPipeline" << std::endl;
             view = VectorGlyphPipeline::New();
-            // Logger::verbose << function << ": making VectorHeightMapPipeline" << std::endl;
-            // view = VectorHeightMapPipeline::New();
+//            Logger::verbose << function << ": making VectorHeightMapPipeline" << std::endl;
+//            view = VectorHeightMapPipeline::New();
             break;
         default:
             Logger::warning << "ImageTrackerController::GenerateViewPipeline: DataSource not recognized!" << std::endl;
