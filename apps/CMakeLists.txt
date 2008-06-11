@@ -7,6 +7,9 @@ PROJECT (apps)
 ADD_EXECUTABLE(convertvol ConvertVolume.cxx)
 TARGET_LINK_LIBRARIES(convertvol ITFilters ITImage ITPipelines)
 
+ADD_EXECUTABLE(convertimg ConvertScalar.cxx)
+TARGET_LINK_LIBRARIES(convertimg ITCommon ITImage ITKIO)
+
 ADD_EXECUTABLE(transform TransformImages.cxx)
 TARGET_LINK_LIBRARIES(transform ITFilters ITImage ITPipelines)
 
@@ -61,9 +64,6 @@ TARGET_LINK_LIBRARIES(mrflow ITCommon ITImage ITFilters ITPipelines)
 ADD_EXECUTABLE(flowerr ComputeFlowError.cxx)
 TARGET_LINK_LIBRARIES(flowerr ITCommon ITImage ITFilters)
 
-ADD_EXECUTABLE(integrate IntegrateFlowField.cxx)
-TARGET_LINK_LIBRARIES(integrate ITCommon ITImage ITFilters)
-
 ADD_EXECUTABLE(intflow IntegrateOpticalFlow.cxx)
 TARGET_LINK_LIBRARIES(intflow ITCommon ITImage ITFilters ITPipelines)
 
@@ -106,12 +106,6 @@ TARGET_LINK_LIBRARIES(datasource ITCommon ITImage ITFilters ITGui)
 ADD_EXECUTABLE(harris TestHarrisFeatureDetector.cxx)
 TARGET_LINK_LIBRARIES(harris ITCommon ITImage ITFilters)
 
-INCLUDE (../LocalUsewxWidgets.cmake)
-#######################################
-# nanoWx
-#######################################
-INCLUDE_DIRECTORIES (../../nanoCommon/cpp/wx)
-
 ###################################
 # ImageTracker GUI executables.
 #
@@ -128,4 +122,4 @@ IF (WIN32)
 ENDIF (WIN32)
 
 ADD_EXECUTABLE(ImageTracker ${GUI_EXE} ImageTrackerApp.cxx)
-TARGET_LINK_LIBRARIES(ImageTracker ITCommon ITImage ITFilters ITPipelines ITView ITGui nanoWx)
+TARGET_LINK_LIBRARIES(ImageTracker ITCommon ITImage ITFilters ITPipelines ITGui nanoWx nanoVTKView)
