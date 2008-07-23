@@ -45,3 +45,25 @@ void Logger::undirect()
         delete Logger::redirector;
     Logger::redirector = NULL;
 }
+
+ToggleLogStream& ToggleLogStream::operator<<(std::ostream& (*op)(std::ostream&))
+{
+    if (this->enabled)
+    {
+        MutexLocker lock(this->mutex);
+        (*op)(std::cout);
+    }
+    return *this;
+}
+
+void ToggleLogStream::Enable()
+{ this->enabled = true; }
+
+void ToggleLogStream::Disable()
+{ this->enabled = false; }
+
+void ToggleLogStream::SetEnabled(bool enable)
+{ this->enabled = enable; }
+
+bool ToggleLogStream::GetEnabled()
+{ return this->enabled; }

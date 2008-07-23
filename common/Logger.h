@@ -92,8 +92,8 @@ public:
     {
         if (this->enabled)
         {
-            MutexLocker lock(this->mutex);
-            std::cout << val;
+                MutexLocker lock(this->mutex);
+                std::cout << val;
         }
         return *this;
     }
@@ -103,27 +103,19 @@ public:
      * Josuttis, Nicolai. The C++ Standard Library.
      * Addison-Wesley, New York, 2005, p. 612.
      */
-    virtual ToggleLogStream& operator<<(std::ostream& (*op)(std::ostream&))
-    {
-        if (this->enabled)
-        {
-            MutexLocker lock(this->mutex);
-            (*op)(std::cout);
-        }
-        return *this;
-    }
+    virtual ToggleLogStream& operator<<(std::ostream& (*op)(std::ostream&));
 
     /** Turn this log stream on. */
-    void Enable() { this->enabled = true; }
+    void Enable();
     
     /** Turn this log stream off. */
-    void Disable() { this->enabled = false; }
+    void Disable();
     
     /** Turn this log stream on or off. */
-    void SetEnabled(bool enable) { this->enabled = enable; }
+    void SetEnabled(bool enable);
     
     /** Determine if this log stream is on or off. */
-    bool GetEnabled() { return this->enabled; }
+    bool GetEnabled();
 
 protected:
     bool enabled;
