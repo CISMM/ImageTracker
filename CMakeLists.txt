@@ -1,5 +1,12 @@
 PROJECT (ImageTracker)
 
+cmake_minimum_required(VERSION 2.4)
+
+if(COMMAND cmake_policy)
+	cmake_policy(SET CMP0003 OLD)
+endif(COMMAND cmake_policy)
+
+
 SET (EXECUTABLE_OUTPUT_PATH "${ImageTracker_BINARY_DIR}/bin")
 SET (LIBRARY_OUTPUT_PATH "${ImageTracker_BINARY_DIR}/lib")
 
@@ -48,6 +55,14 @@ ELSEIF (CMAKE_USE_WIN32_THREADS_INIT)
 ENDIF(CMAKE_USE_PTHREADS_INIT)
 
 #######################################
+# Build nanoCommon
+#######################################
+set (NANO_COMMON_DIR ../nanoCommon/cpp)
+include (LocalUsewxWidgets.cmake)
+subdirs (${NANO_COMMON_DIR}/wx)
+subdirs (${NANO_COMMON_DIR}/wxvtk)
+
+#######################################
 # Personal filter library and support classes.
 #
 # ImageTracker is split up into several logical groups.
@@ -69,11 +84,12 @@ SUBDIRS (common image filters pipelines)
 #######################################
 INCLUDE_DIRECTORIES(
     ${ImageTracker_SOURCE_DIR}
-    ${ImageTracker_SOURCE_DIR}/apps
-    ${ImageTracker_SOURCE_DIR}/vtkView 
+    ${NANO_COMMON_DIR}/wx
+    ${NANO_COMMON_DIR}/wxvtk
+    ${ImageTracker_SOURCE_DIR}/apps 
     ${ImageTracker_SOURCE_DIR}/wxGui )
 
-SUBDIRS(vtkView wxGui apps)
+SUBDIRS(wxGui apps)
 
 #######################################
 # Testing components
