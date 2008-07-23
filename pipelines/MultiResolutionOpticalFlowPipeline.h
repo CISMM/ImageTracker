@@ -33,8 +33,10 @@ public:
     itkSetMacro(Iterations, unsigned int);
     itkGetMacro(SpatialSigma, float);
     itkSetMacro(SpatialSigma, float);
-    itkGetMacro(SmoothWeighting, float);
-    itkSetMacro(SmoothWeighting, float);
+    itkGetMacro(IntegrationSigma, float);
+    itkSetMacro(IntegrationSigma, float);
+    itkGetMacro(Regularization, float);
+    itkSetMacro(Regularization, float);
     itkGetMacro(Relaxation, float);
     itkSetMacro(Relaxation, float);
     itkGetMacro(NumberOfLevels, unsigned int);
@@ -50,7 +52,8 @@ protected:
     MultiResolutionOpticalFlowPipeline()
         : m_Iterations(200),
           m_SpatialSigma(1.0),
-          m_SmoothWeighting(10e4),
+          m_IntegrationSigma(4.0),
+          m_Regularization(10e4),
           m_Relaxation(1.9),
           m_NumberOfLevels(1)
         {}
@@ -63,7 +66,8 @@ private:
      
     unsigned int m_Iterations;
     float m_SpatialSigma;
-    float m_SmoothWeighting;
+    float m_IntegrationSigma;
+    float m_Regularization;
     float m_Relaxation;
     unsigned int m_NumberOfLevels;
 };

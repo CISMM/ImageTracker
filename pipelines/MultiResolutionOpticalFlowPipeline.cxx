@@ -24,15 +24,15 @@ void MultiResolutionOpticalFlowPipeline::Update()
     
     Logger::debug << function << ": Setting up flow computation" << std::endl;
     
-//     typedef CLGOpticFlowImageFilter< InternalImageType, InternalImageType, float > FlowType;
-    typedef HornOpticalFlowImageFilter< InternalImageType, InternalImageType, float > FlowType;
+    typedef CLGOpticFlowImageFilter< InternalImageType, InternalImageType, float > FlowType;
+//     typedef HornOpticalFlowImageFilter< InternalImageType, InternalImageType, float > FlowType;
     typedef MultiResolutionOpticalFlowMethod< InternalImageType, InternalImageType > MRFlowType;
     
     FlowType::Pointer method = FlowType::New();
     method->SetIterations(this->GetIterations());
     method->SetSpatialSigma(this->GetSpatialSigma());
-    method->SetSmoothWeighting(this->GetSmoothWeighting());
-//     method->SetRegularization(this->GetSmoothWeighting());
+    method->SetIntegrationSigma(this->GetIntegrationSigma());
+    method->SetRegularization(this->GetRegularization());
 //     method->SetRelaxation(this->GetRelaxation());
     
     MRFlowType::Pointer flow = MRFlowType::New();
