@@ -42,6 +42,7 @@ SET (Filters_SRCS
                             DerivativesToSurfaceImageFilter.h
                             itkFFTComplexToComplexImageFilter.h
                             itkFFTWComplexToComplexImageFilter.h
+                            GaussSeidelIterativeStepImageFilter.h
                             Gaussian2DVectorFilter.h
                             GaussianFunctionImageFilter.h
                             GaussianGradientImageFilter.h

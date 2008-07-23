@@ -9,7 +9,7 @@
  * \brief Computes the image structure tensor for a pair of images.
  * The structure tensor is the cross product of the spatio-temporal gradient of an image: 
  * G(I) = [Ix Iy It]^T
- * T = Kp * [G(I)^T x G(I)]
+ * T = Kp * [G(I) x G(I)^T]
  * Here, ^T denotes transposition, Ks* denotes convolution with a Gaussian of scale p, and x is the vector cross product.
  *
  * There are two scale parameters associated with the structure tensor, the spatial differential scale s, and the tensor

@@ -4,6 +4,7 @@
 #include "itkVector.h"
 
 #include "CLGOpticalFlowIterativeStepImageFilter.h"
+#include "GaussSeidelIterativeStepImageFilter.h"
 #include "OpticalFlowImageFilter.h"
 #include "StructureTensorImageFilter.h"
 
@@ -39,7 +40,8 @@ public:
     typedef float InternalValueType;
     typedef StructureTensorImageFilter< Input1ImageType > TensorFilterType;
     typedef typename TensorFilterType::TensorImageType TensorImageType;
-    typedef CLGOpticalFlowIterativeStepImageFilter< OutputImageType > IterativeStepType;
+    // typedef CLGOpticalFlowIterativeStepImageFilter< OutputImageType > IterativeStepType;
+    typedef GaussSeidelIterativeStepImageFilter< OutputImageType > IterativeStepType;
 
     /** Standard itk class typedefs */
     typedef CLGOpticFlowImageFilter Self;
@@ -117,6 +119,12 @@ protected:
      */
     void AfterGenerateData();
 
+    /**
+     * Determines if the CLG optical flow computation has stopped making progress and
+     * should halt.
+     */
+    bool CheckForCompletion(OutputImagePointer prev, OutputImagePointer next);
+
 private:
     // Not implemented
     CLGOpticFlowImageFilter(const Self& other);
@@ -133,6 +141,8 @@ private:
 /************************************************************************/
 /* Implementation                                                       */
 /************************************************************************/
+
+#include "itkImageRegionConstIterator.h"
 
 #include "ImageUtils.h"
 #include "Logger.h"
@@ -163,35 +173,45 @@ void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
     typename IterativeStepType::Pointer step = IterativeStepType::New();
     step->SetStructureTensor(tensor->GetOutput());
     step->SetRegularization(this->GetRegularization());
-    step->SetRelaxation(this->GetRelaxation());
+    // step->SetRelaxation(this->GetRelaxation());
     // step->SetNumberOfThreads(4);
     Logger::debug << function << ": iterative step filter threads: " << step->GetNumberOfThreads() << std::endl;
 
     // Initialize output to zero flow field	
     Logger::debug << function << ": initializing flow field" << std::endl;
-    typename OutputImageType::Pointer output = OutputImageType::New();
+    OutputImagePointer output = OutputImageType::New();
     output->SetRegions(this->GetOutput()->GetLargestPossibleRegion());
     output->SetSpacing(this->GetOutput()->GetSpacing());
     output->SetOrigin(this->GetOutput()->GetOrigin());
     output->Allocate();
-    typename OutputImageType::PixelType zero;
+    OutputPixelType zero;
     zero.Fill(0);
     output->FillBuffer(zero);
     PrintImageInfo<OutputImageType>(output, "Initial flow");
 
     // Iteratively calculate flow field
     Logger::debug << function << ": caluculating flow field" << std::endl;
-    for (int i = 0; i < this->m_Iterations; i++)
+    OutputImagePointer prev, next;
+    bool terminate = false;
+    for (int i = 0; i < this->m_Iterations && !terminate; i++)
     {
+        prev = output;
         step->SetInput(output);
         step->Update();
         output = step->GetOutput();
         output->DisconnectPipeline();
+        next = output;
 
-	char msg[80];
-	sprintf(msg, "Flow after step %d", i);
-	PrintImageInfo<OutputImageType>(output, std::string(msg));
+        terminate = this->CheckForCompletion(prev, next);
+        if (terminate)
+            Logger::debug << function << ": stopping after " << i << " iterations." << std::endl;
+// 	char msg[80];
+// 	sprintf(msg, "Flow after step %d", i);
+// 	PrintImageInfo<OutputImageType>(output, std::string(msg));
     }
+    char msg[80];
+    sprintf(msg, "Flow after step %d", this->m_Iterations);
+    PrintImageInfo<OutputImageType>(output, std::string(msg));
 
     // Call AfterGenerateData to calculate the confidence image.
     this->AfterGenerateData();
@@ -199,6 +219,41 @@ void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
     Logger::debug << function << ": grafting output" << std::endl;
     this->GraftOutput(output);
     Logger::debug << function << ": done" << std::endl;
+}
+
+template <class TInputImage1, class TInputImage2, class TOutputValueType>
+bool CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
+::CheckForCompletion(OutputImagePointer prev, OutputImagePointer next)
+{
+    bool complete = false;
+    std::string function("CLGOpticFlowImageFilter::CheckForCompletion");
+    
+    // Compute the sum squared difference between the previous and next computed flow field
+    typedef itk::ImageRegionConstIterator<OutputImageType> OutputIterator;
+    OutputIterator prevIt(prev, prev->GetLargestPossibleRegion());
+    OutputIterator nextIt(next, next->GetLargestPossibleRegion());
+
+    int pixCount = 0;
+    double ssd = 0;
+    OutputPixelType prevPix, nextPix;
+    for (prevIt.GoToBegin(), nextIt.GoToBegin();
+         !(prevIt.IsAtEnd() || nextIt.IsAtEnd());
+         ++prevIt, ++nextIt)
+    {
+        prevPix = prevIt.Get();
+        nextPix = nextIt.Get();
+        for (int d = 0; d < CLGOpticFlowImageFilter::ImageDimension; d++)
+        {
+            ssd += (prevPix[d] - nextPix[d])*(prevPix[d] - nextPix[d]);
+        }
+        pixCount += 1;
+    }
+
+    Logger::debug << function << ": Completion metric: " << (ssd/pixCount) << std::endl;
+    
+    // complete = (ssd/pixCount) < 1e-9;
+
+    return complete;
 }
 
 template <class TInputImage1, class TInputImage2, class TOutputValueType>
