@@ -1,4 +1,4 @@
-function [ ] = ShowFeatureMovie( imgs, feats, tracks, fps, filename )
+function [ ] = ShowFeatureMovie( imgs, features, tracks, fps, filename )
 % ShowFeatureMovie(imgs, feats) displays an image sequence along with
 % tracked features.
 %
@@ -37,74 +37,78 @@ if (nargin < 5)
     save = false;
 else
     save = true;
-end;
+end
 if (nargin < 4)
     fps = 20;
-end;
+end
 if (nargin < 3)
     tracks = false;
-end;
+end
 
-[hi,wi,ti] = size(imgs);
-[hf,wf,tf] = size(feats);
-ff = 1:hf;
+[h, w, t] = size(imgs);
+fCount = length(features);
+ff = 1:fCount;
+
+% extract feature data so we can do indexing operations
+active = reshape([features.active], [], fCount); % t x N matrix
+position = reshape([features.pos], t, 2, []);    % t x 2 x N matrix
 
 % Show first frame
 dispimg(imgs(:,:,1));
-fidx = find(feats(:,4,1));
+fidx = find(active(1,:));
 hold on;
-plot(feats(fidx,2,1), feats(fidx,1,1), 'gs');
+plot(squeeze(position(1, 2, fidx)), squeeze(position(1, 1, fidx)), 'ys');
 hold off;
 if (save)
     mov(1) = getframe;
-end;
+end
 pause(1/fps);
 
 % Show other frames
-for i=2:min(ti,tf)
+for i=2:t
     % show the Image
     dispimg(imgs(:,:,i));
     
     % identify the feature classes
-    newFeat(ff)  = (feats(ff,4,i) == 1).*(feats(ff,4,i-1)==0);
-    contFeat(ff) = (feats(ff,4,i) == 1).*(feats(ff,4,i-1)==1);
-    deadFeat(ff) = (feats(ff,4,i) == 0).*(feats(ff,4,i-1)==1);
-    newIdx  = find(newFeat);
-    contIdx = find(contFeat);
-    deadIdx = find(deadFeat);
+    newFeat     = (active(i,:) == 1) & (active(i-1,:) == 0);
+    contFeat    = (active(i,:) == 1) & (active(i-1,:) == 1);
+    deadFeat	= (active(i,:) == 0) & (active(i-1,:) == 1);
     
     hold on; % keep the image up while drawing features
-
     % Show each feature's history, if necessary
     if (tracks)
-        fidx = find(feats(:,4,i)); % valid features
-        for f = 1:length(fidx)
-            tidx = find(feats(fidx(f),4,:)); % feature track history
+        actIdx = find(contFeat);
+        for featIdx = actIdx
+            frameIdx = find(active(:, featIdx)); % feature track history
             % crop history to this frame
-            tidx = tidx.*(tidx <= i); 
-            tt = find(tidx);
+            frameIdx = frameIdx.*(frameIdx <= i); 
+            frameIdx = frameIdx(frameIdx ~= 0);
             % display track
-            plot(squeeze(feats(fidx(f),2,tidx(tt))), squeeze(feats(fidx(f),1,tidx(tt))), 'y-');
-        end;
-    end;
+            plot(position(frameIdx, 2, featIdx), ...
+                position(frameIdx, 1, featIdx), 'g-');
+        end
+    end
     
     % display the features, color coded
-    plot(feats(newIdx, 2,i), feats( newIdx,1,i), 'gs');
-    plot(feats(contIdx,2,i), feats(contIdx,1,i), 'ys');
-    plot(feats(deadIdx,2,i), feats(deadIdx,1,i), 'rs');
+    plot(squeeze(position(i, 2, newFeat)),  squeeze(position(i, 1, newFeat)),  'yx');
+    plot(squeeze(position(i, 2, contFeat)), squeeze(position(i, 1, contFeat)), 'gs');
+    plot(squeeze(position(i, 2, deadFeat)), squeeze(position(i, 1, deadFeat)), 'ro');
 
     hold off; % done drawing on the figure
 
     % Grab frame, if we're saving the movie
     if (save)
         mov(i) = getframe;
-    end;
+    end
     pause(1/fps);
-end;
+end
 
 % Save the video file
 if (save)
     display(sprintf('Saving avi file to %s', filename));
-%    movie2avi(mov,filename,'FPS',fps,'Quality',90);
-    movie2avi(mov,filename,'FPS',fps,'Compression','None');
-end;
+    for i = 1:length(mov)
+        imwrite(mov(i).cdata, sprintf(filename, i), 'Compression', 'None');
+    end
+%     movie2avi(mov,filename,'FPS',fps,'Quality',90);
+%     movie2avi(mov,filename,'FPS',fps,'Compression','None');
+end

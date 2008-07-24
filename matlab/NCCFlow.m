@@ -1,104 +1,127 @@
-function [ feat, meanFeat, corrMaps ] = NCCFlow( imgs, cFrame, tempRadius, searchRadius, feat, errTolerance, meanFeat, evolve )
+function [ features, corrMaps ] = NCCFlow(imgs, frameIdx, params, features )
 % NCCFlow Computes the flow between two images using normalized
 % cross-correlation (NCC) block matching.
 % Input (default)
 %   imgs            - the images to track
-%   cFrame          - the index of the current frame
-%   tempRadius      - the radius of each feature template
-%   searchRadius    - the radius of the image region in which to search for
-%   each feature
-%   feat            - feature list, a Nx4xF matrix, where N is the feature
-%   index, F is the frame index, and the 4-vector specifies position (y,x),
-%   error metric, and an active tracking flag (an even selection of points)
-%   errTolerance    - the NCC error threshold below which features are
-%   considered lost (0.95)
-%   meanFeat        - a set of images of the feature templates [zeros]
-%   evolve          - indicates whether the meanFeat images should be
-%   updated with matched image regions from the current frame. 1 for
-%   feature evolution, 0 for no evolution (0)
+%   frameIdx        - the indeces of the frames to track
+%   params          - tracking parameters, including:
+%       .patchRadius    - the radius of each feature patch
+%       .searchRadius   - the radius of the matching search region
+%       .errorTolerance - the NCC error threshold below which features are
+%       considered lost
+%       .evolveFeatures - indicates whether the feature patches should be
+%       updated with matched image regions
+%       .accuracy       - the subpixel accuracy to use
+%   features        - the structure array of features, with fields
+%       .pos        - the Nx2 positions of a feature, where N is the frame
+%       index and the positions are stored (y,x) in each row
+%       .error      - the Nx1 error metric values for the feature
+%       .active     - a Nx1 array indicating if a feature is valid in a
+%       given frame
+%       .patch      - the patch appearance
 %
 % Output
-%   feat            - the updated feature matrix--will grow by one in the
-%   frame direction
-%   meanFeat        - the updated feature templates, updated only if
-%   evolution is on
-%
+%   features        - the updated feature structure array
+%   corrMaps        - a p x p x F matrix of correlation maps, where p is
+%   the width of an image patch and F is the active feature index
 
-pFrame = cFrame - 1;
-I1 = squeeze(imgs(:,:,pFrame));
-I2 = squeeze(imgs(:,:,cFrame));
+pFrame = frameIdx(1);
+cFrame = frameIdx(2);
+
+I1 = squeeze(imgs(:, :, pFrame));
+I2 = squeeze(imgs(:, :, cFrame));
 
 [h,w] = size(I1);
 
-% feat should be an Fx4xT matrix;
-fs = size(feat,1);
+fcount = length(features);
+corrMaps= zeros(2*params.searchRadius(1)+1, 2*params.searchRadius(2)+1, fcount);
 
-if (nargin < 8)
-    evolve = 0;
-end;
-if (nargin < 7)
-    meanFeat = zeros(2*tempRadius(1)+1, 2*tempRadius(2)+1, fs);
-end;
-if (nargin < 6)
-    errTolerance = 0.95;
-end;
-if (nargin < 5) 
-    % create a default feature list
-    yy = searchRadius(1)+1:h-searchRadius(1);
-    xx = searchRadius(2)+1:w-searchRadius(2);
-    [xxg, yyg] = meshgrid(xx,yy);
-    i = 1:100:length(yy)*length(xx);
-    feat = [yyg(i); xxg(i); ones(length(i)); ones(length(i))]';
-end;
+accuracy = GetFieldDefault(params, 'nccAccuracy', 1);
 
-ff = find(feat(:,4,pFrame));
+for fidx = 1:fcount
+    if (features(fidx).active(pFrame)) % process only active features
+        y = features(fidx).pos(pFrame,1);
+        x = features(fidx).pos(pFrame,2);
+        
+        % exclude features that have search windows that run off the edge
+        % of the frame
+        if (y - params.searchRadius(1) < 1 || ...
+            y + params.searchRadius(1) > h || ...
+            x - params.searchRadius(2) < 1 || ...
+            x + params.searchRadius(2) > w)
+                features(fidx).pos(cFrame,:) = [0 0];
+                features(fidx).error(cFrame) = 0;
+                features(fidx).active(cFrame) = 0;
+                continue;
+        end
 
-corrMaps= zeros(2*searchRadius(1)+1, 2*searchRadius(2)+1, length(ff));
+        % compute the indices of the search window and template
+        yySearch = ...
+            y-params.searchRadius(1): ...
+            y+params.searchRadius(1);
+        xxSearch = ...
+            x-params.searchRadius(2): ...
+            x+params.searchRadius(2);
+        [xxMesh, yyMesh] = meshgrid(xxSearch, yySearch);
 
-for fidx = 1:length(ff)
-    y = feat(ff(fidx),1,pFrame);
-    x = feat(ff(fidx),2,pFrame);
-    
-    % compute the indices of the search window and template
-    yySearch = max(y-searchRadius(1),1):min(y+searchRadius(1), h);
-    xxSearch = max(x-searchRadius(2),1):min(x+searchRadius(2), w);
-%     yyTemp = max(y-tempRadius(1),1):min(y+tempRadius(1), h);
-%     xxTemp = max(x-tempRadius(2),1):min(x+tempRadius(2), w);
+        % take the template from the mean template, search for it in I2
+        imgSearch = interp2(I2, xxMesh, yyMesh);
+        imgPatch = features(fidx).patch;
+        corr = CorrMap(imgSearch, imgPatch);
 
-%     if (size(yyTemp,2) ~= 2*tempRadius(1)+1 || size(xxTemp,2) ~= 2*tempRadius(2)+1)
-%         continue;
-%     end;
-    
-    % take the template from the mean template, search for it in I2
-    imgSearch = I2(yySearch, xxSearch);
-%     imgTemp = I1(yyTemp, xxTemp);
-    imgTemp = squeeze(meanFeat(:,:,ff(fidx)));
-    corr = CorrMap(imgSearch, imgTemp);
+        corrMaps(1:size(corr,1), 1:size(corr,2), fidx) = corr;
 
-    corrMaps(1:size(corr,1),1:size(corr,2),fidx) = corr;
-    
-    % compute the index offset for search windows that are not full size,
-    % i.e. up against the boundary of the image
-    if (y - searchRadius(1) < 1)
-        dp(1) = 2*searchRadius(1) + 1 - size(yySearch,2);
+        % find the maximum ncc response
+        maxresp = max(corr(:));
+        [j,i] = find(corr == maxresp); % find returns row, col
+        
+        % Subpixel correlation
+        % resample the template and search image at the desired subpixel
+        % accuracy
+        if (accuracy < 1 & accuracy > 0)
+            % resample search image
+            x = x + (i(1) - (params.searchRadius(2) + 1));
+            y = y + (j(1) - (params.searchRadius(1) + 1));
+            yySearch = ...
+                y - params.patchRadius(2) - 1:accuracy: ...
+                y + params.patchRadius(2) + 1;
+            xxSearch = ...
+                x - params.patchRadius(1) - 1:accuracy: ...
+                x + params.patchRadius(1) + 1;
+            [xxMesh, yyMesh] = meshgrid(xxSearch, yySearch);
+            imgSearch = interp2(I2, xxMesh, yyMesh);
+            
+            % resample template image
+            yyPatch = 1:accuracy:size(imgPatch,1);
+            xxPatch = 1:accuracy:size(imgPatch,2);
+            [xxMesh, yyMesh] = meshgrid(xxPatch, yyPatch);
+            imgPatch = interp2(imgPatch, xxMesh, yyMesh);
+            
+            % compute correlation map and find maximum ncc response
+            corr = CorrMap(imgSearch, imgPatch);
+            maxresp = max(corr(:));
+            [j,i] = find(corr == maxresp); % find returns row, col
+            
+            features(fidx).pos(cFrame,:) = ...
+                [y + (j(1) - (size(corr,1)+1)/2) * accuracy
+                 x + (i(1) - (size(corr,2)+1)/2) * accuracy];
+        else
+            features(fidx).pos(cFrame,:) = ...
+                [y + (j(1) - (params.searchRadius(1) + 1)) ...
+                 x + (i(1) - (params.searchRadius(2) + 1))];
+        end
+        features(fidx).error(cFrame) = maxresp;
+        features(fidx).active(cFrame) = maxresp > params.errorTolerance;
+
+        % Evolve the tracked feature
+        if (params.evolveFeatures && features(fidx).active(cFrame)) % accepted feature
+            activeCount = sum([features(fidx).active]);
+            match = imgSearch(j-params.patchRadius(1):j+params.patchRadius(1),i-params.patchRadius(2):i+params.patchRadius(2));
+            features(fidx).patch = (features(fidx).patch * (activeCount-1) + match) ./ activeCount;
+        end
     else
-        dp(1) = 0;
-    end;
-    if (x - searchRadius(2) < 1)
-        dp(2) = 2*searchRadius(2) + 1 - size(xxSearch,2);
-    else
-        dp(2) = 0;
-    end;
-    
-    % find the maximum ncc response
-    maxresp = max(corr(:));
-    [j,i] = find(corr == maxresp); % find returns row, col
-    feat(ff(fidx), 1:2, cFrame) = [y+(j(1)-(searchRadius(1)+1)) x+(i(1)-(searchRadius(2)+1))] + dp;
-    feat(ff(fidx), 3:4, cFrame) = [maxresp maxresp >= errTolerance];
-    
-    % Evolve the tracked feature
-    if (evolve && feat(ff(fidx), 4)) % accepted feature
-        match = imgSearch(j-tempRadius(1):j+tempRadius(1),i-tempRadius(2):i+tempRadius(2));
-        meanFeat(:,:,ff(fidx)) = (meanFeat(:,:,ff(fidx))*pFrame + match) / cFrame;
-    end;
-end;
+        features(fidx).pos(cFrame,:) = [0 0];
+        features(fidx).error(cFrame) = 0;
+        features(fidx).active(cFrame) = 0;
+    end
+end

@@ -1,20 +1,24 @@
-function [ featImgs ] = ExtractFeatureImages( img, feats, featRadius )
+function [ feats ] = ExtractFeatureImages( img, feats, featRadius, frame )
 % ExtractFeatureImages(img, feats, featRadius) - Creates a set of feature
 % images from the input image and feature point locations.
 % Inputs
 %   img     - the input image from which to extract feature patches
-%   feats   - the list of feature locations, a Fx4xT matrix, where F is the
-%   feature index and T is a frame index
+%   feats   - the structure array features
 %   featRadius  - the radius [y,x] of the patches to extract
 
-[h, w] = size(img);
-fs = size(feats,1);
+if (nargin < 4)
+    frame = 1;
+end
 
-featImgs = zeros(2*featRadius(1)+1, 2*featRadius(2)+1, fs);
+[h, w] = size(img);
+fs = length(feats);
 
 for fidx = 1:fs
-    xx = max(feats(fidx,2,1),1)-featRadius(2) : 1 : min(feats(fidx,2,1),w)+featRadius(2);
-    yy = max(feats(fidx,1,1),1)-featRadius(1) : 1 : min(feats(fidx,1,1),h)+featRadius(1);
+    xx = max(feats(fidx).pos(frame,2), 1) - featRadius(2) : ...
+        min(feats(fidx).pos(frame,2), w) + featRadius(2);
+    yy = max(feats(fidx).pos(frame,1), 1) - featRadius(1) : ...
+        min(feats(fidx).pos(frame,1), h) + featRadius(1);
     [xg, yg] = meshgrid(xx,yy);
-    featImgs(:,:,fidx) = interp2(img,xg,yg);
+    feats(fidx).originalPatch = interp2(img, xg, yg);
+    feats(fidx).patch = feats(fidx).originalPatch;
 end;

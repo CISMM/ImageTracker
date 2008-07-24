@@ -82,17 +82,10 @@ for idx=1:length(fidx) % for each valid feature
         [xidx2 yidx2] = meshgrid(xx2, yy2);
         dtt = interp2(I2, xidx2, yidx2) - interp2(I1, xidx, yidx);
 
-    % Find the indices for the weighting function
-%     wxi = radius+1 - min(radius,x):radius+1 + min(radius,w-x);
-%     wyi = radius+1 - min(radius,y):radius+1 + min(radius,h-y);
-%     w = [gg(wyi,wxi)];
-%     ww = [w(:) w(:)].^2';
-
         A = [dxx(:), dyy(:)];
         b = -dtt(:);
         v = A\b;
-    %     v = inv((A'.*ww)*A)*A'.*ww*b;
-        % v = inv(A'*A)*A'*b;
+
         d(i,:) = d(i,:) + [v(2) v(1)]; % have to swap order of x,y displacement
     end;
 end;
