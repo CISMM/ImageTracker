@@ -46,7 +46,7 @@ int main(int argc, char** argv)
     pipeline->SetInput(&video);
     pipeline->SetOutputFiles(filesOut);
     pipeline->SetSpatialSigma(sigma);
-    pipeline->SetSmoothWeighting(weight);
+    pipeline->SetRegularization(weight);
     pipeline->SetIterations(iterations);
     pipeline->SetRelaxation(relaxation);
     pipeline->SetNumberOfLevels(levels);
