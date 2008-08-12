@@ -7,7 +7,7 @@ EmptyVisualizationControl::EmptyVisualizationControl(wxWindow* parent, int id, c
     wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
 {
     // begin wxGlade: EmptyVisualizationControl::EmptyVisualizationControl
-    label_35 = new wxStaticText(this, -1, wxT("This visualization has no configurable settings."));
+    label_35 = new wxStaticText(this, wxID_ANY, wxT("This visualization has no configurable settings."));
 
     set_properties();
     do_layout();
@@ -26,11 +26,9 @@ void EmptyVisualizationControl::do_layout()
 {
     // begin wxGlade: EmptyVisualizationControl::do_layout
     wxBoxSizer* sizer_39 = new wxBoxSizer(wxHORIZONTAL);
-    sizer_39->Add(label_35, 1, wxEXPAND|wxADJUST_MINSIZE, 0);
-    SetAutoLayout(true);
+    sizer_39->Add(label_35, 1, wxEXPAND, 0);
     SetSizer(sizer_39);
     sizer_39->Fit(this);
-    sizer_39->SetSizeHints(this);
     // end wxGlade
 }
 

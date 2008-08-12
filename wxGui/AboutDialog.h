@@ -9,7 +9,7 @@
 // begin wxGlade: ::dependencies
 // end wxGlade
 
-#include "wxUtils.h"
+#include <string>
 
 class AboutDialog: public wxDialog {
 public:
@@ -18,10 +18,7 @@ public:
 
     AboutDialog(wxWindow* parent, int id, const wxString& title, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE);
     
-    void SetMessage(const std::string& message)
-    {
-        this->txtLabel->SetLabel(nano::std2wx(message));
-    }
+    void SetMessage(const std::string& message);
 
 private:
     // begin wxGlade: AboutDialog::methods
@@ -31,8 +28,8 @@ private:
 
 protected:
     // begin wxGlade: AboutDialog::attributes
-    wxStaticText* txtLabel;
-    wxButton* btnOK;
+    wxTextCtrl* textMessage;
+    wxButton* buttonOK;
     // end wxGlade
 }; // wxGlade: end class
 

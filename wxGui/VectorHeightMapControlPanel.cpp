@@ -3,12 +3,12 @@
 #include "VectorHeightMapControlPanel.h"
 #include "LookupTableUtil.h"
 
-VectorHeightMapPipeline::Pointer VectorHeightMapControlPanel::GetPipeline()
+VectorHeightMapVisualization::Pointer VectorHeightMapControlPanel::GetPipeline()
 {
     return this->pipeline;
 }
 
-void VectorHeightMapControlPanel::SetPipeline(VectorHeightMapPipeline::Pointer pipeline)
+void VectorHeightMapControlPanel::SetPipeline(VectorHeightMapVisualization::Pointer pipeline)
 {
     this->pipeline = pipeline;
     this->TransferDataToWindow();
@@ -20,7 +20,7 @@ VectorHeightMapControlPanel::VectorHeightMapControlPanel(wxWindow* parent, int i
     // begin wxGlade: VectorHeightMapControlPanel::VectorHeightMapControlPanel
     sizer_56_staticbox = new wxStaticBox(this, -1, wxT("Vector Height Map"));
     checkVisible = new wxCheckBox(this, CBX_VISIBLE, wxT("Visible"));
-    label_46 = new wxStaticText(this, -1, wxT("Color Map"));
+    label_46 = new wxStaticText(this, wxID_ANY, wxT("Color Map"));
     const wxString comboColorMapType_choices[] = {
         wxT("Red Green"),
         wxT("Blue Yellow"),
@@ -29,13 +29,13 @@ VectorHeightMapControlPanel::VectorHeightMapControlPanel(wxWindow* parent, int i
         wxT("Gray")
     };
     comboColorMapType = new wxComboBox(this, CMB_COLOR_MAP_TYPE, wxT(""), wxDefaultPosition, wxDefaultSize, 5, comboColorMapType_choices, wxCB_DROPDOWN|wxCB_READONLY);
-    label_47 = new wxStaticText(this, -1, wxT("Maximum"));
+    label_47 = new wxStaticText(this, wxID_ANY, wxT("Maximum"));
     slideColorMapMaximum = new wxDoubleSlider(this, SLD_COLOR_MAP_MAXIMUM);
-    label_48 = new wxStaticText(this, -1, wxT("Minimum"));
+    label_48 = new wxStaticText(this, wxID_ANY, wxT("Minimum"));
     slideColorMapMinimum = new wxDoubleSlider(this, SLD_COLOR_MAP_MINIMUM);
-    label_52 = new wxStaticText(this, -1, wxT("Scale Factor"));
+    label_52 = new wxStaticText(this, wxID_ANY, wxT("Scale Factor"));
     slideScaleFactor = new wxDoubleSlider(this, SLD_SCALE_FACTOR);
-    label_53 = new wxStaticText(this, -1, wxT("Magnitude Function"));
+    label_53 = new wxStaticText(this, wxID_ANY, wxT("Magnitude Function"));
     const wxString comboMagnitudeFunction_choices[] = {
         wxT("Vector Magnitude"),
         wxT("X Component"),
@@ -87,13 +87,13 @@ bool VectorHeightMapControlPanel::TransferDataToWindow()
         }
         switch (this->pipeline->GetMagnitudeFunction())
         {
-            case VectorHeightMapPipeline::XComponent:
+            case VectorHeightMapVisualization::XComponent:
                 this->comboMagnitudeFunction->SetValue(wxT("X Component"));
                 break;
-            case VectorHeightMapPipeline::YComponent:
+            case VectorHeightMapVisualization::YComponent:
                 this->comboMagnitudeFunction->SetValue(wxT("Y Component"));
                 break;
-            case VectorHeightMapPipeline::VectorMagnitude:
+            case VectorHeightMapVisualization::VectorMagnitude:
             default:
                 this->comboMagnitudeFunction->SetValue(wxT("Vector Magnitude"));
                 break;
@@ -105,7 +105,8 @@ bool VectorHeightMapControlPanel::TransferDataToWindow()
 
 void VectorHeightMapControlPanel::OnVisible(wxCommandEvent &event)
 {
-    event.Skip();
+    if (this->pipeline && this->pipeline.IsNotNull())
+        this->pipeline->SetVisibility(this->checkVisible->IsChecked());
 }
 
 
@@ -134,11 +135,11 @@ void VectorHeightMapControlPanel::OnMagnitudeFunction(wxCommandEvent &event)
     {
         wxString val(this->comboMagnitudeFunction->GetValue());
         if (val.IsSameAs(wxT("X Component")))
-            this->pipeline->SetMagnitudeFunction(VectorHeightMapPipeline::XComponent);
+            this->pipeline->SetMagnitudeFunction(VectorHeightMapVisualization::XComponent);
         else if(val.IsSameAs(wxT("Y Component")))
-            this->pipeline->SetMagnitudeFunction(VectorHeightMapPipeline::YComponent);
+            this->pipeline->SetMagnitudeFunction(VectorHeightMapVisualization::YComponent);
         else // Vector Magnitude
-            this->pipeline->SetMagnitudeFunction(VectorHeightMapPipeline::VectorMagnitude);
+            this->pipeline->SetMagnitudeFunction(VectorHeightMapVisualization::VectorMagnitude);
     }
 }
 
@@ -167,25 +168,23 @@ void VectorHeightMapControlPanel::do_layout()
     wxBoxSizer* sizer_55 = new wxBoxSizer(wxVERTICAL);
     wxStaticBoxSizer* sizer_56 = new wxStaticBoxSizer(sizer_56_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_20 = new wxFlexGridSizer(6, 2, 5, 5);
-    grid_sizer_20->Add(checkVisible, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_20->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_20->Add(label_46, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_20->Add(comboColorMapType, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    grid_sizer_20->Add(label_47, 0, wxADJUST_MINSIZE, 0);
+    grid_sizer_20->Add(checkVisible, 0, 0, 0);
+    grid_sizer_20->Add(20, 20, 0, 0, 0);
+    grid_sizer_20->Add(label_46, 0, 0, 0);
+    grid_sizer_20->Add(comboColorMapType, 0, wxEXPAND, 0);
+    grid_sizer_20->Add(label_47, 0, 0, 0);
     grid_sizer_20->Add(slideColorMapMaximum, 1, wxEXPAND, 0);
-    grid_sizer_20->Add(label_48, 0, wxADJUST_MINSIZE, 0);
+    grid_sizer_20->Add(label_48, 0, 0, 0);
     grid_sizer_20->Add(slideColorMapMinimum, 1, wxEXPAND, 0);
-    grid_sizer_20->Add(label_52, 0, wxADJUST_MINSIZE, 0);
+    grid_sizer_20->Add(label_52, 0, 0, 0);
     grid_sizer_20->Add(slideScaleFactor, 1, wxEXPAND, 0);
-    grid_sizer_20->Add(label_53, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_20->Add(comboMagnitudeFunction, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
+    grid_sizer_20->Add(label_53, 0, 0, 0);
+    grid_sizer_20->Add(comboMagnitudeFunction, 0, wxEXPAND, 0);
     grid_sizer_20->AddGrowableCol(1);
     sizer_56->Add(grid_sizer_20, 1, wxEXPAND, 0);
     sizer_55->Add(sizer_56, 1, wxEXPAND, 0);
-    SetAutoLayout(true);
     SetSizer(sizer_55);
     sizer_55->Fit(this);
-    sizer_55->SetSizeHints(this);
     // end wxGlade
 }
 

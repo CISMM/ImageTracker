@@ -8,7 +8,7 @@
 
 #include "wxDoubleSlider.h"
 #include "wxIntSlider.h"
-#include "VectorGlyphPipeline.h"
+#include "VectorGlyphVisualization.h"
 
 // begin wxGlade: ::dependencies
 // end wxGlade
@@ -31,8 +31,8 @@ public:
     /**
      * Get/Set the visualization pipeline.
      */
-    VectorGlyphPipeline::Pointer GetPipeline();
-    void SetPipeline(VectorGlyphPipeline::Pointer pipeline);
+    VectorGlyphVisualization::Pointer GetPipeline();
+    void SetPipeline(VectorGlyphVisualization::Pointer pipeline);
 
 private:
     // begin wxGlade: VectorGlyphControlPanel::methods
@@ -60,7 +60,7 @@ public:
     virtual bool TransferDataToWindow();
     
 private:
-    VectorGlyphPipeline::Pointer pipeline;
+    VectorGlyphVisualization::Pointer pipeline;
 }; // wxGlade: end class
 
 

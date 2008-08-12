@@ -4,7 +4,7 @@
 #include <wx/thread.h>
 
 #include "ItkPipeline.h"
-#include "WxPipelineObserver.h"
+#include "ItkPipelineObserver.h"
 
 /**
  * \class PipelineExecutor
@@ -31,14 +31,16 @@ public:
     virtual ExitCode Entry();
 
     void SetOpenFiles(bool open);
+    void SetImageResult(bool isImage);
     
 protected:
     // The pipeline to execute on this thread.
     ItkPipeline* pipeline;
     
     // The progress observer attached to this thread's pipeline.
-    WxPipelineObserver::Pointer progress;
+    ItkPipelineObserver::Pointer progress;
     
 private:
     bool openResult;
+    bool imageResult;
 };

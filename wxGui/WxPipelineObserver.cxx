@@ -7,11 +7,16 @@ WxPipelineObserver::WxPipelineObserver() :
     wasAborted(false),
     dlgProgress(_T("Pipeline Progress"), _T(""), 100, NULL, wxPD_CAN_ABORT | wxPD_REMAINING_TIME)
 {
+    std::string function("WxPipelineObserver::WxPipelineObserver");
+    Logger::debug << function << ": constructed." << std::endl;
     this->dlgProgress.Show(true);
 }
     
 WxPipelineObserver::~WxPipelineObserver() 
 {
+    std::string function("WxPipelineObserver::~WxPipelineObserver");
+    Logger::debug << function << ": destructing...." << std::endl;
+//    this->dlgProgress.Destroy();
     // The wxProgressDialog seems to have some odd properties.
     // If the pipeline was allowed to complete without canceling, the
     // progress dialog can be Destroy()ed.  But, if the cancel button

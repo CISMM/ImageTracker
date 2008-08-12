@@ -2,17 +2,20 @@
 
 #include "ApplyTransformDialog.h"
 #include "FileUtils.h"
+#include "ImageTrackerController.h"
 #include "Logger.h"
 #include "PipelineExecutor.h"
 #include "wxUtils.h"
 
 bool ApplyTransformDialog::TransferDataToWindow()
 {
-    // create an output file pattern from the input files
-    std::string dir(this->input->GetFiles().GetDirectory());
+    // create a default output file pattern
+    std::string dir(nano::wx2std(wxGetCwd()));
+    CapDirectory(dir);
     std::string format("trans-%04d.tif");
-    unsigned int start = NumberPart(this->input->GetFiles()[0]);
-    unsigned int end = start + this->input->size() - 1;
+    std::string example = ImageTrackerController::Instance()->GetImageFiles()[0];    
+    unsigned int start = NumberPart(example);
+    unsigned int end = start + this->input->GetImageCount() - 1;
     this->panelFilePattern->SetFilePattern(FilePattern(dir, format, start, end));
 
     this->textTransform->SetValue(nano::std2wx(dir + "transforms.txt"));
@@ -28,7 +31,7 @@ bool ApplyTransformDialog::TransferDataFromWindow()
     Logger::verbose << function << ": entering" << std::endl;
     
     // Set up pipeline paramters
-    this->pipeline->SetInput(this->input->GetImages());
+    this->pipeline->SetInput(this->input);
     this->pipeline->SetTransformFile(nano::wx2std(this->textTransform->GetValue()));
     
     // Create an output file set
@@ -52,8 +55,11 @@ bool ApplyTransformDialog::TransferDataFromWindow()
     return true;
 }
 
-void ApplyTransformDialog::SetInput(DataSource::Pointer input)
+void ApplyTransformDialog::SetInput(ImageFileSet* input)
 {
+    if (this->input)
+        delete (this->input);
+    
     this->input = input;
 }
 
@@ -63,11 +69,11 @@ ApplyTransformDialog::ApplyTransformDialog(wxWindow* parent, int id, const wxStr
     // begin wxGlade: ApplyTransformDialog::ApplyTransformDialog
     sizer_21_staticbox = new wxStaticBox(this, -1, wxT("Output"));
     sizer_30_staticbox = new wxStaticBox(this, -1, wxT("Parameters"));
-    label_25 = new wxStaticText(this, -1, wxT("Transform File"));
-    textTransform = new wxTextCtrl(this, -1, wxT("transforms.txt"));
+    label_25 = new wxStaticText(this, wxID_ANY, wxT("Transform File"));
+    textTransform = new wxTextCtrl(this, wxID_ANY, wxT("transforms.txt"));
     btnBrowse = new wxButton(this, BTN_BROWSE_TRANSFORM, wxT("Browse..."));
-    panelFilePattern = new FilePatternPanel(this, -1);
-    checkOpenOutput = new wxCheckBox(this, -1, wxT("Open output when finished"));
+    panelFilePattern = new FilePatternPanel(this, wxID_ANY);
+    checkOpenOutput = new wxCheckBox(this, wxID_ANY, wxT("Open output when finished"));
     btnRun = new wxButton(this, wxID_OK, wxT("&Run"));
     btnHide = new wxButton(this, wxID_CANCEL, wxT("&Hide"));
 
@@ -76,6 +82,7 @@ ApplyTransformDialog::ApplyTransformDialog(wxWindow* parent, int id, const wxStr
     // end wxGlade
     
     //----- Custom code -----//
+    this->input = NULL;
     this->pipeline = ApplyTransformsPipeline::New();
     this->panelFilePattern->SetRangeEnabled(false);
 }
@@ -91,7 +98,7 @@ void ApplyTransformDialog::OnBrowseTransform(wxCommandEvent &event)
     wxFileDialog open(this, wxT("Choose a transform file"), wxT(""), wxT(""), wxT("All Files|*.*|Text Files|*.txt"));
     if (open.ShowModal() == wxID_OK)
     {
-        this->textTransform->SetValue(open.GetFilename());
+        this->textTransform->SetValue(open.GetPath());
     }
 }
 
@@ -120,21 +127,20 @@ void ApplyTransformDialog::do_layout()
     wxFlexGridSizer* grid_sizer_10 = new wxFlexGridSizer(1, 2, 5, 5);
     wxStaticBoxSizer* sizer_30 = new wxStaticBoxSizer(sizer_30_staticbox, wxHORIZONTAL);
     wxFlexGridSizer* grid_sizer_9 = new wxFlexGridSizer(1, 3, 5, 0);
-    grid_sizer_9->Add(label_25, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_9->Add(textTransform, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    grid_sizer_9->Add(btnBrowse, 0, wxADJUST_MINSIZE, 0);
+    grid_sizer_9->Add(label_25, 0, 0, 0);
+    grid_sizer_9->Add(textTransform, 0, wxEXPAND, 0);
+    grid_sizer_9->Add(btnBrowse, 0, 0, 0);
     grid_sizer_9->AddGrowableCol(1);
     sizer_30->Add(grid_sizer_9, 1, wxEXPAND, 0);
     sizer_28->Add(sizer_30, 0, wxEXPAND, 0);
     sizer_21->Add(panelFilePattern, 0, wxBOTTOM|wxEXPAND, 10);
-    grid_sizer_10->Add(110, 20, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_10->Add(checkOpenOutput, 0, wxADJUST_MINSIZE, 0);
+    grid_sizer_10->Add(110, 20, 0, 0, 0);
+    grid_sizer_10->Add(checkOpenOutput, 0, 0, 0);
     sizer_21->Add(grid_sizer_10, 1, wxEXPAND, 0);
     sizer_28->Add(sizer_21, 1, wxEXPAND, 0);
-    sizer_29->Add(btnRun, 0, wxADJUST_MINSIZE, 0);
-    sizer_29->Add(btnHide, 0, wxADJUST_MINSIZE, 0);
+    sizer_29->Add(btnRun, 0, 0, 0);
+    sizer_29->Add(btnHide, 0, 0, 0);
     sizer_28->Add(sizer_29, 0, wxALIGN_CENTER_HORIZONTAL, 0);
-    SetAutoLayout(true);
     SetSizer(sizer_28);
     Layout();
     // end wxGlade

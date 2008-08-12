@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "wx/window.h"
+#include <wx/wx.h>
 
 #include "itkDataObject.h"
 #include "itkLightObject.h"

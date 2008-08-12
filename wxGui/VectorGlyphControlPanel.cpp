@@ -3,12 +3,12 @@
 #include "VectorGlyphControlPanel.h"
 #include "Logger.h"
 
-VectorGlyphPipeline::Pointer VectorGlyphControlPanel::GetPipeline()
+VectorGlyphVisualization::Pointer VectorGlyphControlPanel::GetPipeline()
 {
     return this->pipeline;
 }
 
-void VectorGlyphControlPanel::SetPipeline(VectorGlyphPipeline::Pointer pipeline)
+void VectorGlyphControlPanel::SetPipeline(VectorGlyphVisualization::Pointer pipeline)
 {
     this->pipeline = pipeline;
     this->TransferDataToWindow();
@@ -20,9 +20,9 @@ VectorGlyphControlPanel::VectorGlyphControlPanel(wxWindow* parent, int id, const
     // begin wxGlade: VectorGlyphControlPanel::VectorGlyphControlPanel
     sizer_40_staticbox = new wxStaticBox(this, -1, wxT("Vector Glyphs"));
     checkVisibility = new wxCheckBox(this, CBX_VISIBILITY, wxT("Visible"));
-    label_33 = new wxStaticText(this, -1, wxT("Scale Factor"));
+    label_33 = new wxStaticText(this, wxID_ANY, wxT("Scale Factor"));
     slideGlyphScaleFactor = new wxDoubleSlider(this, SLD_SCALE_FACTOR);
-    label_34 = new wxStaticText(this, -1, wxT("Mask Ratio"));
+    label_34 = new wxStaticText(this, wxID_ANY, wxT("Mask Ratio"));
     slideGlyphMaskRatio = new wxIntSlider(this, SLD_MASK_RATIO);
 
     set_properties();
@@ -99,19 +99,17 @@ void VectorGlyphControlPanel::do_layout()
     wxBoxSizer* sizer_38 = new wxBoxSizer(wxVERTICAL);
     wxStaticBoxSizer* sizer_40 = new wxStaticBoxSizer(sizer_40_staticbox, wxVERTICAL);
     wxFlexGridSizer* grid_sizer_13 = new wxFlexGridSizer(3, 2, 5, 5);
-    grid_sizer_13->Add(checkVisibility, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_13->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_13->Add(label_33, 0, wxADJUST_MINSIZE, 0);
+    grid_sizer_13->Add(checkVisibility, 0, 0, 0);
+    grid_sizer_13->Add(20, 20, 0, 0, 0);
+    grid_sizer_13->Add(label_33, 0, 0, 0);
     grid_sizer_13->Add(slideGlyphScaleFactor, 1, wxEXPAND, 0);
-    grid_sizer_13->Add(label_34, 0, wxADJUST_MINSIZE, 0);
+    grid_sizer_13->Add(label_34, 0, 0, 0);
     grid_sizer_13->Add(slideGlyphMaskRatio, 1, wxEXPAND, 0);
     grid_sizer_13->AddGrowableCol(1);
     sizer_40->Add(grid_sizer_13, 1, wxEXPAND, 0);
     sizer_38->Add(sizer_40, 1, wxEXPAND, 0);
-    SetAutoLayout(true);
     SetSizer(sizer_38);
     sizer_38->Fit(this);
-    sizer_38->SetSizeHints(this);
     // end wxGlade
 }
 

@@ -3,29 +3,35 @@ PROJECT (gui)
 SET (Gui_SRCS
     AboutDialog.cpp                             AboutDialog.h
     ApplyTransformDialog.cpp                    ApplyTransformDialog.h
-    CLGOpticFlowDialog.cpp                      CLGOpticFlowDialog.h
-						ConnectVTKITK.h
-    DataSourceDialog.cpp                        DataSourceDialog.h
+    CLGOpticalFlowDialog.cpp                    CLGOpticalFlowDialog.h
+    CompositeImageFileSet.cxx                   CompositeImageFileSet.h
+						                        ConnectVTKITK.h
     EmptyVisualizationControl.cpp               EmptyVisualizationControl.h
     FilePatternDialog.cpp                       FilePatternDialog.h
     FilePatternPanel.cpp                        FilePatternPanel.h
-    GuiUtils.cxx                                GuiUtils.h
+    FileSetPanel.cpp                            FileSetPanel.h
+    FilterControlPanel.cxx                      FilterControlPanel.h
+    GaussianFilterPanel.cpp                     GaussianFilterPanel.h
     HornOpticalFlowDialog.cpp                   HornOpticalFlowDialog.h
+    ImageFileSetPanel.cpp                       ImageFileSetPanel.h
     ImageTracker.cpp                            ImageTracker.h
     ImageTrackerController.cxx                  ImageTrackerController.h
     ItkVtkPipeline.cxx                          ItkVtkPipeline.h
     IntegrateFlowDialog.cpp                     IntegrateFlowDialog.h
+    LoggerDialog.cpp                            LoggerDialog.h
     LookupTableUtil.cxx                         LookupTableUtil.h
-    MultiResolutionRegistrationDialog.cpp	MultiResolutionRegistrationDialog.h
+    MultiResolutionRegistrationDialog.cpp       MultiResolutionRegistrationDialog.h
     PipelineExecutor.cxx                        PipelineExecutor.h
     RemoveOcclusionsDialog.cpp                  RemoveOcclusionsDialog.h
     SaveVisualizationDialog.cpp                 SaveVisualizationDialog.h
+    ScalarImageControlDialog.cpp                ScalarImageControlDialog.h
     ScalarImageControlPanel.cpp                 ScalarImageControlPanel.h
-    ScalarImageItkVtkPipeline.cxx               ScalarImageItkVtkPipeline.h
+    ScalarImageVisualization.cxx                ScalarImageVisualization.h
+    ThresholdPanel.cpp                          ThresholdPanel.h
     VectorGlyphControlPanel.cpp                 VectorGlyphControlPanel.h
-    VectorGlyphPipeline.cxx                     VectorGlyphPipeline.h
+    VectorGlyphVisualization.cxx                VectorGlyphVisualization.h
     VectorHeightMapControlPanel.cpp             VectorHeightMapControlPanel.h
-    VectorHeightMapPipeline.cxx                 VectorHeightMapPipeline.h
+    VectorHeightMapVisualization.cxx            VectorHeightMapVisualization.h
     WxPipelineObserver.cxx                      WxPipelineObserver.h
 )
 

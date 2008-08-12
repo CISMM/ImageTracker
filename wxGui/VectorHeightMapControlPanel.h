@@ -7,7 +7,7 @@
 #define VECTORHEIGHTMAPCONTROLPANEL_H
 
 #include "wxDoubleSlider.h"
-#include "VectorHeightMapPipeline.h"
+#include "VectorHeightMapVisualization.h"
 
 // begin wxGlade: ::dependencies
 // end wxGlade
@@ -33,8 +33,8 @@ public:
     /**
      * Get/Set the visualization pipeline
      */
-    VectorHeightMapPipeline::Pointer GetPipeline();
-    void SetPipeline(VectorHeightMapPipeline::Pointer pipeline);
+    VectorHeightMapVisualization::Pointer GetPipeline();
+    void SetPipeline(VectorHeightMapVisualization::Pointer pipeline);
     
     virtual bool TransferDataToWindow();
     
@@ -44,7 +44,7 @@ private:
     void do_layout();
     // end wxGlade
 
-    VectorHeightMapPipeline::Pointer pipeline;
+    VectorHeightMapVisualization::Pointer pipeline;
     
 protected:
     // begin wxGlade: VectorHeightMapControlPanel::attributes

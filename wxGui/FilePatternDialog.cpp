@@ -7,7 +7,7 @@ FilePatternDialog::FilePatternDialog(wxWindow* parent, int id, const wxString& t
     wxDialog(parent, id, title, pos, size, style)
 {
     // begin wxGlade: FilePatternDialog::FilePatternDialog
-    panelFilePattern = new FilePatternPanel(this, -1);
+    panelFilePattern = new FilePatternPanel(this, wxID_ANY);
     buttonOK = new wxButton(this, wxID_OK, wxT("&OK"));
     buttonCancel = new wxButton(this, wxID_CANCEL, wxT("&Cancel"));
 
@@ -68,13 +68,11 @@ void FilePatternDialog::do_layout()
     wxBoxSizer* sizer_63 = new wxBoxSizer(wxVERTICAL);
     wxBoxSizer* sizer_64 = new wxBoxSizer(wxHORIZONTAL);
     sizer_63->Add(panelFilePattern, 1, wxEXPAND, 0);
-    sizer_64->Add(buttonOK, 0, wxADJUST_MINSIZE, 0);
-    sizer_64->Add(buttonCancel, 0, wxADJUST_MINSIZE, 0);
+    sizer_64->Add(buttonOK, 0, 0, 0);
+    sizer_64->Add(buttonCancel, 0, 0, 0);
     sizer_63->Add(sizer_64, 0, wxALIGN_CENTER_HORIZONTAL, 0);
-    SetAutoLayout(true);
     SetSizer(sizer_63);
     sizer_63->Fit(this);
-    sizer_63->SetSizeHints(this);
     Layout();
     // end wxGlade
 }

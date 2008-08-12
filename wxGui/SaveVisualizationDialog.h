@@ -13,16 +13,14 @@
 class SaveVisualizationDialog: public wxDialog {
 public:
     // begin wxGlade: SaveVisualizationDialog::ids
+    enum {
+        BUTTON_BROWSE = wxID_HIGHEST + 1082,
+        TEXT_RANGE_FROM = wxID_HIGHEST + 1084,
+        TEXT_RANGE_TO = wxID_HIGHEST + 1086
+    };
     // end wxGlade
 
     SaveVisualizationDialog(wxWindow* parent, int id, const wxString& title, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxTHICK_FRAME);
-    
-    enum IDs
-    {
-        BTN_BROWSE = 3070,
-        TXT_RANGE_FROM,
-        TXT_RANGE_TO
-    };
     
     std::string GetFileFormat();
     int GetIndexStart();
@@ -40,7 +38,7 @@ protected:
     // begin wxGlade: SaveVisualizationDialog::attributes
     wxStaticText* label_42;
     wxTextCtrl* textDirectory;
-    wxButton* btnBrowse;
+    wxButton* buttonBrowse;
     wxStaticText* label_43;
     wxTextCtrl* textFilePattern;
     wxStaticText* label_44;
@@ -56,8 +54,8 @@ protected:
     wxStaticText* labelRangeMax;
     wxStaticText* labelFrameCurrent;
     wxTextCtrl* text_ctrl_1;
-    wxButton* btnRun;
-    wxButton* btnHide;
+    wxButton* buttonRun;
+    wxButton* buttonHide;
     // end wxGlade
 
     DECLARE_EVENT_TABLE();

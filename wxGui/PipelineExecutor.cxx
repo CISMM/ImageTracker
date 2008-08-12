@@ -1,18 +1,24 @@
 #include "PipelineExecutor.h"
 
-#include "DataSource.h"
+#include <string>
+
 #include "FileSet.h"
 #include "ImageTrackerController.h"
 #include "Logger.h"
+#include "TextPipelineObserver.h"
+#include "WxPipelineObserver.h"
 
 PipelineExecutor::PipelineExecutor(ItkPipeline* pipeline, wxThreadKind kind) :
     wxThread(kind),
-	openResult(false)
+	openResult(false),
+    imageResult(true)
 {
-    Logger::verbose << "PipelineExecutor::PipelineExecutor" << std::endl;
+	std::string function("PipelineExecutor::PipelineExecutor");
+	Logger::verbose << function << " (" << wxThread::GetCurrentId() << "): constructing..." << std::endl;
     this->pipeline = pipeline;
     if (this->pipeline != NULL)
     {
+		Logger::verbose << function << ": Creating pipeline observer and attaching to pipeline" << std::endl;
         this->progress = WxPipelineObserver::New();
         this->pipeline->AddObserver(this->progress);
     }
@@ -20,11 +26,14 @@ PipelineExecutor::PipelineExecutor(ItkPipeline* pipeline, wxThreadKind kind) :
 
 PipelineExecutor::~PipelineExecutor()
 {
-    Logger::verbose << "PipelineExecutor::~PipelineExecutor" << std::endl;
-     if (this->pipeline != NULL && this->progress.IsNotNull())
-     {
-         this->pipeline->RemoveObserver(progress);
-     }
+	std::string function("PipelineExecutor::~PipelineExecutor");
+	Logger::verbose << function << ": destructing..." << std::endl;
+    if (this->pipeline != NULL && this->progress.IsNotNull())
+    {
+		Logger::verbose << function << ": removing observer from pipeline" << std::endl;
+        this->pipeline->RemoveObserver(progress);
+    }
+	Logger::verbose << function << ": exiting" << std::endl;
 }
 
 void PipelineExecutor::SetOpenFiles(bool open)
@@ -32,27 +41,30 @@ void PipelineExecutor::SetOpenFiles(bool open)
 	this->openResult = open;
 }
 
+void PipelineExecutor::SetImageResult(bool isImage)
+{
+    this->imageResult = isImage;
+}
+
 PipelineExecutor::ExitCode PipelineExecutor::Entry()
 {
-    Logger::verbose << "PipelineExecutor::Entry" << std::endl;
+	std::string function("PipelineExecutor::Entry");
+	Logger::debug << function << ": starting..." << std::endl;
 
     if (this->pipeline != NULL)
     {
+		Logger::debug << function << ": updating pipeline..." << std::endl;
         this->pipeline->Update();
     }
 
     // Open the result, if we're supposed to
-    if (this->openResult &&
-        this->pipeline->GetSuccess())
+    if (this->pipeline->GetSuccess() &&
+        this->openResult)
     {
-        DataSource::Pointer source = DataSource::New();
-        source->SetName("Result");
-        source->SetFiles(this->pipeline->GetOutputFiles());
-        
-        // Add the new data source to the controller
-        ImageTrackerController::Instance()->AddDataSource(source);
+		Logger::debug << function << ": loading output images through the backdoor" << std::endl;
+		ImageTrackerController::Instance()->SetBackdoorFiles(this->pipeline->GetOutputFiles(), this->imageResult);
     }
 
-    Logger::verbose << "PipelineExecutor::Entry: done" << std::endl;
+	Logger::debug << function << ": finished." << std::endl;
     return (ExitCode) 0;
 }

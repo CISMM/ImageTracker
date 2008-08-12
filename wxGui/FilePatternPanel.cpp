@@ -10,23 +10,23 @@ FilePatternPanel::FilePatternPanel(wxWindow* parent, int id, const wxPoint& pos,
     pattern(".", "file-%04d.tif", 0, 10)
 {
     // begin wxGlade: FilePatternPanel::FilePatternPanel
-    label_62 = new wxStaticText(this, -1, wxT("Directory"));
-    textDirectory = new wxTextCtrl(this, TXT_DIRECTORY, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-    buttonBrowse = new wxButton(this, BTN_BROWSE, wxT("&Browse"));
-    label_57_copy = new wxStaticText(this, -1, wxT("Prefix"));
-    textPrefix = new wxTextCtrl(this, TXT_PREFIX, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-    label_58_copy = new wxStaticText(this, -1, wxT("Number format"));
-    textNumberFormat = new wxTextCtrl(this, TXT_NUMBER_FORMAT, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-    label_7 = new wxStaticText(this, -1, wxT("(e.g. %04d)"));
-    label_59_copy = new wxStaticText(this, -1, wxT("Extension"));
-    textExtension = new wxTextCtrl(this, TXT_EXTENSION, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-    label_63_copy = new wxStaticText(this, -1, wxT("File index range"));
-    label_64_copy = new wxStaticText(this, -1, wxT("From"));
-    textRangeStart = new wxTextCtrl(this, TXT_RANGE_START, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-    label_65_copy = new wxStaticText(this, -1, wxT("To"));
-    textRangeEnd = new wxTextCtrl(this, TXT_RANGE_END, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-    label_60_copy = new wxStaticText(this, -1, wxT("Example:"));
-    labelExample = new wxStaticText(this, -1, wxT(""));
+    label_62 = new wxStaticText(this, wxID_ANY, wxT("Directory"));
+    textDirectory = new wxTextCtrl(this, TEXT_DIRECTORY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+    buttonBrowse = new wxButton(this, BUTTON_BROWSE, wxT("&Browse"));
+    label_57_copy = new wxStaticText(this, wxID_ANY, wxT("Prefix"));
+    textPrefix = new wxTextCtrl(this, TEXT_PREFIX, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+    label_58_copy = new wxStaticText(this, wxID_ANY, wxT("Number format"));
+    textNumberFormat = new wxTextCtrl(this, TEXT_NUMBER_FORMAT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+    label_7 = new wxStaticText(this, wxID_ANY, wxT("(e.g. %04d)"));
+    label_59_copy = new wxStaticText(this, wxID_ANY, wxT("Extension"));
+    textExtension = new wxTextCtrl(this, TEXT_EXTENSION, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+    label_63_copy = new wxStaticText(this, wxID_ANY, wxT("File index range"));
+    label_64_copy = new wxStaticText(this, wxID_ANY, wxT("From"));
+    textRangeStart = new wxTextCtrl(this, TEXT_RANGE_START, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+    label_65_copy = new wxStaticText(this, wxID_ANY, wxT("To"));
+    textRangeEnd = new wxTextCtrl(this, TEXT_RANGE_END, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+    label_60_copy = new wxStaticText(this, wxID_ANY, wxT("Example:"));
+    labelExample = new wxStaticText(this, wxID_ANY, wxEmptyString);
 
     set_properties();
     do_layout();
@@ -59,31 +59,36 @@ bool FilePatternPanel::TransferDataFromWindow()
 
 BEGIN_EVENT_TABLE(FilePatternPanel, wxPanel)
     // begin wxGlade: FilePatternPanel::event_table
-    EVT_TEXT_ENTER(TXT_DIRECTORY, FilePatternPanel::OnDirectory)
-    EVT_BUTTON(BTN_BROWSE, FilePatternPanel::OnBrowse)
-    EVT_TEXT_ENTER(TXT_PREFIX, FilePatternPanel::OnPrefix)
-    EVT_TEXT_ENTER(TXT_NUMBER_FORMAT, FilePatternPanel::OnFormat)
-    EVT_TEXT_ENTER(TXT_EXTENSION, FilePatternPanel::OnExtension)
-    EVT_TEXT_ENTER(TXT_RANGE_START, FilePatternPanel::OnRangeStart)
-    EVT_TEXT_ENTER(TXT_RANGE_END, FilePatternPanel::OnRangeEnd)
+    EVT_TEXT_ENTER(TEXT_DIRECTORY, FilePatternPanel::OnDirectory)
+    EVT_BUTTON(BUTTON_BROWSE, FilePatternPanel::OnBrowse)
+    EVT_TEXT_ENTER(TEXT_PREFIX, FilePatternPanel::OnPrefix)
+    EVT_TEXT_ENTER(TEXT_NUMBER_FORMAT, FilePatternPanel::OnFormat)
+    EVT_TEXT_ENTER(TEXT_EXTENSION, FilePatternPanel::OnExtension)
+    EVT_TEXT_ENTER(TEXT_RANGE_START, FilePatternPanel::OnRangeStart)
+    EVT_TEXT_ENTER(TEXT_RANGE_END, FilePatternPanel::OnRangeEnd)
     // end wxGlade
 END_EVENT_TABLE();
 
 
 void FilePatternPanel::OnDirectory(wxCommandEvent &event)
 {
-    this->pattern.directory = nano::wx2std(this->textDirectory->GetValue());
+    std::string dir = nano::wx2std(this->textDirectory->GetValue());
+    CapDirectory(dir);
+    this->pattern.directory = dir;
+    this->textDirectory->SetValue(nano::std2wx(dir));
     this->UpdateExample();
 }
 
 
 void FilePatternPanel::OnBrowse(wxCommandEvent &event)
 {
-    wxDirDialog dir(this, wxT("Choose a directory"), this->textDirectory->GetValue());
-    if (dir.ShowModal() == wxID_OK)
+    wxDirDialog dirDlg(this, wxT("Choose a directory"), this->textDirectory->GetValue());
+    if (dirDlg.ShowModal() == wxID_OK)
     {
-        this->textDirectory->SetValue(dir.GetPath());
-        this->pattern.directory = nano::wx2std(this->textDirectory->GetValue());
+        std::string dir = nano::wx2std(dirDlg.GetPath());
+        CapDirectory(dir);
+        this->textDirectory->SetValue(nano::std2wx(dir));
+        this->pattern.directory = dir;
         this->UpdateExample();
     }
 }
@@ -210,36 +215,34 @@ void FilePatternPanel::do_layout()
     wxBoxSizer* sizer_31 = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer* sizer_62_copy = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer* sizer_61_copy = new wxBoxSizer(wxHORIZONTAL);
-    grid_sizer_21->Add(label_62, 0, wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 0);
-    grid_sizer_21->Add(textDirectory, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    grid_sizer_21->Add(buttonBrowse, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_21->Add(label_57_copy, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_21->Add(textPrefix, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    grid_sizer_21->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_21->Add(label_58_copy, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_21->Add(textNumberFormat, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    grid_sizer_21->Add(label_7, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_21->Add(label_59_copy, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_21->Add(textExtension, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    grid_sizer_21->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_21->Add(label_63_copy, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 10);
-    sizer_61_copy->Add(label_64_copy, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 5);
-    sizer_61_copy->Add(textRangeStart, 0, wxADJUST_MINSIZE, 0);
+    grid_sizer_21->Add(label_62, 0, wxALIGN_CENTER_VERTICAL, 0);
+    grid_sizer_21->Add(textDirectory, 0, wxEXPAND, 0);
+    grid_sizer_21->Add(buttonBrowse, 0, 0, 0);
+    grid_sizer_21->Add(label_57_copy, 0, 0, 0);
+    grid_sizer_21->Add(textPrefix, 0, wxEXPAND, 0);
+    grid_sizer_21->Add(20, 20, 0, 0, 0);
+    grid_sizer_21->Add(label_58_copy, 0, 0, 0);
+    grid_sizer_21->Add(textNumberFormat, 0, wxEXPAND, 0);
+    grid_sizer_21->Add(label_7, 0, 0, 0);
+    grid_sizer_21->Add(label_59_copy, 0, 0, 0);
+    grid_sizer_21->Add(textExtension, 0, wxEXPAND, 0);
+    grid_sizer_21->Add(20, 20, 0, 0, 0);
+    grid_sizer_21->Add(label_63_copy, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 10);
+    sizer_61_copy->Add(label_64_copy, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 5);
+    sizer_61_copy->Add(textRangeStart, 0, 0, 0);
     sizer_31->Add(sizer_61_copy, 1, wxEXPAND, 0);
-    sizer_62_copy->Add(label_65_copy, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL|wxADJUST_MINSIZE, 5);
-    sizer_62_copy->Add(textRangeEnd, 0, wxADJUST_MINSIZE, 0);
+    sizer_62_copy->Add(label_65_copy, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 5);
+    sizer_62_copy->Add(textRangeEnd, 0, 0, 0);
     sizer_31->Add(sizer_62_copy, 1, wxEXPAND, 0);
     grid_sizer_21->Add(sizer_31, 1, wxEXPAND, 0);
-    grid_sizer_21->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_21->Add(label_60_copy, 0, wxTOP|wxADJUST_MINSIZE, 10);
+    grid_sizer_21->Add(20, 20, 0, 0, 0);
+    grid_sizer_21->Add(label_60_copy, 0, wxTOP, 10);
     grid_sizer_21->Add(labelExample, 1, wxTOP|wxEXPAND, 10);
-    grid_sizer_21->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
+    grid_sizer_21->Add(20, 20, 0, 0, 0);
     grid_sizer_21->AddGrowableCol(1);
     sizer_57->Add(grid_sizer_21, 0, wxTOP|wxBOTTOM|wxEXPAND, 10);
-    SetAutoLayout(true);
     SetSizer(sizer_57);
     sizer_57->Fit(this);
-    sizer_57->SetSizeHints(this);
     // end wxGlade
 }
 

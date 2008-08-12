@@ -15,18 +15,16 @@
 class FilePatternPanel: public wxPanel {
 public:
     // begin wxGlade: FilePatternPanel::ids
-    // end wxGlade
-    
-    enum IDs
-    {
-        TXT_DIRECTORY=7090,
-        BTN_BROWSE,
-        TXT_PREFIX,
-        TXT_NUMBER_FORMAT,
-        TXT_EXTENSION,
-        TXT_RANGE_START,
-        TXT_RANGE_END
+    enum {
+        TEXT_DIRECTORY = wxID_HIGHEST + 1088,
+        BUTTON_BROWSE = wxID_HIGHEST + 1090,
+        TEXT_PREFIX = wxID_HIGHEST + 1092,
+        TEXT_NUMBER_FORMAT = wxID_HIGHEST + 1094,
+        TEXT_EXTENSION = wxID_HIGHEST + 1096,
+        TEXT_RANGE_START = wxID_HIGHEST + 1098,
+        TEXT_RANGE_END = wxID_HIGHEST + 1100
     };
+    // end wxGlade
     
     FilePatternPanel(wxWindow* parent, int id, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
 

@@ -4,9 +4,9 @@
 #include <wx/image.h>
 
 #include "ApplyTransformsPipeline.h"
-#include "DataSource.h"
 #include "FilePatternPanel.h"
-        
+#include "ImageFileSet.h"
+
 #ifndef APPLYTRANSFORMDIALOG_H
 #define APPLYTRANSFORMDIALOG_H
 
@@ -53,12 +53,12 @@ public:
 public:
     virtual bool TransferDataToWindow();
     virtual bool TransferDataFromWindow();
-    void SetInput(DataSource::Pointer input);
+    void SetInput(ImageFileSet* input);
     
 protected:
     
 private:
-    DataSource::Pointer input;
+    ImageFileSet* input;
     ApplyTransformsPipeline::Pointer pipeline;
     
 }; // wxGlade: end class

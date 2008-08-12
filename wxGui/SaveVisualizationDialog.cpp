@@ -14,19 +14,22 @@ bool SaveVisualizationDialog::TransferDataToWindow()
 {
     char text[80];
     
+    int curIdx = ImageTrackerController::Instance()->GetImageIndex();
+    int maxIdx = ImageTrackerController::Instance()->GetImageCount() - 1;
+    
     if (this->firstTime)
     {
         this->firstTime = false;
 
-        sprintf(text, "%d", ImageTrackerController::Instance()->GetFrameIndex());
+        sprintf(text, "%d", curIdx);
         this->textRangeFrom->SetValue(nano::std2wx(std::string(text)));
-        sprintf(text, "%d", ImageTrackerController::Instance()->GetMaxIndex());
+        sprintf(text, "%d", maxIdx);
         this->textRangeTo->SetValue(nano::std2wx(std::string(text)));
     }
 
-    sprintf(text, "(Max: %d)", ImageTrackerController::Instance()->GetMaxIndex());
+    sprintf(text, "(Max: %d)", maxIdx);
     this->labelRangeMax->SetLabel(nano::std2wx(std::string(text)));
-    sprintf(text, "(%d)", ImageTrackerController::Instance()->GetFrameIndex());
+    sprintf(text, "(%d)", curIdx);
     this->labelFrameCurrent->SetLabel(nano::std2wx(std::string(text)));
     
     return true;
@@ -42,26 +45,26 @@ SaveVisualizationDialog::SaveVisualizationDialog(wxWindow* parent, int id, const
     firstTime(true)
 {
     // begin wxGlade: SaveVisualizationDialog::SaveVisualizationDialog
-    label_42 = new wxStaticText(this, -1, wxT("Directory"));
-    textDirectory = new wxTextCtrl(this, -1, wxT("."));
-    btnBrowse = new wxButton(this, BTN_BROWSE, wxT("&Browse..."));
-    label_43 = new wxStaticText(this, -1, wxT("File Pattern"));
-    textFilePattern = new wxTextCtrl(this, -1, wxT("visualization"));
-    label_44 = new wxStaticText(this, -1, wxT("-%04d.tif"));
-    label_45 = new wxStaticText(this, -1, wxT("e.g. cell-flowvis"));
-    label_49 = new wxStaticText(this, -1, wxT("Frames"));
-    radFramesAll = new wxRadioButton(this, -1, wxT("All"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-    radFramesRange = new wxRadioButton(this, -1, wxT("Range"));
-    radFramesCurrent = new wxRadioButton(this, -1, wxT("Current"));
-    label_50 = new wxStaticText(this, -1, wxT("From"));
-    textRangeFrom = new wxTextCtrl(this, TXT_RANGE_FROM, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-    label_51 = new wxStaticText(this, -1, wxT("to"));
-    textRangeTo = new wxTextCtrl(this, TXT_RANGE_TO, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-    labelRangeMax = new wxStaticText(this, -1, wxT("(max)"));
-    labelFrameCurrent = new wxStaticText(this, -1, wxT("()"));
-    text_ctrl_1 = new wxTextCtrl(this, -1, wxT("Note: Do not let any other window obscure the ImageTracker render window and do not minimize ImageTracker when saving visualizations. Doing so will probably corrupt the saved images. The frame index slider will provide progress information, and a message should be printed to the Logger window when finished if the proper logging level is enabled."), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_WORDWRAP);
-    btnRun = new wxButton(this, wxID_OK, wxT("&Run"));
-    btnHide = new wxButton(this, wxID_CANCEL, wxT("&Hide"));
+    label_42 = new wxStaticText(this, wxID_ANY, wxT("Directory"));
+    textDirectory = new wxTextCtrl(this, wxID_ANY, wxT("."));
+    buttonBrowse = new wxButton(this, BUTTON_BROWSE, wxT("&Browse..."));
+    label_43 = new wxStaticText(this, wxID_ANY, wxT("File Pattern"));
+    textFilePattern = new wxTextCtrl(this, wxID_ANY, wxT("visualization"));
+    label_44 = new wxStaticText(this, wxID_ANY, wxT("-%04d.tif"));
+    label_45 = new wxStaticText(this, wxID_ANY, wxT("e.g. cell-flowvis"));
+    label_49 = new wxStaticText(this, wxID_ANY, wxT("Frames"));
+    radFramesAll = new wxRadioButton(this, wxID_ANY, wxT("All"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+    radFramesRange = new wxRadioButton(this, wxID_ANY, wxT("Range"));
+    radFramesCurrent = new wxRadioButton(this, wxID_ANY, wxT("Current"));
+    label_50 = new wxStaticText(this, wxID_ANY, wxT("From"));
+    textRangeFrom = new wxTextCtrl(this, TEXT_RANGE_FROM, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+    label_51 = new wxStaticText(this, wxID_ANY, wxT("to"));
+    textRangeTo = new wxTextCtrl(this, TEXT_RANGE_TO, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+    labelRangeMax = new wxStaticText(this, wxID_ANY, wxT("(max)"));
+    labelFrameCurrent = new wxStaticText(this, wxID_ANY, wxT("()"));
+    text_ctrl_1 = new wxTextCtrl(this, wxID_ANY, wxT("Note: Do not let any other window obscure the ImageTracker render window and do not minimize ImageTracker when saving visualizations. Doing so will probably corrupt the saved images. The frame index slider will provide progress information, and a message should be printed to the Logger window when finished if the proper logging level is enabled."), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_WORDWRAP);
+    buttonRun = new wxButton(this, wxID_OK, wxT("&Run"));
+    buttonHide = new wxButton(this, wxID_CANCEL, wxT("&Hide"));
 
     set_properties();
     do_layout();
@@ -71,9 +74,9 @@ SaveVisualizationDialog::SaveVisualizationDialog(wxWindow* parent, int id, const
 
 BEGIN_EVENT_TABLE(SaveVisualizationDialog, wxDialog)
     // begin wxGlade: SaveVisualizationDialog::event_table
-    EVT_BUTTON(BTN_BROWSE, SaveVisualizationDialog::OnBrowse)
-    EVT_TEXT_ENTER(TXT_RANGE_FROM, SaveVisualizationDialog::OnRangeFrom)
-    EVT_TEXT_ENTER(TXT_RANGE_TO, SaveVisualizationDialog::OnRangeTo)
+    EVT_BUTTON(BUTTON_BROWSE, SaveVisualizationDialog::OnBrowse)
+    EVT_TEXT_ENTER(TEXT_RANGE_FROM, SaveVisualizationDialog::OnRangeFrom)
+    EVT_TEXT_ENTER(TEXT_RANGE_TO, SaveVisualizationDialog::OnRangeTo)
     EVT_BUTTON(wxID_OK, SaveVisualizationDialog::OnRun)
     EVT_BUTTON(wxID_CANCEL, SaveVisualizationDialog::OnHide)
     // end wxGlade
@@ -97,7 +100,7 @@ void SaveVisualizationDialog::OnRangeFrom(wxCommandEvent &event)
     Logger::verbose << function << ": entering" << std::endl;
     int value = atoi(nano::wx2std(this->textRangeFrom->GetValue()).c_str());
     value = std::max(0, value);
-    value = std::min(value, (int) ImageTrackerController::Instance()->GetMaxIndex());
+    value = std::min(value, (int) (ImageTrackerController::Instance()->GetImageCount()-1));
     char text[80];
     sprintf(text, "%d", value);
     this->textRangeFrom->SetValue(nano::std2wx(std::string(text)));
@@ -110,7 +113,7 @@ void SaveVisualizationDialog::OnRangeTo(wxCommandEvent &event)
     Logger::verbose << function << ": entering" << std::endl;
     int value = atoi(nano::wx2std(this->textRangeTo->GetValue()).c_str());
     value = std::max(0, value);
-    value = std::min(value, (int) ImageTrackerController::Instance()->GetMaxIndex());
+    value = std::min(value, (int) (ImageTrackerController::Instance()->GetImageCount()-1));
     char text[80];
     sprintf(text, "%d", value);
     this->textRangeTo->SetValue(nano::std2wx(std::string(text)));
@@ -146,7 +149,7 @@ int SaveVisualizationDialog::GetIndexStart()
     }
     else if (this->radFramesCurrent->GetValue())
     {
-        from = ImageTrackerController::Instance()->GetFrameIndex();
+        from = ImageTrackerController::Instance()->GetImageIndex();
     }
     
     return from;
@@ -154,7 +157,7 @@ int SaveVisualizationDialog::GetIndexStart()
 
 int SaveVisualizationDialog::GetIndexEnd()
 {
-    int to = ImageTrackerController::Instance()->GetMaxIndex();
+    int to = ImageTrackerController::Instance()->GetImageCount() - 1;
     
     if (this->radFramesRange->GetValue())
     {
@@ -162,7 +165,7 @@ int SaveVisualizationDialog::GetIndexEnd()
     }
     else if (this->radFramesCurrent->GetValue())
     {
-        to = ImageTrackerController::Instance()->GetFrameIndex();
+        to = ImageTrackerController::Instance()->GetImageIndex();
     }
     
     return to;
@@ -205,41 +208,40 @@ void SaveVisualizationDialog::do_layout()
     wxBoxSizer* sizer_50 = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer* sizer_48 = new wxBoxSizer(wxVERTICAL);
     wxFlexGridSizer* grid_sizer_15 = new wxFlexGridSizer(3, 3, 5, 5);
-    grid_sizer_15->Add(label_42, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_15->Add(textDirectory, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    grid_sizer_15->Add(btnBrowse, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_15->Add(label_43, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_15->Add(textFilePattern, 0, wxEXPAND|wxADJUST_MINSIZE, 0);
-    grid_sizer_15->Add(label_44, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_15->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
-    grid_sizer_15->Add(label_45, 0, wxALIGN_CENTER_HORIZONTAL|wxADJUST_MINSIZE, 0);
-    grid_sizer_15->Add(20, 20, 0, wxADJUST_MINSIZE, 0);
+    grid_sizer_15->Add(label_42, 0, 0, 0);
+    grid_sizer_15->Add(textDirectory, 0, wxEXPAND, 0);
+    grid_sizer_15->Add(buttonBrowse, 0, 0, 0);
+    grid_sizer_15->Add(label_43, 0, 0, 0);
+    grid_sizer_15->Add(textFilePattern, 0, wxEXPAND, 0);
+    grid_sizer_15->Add(label_44, 0, 0, 0);
+    grid_sizer_15->Add(20, 20, 0, 0, 0);
+    grid_sizer_15->Add(label_45, 0, 0, 0);
+    grid_sizer_15->Add(20, 20, 0, 0, 0);
     grid_sizer_15->AddGrowableCol(1);
     sizer_43->Add(grid_sizer_15, 0, wxEXPAND, 0);
-    grid_sizer_16->Add(80, 20, 0, wxADJUST_MINSIZE, 0);
-    sizer_48->Add(label_49, 0, wxADJUST_MINSIZE, 0);
-    sizer_48->Add(radFramesAll, 0, wxADJUST_MINSIZE, 0);
-    sizer_48->Add(radFramesRange, 0, wxADJUST_MINSIZE, 0);
-    sizer_48->Add(radFramesCurrent, 0, wxADJUST_MINSIZE, 0);
+    grid_sizer_16->Add(80, 20, 0, 0, 0);
+    sizer_48->Add(label_49, 0, 0, 0);
+    sizer_48->Add(radFramesAll, 0, 0, 0);
+    sizer_48->Add(radFramesRange, 0, 0, 0);
+    sizer_48->Add(radFramesCurrent, 0, 0, 0);
     grid_sizer_16->Add(sizer_48, 1, wxEXPAND, 0);
-    sizer_49->Add(75, 25, 0, wxADJUST_MINSIZE, 0);
-    sizer_49->Add(75, 25, 0, wxADJUST_MINSIZE, 0);
-    sizer_50->Add(label_50, 0, wxALIGN_BOTTOM|wxADJUST_MINSIZE, 0);
-    sizer_50->Add(textRangeFrom, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 5);
-    sizer_50->Add(label_51, 0, wxALIGN_BOTTOM|wxADJUST_MINSIZE, 0);
-    sizer_50->Add(textRangeTo, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 5);
-    sizer_50->Add(labelRangeMax, 0, wxALIGN_BOTTOM|wxADJUST_MINSIZE, 0);
+    sizer_49->Add(75, 25, 0, 0, 0);
+    sizer_49->Add(75, 25, 0, 0, 0);
+    sizer_50->Add(label_50, 0, wxALIGN_BOTTOM, 0);
+    sizer_50->Add(textRangeFrom, 0, wxLEFT|wxRIGHT, 5);
+    sizer_50->Add(label_51, 0, wxALIGN_BOTTOM, 0);
+    sizer_50->Add(textRangeTo, 0, wxLEFT|wxRIGHT, 5);
+    sizer_50->Add(labelRangeMax, 0, wxALIGN_BOTTOM, 0);
     sizer_49->Add(sizer_50, 1, wxEXPAND, 0);
-    sizer_49->Add(labelFrameCurrent, 0, wxADJUST_MINSIZE, 0);
+    sizer_49->Add(labelFrameCurrent, 0, 0, 0);
     grid_sizer_16->Add(sizer_49, 1, wxEXPAND, 0);
     grid_sizer_16->AddGrowableCol(2);
     sizer_43->Add(grid_sizer_16, 0, wxEXPAND, 0);
-    sizer_45->Add(text_ctrl_1, 1, wxEXPAND|wxADJUST_MINSIZE, 0);
+    sizer_45->Add(text_ctrl_1, 1, wxEXPAND, 0);
     sizer_43->Add(sizer_45, 1, wxEXPAND, 0);
-    sizer_44->Add(btnRun, 0, wxADJUST_MINSIZE, 0);
-    sizer_44->Add(btnHide, 0, wxADJUST_MINSIZE, 0);
+    sizer_44->Add(buttonRun, 0, 0, 0);
+    sizer_44->Add(buttonHide, 0, 0, 0);
     sizer_43->Add(sizer_44, 0, wxALIGN_CENTER_HORIZONTAL, 0);
-    SetAutoLayout(true);
     SetSizer(sizer_43);
     Layout();
     // end wxGlade

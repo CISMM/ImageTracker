@@ -1,12 +1,12 @@
 #pragma once
 
 #include <string>
-#include <utility>
 #include <vector>
 
 #include <wx/arrstr.h>
 #include <wx/event.h>
 #include <wx/thread.h>
+#include <wx/wx.h>
 
 #include "itkLightObject.h"
 
@@ -15,14 +15,18 @@
 #include "vtkTIFFWriter.h"
 #include "vtkWindowToImageFilter.h"
 
-#include "DataSource.h"
+#include "FileSet.h"
+#include "FilterControlPanel.h"
+#include "ImageFileSet.h"
+#include "ImageFileSetPanel.h"
 #include "ItkVtkPipeline.h"
+#include "VectorFileSetReader.h"
 
 /**
  * \class ImageTrackerController
  * \brief Key moderator of the ImageTracker application.
  *
- * Maintains data sources and visualization pipelines. Provides methods for
+ * Maintains data sets and visualization pipelines. Provides methods for
  * querying and managing the data and visualization objects that exist in
  * the system. This object is a singleton--only one of these is
  * expected to exist at a time, and many objects need to access controller
@@ -35,9 +39,25 @@
  * objects to which this controller refers can be cleaned up.
  *
  * This implementation was adopted after the global static approach was found to fail
- * on Windows platforms.  As the datavis pair was being cleared, itk would request
+ * on Windows platforms.  As the image filters were being cleared, itk would request
  * Mutex locks to delete these objects.  These requests failed, presumably because the
  * application was shutting down.
+ * 
+ * Synchronization among different threads is a little bit odd, due to a need for a
+ * cross-platform solution.  This approach works in Linux and Windows.  Access to image
+ * filter data is controlled through a mutex s_ControllerMutex.  This mutex controls
+ * access to methods to clear, add, and remove filters from the pipeline as well as
+ * accessor methods to check whether the data held by this controller has been changed.
+ * These methods are expected to be used on the main application thread.
+ * 
+ * Data can also be submitted to the controller through a "backdoor."  This approach was
+ * adopted because there were inconsistent synchronization blocks occuring when a process
+ * on a different thread tried to clear the filter pipeline while the UI thread requested
+ * an update of information.  A mutex s_BackdoorMutex controls access to these backdoor
+ * methods.  The main application thread can call CheckForUpdates() to apply any data
+ * changes requested through the backdoor, and then check for the data changed flag.  This
+ * ensures that data is loaded into the controller objects and reflected in the UI from 
+ * one thread.
  */
 class ImageTrackerController :
     public itk::LightObject
@@ -48,12 +68,10 @@ public:
     typedef itk::LightObject Superclass;
     typedef itk::SmartPointer< Self > Pointer;
     typedef itk::SmartPointer< const Self > ConstPointer;
-    
-    // Type to tie each DataSource to an ItkVtkPipeline for visualization.
-    typedef std::pair< DataSource::Pointer, ItkVtkPipeline::Pointer > DataVisualPair;
-    // Type to hold a list of DataVisualPairs.
-    typedef std::vector< DataVisualPair > DataVisualList;
-    
+        
+    // Type to hold a set of FilterControlPanels.
+    typedef std::vector< FilterControlPanel* > ImagePipelineType;
+
     /**
      * Obtain the singleton instance of this ImageTrackerController.
      */
@@ -64,50 +82,119 @@ public:
      * typically, right before the application closes.
      */
     static void DeleteInstance();
-    
-    /**
-     * Retrieves a reference to the DataSource at the specified index.
-     */
-    DataSource::Pointer GetDataSource(unsigned int i);
-    
-    /**
-     *
-     */
-    ItkVtkPipeline::Pointer GetVisualization(unsigned int i);
-    
-    /**
-     * Adds a DataSource to the list managed by this controller.
-     */
-    void AddDataSource(DataSource::Pointer source);
-    
-    /**
-     * Removes the data source at the given index from this controller.
-     */
-    void RemoveDataSource(unsigned int i);
-    
-    /**
-     * Sets the index into the DataSources managed by this controller. This 
-     * specifies the active data item within all the DataSources.  (As opposed 
-     * to the index into the list of DataSources managed by this controller.)
-     */
-    void SetFrameIndex(unsigned int index);
 
-    unsigned int GetFrameIndex() { return this->frameIndex; }
-    
-    unsigned int GetMaxIndex();
-    
     /**
-     * Sets the index of the active DataSource managed by this controller.
+     * Add a FilterControlPanel to the set of filters managed by this ImageTrackerController.
      */
-    void SetDataIndex(unsigned int index);
+    void AddFilter(FilterControlPanel* filter);
     
     /**
-     * Returns the size of the largest data source set managed by this controller.
+     * Removes the filter at the specified index, if possible.
      */
-    unsigned int GetMaxSize();
+    void RemoveFilter(int idx);
     
     /**
-     * Updates all visualization pipelines with the proper parameters.
+     * Reset the FilterControlPanel set managed by this ImageTrackerController.
+     * Optionally, load a new set of image files into the initial ImageFileSetPanel.
+     */
+    void ClearFilters(const FileSet& newFiles = FileSet());
+
+    /**
+     * Updates the image filter pipeline and display to reflect changes
+     * made to the image file set.
+     */
+    void UpdateImageFileSet();
+    
+    /**
+     * Populate a list of the names of the FilterControlPanels managed by 
+     * this ImageTrackerController.
+     */
+    void GetFilterNames(wxArrayString& list);
+    
+    /**
+     * Return the wx panel that controls the filter with the given index.
+     */
+    wxWindow* GetFilterPanel(unsigned int index);    
+    
+    /**
+     * Set the wxWindow parent that is the container for filter control
+     * panels.  This needs to be available to all control panels that 
+     * get created, possibly initially hidden.
+     */
+    void SetFilterParent(wxWindow* parent);
+    
+    /**
+     * Retrieve the wxWindow parent that is the container for filter 
+     * control panels.  This is needed to create control panels that 
+     * may not be immediately visible and may be swapped for other 
+     * content in some window.
+     */
+    wxWindow* GetFilterParent();    
+    
+    /**
+     * Return a reference to the currently loaded ImageFileSet, with
+     * filters applied.
+     */
+    ImageFileSet* GetImageFileSet();
+    
+	/**
+	 * Get the list of image files currently loaded.
+	 */
+    FileSet& GetImageFiles();
+    
+	/**
+	 * Set the list of vector image files loaded.
+	 */
+    void SetVectorFiles(const FileSet& files);
+    
+	/**
+	 * Get the list of vector image files loaded.
+	 */
+    FileSet& GetVectorFiles();
+    
+	/**
+	 * Get the VectorFileSet managed by this ImageTrackerController.
+	 */
+    VectorFileSet* GetVectorFileSet();
+    
+	/**
+	 * Set the visualization used for displaying vector images.
+	 */
+    void SetVectorVisualization(ItkVtkPipeline::Pointer pipeline);
+
+	/**
+	 * Get the visualization used for displaying vector images.
+	 */
+	ItkVtkPipeline::Pointer GetVectorVisualization();
+
+	/**
+	 * Get the visualization used for displaying images.
+	 */
+    ItkVtkPipeline::Pointer GetImageVisualization();    
+        
+    /**
+     * Sets the image index for the image file set that is currently
+     * controled by this ImageTrackerController.
+     */
+    void SetImageIndex(unsigned int index);
+
+    /**
+     * Returns the image index for the image file set.
+     */
+    unsigned int GetImageIndex();
+        
+    /**
+     * Returns the number of images in the set managed by this controller.
+     */
+    unsigned int GetImageCount();
+    
+    /**
+     * Returns the number of vector images in the set managed by this controller.
+     */
+    unsigned int GetVectorCount();
+    
+    /**
+     * Updates all visualizations with the proper parameters.
      */
     void UpdateView();
     
@@ -116,14 +203,11 @@ public:
      */
     void SetRenderWindow(vtkRenderWindow* rw);
     
+    /**
+     * Gets the vtkRenderWindow drawn to by this controller.
+     */
     vtkRenderWindow* GetRenderWindow();
     
-    /**
-     * Populate a list of the data sources managed by this controller.  We
-     * use a wxArrayString for using this list in wx widgets.
-     */
-    void GetDataSourceNames(wxArrayString& names);
-
     /**
      * Returns a handle to the renderer this controller manages.
      */
@@ -134,23 +218,47 @@ public:
      */
     void Render();
     
-    bool IsIndexChanged();
-    void SetIsIndexChanged(bool changed);
-    
     bool IsDataChanged();
     void SetIsDataChanged(bool changed);
     
     /**
-     * Cycles through all frames of the data managed by this ImageTrackerControler,
-     * and saves them as tiffs in files specified by a FileSet.
+     * Checks for updates to the image files loaded.  Updates the internal set of image
+     * files if any have been loaded "through the backdoor."  Returns true if there has
+     * been a change to the data held by the ImageTrackerController.
+     */
+	bool CheckForUpdates();
+    
+    /**
+     * Saves the image displayed in the render window as a TIFF
+     * file with the specified name.
      */
     void SaveViewImage(const std::string& fileName);
+
+    /**
+     * Specify file names that should be loaded the next time ImageTrackerController is
+     * asked to check for updates.
+     */
+	void SetBackdoorFiles(const FileSet& files, bool isImage);
 
 protected:
     // Making the New() method protected ensures this is a singleton.
     itkNewMacro(Self);
     ImageTrackerController();
     virtual ~ImageTrackerController();
+    
+    /**
+     * Return the ImageFileSetPanel that loads the images into
+     * the itk pipeline.
+     */
+    ImageFileSetPanel* GetImageFileSetPanel();
+    
+    /**
+     * Retrieve a blank panel that can take the place of filter
+     * controls when none is active.
+     */
+    wxWindow* GetBlankPanel();
+
+	void CheckBackdoorData();
     
 private:
     // Not implemented
@@ -159,14 +267,20 @@ private:
     
     // Data members
     
-    // The current data frame index.
-    unsigned int frameIndex;
-
-    // The current data source index
-    unsigned int dataIndex;
+    /**
+     * Holds a set of FilterControlPanels, which creates an itk image filter
+     * pipeline and associated control panels for parameter manipulation.
+     */
+    ImagePipelineType imagePipeline;
     
-    // The set of data and visualization pairs.
-    DataVisualList datavis;
+    // Holds a set of vector files
+    VectorFileSetReader::Pointer vectorImages;
+        
+    // The image visualization
+    ItkVtkPipeline::Pointer imageVisualization;
+    
+    // The vector visualization
+    ItkVtkPipeline::Pointer vectorVisualization;
 
     // A flag indicating if the camera should be reset.
     bool resetCamera;
@@ -182,12 +296,23 @@ private:
     vtkTIFFWriter* writer;
 
     // The wxWidgets window that created this controller.
-    wxWindow* parent;
+    wxWindow* wxFilterParent;
+    wxWindow* wxBlankPanel;
 
-    // A flag indicating if this controller has new data sources.
+    // A flag indicating if this controller has new data
     bool isDataChanged;
-    // A flag indicating if the controller's index has changed recently
-    bool isIndexChanged;
     
+	// A flag indicating if this controller has been passed data
+    bool isBackdoorData;
+    // A flag that indicates if the backdoor FileSet specifies image files
+	bool isBackdoorImage;
+    // A set of files to load through the backdoor
+	FileSet backdoorFiles;
+    
+    /**
+     * These mutexes syncronizes changes to critical data that may occur
+     * across different threads.
+     */
     static wxMutex s_ControllerMutex;
+	static wxMutex s_BackdoorMutex;
 };
