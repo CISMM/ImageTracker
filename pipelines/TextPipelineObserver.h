@@ -27,8 +27,8 @@ public:
     virtual bool Update(double progress, const std::string& message);
     
 protected:
-    TextPipelineObserver(){}
-    virtual ~TextPipelineObserver(){}
+    TextPipelineObserver();
+    virtual ~TextPipelineObserver();
     
 private:
     // not implemented

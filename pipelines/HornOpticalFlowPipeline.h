@@ -4,16 +4,16 @@
 #include "itkObject.h"
 #include "itkVector.h"
 
-#include "CommonTypes.h"
-#include "ItkPipeline.h"
+#include "ImageFileSet.h"
+#include "ItkImagePipeline.h"
 
 class HornOpticalFlowPipeline :
-    public ItkPipeline
+    public ItkImagePipeline
 {
 public:
     // Common itk typedefs
     typedef HornOpticalFlowPipeline Self;
-    typedef ItkPipeline Superclass;
+    typedef ItkImagePipeline Superclass;
     typedef itk::SmartPointer< Self > Pointer;
     typedef itk::SmartPointer< const Self > ConstPointer;
     
@@ -21,10 +21,10 @@ public:
     itkTypeMacro(HornOpticalFlowPipeline, ItkPipeline);
     
     // Image typedefs
-    typedef CommonTypes::InternalImageType InternalImageType;
+    typedef ImageFileSet::ImageType ImageType;
     typedef itk::Image< 
-            itk::Vector< float, InternalImageType::ImageDimension >, 
-            InternalImageType::ImageDimension > FlowImageType;
+            itk::Vector< float, ImageType::ImageDimension >, 
+            ImageType::ImageDimension > FlowImageType;
     
     itkGetMacro(Iterations, unsigned int);
     itkSetMacro(Iterations, unsigned int);

@@ -8,7 +8,7 @@
 #include "CommonTypes.h"
 #include "FileSet.h"
 #include "ImageSetReader.h"
-#include "ItkPipeline.h"
+#include "ItkImagePipeline.h"
 
 /**
  * \class ApplyTransformsPipeline
@@ -19,22 +19,18 @@
  * transforms.
  */
 class ApplyTransformsPipeline :
-    public ItkPipeline
+    public ItkImagePipeline
 {
 public:
     // Standard itk typedefs
     typedef ApplyTransformsPipeline Self;
-    typedef ItkPipeline Superclass;
+    typedef ItkImagePipeline Superclass;
     typedef itk::SmartPointer< Self > Pointer;
     typedef itk::SmartPointer< const Self > ConstPointer;
     itkNewMacro(Self);
     
     itkGetMacro(TransformFile, std::string);
-    itkSetMacro(TransformFile, std::string);
-    
-    //void SetInput(ImageSetReaderBase* input) { this->input = input; }
-    //const FileSet& GetOutputFiles() { return this->outputFiles; }
-    //void SetOutputFiles(const FileSet& files) { this->outputFiles = files; }
+    itkSetMacro(TransformFile, std::string);    
 
     virtual void Update();
     
@@ -50,7 +46,5 @@ private:
     ApplyTransformsPipeline(const Self& other);
     void operator=(const Self& other);
     
-    //ImageSetReaderBase* input;
-    //FileSet outputFiles;
     std::string m_TransformFile;
 };

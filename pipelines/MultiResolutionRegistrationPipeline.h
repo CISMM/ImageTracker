@@ -8,39 +8,38 @@
 #include "itkDiscreteGaussianImageFilter.h"
 #include "itkObject.h"
 #include "itkResampleImageFilter.h"
-#include "itkThresholdImageFilter.h"
 
-#include "CommonTypes.h"
-#include "FileSet.h"
-#include "ImageSetReader.h"
-#include "ItkPipeline.h"
+#include "ImageFileSet.h"
+#include "ItkImagePipeline.h"
 #include "MultiResolutionRegistration.h"
 
 /**
  * \class MultiResolutionRegistrationPipeline
+ * \brief Performs a multiresolution registration of images.
+ * 
+ * Registers the images in a series using a multiresolution framework.
+ * The multiresolution framework uses a multiscale image pyramid with
+ * coarse and fine bounds.  The registration performs rough alignmnent
+ * at the coarse level and refines the registration estimate at the
+ * lower levels.  
  */
 class MultiResolutionRegistrationPipeline : 
-	public ItkPipeline
+	public ItkImagePipeline
 {
 public:
 	// Standard itk object definitions
 	typedef MultiResolutionRegistrationPipeline Self;
-	typedef ItkPipeline Superclass;
+	typedef ItkImagePipeline Superclass;
 	typedef itk::SmartPointer<Self> Pointer;
 	typedef itk::SmartPointer<const Self> ConstPointer;
 	itkNewMacro(Self);
-	itkTypeMacro(MultiResolutionRegistrationProcessor, ItkPipeline);
+	itkTypeMacro(MultiResolutionRegistrationProcessor, ItkImagePipeline);
 
 	// Pipeline typedefs
 	typedef itk::CenteredRigid2DTransform<double> TransformType;
-	// typedef itk::TranslationTransform<double, 2> TransformType;
-	typedef CommonTypes::InputImageType InputImageType;
-	typedef CommonTypes::InternalImageType ImageType;
-	typedef ImageSetReaderBase* ReaderType;
-	typedef itk::ThresholdImageFilter<ImageType> ThresholdType;
+	typedef ImageFileSet::ImageType ImageType;
 	typedef MultiResolutionRegistration<ImageType, TransformType> RegistrationType;
 	typedef itk::ResampleImageFilter<ImageType, ImageType> ResampleType;
-	typedef itk::CastImageFilter<ImageType, InputImageType> CasterType;
 
 	// For image preview
 	typedef itk::DiscreteGaussianImageFilter<ImageType, ImageType> SmoothType;
@@ -52,11 +51,8 @@ public:
 	 */
 	virtual void Update();
 
-	ImageType::PixelType GetUpperThreshold();
-	ImageType::PixelType GetLowerThreshold();
-    void SetUpperThreshold(ImageType::PixelType threshold);
-    void SetLowerThreshold(ImageType::PixelType threshold);
-
+    virtual void SetInput(ImageFileSet* input);
+    
     void SetPreviewShrinkFactor(unsigned int factor);
 	void SetShrinkFactors(unsigned int min, unsigned int max);
         
@@ -88,10 +84,6 @@ public:
 
 	void SetOptimizerNumberOfIterations(unsigned long iters)
 	{ this->registration->SetOptimizerNumberOfIterations(iters); }
-	
-    //const FileSet& GetOutputFiles() { return this->outputFiles; }
-    //void SetOutputFiles(const FileSet& files) { this->outputFiles = files; }
-    virtual void SetInput(ImageSetReaderBase* input);
 
 	ImageType::Pointer GetPreviewImage();
 
@@ -107,9 +99,7 @@ private:
 	std::string m_TransformFile;
     bool m_ThresholdBetween;
 
-	ThresholdType::Pointer threshold[2];
 	RegistrationType::Pointer registration;
 	ResampleType::Pointer resample;
-	CasterType::Pointer caster;
 	SmoothType::Pointer smooth;
 };

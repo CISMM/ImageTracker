@@ -1,7 +1,5 @@
 #include "ItkPipeline.h"
 
-#include <algorithm>
-
 void ItkPipeline::AddObserver(ItkPipelineObserver* observer)
 {
     this->observers.push_back(observer);
@@ -27,16 +25,6 @@ bool ItkPipeline::NotifyProgress(double progress, const std::string& message)
     }
     
     return abort;
-}
-
-ImageSetReaderBase* ItkPipeline::GetInput()
-{
-    return this->input;
-}
-
-void ItkPipeline::SetInput(ImageSetReaderBase *input)
-{
-    this->input = input;
 }
 
 const FileSet& ItkPipeline::GetOutputFiles()

@@ -25,7 +25,7 @@ void RemovePartialOcclusionsPipeline::Update()
     
     // Check inputs
     if (this->input == NULL ||
-        this->input->size() == 0 ||
+        this->input->GetImageCount() == 0 ||
         this->outputFiles.size() == 0)
     {
         Logger::error << function << ": Input or output files not set...aborting" << std::endl;
@@ -39,7 +39,7 @@ void RemovePartialOcclusionsPipeline::Update()
     this->NotifyProgress(0.0, "Initializing");
     
     // Compute the raw transmission metric
-    InternalImageType::Pointer rawTransmit;
+    ImageType::Pointer rawTransmit;
     switch (this->GetMetric())
     {
     case Median:
@@ -50,16 +50,15 @@ void RemovePartialOcclusionsPipeline::Update()
         rawTransmit = this->ComputeTransmissionMean(this->input);
     }
     
-    PrintImageInfo<InternalImageType>(rawTransmit, "Raw transmission");
+    PrintImageInfo<ImageType>(rawTransmit, "Raw transmission");
     
     // For rescaling transmission map
-    typedef PercentileImageMetric< InternalImageType > PercentileType;
-    typedef itk::ShiftScaleImageFilter< InternalImageType, InternalImageType > ScaleType;
+    typedef PercentileImageMetric< ImageType > PercentileType;
+    typedef itk::ShiftScaleImageFilter< ImageType, ImageType > ScaleType;
     
     // For repairing video
-    typedef itk::DivideImageFilter< InternalImageType, InternalImageType, InternalImageType > DivideType;
-    typedef itk::ThresholdImageFilter< InternalImageType > ThresholdType;
-    typedef itk::CastImageFilter< InternalImageType, OutputImageType > CastType;
+    typedef itk::DivideImageFilter< ImageType, ImageType, ImageType > DivideType;
+    typedef itk::ThresholdImageFilter< ImageType > ThresholdType;
     
     // Rescale transmission metric to be 1 at the given percentile value
     Logger::info << function << ": Scaling transmission metric to 1.0 at " << this->GetTransmitPercentile() << "th percentile" << std::endl;
@@ -78,23 +77,24 @@ void RemovePartialOcclusionsPipeline::Update()
     
     DivideType::Pointer divide = DivideType::New();
     ThresholdType::Pointer clamp = ThresholdType::New();
-    CastType::Pointer cast = CastType::New();
     
     // It is possible that a repaired pixel will have intensity over that
     // allowed by the pixel type.  So, we must threshold to avoid wrap-around
     // when casting to the output image type.
+    typedef OutputImageType::PixelType PixelType;
     clamp->SetOutsideValue(std::numeric_limits<PixelType>::max());
     clamp->ThresholdAbove(std::numeric_limits<PixelType>::max());
     
     divide->SetInput2(scale->GetOutput());
     clamp->SetInput(divide->GetOutput());
-    cast->SetInput(clamp->GetOutput());
     
-    int count = this->input->size();
-    for (unsigned int i = 0; i < this->input->size() && i < this->GetOutputFiles().size(); i++)
+    int count = this->input->GetImageCount();
+    for (unsigned int i = 0; 
+         i < count && i < this->GetOutputFiles().size(); 
+         i++)
     {
-        divide->SetInput1(dynamic_cast< InternalImageType* >(this->input->GetImage(i)));
-        WriteImage(cast->GetOutput(), this->GetOutputFiles()[i]);
+        divide->SetInput1(this->input->GetImage(i));
+        WriteImage<ImageType, OutputImageType>(clamp->GetOutput(), this->GetOutputFiles()[i], false);
         this->NotifyProgress(done + (1.0-done) * (double(i+1)/count));
     }
 }
@@ -103,18 +103,18 @@ void RemovePartialOcclusionsPipeline::Update()
  * Computes the raw transmission metric using the mean estimator.  This
  * simplifies to computing the pixel-wise geometric mean of image intensities.
  */
-RemovePartialOcclusionsPipeline::InternalImageType::Pointer
-     RemovePartialOcclusionsPipeline::ComputeTransmissionMean(VideoType& video)
+RemovePartialOcclusionsPipeline::ImageType::Pointer
+     RemovePartialOcclusionsPipeline::ComputeTransmissionMean(ImageFileSet* images)
 {
     std::string function("RemovePartialOcclusionsPipeline::ComputeTransmissionMean()");
     Logger::verbose << function << std::endl;
     
     double contrib = 0.75;
     
-    typedef NonZeroLog10ImageFilter< InternalImageType, InternalImageType > LogType;
-    typedef itk::ImageDuplicator< InternalImageType > CopyType;
-    typedef NaryMeanImageFilter< InternalImageType, InternalImageType > MeanType;
-    typedef Power10ImageFilter< InternalImageType, InternalImageType > PowerType;
+    typedef NonZeroLog10ImageFilter< ImageType, ImageType > LogType;
+    typedef itk::ImageDuplicator< ImageType > CopyType;
+    typedef NaryMeanImageFilter< ImageType, ImageType > MeanType;
+    typedef Power10ImageFilter< ImageType, ImageType > PowerType;
     
     // Pipeline components
     LogType::Pointer log = LogType::New();
@@ -122,11 +122,11 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
     MeanType::Pointer mean = MeanType::New();
     
     // Compute mean of logarithm of all images
-    int size = video->size();
+    int size = images->GetImageCount();
     Logger::verbose << function << ": Computing mean of logarithm of all frames" << std::endl;
     for (int i = 0; i < size; i++)
     {
-        log->SetInput(dynamic_cast< InternalImageType* >(video->GetImage(i)));
+        log->SetInput(images->GetImage(i));
         log->Update();
         copy->SetInputImage(log->GetOutput());
         copy->Update();
@@ -151,8 +151,8 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
  * integrating this metric over the image frame, and converting back into linear space.  The
  * logarithm images are padded to improve the behavior of the Fourier transform.
  */
-RemovePartialOcclusionsPipeline::InternalImageType::Pointer
-    RemovePartialOcclusionsPipeline::ComputeTransmissionMedian(VideoType& video)
+RemovePartialOcclusionsPipeline::ImageType::Pointer
+    RemovePartialOcclusionsPipeline::ComputeTransmissionMedian(ImageFileSet* images)
 {
     std::string function("RemovePartialOcclusionsPipeline::ComputeTransmissionMedian()");
     Logger::verbose << function << std::endl;
@@ -160,16 +160,15 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
     double contribDeriv = 0.50, contribIntegrate = 0.25;
     
     // Typedefs
-    typedef NonZeroLog10ImageFilter< InternalImageType, InternalImageType > LogType;
-    typedef itk::StatisticsImageFilter< InternalImageType > StatsType;
-    typedef PadFunctorImageFilter< InternalImageType, InternalImageType, CosFunctor > PadType;
-    typedef CentralDifferenceImageFilter< InternalImageType, InternalImageType > GradType;
-    typedef NaryMedianImageFilter< InternalImageType, InternalImageType > MedianType;
-    typedef DerivativesToSurfaceImageFilter< InternalImageType > SurfaceType;
-    typedef itk::RegionOfInterestImageFilter< InternalImageType, InternalImageType > ROIType;
-    typedef Power10ImageFilter< InternalImageType, InternalImageType > PowerType;
-    
-    typedef itk::ImageDuplicator< InternalImageType > CopyType;
+    typedef NonZeroLog10ImageFilter< ImageType, ImageType > LogType;
+    typedef itk::StatisticsImageFilter< ImageType > StatsType;
+    typedef PadFunctorImageFilter< ImageType, ImageType, CosFunctor > PadType;
+    typedef CentralDifferenceImageFilter< ImageType, ImageType > GradType;
+    typedef NaryMedianImageFilter< ImageType, ImageType > MedianType;
+    typedef DerivativesToSurfaceImageFilter< ImageType > SurfaceType;
+    typedef itk::RegionOfInterestImageFilter< ImageType, ImageType > ROIType;
+    typedef Power10ImageFilter< ImageType, ImageType > PowerType;
+    typedef itk::ImageDuplicator< ImageType > CopyType;
     
     LogType::Pointer log = LogType::New();
     StatsType::Pointer logStat = StatsType::New();
@@ -187,9 +186,10 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
     // of the input images in each dimension.  We'll also need a zeroing index
     // and we'll need to keep track of the offset to get back to the original
     // image region.
-    InternalImageType::RegionType padRegion = dynamic_cast< InternalImageType* >(video->GetImage(0))->GetLargestPossibleRegion();
-    InternalImageType::IndexType zeroIndex;
-    InternalImageType::IndexType padOffset;
+    ImageType::RegionType padRegion = 
+        images->GetImage(0)->GetLargestPossibleRegion();
+    ImageType::IndexType zeroIndex;
+    ImageType::IndexType padOffset;
     
     for (unsigned int i = 0; i < ImageDimension; i++)
     {
@@ -212,11 +212,11 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
     
     // Compute average gradient of log intensity for all images
     Logger::verbose << function << ": Computing derivative transmission metric" << std::endl;
-    unsigned int size = video->size();
+    unsigned int size = images->GetImageCount();
     for (unsigned int i = 0; i < size; i++)
     {
         // logarithm
-        log->SetInput(dynamic_cast< InternalImageType* >(video->GetImage(i)));
+        log->SetInput(images->GetImage(i));
         logStat->Update();
         pad->SetBoundaryValue(logStat->GetMean());
         
@@ -244,7 +244,7 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
     // We have to adjust the padded image's index for the Fourier transform to work.
     padRegion = pad->GetOutput()->GetLargestPossibleRegion();
     padRegion.SetIndex(zeroIndex);
-    PrintRegionInfo<InternalImageType>(padRegion, "Padded image region");
+    PrintRegionInfo<ImageType>(padRegion, "Padded image region");
     
     // Compute log attenuation by integrating gradient of log attenuation
     Logger::debug << function << ": Integrate surface from derivative estimates" << std::endl;
@@ -264,7 +264,7 @@ RemovePartialOcclusionsPipeline::InternalImageType::Pointer
     // of the image...so the original input image region, with an offset, should extract the 
     // part of the surface we want.
     ROIType::Pointer roi = ROIType::New();
-    padRegion = dynamic_cast< InternalImageType* >(video->GetImage(0))->GetLargestPossibleRegion();
+    padRegion = images->GetImage(0)->GetLargestPossibleRegion();
     padRegion.SetIndex(padOffset);
     roi->SetRegionOfInterest(padRegion);
     roi->SetInput(surface->GetOutput());

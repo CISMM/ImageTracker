@@ -16,7 +16,7 @@ void ApplyTransformsPipeline::Update()
     std::string function("ApplyTransformsPipeline::Update");
     Logger::verbose << function << ": Checking parameters" << std::endl;
     if (this->input == NULL ||
-        this->input->size() < 1 ||
+        this->input->GetImageCount() < 1 ||
         this->outputFiles.size() < 1 ||
         this->m_TransformFile == "")
     {
@@ -48,7 +48,7 @@ void ApplyTransformsPipeline::Update()
     cast->SetInput(resample->GetOutput());
     
     Logger::verbose << function << ": Using first image to set resampling parameters" << std::endl;
-    InternalImageType::Pointer image(dynamic_cast< InternalImageType* >(this->input->GetImage(0)));
+    InternalImageType::Pointer image(this->input->GetImage(0));
     resample->SetSize(image->GetLargestPossibleRegion().GetSize());
     resample->SetOutputOrigin(image->GetOrigin());
     resample->SetOutputSpacing(image->GetSpacing());
@@ -61,13 +61,13 @@ void ApplyTransformsPipeline::Update()
     // Iterate through all transforms, making sure not to overrun either our input images or
     // output file names
     int index = 0;
-    int count = this->input->size();
+    int count = this->input->GetImageCount();
     
     for (TransformVector::iterator vecIt = pTransforms->begin();
          vecIt != pTransforms->end() && 
-             index < this->input->size() && 
-             index < this->outputFiles.size() &&
-             !abort;
+            index < this->input->GetImageCount() && 
+            index < this->outputFiles.size() &&
+            !abort;
          ++vecIt, 
          index++)
     {
@@ -75,7 +75,7 @@ void ApplyTransformsPipeline::Update()
         transform->Compose(*vecIt, true);
         
         // Set the resample inputs
-        resample->SetInput(dynamic_cast< InternalImageType* >(this->input->GetImage(index)));
+        resample->SetInput(this->input->GetImage(index));
         resample->SetTransform(transform);
         
         // Write the image

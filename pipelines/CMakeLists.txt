@@ -6,15 +6,17 @@ PROJECT (Pipelines)
 
 SET (Pipelines_SRCS
     ApplyTransformsPipeline.cxx             ApplyTransformsPipeline.h
-    CLGOpticFlowPipeline.cxx                CLGOpticFlowPipeline.h
+#     CLGOpticFlowPipeline.cxx                CLGOpticFlowPipeline.h
     HornOpticalFlowPipeline.cxx             HornOpticalFlowPipeline.h
     IntegrateFlowFieldPipeline.cxx          IntegrateFlowFieldPipeline.h
+    ItkImagePipeline.cxx                    ItkImagePipeline.h
     ItkPipeline.cxx                         ItkPipeline.h
                                             ItkPipelineObserver.h
+    ItkVectorPipeline.cxx                   ItkVectorPipeline.h
     MultiResolutionOpticalFlowPipeline.cxx  MultiResolutionOpticalFlowPipeline.h
     MultiResolutionRegistrationPipeline.cxx MultiResolutionRegistrationPipeline.h
     RemovePartialOcclusionsPipeline.cxx     RemovePartialOcclusionsPipeline.h
-    StrainTensorPipeline.cxx                StrainTensorPipeline.h
+#     StrainTensorPipeline.cxx                StrainTensorPipeline.h
     TextPipelineObserver.cxx                TextPipelineObserver.h
 )
 

@@ -6,8 +6,8 @@
 #include "itkObject.h"
 
 #include "FileSet.h"
-#include "ImageSetReader.h"
-#include "ItkPipeline.h"
+#include "ImageFileSet.h"
+#include "ItkImagePipeline.h"
 
 enum MetricType 
 {
@@ -20,28 +20,25 @@ enum MetricType
  * \brief Computes and removes the constant occlusions from a bright-field microscopy image sequence.
  */
 class RemovePartialOcclusionsPipeline :
-    public ItkPipeline
+    public ItkImagePipeline
 {
 public:
 
     // Standard ITK typedefs
     typedef RemovePartialOcclusionsPipeline Self;
-    typedef ItkPipeline Superclass;
+    typedef ItkImagePipeline Superclass;
     typedef itk::SmartPointer< Self > Pointer;
     typedef itk::SmartPointer< const Self > ConstPointer;
     
     itkNewMacro(Self);
-    itkTypeMacro(RemovePartialOcclusionsPipeline, ItkPipeline);
+    itkTypeMacro(RemovePartialOcclusionsPipeline, ItkImagePipeline);
     
     // Typedefs
-    typedef itk::Image< unsigned short, 2 > InputImageType;
-    typedef itk::Image< float, 2 > InternalImageType;
-    typedef itk::Image< unsigned short, 2 > OutputImageType;
-    typedef InputImageType::PixelType PixelType;
-    typedef ImageSetReaderBase* VideoType;
-    
+    typedef ImageFileSet::ImageType ImageType;
+    typedef ImageTypeUS2 OutputImageType;
+        
     itkStaticConstMacro(ImageDimension, unsigned int,
-                        InputImageType::ImageDimension);
+                        ImageType::ImageDimension);
     // Getters/setters
     itkGetMacro(Metric, MetricType);
     itkSetMacro(Metric, MetricType);
@@ -54,19 +51,7 @@ public:
     
     itkGetMacro(TransmissionFile, std::string);
     itkSetMacro(TransmissionFile, std::string);
-    
-    const FileSet& GetInputFiles() const
-    { return this->input->GetFiles(); }
-
-    //void SetInputFiles(const FileSet& files)
-    //{ this->inputFiles = files; }
-    //
-    //const FileSet& GetOutputFiles() const
-    //{ return this->outputFiles; }
-
-    //void SetOutputFiles(const FileSet& files)
-    //{ this->outputFiles = files; }
-    
+        
     /**
      * Compute and remove the constant occlusions from the image sequence.
      */
@@ -82,8 +67,8 @@ protected:
         
     virtual ~RemovePartialOcclusionsPipeline(){}
     
-    InternalImageType::Pointer ComputeTransmissionMean(VideoType& video);
-    InternalImageType::Pointer ComputeTransmissionMedian(VideoType& video);
+    ImageType::Pointer ComputeTransmissionMean(ImageFileSet* images);
+    ImageType::Pointer ComputeTransmissionMedian(ImageFileSet* images);
     
 private:
     // Purposefully not implemented

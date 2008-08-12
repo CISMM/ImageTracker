@@ -2,24 +2,23 @@
 
 #include "itkImage.h"
 
-#include "CommonTypes.h"
-#include "ItkPipeline.h"
+#include "ItkVectorPipeline.h"
 
 /**
  * Integrates the displacement of massless particles in time-varying flow field.
  */ 
 class IntegrateFlowFieldPipeline :
-    public ItkPipeline
+    public ItkVectorPipeline
 {
 public:
     // Common ITK typedefs
     typedef IntegrateFlowFieldPipeline Self;
-    typedef ItkPipeline Superclass;
+    typedef ItkVectorPipeline Superclass;
     typedef itk::SmartPointer< Self > Pointer;
     typedef itk::SmartPointer< const Self > ConstPointer;
     
     itkNewMacro(Self);
-    itkTypeMacro(IntegrateFlowFieldPipeline, ItkPipeline);
+    itkTypeMacro(IntegrateFlowFieldPipeline, ItkVectorPipeline);
     
     // Image types
     typedef float ComponentType;

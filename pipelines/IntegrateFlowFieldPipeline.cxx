@@ -1,6 +1,5 @@
 #include "IntegrateFlowFieldPipeline.h"
 
-#include "itkImageDuplicator.h"
 #include "itkImageRegionIteratorWithIndex.h"
 #include "itkJoinSeriesImageFilter.h"
 #include "itkSubtractImageFilter.h"
@@ -21,8 +20,8 @@ void IntegrateFlowFieldPipeline::Update()
     typedef itk::ImageDuplicator< FlowImageType > CopyType;
     typedef itk::SubtractImageFilter< FlowImageType, FlowImageType, FlowImageType > SubtractType;
     
-    FlowImageType* img0 = dynamic_cast<FlowImageType*>(this->input->GetImage(0));
-    PrintRegionInfo<FlowImageType>(img0->GetLargestPossibleRegion(), "Flow field region");
+    FlowImageType::Pointer img0 = CopyImage(this->input->GetImage(0));
+//     PrintRegionInfo<FlowImageType>(img0->GetLargestPossibleRegion(), "Flow field region");
     
     // Initialize position information by creating a vector-image where each vector value
     // is determined by the image grid position of the cell.
@@ -48,10 +47,7 @@ void IntegrateFlowFieldPipeline::Update()
         posIt.Set(pos);
     }
     
-    CopyType::Pointer copy = CopyType::New();
-    copy->SetInputImage(pos0);
-    copy->Update();
-    FlowImageType::Pointer position = copy->GetOutput();
+    FlowImageType::Pointer position = CopyImage(pos0.GetPointer());
     PrintImageInfo<FlowImageType>(position, "Initial position image");
     
     // Save the intitial displacement information
@@ -64,16 +60,16 @@ void IntegrateFlowFieldPipeline::Update()
     // Extract the first three flow field frames from the input images 
     // (three frames is the maximum needed for linear interpolation at a StepSize < 1 frame).
     JoinFilter::Pointer flows = JoinFilter::New();
-    flows->PushBackInput(dynamic_cast<FlowImageType*>(this->input->GetImage(0)));
-    flows->PushBackInput(dynamic_cast<FlowImageType*>(this->input->GetImage(1)));
-    flows->PushBackInput(dynamic_cast<FlowImageType*>(this->input->GetImage(2)));
+    flows->PushBackInput(CopyImage(this->input->GetImage(0)));
+    flows->PushBackInput(CopyImage(this->input->GetImage(1)));
+    flows->PushBackInput(CopyImage(this->input->GetImage(2)));
     flows->Update();
     
     // Setup displacement integrator
     IntegratorType::Pointer integrate = IntegratorType::New();
     integrate->SetStepSize(this->GetStepSize());
     
-    int steps = (int)((this->input->size()-1) / this->GetStepSize());
+    int steps = (int)((this->input->GetImageCount()-1) / this->GetStepSize());
     
     // Integration time = 0
     unsigned int step = 0;
@@ -111,7 +107,7 @@ void IntegrateFlowFieldPipeline::Update()
             if (doContinue)
             {
                 flows->PopFrontInput();
-                flows->PushBackInput(dynamic_cast<FlowImageType*>(this->input->GetImage(idx+2)));
+                flows->PushBackInput(CopyImage(this->input->GetImage(idx+2)));
                 flows->Update();
             }
         }

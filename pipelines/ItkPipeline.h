@@ -44,9 +44,6 @@ public:
      */
     virtual bool NotifyProgress(double progress, const std::string& message = "");
 
-    virtual void SetInput(ImageSetReaderBase* input);
-    virtual ImageSetReaderBase* GetInput();
-
     virtual void SetOutputFiles(const FileSet& files);
     virtual const FileSet& GetOutputFiles();
     
@@ -61,7 +58,6 @@ protected:
     virtual ~ItkPipeline(){}
     
     ObserverList observers;
-    ImageSetReaderBase* input;
     FileSet outputFiles;
     bool m_Success;
     

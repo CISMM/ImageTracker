@@ -5,58 +5,50 @@
 #include "itkVector.h"
 
 #include "CommonTypes.h"
-#include "FileSet.h"
-#include "ImageSetReader.h"
-#include "ItkPipeline.h"
-#include "Logger.h"
+#include "HarrisFeatureInterestImageFilter.h"
+#include "ItkImagePipeline.h"
 
 class MultiResolutionOpticalFlowPipeline :
-    public ItkPipeline
+    public ItkImagePipeline
 {
 public:
     // Common itk typedefs
     typedef MultiResolutionOpticalFlowPipeline Self;
-    typedef ItkPipeline Superclass;
+    typedef ItkImagePipeline Superclass;
     typedef itk::SmartPointer< Self > Pointer;
     typedef itk::SmartPointer< const Self > ConstPointer;
     
     itkNewMacro(Self);
-    itkTypeMacro(MultiResolutionOpticalFlowPipeline, ItkPipeline);
+    itkTypeMacro(MultiResolutionOpticalFlowPipeline, ItkImagePipeline);
     
     // Image typedefs
-    typedef CommonTypes::InternalImageType InternalImageType;
+    typedef CommonTypes::InternalImageType ImageType;
     typedef itk::Image< 
-            itk::Vector< float, InternalImageType::ImageDimension >, 
-            InternalImageType::ImageDimension > FlowImageType;
+            itk::Vector< float, ImageType::ImageDimension >, 
+            ImageType::ImageDimension > FlowImageType;
+    typedef HarrisFeatureInterestImageFilter< ImageType, ImageType > HarrisType;
     
     itkGetMacro(Iterations, unsigned int);
     itkSetMacro(Iterations, unsigned int);
     itkGetMacro(SpatialSigma, float);
-    itkSetMacro(SpatialSigma, float);
     itkGetMacro(IntegrationSigma, float);
-    itkSetMacro(IntegrationSigma, float);
     itkGetMacro(Regularization, float);
     itkSetMacro(Regularization, float);
     itkGetMacro(Relaxation, float);
     itkSetMacro(Relaxation, float);
     itkGetMacro(NumberOfLevels, unsigned int);
     itkSetMacro(NumberOfLevels, unsigned int);
-            
-    //const FileSet& GetOutputFiles() { return this->outputFiles; }
-    //void SetOutputFiles(const FileSet& files) { this->outputFiles = files; }
-    //void SetInput(ImageSetReaderBase* input) { this->input = input; }
     
     virtual void Update();
+    virtual void SetInput(ImageFileSet* input);
+    
+    void SetSpatialSigma(float sigma);
+    void SetIntegrationSigma(float sigma);
+    
+    ImageType::Pointer GetPreviewImage();
     
 protected:
-    MultiResolutionOpticalFlowPipeline()
-        : m_Iterations(200),
-          m_SpatialSigma(1.0),
-          m_IntegrationSigma(4.0),
-          m_Regularization(10e4),
-          m_Relaxation(1.9),
-          m_NumberOfLevels(1)
-        {}
+    MultiResolutionOpticalFlowPipeline();
     virtual ~MultiResolutionOpticalFlowPipeline(){}
 
 private:
@@ -70,4 +62,5 @@ private:
     float m_Regularization;
     float m_Relaxation;
     unsigned int m_NumberOfLevels;
+    HarrisType::Pointer harris;
 };

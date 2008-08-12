@@ -5,39 +5,26 @@
 
 #include "itkArray2D.h"
 
-#include "CommonTypes.h"
 #include "Logger.h"
 #include "MathUtils.h"
 #include "TransformGroup.h"
+#include "ImageUtils.h"
 
 MultiResolutionRegistrationPipeline::MultiResolutionRegistrationPipeline()
 {
 	// Create pipeline objects
-	this->threshold[0] = ThresholdType::New();
-	this->threshold[1] = ThresholdType::New();
 	this->registration = RegistrationType::New();
 	this->resample = ResampleType::New();
-	this->caster = CasterType::New();
 	this->smooth = SmoothType::New();
-
-	// Connect pipeline
-	this->registration->SetFixedImage(this->threshold[0]->GetOutput());
-	this->registration->SetMovingImage(this->threshold[1]->GetOutput());
-	this->smooth->SetInput(this->threshold[0]->GetOutput());
 
 	// User must supply these
 	this->SetTransformFile("");
 }
 
-void MultiResolutionRegistrationPipeline::SetInput(ImageSetReaderBase* input)
+void MultiResolutionRegistrationPipeline::SetInput(ImageFileSet* input)
 {
 	this->input = input;
-
-	this->resample->SetInput(dynamic_cast<ImageTypeF2*>(this->input->GetImage(0)));
-        this->threshold[0]->SetInput(dynamic_cast<ImageTypeF2*>(this->input->GetImage(0)));
-        this->threshold[1]->SetInput(dynamic_cast<ImageTypeF2*>(this->input->GetImage(1)));
-
-	this->smooth->SetInput(this->threshold[0]->GetOutput());
+	this->smooth->SetInput(this->input->GetOutput());
 }
 
 void MultiResolutionRegistrationPipeline::SetPreviewShrinkFactor(unsigned int factor)
@@ -117,30 +104,6 @@ void MultiResolutionRegistrationPipeline::SetNumberOfLevels(unsigned int levels)
 	this->registration->SetNumberOfLevels(levels);
 }
 
-MultiResolutionRegistrationPipeline::ImageType::PixelType
-MultiResolutionRegistrationPipeline::GetUpperThreshold()
-{
-	return this->threshold[0]->GetUpper();
-}
-
-void MultiResolutionRegistrationPipeline::SetUpperThreshold(ImageType::PixelType threshold)
-{
-	this->threshold[0]->SetUpper(threshold);
-	this->threshold[1]->SetUpper(threshold);
-}
-
-MultiResolutionRegistrationPipeline::ImageType::PixelType
-MultiResolutionRegistrationPipeline::GetLowerThreshold()
-{
-	return this->threshold[0]->GetLower();
-}
-
-void MultiResolutionRegistrationPipeline::SetLowerThreshold(ImageType::PixelType threshold)
-{
-	this->threshold[0]->SetLower(threshold);
-	this->threshold[1]->SetLower(threshold);
-}
-
 MultiResolutionRegistrationPipeline::ImageType::Pointer
 MultiResolutionRegistrationPipeline::GetPreviewImage()
 {
@@ -151,6 +114,8 @@ void MultiResolutionRegistrationPipeline::Update()
 {
     std::string function("MultiResolutionRegistrationPipeline::Update()");
     Logger::verbose << function << std::endl;
+    
+    typedef ImageTypeUS2 OutputImageType;
     
     int total = this->outputFiles.size();
     bool abort = this->NotifyProgress(0.0 / total, "Initializing...");
@@ -171,28 +136,27 @@ void MultiResolutionRegistrationPipeline::Update()
 
     // Start at the beginning of the input images
     // Write the first image, un-changed
-    this->caster->SetInput(dynamic_cast<ImageTypeF2*>(this->input->GetImage(0)));
-    WriteImage(this->caster->GetOutput(), this->outputFiles[0]);
-
-    // Connect caster to the resampling pipeline
-    this->caster->SetInput(this->resample->GetOutput());
+    WriteImage<ImageType, OutputImageType>(this->input->GetImage(0), this->outputFiles[0], false);
 
     abort = this->NotifyProgress(1.0 / total, "Registering...");
     
     // Register every image with the previous image
+    ImageType::Pointer fixed = NULL;
+    ImageType::Pointer moving = NULL;
     for (unsigned int i = 0; 
-         i < this->input->size()-1 && 
+         i < this->input->GetImageCount()-1 && 
              i < this->outputFiles.size()-1 &&
              !abort; 
          i++)
     {
-        ImageType::Pointer fixed = dynamic_cast<ImageTypeF2*>(this->input->GetImage(i));
-        ImageType::Pointer moving = dynamic_cast<ImageTypeF2*>(this->input->GetImage(i+1));
+        // We need to create a copy of the fixed image so grabbing
+        // the moving image doesn't clobber it
+        fixed = CopyImage(this->input->GetImage(i));
+        moving = this->input->GetImage(i+1);
         
         // Update pipeline inputs
-        this->threshold[0]->SetInput(fixed);
-        this->threshold[1]->SetInput(moving);
-        this->smooth->SetInput(this->threshold[0]->GetOutput());
+        this->registration->SetFixedImage(fixed);
+        this->registration->SetMovingImage(moving);
         this->resample->SetInput(moving);
         
         // Run registration
@@ -210,7 +174,7 @@ void MultiResolutionRegistrationPipeline::Update()
         this->resample->SetOutputSpacing(fixed->GetSpacing());
         this->resample->SetDefaultPixelValue(0);
         this->resample->Update();
-        WriteImage(this->caster->GetOutput(), this->outputFiles[i+1]);
+        WriteImage<ImageType, OutputImageType>(this->resample->GetOutput(), this->outputFiles[i+1], false);
         
         abort = this->NotifyProgress(((double) i+2) / total);
     }
@@ -223,10 +187,4 @@ void MultiResolutionRegistrationPipeline::Update()
 
     // At this point, we have succeeded if we were not stopped.
     this->SetSuccess(!abort);
-
-    // Reset image
-    this->resample->SetInput(dynamic_cast<ImageTypeF2*>(this->input->GetImage(0)));
-    this->threshold[0]->SetInput(dynamic_cast<ImageTypeF2*>(this->input->GetImage(0)));
-    this->threshold[1]->SetInput(dynamic_cast<ImageTypeF2*>(this->input->GetImage(1)));
-    this->smooth->SetInput(this->threshold[0]->GetOutput());
 }
