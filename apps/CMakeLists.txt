@@ -106,6 +106,9 @@ TARGET_LINK_LIBRARIES(datasource ITCommon ITImage ITFilters ITGui)
 ADD_EXECUTABLE(harris TestHarrisFeatureDetector.cxx)
 TARGET_LINK_LIBRARIES(harris ITCommon ITImage ITFilters)
 
+ADD_EXECUTABLE(testlog TestLogging.cxx)
+TARGET_LINK_LIBRARIES(testlog ITCommon)
+
 ###################################
 # ImageTracker GUI executables.
 #
