@@ -4,6 +4,7 @@
 
 #include "itkCastImageFilter.h"
 #include "itkImage.h"
+#include "itkImageDuplicator.h"
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkRescaleIntensityImageFilter.h"
@@ -100,7 +101,7 @@ void WriteImage(const TImage* image, const std::string& filename)
 }
 
 template < class TImageIn, class TImageOut >
-void WriteImage(const TImageIn* image, const std::string& filename, bool rescale = true)
+void WriteImage(const TImageIn* image, const std::string& filename, bool rescale = false)
 {
     Logger::verbose << "Writing:\t" << filename << std::endl;
     typedef itk::RescaleIntensityImageFilter< TImageIn, TImageOut > RescaleType;
@@ -140,6 +141,18 @@ typename TImage::Pointer ReadImage(const std::string& filename)
     reader->SetFileName(filename.c_str());
     reader->Update();
     return reader->GetOutput();
+}
+
+template < class TImage >
+typename TImage::Pointer CopyImage(const TImage* input)
+{
+    typedef itk::ImageDuplicator<TImage> CopyType;
+    typename CopyType::Pointer copy = CopyType::New();
+    TImage* inputNC = const_cast<TImage*>(input);       // sometimes input has not been updated...
+    inputNC->Update();
+    copy->SetInputImage(inputNC);
+    copy->Update();
+    return copy->GetOutput();
 }
 
 template <class TSourceImage, class TDestImage >
