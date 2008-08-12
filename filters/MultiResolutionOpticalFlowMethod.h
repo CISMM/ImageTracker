@@ -168,9 +168,9 @@ void MultiResolutionOpticalFlowMethod< TFixedImage, TMovingImage >::GenerateData
         PrintImageInfo(warp->GetOutput(), "Warped image", Logger::debug);
         PrintImageInfo<OutputImageType>(currentFlow, "Current flow", Logger::debug);
         
-        char filename[80];
-        sprintf(filename, "warp-lev-%d.tif", level);
-        WriteImage< MovingImageType, CommonTypes::InputImageType >(warp->GetOutput(), std::string(filename), false);
+//         char filename[80];
+//         sprintf(filename, "warp-lev-%d.tif", level);
+//         WriteImage< MovingImageType, CommonTypes::InputImageType >(warp->GetOutput(), std::string(filename), false);
         
         Logger::debug << function << ": Level => " << level << " setting up flow computation" << std::endl;
         // Compute optical flow at current resolution level using the optical flow method
@@ -188,8 +188,8 @@ void MultiResolutionOpticalFlowMethod< TFixedImage, TMovingImage >::GenerateData
         Logger::debug << function << ": Level => " << level << " executing flow, add" << std::endl;
         add->UpdateLargestPossibleRegion();
         
-        sprintf(filename, "add-lev-%d.mha", level);
-        WriteImage<OutputImageType>(add->GetOutput(), std::string(filename));
+//         sprintf(filename, "add-lev-%d.mha", level);
+//         WriteImage<OutputImageType>(add->GetOutput(), std::string(filename));
         
         if (level == this->GetNumberOfLevels()-1) break; // Done...no need to resample and rescale
         
@@ -203,14 +203,14 @@ void MultiResolutionOpticalFlowMethod< TFixedImage, TMovingImage >::GenerateData
         resample->SetOutputSpacing(nextImg->GetSpacing());
         resample->UpdateLargestPossibleRegion();
         
-        sprintf(filename, "resample-lev-%d.mha", level);
-        WriteImage<OutputImageType>(resample->GetOutput(), std::string(filename));
+//         sprintf(filename, "resample-lev-%d.mha", level);
+//         WriteImage<OutputImageType>(resample->GetOutput(), std::string(filename));
         
         Logger::debug << function << ": Level => " << level << " rescaling flow for next level" << std::endl;
         scale->UpdateLargestPossibleRegion();
         
-        sprintf(filename, "rescale-lev-%d.mha", level);
-        WriteImage<OutputImageType>(scale->GetOutput(), std::string(filename));
+//         sprintf(filename, "rescale-lev-%d.mha", level);
+//         WriteImage<OutputImageType>(scale->GetOutput(), std::string(filename));
         
         currentFlow = scale->GetOutput();
         currentFlow->DisconnectPipeline();

@@ -48,8 +48,8 @@ public:
     itkGetMacro(DerivativeSigma, float);
     itkSetMacro(DerivativeSigma, float);
     
-    itkGetMacro(WindowSigma, float);
-    itkSetMacro(WindowSigma, float);
+    itkGetMacro(IntegrationSigma, float);
+    itkSetMacro(IntegrationSigma, float);
     
     itkGetMacro(TraceWeight, float);
     itkSetMacro(TraceWeight, float);
@@ -57,7 +57,7 @@ public:
 protected:
     HarrisFeatureInterestImageFilter()
     : m_DerivativeSigma(1.0),
-      m_WindowSigma(2.0),
+      m_IntegrationSigma(4.0),
       m_TraceWeight(0.06)
     {
     }
@@ -72,7 +72,7 @@ private:
     void operator=(const Self& other);
     
     float m_DerivativeSigma;
-    float m_WindowSigma;
+    float m_IntegrationSigma;
     float m_TraceWeight;
 };
 
@@ -111,11 +111,11 @@ void HarrisFeatureInterestImageFilter<TInputImage, TOutputImage>
     typedef typename GaussianType::Pointer GaussianPointer;
     typedef itk::ImageRegionConstIterator< InputImageType > InputIterator;
     typedef itk::ImageRegionIterator< OutputImageType > OutputIterator;
+    typename MultiplyType::Pointer mult = MultiplyType::New();
     
     Logger::debug << function << ": Setting up spatial derivative pipeline" << std::endl;
     GaussianPointer dx = GaussianType::New(); // for spatial derivatives
     GaussianPointer dy = GaussianType::New(); // for spatial derivatives
-    typename MultiplyType::Pointer mult = MultiplyType::New();
     GaussianPointer gx = GaussianType::New(); // for window weighting
     GaussianPointer gy = GaussianType::New(); // for window weighting
     
@@ -132,50 +132,48 @@ void HarrisFeatureInterestImageFilter<TInputImage, TOutputImage>
     // Compute Ix
     dx->SetFirstOrder();
     dy->SetZeroOrder();
-    dy->Update();
-    InputPointerType Ix = dy->GetOutput();
-    Ix->DisconnectPipeline();
+    InputPointerType Ix = CopyImage(dy->GetOutput());
 
     typedef itk::Image< unsigned short, 2 > WriteImageType;
-    WriteImage< InputImageType, WriteImageType >(dx->GetOutput(), "dx.tiff");
-    WriteImage< InputImageType, WriteImageType >(dy->GetOutput(), "dxsy.tiff");
+//     WriteImage< InputImageType, WriteImageType >(dx->GetOutput(), "dx.tiff", true);
+//     WriteImage< InputImageType, WriteImageType >(dy->GetOutput(), "dxsy.tiff", true);
     
     // Compute Iy
     dx->SetZeroOrder();
     dy->SetFirstOrder();
-    dy->Update();
-    InputPointerType Iy = dy->GetOutput();
-    Iy->DisconnectPipeline();
-    WriteImage< InputImageType, WriteImageType >(dx->GetOutput(), "sx.tiff");
-    WriteImage< InputImageType, WriteImageType >(dy->GetOutput(), "sxdy.tiff");
+    InputPointerType Iy = CopyImage(dy->GetOutput());
+    
+//     WriteImage< InputImageType, WriteImageType >(dx->GetOutput(), "sx.tiff", true);
+//     WriteImage< InputImageType, WriteImageType >(dy->GetOutput(), "sxdy.tiff", true);
     
     // Set up windowing smoothing
     gx->SetDirection(0);
     gx->SetZeroOrder();
-    gx->SetSigma(this->GetWindowSigma());
+    gx->SetSigma(this->GetIntegrationSigma());
     gy->SetDirection(1);
     gy->SetZeroOrder();
-    gy->SetSigma(this->GetWindowSigma());
+    gy->SetSigma(this->GetIntegrationSigma());
     
     gx->SetInput(mult->GetOutput());
     gy->SetInput(gx->GetOutput());
-    
+        
     Logger::debug << function << ": Compute auto-correlation matrix members" << std::endl;
     mult->SetInput1(Ix);
     mult->SetInput2(Ix);
-    gy->Update();
-    InputPointerType IxIx = gy->GetOutput();
-    IxIx->DisconnectPipeline();
+    InputPointerType IxIx = CopyImage(gy->GetOutput());
 
     mult->SetInput2(Iy);
-    gy->Update();
-    InputPointerType IxIy = gy->GetOutput();
-    IxIy->DisconnectPipeline();
+    InputPointerType IxIy = CopyImage(gy->GetOutput());
     
     mult->SetInput1(Iy);
-    gy->Update();
-    InputPointerType IyIy = gy->GetOutput();
-    IyIy->DisconnectPipeline();
+    InputPointerType IyIy = CopyImage(gy->GetOutput());
+    
+    PrintImageInfo(input.GetPointer(), "input");
+    PrintImageInfo(Ix.GetPointer(), "Ix");
+    PrintImageInfo(Iy.GetPointer(), "Iy");
+    PrintImageInfo(IxIx.GetPointer(), "IxIx");
+    PrintImageInfo(IxIy.GetPointer(), "IxIy");
+    PrintImageInfo(IyIy.GetPointer(), "IyIy");
     
     Logger::debug << function << ": Computing Harris feature interest image" << std::endl;
     InputIterator itIxIx(IxIx, outRegion);
@@ -188,8 +186,10 @@ void HarrisFeatureInterestImageFilter<TInputImage, TOutputImage>
          ++itIxIx, ++itIyIy, ++ itIxIy, ++outIt)
     {
         // det(A) - a Trace(A)^2
-        outIt.Set(static_cast<OutputPixelType>((itIxIx.Get() * itIyIy.Get() - itIxIy.Get() * itIxIy.Get()) - 
-                this->GetTraceWeight() * (itIxIx.Get() + itIyIy.Get()) * (itIxIx.Get() + itIyIy.Get())));
+        outIt.Set(static_cast<OutputPixelType>(
+            (itIxIx.Get() * itIyIy.Get() - itIxIy.Get() * itIxIy.Get()) -       // determinant
+            this->GetTraceWeight() * 
+            ((itIxIx.Get() + itIyIy.Get()) * (itIxIx.Get() + itIyIy.Get()))));   // trace^2
     }
     
     Logger::debug << function << ": Grafting output" << std::endl;

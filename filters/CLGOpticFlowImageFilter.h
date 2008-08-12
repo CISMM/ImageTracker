@@ -202,7 +202,7 @@ void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
         output->DisconnectPipeline();
         next = output;
 
-        terminate = this->CheckForCompletion(prev, next);
+//         terminate = this->CheckForCompletion(prev, next);
         if (terminate)
             Logger::debug << function << ": stopping after " << i << " iterations." << std::endl;
 // 	char msg[80];

@@ -194,9 +194,9 @@ void HornOpticalFlowImageFilter< TInputImage1, TInputImage2, TComponentType >
     
     // Write out derivative images, for debugging
     typedef itk::Image< unsigned short, 2 > WriteImageType;
-    WriteImage< InternalImageType, WriteImageType >(dIdx, "dIdx.tiff");
-    WriteImage< InternalImageType, WriteImageType >(dIdy, "dIdy.tiff");
-    WriteImage< InternalImageType, WriteImageType >(dt->GetOutput(), "dIdt.tiff");
+//     WriteImage< InternalImageType, WriteImageType >(dIdx, "dIdx.tiff");
+//     WriteImage< InternalImageType, WriteImageType >(dIdy, "dIdy.tiff");
+//     WriteImage< InternalImageType, WriteImageType >(dt->GetOutput(), "dIdt.tiff");
     
     Logger::debug << function << ": Initializing input flow field" << std::endl;
     OutputImagePointer flow = OutputImageType::New();
