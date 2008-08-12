@@ -28,23 +28,23 @@
 
 <div id="content">
 
-<p class="section">Table of Contents</p>
+<h2>Table of Contents</h2>
 <ul>
-<li class="menu-section"><a href="#windows">Windows XP</a></li>
-<li class="menu-section"><a href="#linux">Linux</a></li>
+<li class="toch2"><a href="#windows">Windows XP</a></li>
+<li class="toch2"><a href="#linux">Linux</a></li>
 </ul>
 
-<p class="section"><a name="windows"></a>Windows XP</p>
+<h2><a name="windows"></a>Windows XP</h2>
 
 <p>ImageTracker leverages a number of open-source software packages. To build ImageTracker from source, one first needs to build these packages. The following instructions create a build of ImageTracker on a Windows XP machine using Microsoft's Visual Studio 2003 .NET.</p>
 
-<p class="subsection">CMAKE</p>
+<h3>CMAKE</h3>
 <p>CMAKE is a cross-platform, compiler-independent make system. It is available from Kitware at <a href="http://www.cmake.org">www.cmake.org</a>. Download and install the latest stable release for Windows.</p>
 
-<p class="subsection">fftw</p>
+<h3>fftw</h3>
 <p>fftw is a fast Fourier transform library.  Download the Windows DLLs from <a href="http://www.fftw.org/">www.fftw.org</a>. Then, follow the instructions to create "lib import libraries."</p>
 
-<p class="subsection">ITK</p>
+<h3>ITK</h3>
 <p>ITK is a powerful image processing and analysis library available from Kitware at <a href="http://www.itk.org">www.itk.org</a>. Download the latest source code release. Follow the instructions for using CMAKE to configure ITK for Visual Studio with the following important exceptions:</p>
 <ul>
 <li>In CMAKE, click on the &quot;Show Advanced Values&quot; checkbox to display advanced ITK configuration parameters</li>
@@ -55,10 +55,10 @@
 </ul>
 <p>Build &quot;Debug&quot; (if you plan to do any development) and &quot;Release&quot; versions of the generated ITK solution.</p>
 
-<p class="subsection">VTK</p>
+<h3>VTK</h3>
 <p>VTK is a data visualization library available from Kitware at <a href="http://www.vtk.org">www.vtk.org</a>. Download, configure, and build the latest source code release using CMAKE and Visual Studio, or obtain the CVS version from the VTK repositories. Build both a &quot;Debug&quot; and &quot;Release&quot; version.</p>
 
-<p class="subsection">wxWidgets</p>
+<h3>wxWidgets</h3>
 <p>wxWidgets is a platform-independent graphical user interface (GUI) development library. Download and install MSW version 2.6.3 from <a href="http://www.wxWidgets.org">www.wxwidgets.org</a>. ImageTracker uses a feature of wxWidgets that is disabled by default:</p>
 <ul>
 <li>Open wx.dsw and convert to a .NET solution</li>
@@ -67,7 +67,7 @@
 <li>Build a Release version of the .NET project.</li>
 </ul>
 
-<p class="subsection">ImageTracker</p>
+<h3>ImageTracker</h3>
 <p>The ImageTracker source is available by request or from NSRG's CVS:</p>
 <ul>
 <li>CVSROOT: /afs/cs.unc.edu/proj/stm/src/</li>
@@ -75,9 +75,9 @@
 </ul>
 <p>Create an ImageTracker solution file using CMAKE. I would suggest an out-of-source build to keep the code and binaries separate. The CMakeLists.txt file provided from CVS should configure everything for you; you may need to point to the compiled ITK, VTK, wxWidgets, or fftw libraries. There is an advanced option to turn on or off building of test cases. Generate the solution file, and build the ImageTracker project! When you are done, you need to put the fftw dlls and the ImageTracker executable in the same directory.</p>
 
-<p class="section"><a name="linux"></a>Linux</p>
+<h2><a name="linux"></a>Linux</h2>
 <p>The following instructions build ImageTracker on a new Ubuntu 7.10 (Gutsy) install.</p>
-<p class="subsection">Prerequisites</p>
+<h3>Prerequisites</h3>
 <p>Install the following packages, e.g. with</p>
 <p class="code">$ sudo aptitude install <em>package</em></p>
 <p>For each package, I have included the list of dependencies that aptitude will likely automatically find.</p>
@@ -103,7 +103,7 @@
 <dt>python-wxglade:</dt><dd> libwxbase2.8-0 libwxgtk2.8-0 python-wxgtk2.8 python-wxversion </dd>
 </dl>
 
-<p class="subsection">CMake</p>
+<h3>CMake</h3>
 <p>The cmake package for Ubuntu sometimes lags behind the latest release, so I suggest building from source.  Download the source from www.cmake.org.</p>
 <p class="code">
 $ tar -xvf cmake-2.4.7.tar.gz <br />
@@ -115,7 +115,7 @@ $ cmake --version <br />
 cmake version 2.4-patch 7 <br />
 </p>
 
-<p class="subsection">InsightToolkit (ITK)</p>
+<h3>InsightToolkit (ITK)</h3>
 <p>Download the latest source code release from www.itk.org. Do an out-of-source build.</p>
 <p class="code">
 $ tar xvf InsightToolkit-3.4.0.tar.gz <br />
@@ -128,7 +128,7 @@ Generate <br />
 $ make <br />
 </p>
 
-<p class="subsection">VisualizationToolkit (VTK)</p>
+<h3>VisualizationToolkit (VTK)</h3>
 <p>Download the latest source code from www.vtk.org. Do an out-of-source build.</p>
 <p class="code">
 $ tar xvf vtk-5.0.3.tar.gz<br />
@@ -136,7 +136,7 @@ $ ccmake (path to vtk source)/VTK <br />
 $ make <br />
 </p>
 
-<p class="subsection">ImageTracker</p>
+<h3>ImageTracker</h3>
 <p>Checkout ImageTracker from CVS. Do an out-of-source build.</p>
 <p class="code">
 $ ccmake -G KDevelop3 ../../source/ImageTracker<br />
@@ -154,10 +154,10 @@ $ make ImageTracker <br />
 <div id="footer">
 <p>ImageTracker<br/>
 by Brian Eastwood</p>
-<div class="validation">
+<p class="validation">
 <a href="http://validator.w3.org/check/referer">xhtml</a> | 
 <a href="http://jigsaw.w3.org/css-validator/check/referer">css</a>
-</div>
+</p>
 </div> <!-- end footer -->
 
 </body>

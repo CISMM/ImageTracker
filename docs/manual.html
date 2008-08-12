@@ -28,84 +28,174 @@
 
 <div id="content">
 
-<p class="section">Table of Contents</p>
+<h2>Table of Contents</h2>
+
 <ul>
-<li class="menu-section"><a href="#introduction">Introduction</a></li>
-<li class="menu-section"><a href="#installation">Installation</a></li>
-<li class="menu-section"><a href="#loadingdata">Loading Data</a></li>
-<li class="menu-section"><a href="#savingdata">Saving Data</a></li>
-<li class="menu-section"><a href="#visualization">Visualization</a></li>
-<li class="menu-section"><a href="#stabilization">Stabilization</a></li>
-<li class="menu-section"><a href="#transforms">Transforms</a></li>
-<li class="menu-section"><a href="#occlusions">Removing Occlusions</a></li>
-<li class="menu-section"><a href="#flow">Flow Computation</a></li>
-	<li class="menu-subsection"><a href="#clg">CLG Optical Flow</a></li>
-	<li class="menu-subsection"><a href="#horn">Horn &amp; Schunck Optical Flow</a></li>
-<li class="menu-section"><a href="#integration">Flow Integration</a></li>
-<li class="menu-section"><a href="#saveView">Saving View Images</a></li>
-<li class="menu-section"><a href="#visParaView">Visualization with ParaView</a></li>
-<li class="menu-section"><a href="#versionhistory">Version History</a></li>
-	<li class="menu-subsection"><a href="#v2.07">Version 2.07</a></li>
-	<li class="menu-subsection"><a href="#v2.06">Version 2.06</a></li>
-	<li class="menu-subsection"><a href="#v2.05">Version 2.05</a></li>
-	<li class="menu-subsection"><a href="#v2.04">Version 2.04</a></li>
-	<li class="menu-subsection"><a href="#v2.03">Version 2.03</a></li>
-	<li class="menu-subsection"><a href="#v2.02">Version 2.02</a></li>
-	<li class="menu-subsection"><a href="#v2.01">Version 2.01</a></li>
-	<li class="menu-subsection"><a href="#v2.00">Version 2.00</a></li>
-	<li class="menu-subsection"><a href="#v1.00">Version 1.00</a></li>
+<li class="toch2"><a href="#introduction">Introduction</a></li>
+<li class="toch2"><a href="#installation">Installation</a></li>
+
+<li class="toch2"><a href="#images">Working with Images</a></li>
+    <li class="toch3"><a href="#loadingImages">Loading Images</a></li>
+    <li class="toch3"><a href="#loadingVectors">Loading Vectors</a></li>
+    <li class="toch3"><a href="#vectorVisualization">Vector Visualization</a></li>
+    <li class="toch3"><a href="#imageControls">Image Controls</a></li>
+    <li class="toch3"><a href="#savingVisualizations">Saving Visualizations</a></li>
+
+<li class="toch2"><a href="#filters">Filters</a></li>
+    <li class="toch3"><a href="#threshold">Threshold</a></li>
+    <li class="toch3"><a href="#gaussian">Gaussian</a></li>
+
+<li class="toch2"><a href="#stabilization">Stabilization</a></li>
+<li class="toch2"><a href="#transforms">Transforms</a></li>
+<li class="toch2"><a href="#occlusions">Removing Occlusions</a></li>
+
+<li class="toch2"><a href="#flow">Flow Computation</a></li>
+    <li class="toch3"><a href="#clg">CLG Optical Flow</a></li>
+    <li class="toch3"><a href="#horn">Horn &amp; Schunck Optical Flow</a></li>
+<li class="toch2"><a href="#integration">Flow Integration</a></li>
+<li class="toch2"><a href="#saveView">Saving View Images</a></li>
+<li class="toch2"><a href="#visParaView">Visualization with ParaView</a></li>
+<li class="toch2"><a href="#versionhistory">Version History</a></li>
+    <li class="toch3"><a href="#v2.07">Version 2.07</a></li>
+    <li class="toch3"><a href="#v2.06">Version 2.06</a></li>
+    <li class="toch3"><a href="#v2.05">Version 2.05</a></li>
+    <li class="toch3"><a href="#v2.04">Version 2.04</a></li>
+    <li class="toch3"><a href="#v2.03">Version 2.03</a></li>
+    <li class="toch3"><a href="#v2.02">Version 2.02</a></li>
+    <li class="toch3"><a href="#v2.01">Version 2.01</a></li>
+    <li class="toch3"><a href="#v2.00">Version 2.00</a></li>
+    <li class="toch3"><a href="#v1.00">Version 1.00</a></li>
 </ul>
 
-<p class="section"><a name="introduction"></a>Introduction</p>
-<p>ImageTracker is an application designed to track and measure motion in image sequences. Videos often contain motion of several types, and analysis of these motions can be difficult. For example, videos of cells dividing show the cell moving within solution, kinetochores moving back and forth accross the cell equator, and microtubule structures migrating from the equator to the poles. ImageTracker enables analysis of this type of motion through a multi-scale approach. The video is first stabilized with respect to global motion; flow analysis of smaller scale structures follows.</p>
+<h2><a name="introduction"></a>Introduction</h2>
+
+<p>ImageTracker is an application designed to track and measure motion in image sequences. Videos often contain motion of several types, and analysis of these motions can be difficult. For example, videos of cells dividing show the cell moving within solution, kinetochores moving back and forth accross the cell equator, and microtubule structures migrating from the equator to the poles. ImageTracker enables analysis of this type of motion through a multiscale approach. The video is first stabilized with respect to global motion and flow analysis of smaller scale structures follows.</p>
+
 <p>ImageTracker was written to analyze microscopy videos. Several challenges in analyzing microscopy video mean ImageTracker's performance will depend partially on the nature of the video being analyzed.  In particular, performance may suffer on videos that have low signal-to-noise ratio, poor feature resolution, sparse temporal sampling (objects move too much between fames), and short object life (features appear and disappear frequently).</p>
-<p>The text of this guide refers to the Windows version of ImageTracker, but the screenshots are of the Linux version.  The main differences between ImageTracker versions on these two platforms are purely aesthetic.</p>
 
-<p class="section"><a name="installation"></a>Installation</p>
-<p>Remove previous versions of ImageTracker from your computer before installing updates. To uninstall ImageTracker, select Start--&gt;All Programs--&gt;NSRG--&gt;ImageTracker--&gt;Uninstall ImageTracker from the start menu. </p>
-<p>Note: ImageTracker is a stand-alone application at this time and does not require the NSRG Runtime. </p>
-<p>Download and execute the installer from \\nsrg-cs\installers; we recommend that you accept all default parameters in order to conform to NSRG standards. This will create a folder on your harddrive, C:\NSRG\bin\ImageTracker, and will add to your programs menu a folder NSRG\ImageTracker.</p>
-<p>Run ImageTracker by selecting Start--&gt;All Programs--&gt;NSRG--&gt; ImageTracker--&gt;ImageTracker. </p>
+<p>The text of this guide refers to the Windows version of ImageTracker, but the screenshots are of the Linux version.  The difference between ImageTracker versions on these two platforms is purely aesthetic.</p>
+
+<h2><a name="installation"></a>Installation</h2>
+
+<p>Remove previous versions of ImageTracker from your computer before installing updates. To uninstall ImageTracker, select Start&mdash;&gt;All Programs&mdash;&gt;NSRG&mdash;&gt;ImageTracker&mdash;&gt;Uninstall ImageTracker from the start menu.</p>
+
+<p><em>Note:</em>  ImageTracker is a stand-alone application and does not require the NSRG Runtime.</p>
+
+<p>Download and execute the installer from the 
+<a href="http://www.cs.unc.edu/Research/nano/cismm/download/index.html">
+NSRG download page</a>. The NSRG developers recommend that you accept all default parameters in order to conform to NSRG standards. This will create a folder on your harddrive, C:\NSRG\bin\ImageTracker, and will add to your programs menu a folder NSRG\ImageTracker.</p>
+<p>Run ImageTracker by selecting Start&mdash;&gt;All Programs&mdash;&gt;NSRG&mdash;&gt; ImageTracker&mdash;&gt;ImageTracker.</p>
+
+<!-- Note: all screen shots in this manual are taken with the ImageTracker main window set to display at a size of 960x700 pixels.-->
 <p><span class="figure">
-<a href="img/ImageTracker.jpg"><img src="img/ImageTracker.jpg" width="300" alt="ImageTracker"/></a><br/>
-The ImageTracker main window.
-</span>
-The main ImageTracker window is shown to the right. The window consists of a menu bar, image panel, a data source panel, and logging panel. ImageTracker will launch new dialog windows for different purposes. Most of these windows may be moved around the screen, resized, or temporarily hidden.</p>
+<a href="img/ImageTracker.jpg"><img src="img/ImageTracker.jpg" alt="ImageTracker"/></a>
+<p>The ImageTracker main window.</p></span>
+The main ImageTracker window is shown to the right. The window consists of a menu bar on the top, a data control panel on the left, and an image panel on the right. ImageTracker will launch new dialog windows for different purposes. Most of these windows may be moved around the screen, resized, or temporarily hidden.</p>
+
+<p>Program information will be written to a logging file at various points during execution. This information may be useful for making sure the application is still running or troubleshooting the application if something goes wrong. You can view the log messages by selecting View&mdash;&gt;Logger. Each log message has an associated logging level on the following scale of increasing severity: Verbose, Debug, Info, Warn, Error.  From the logging window you can limit what messages get logged&mdash;all messages at or above the selected logging level will be written. Info is the recommended logging level; lower levels can produce enough messages to noticably slow down the application. The log messages displayed in the logger dialog do not update automatically.  Press the Refresh button to refresh the logger messages.</p>
+
+<p>Occasionally messages from libraries ImageTracker depends on may be printed to other locations.  Some of the ITK classes used in image registration print messages to the console (standard out) if ImageTracker is launched from a command line (not common on Windows).  VTK classes sometimes print messages to a separate logging window; this usually indicates something has gone very wrong with the visualization system.</p>
+
 <p><span class="figure">
-<a href="img/ProgressDialog.jpg"><img src="img/ProgressDialog.jpg" width="300" alt="Progress dialog"/></a><br/>
-The progress dialog displayed while ImageTracker is performing image registration.
-</span>
+<a href="img/ProgressDialog.jpg"><img src="img/ProgressDialog.jpg" alt="Progress dialog"/></a><p>The progress dialog displayed while ImageTracker is performing image registration.</p></span>
 When ImageTracker is performing an image processing task, a progress bar will appear displaying a graphical depiction of about how much of the task has completed as well as an estimate of the time remaining to completion.  A Cancel button on the progress dialog enables a user to request that a process terminate. The task may not terminate immediately after pressing the Cancel button, however; ImageTracker will wait until the next convenient point to stop the process.  A few processing tasks may ignore requests to stop all together&mdash;this may be because at the next convenient stopping point the task is nearly finished anyway.</p>
-<p>Program information will be written to the logging panel at various points during execution. This information may be useful for making sure the application is still running or troubleshooting the application if something goes wrong. You can change the levels of logging messages that appear from the menu Help--&gt;Logging. All messages at or above the selected logging level will be displayed. Info is the recommended logging level; lower levels can produce enough messages to noticably slow down the application.</p>
 
-<p class="section"><a name="loadingdata"></a>Loading Data</p>
-<p>ImageTracker operates on sets of image files, called &quot;data sources&quot;. A data source can contain files that share a common naming scheme or an arbitrary list of files.  Because each task in ImageTracker can generate a large number of image files, it is suggested that users place the image files for each data set in separate directories.  This way, files generated during image processing will not overwrite results from another experiment.</p>
+<h2><a name="images"></a>Working with Images</h2>
+
+<p>ImageTracker operates on stacks of individual image files; a set of images constitutes a video.  ImageTracker can read many types of images, including TIFF, PNG, JPG, MHA, and VTK.  There have been some problems reading some types of TIFF images, but this should be remedied as of ImageTracker v2.00.  Currently, ImageTracker does not support metamorph stacks, video files (<em>e.g.</em> AVI, WMV), or raw camera files.  Software such as <a href="http://rsbweb.nih.gov/ij/">ImageJ</a> can be used to convert images in these file formats into a format ImageTracker can read.</p>
+
+<h2><a name="loadingImages"></a>Loading Images</h2>
+
 <p><span class="figure">
-<a href="img/OpenFiles.jpg"><img src="img/OpenFiles.jpg" width="300" alt="Open file dialog"/></a><br/>
-The Edit Data Source dialog specifies which image files are in a data source.
-</span>
-Open a set of image files by selecting the menu item File--&gt;Open or clicking on the &quot;+&quot; button on the data source panel. This launches the Edit Data Source dialog in example select mode, which also opens a file browser. Select a single image file to load all images in the same directory with the same naming convention. After closing the file selection dialog, configure the data source in the Edit Data Source Dialog. Choose a name for your data source (optional) and select the pixel data type. Add or remove files from the data source using the buttons at the bottom of the file list box:</p>
+<a href="img/OpenFiles.jpg"><img src="img/OpenFiles.jpg" alt="Open file dialog"/></a><p>The Image Files control panel specifies which image files are loaded in ImageTracker.</p></span>
+ImageTracker can have one active image stack and one active vector stack loaded at a time.  (Previous version could have multiple stacks open at once, but this was a little cumbersome.)  To load an image stack, select the Images tab from the data control panel and select the Image Files item from the filter list at the top.  An Image Files control panel appears below the filter list.  Select the pixel type of the image files you will be loading.  (This is typically 8-bit or 16-bit, depending on the bit depth of your camera.  Floating point images are rare, but some of the output ImageTracker produces is of this type.)  Below the pixel type selection is a list of file names that will be loaded into ImageTracker.  Modify this file list by using one of the buttons below the list:</p>
+
 <dl>
-<dt>Example</dt><dd>Select a single image, and let ImageTracker find files with the same naming convention</dd>
-<dt>Pattern</dt><dd>Explicitly specify a directory and naming convention for a data source (advanced)</dd>
-<dt>Selection</dt><dd>Select multiple files to add to the data source&mdash;a maximum of around 1000 file names can be selected at one time</dd>
-<dt>Remove</dt><dd>Remove the files selected in the file list from the data source</dd>
+<dt>Example</dt><dd>Select a single image, and let ImageTracker find files with the same naming convention. This is the easiest way to specify a series of files.</dd>
+<dt>Selection</dt><dd>Select multiple files to add to the file list. The file names will be sorted alphabetically as they are added. A maximum of around 1000 file names can be selected at one time.</dd>
+<dt>Pattern</dt><dd>Specify a file series naming convention pattern by selecting a root directory, file prefix, number format, file extension, and numeric range. Press the Enter key as you modify each field in the pattern specification dialog to update the example name displayed below. (This option is seldom used&mdash; use it if you have a large number of files in a series, but only want to operate on a subset of that series.)</dd>
+<dt>Remove</dt><dd>Remove any selected file names from the list.</dd>
 </dl>
-<p>Currently, ImageTracker does not support metamorph stacks, video files, or raw image files. Although ImageTracker technically can read PNG, TIFF, and JPEG image files, there have been some problems reading certain types of TIFF images. This should be remedied as of version 2.00. Future releases may have support for a wider variety of image formats.</p>
-<p><span class="figure">
-<a href="img/ViewImage.jpg"><img src="img/ViewImage.jpg" width="300" alt="Image display"/></a><br/>
-ImageTracker displaying a sequence of fibrin sheet manipulation along with displacement information.
-</span>
-In the main ImageTracker window, the data source panel on the left displays which data sources are currently loaded. Images from each data source are drawn in the image display panel on the right. Images from all data sources are drawn simultaneously, so a recenlty-added data source might obscure an older data source.</p>
-<p>To change the magnification of the current image, right click on the image, and drag the mouse up or down. To move the current image, center click on the image and drag the mouse in the desired direction. To rotate an image, left click on the image and drag the mouse.</p>
-<p><span class="figure">
-<a href="img/FrameControl.jpg"><img src="img/FrameControl.jpg" width="300" alt="ImageTracker frame controls"/></a><br/>
-The data source frame control panel in ImageTracker.
-</span>
-Controls below the image display panel adjust the index of the frame that is displayed. Move the slider to quickly scan through the loaded data source. To jump to a specific frame, enter the frame index in the text box. A set of buttons to the right of the slider enables playing, rewinding, pausing, single frame advance and rewind, and skipping to either end of the image sequence. The frame index range is based on the length of the largest loaded data source. If two data sources of different sizes are loaded, the image from the smaller data source will no longer update once the frame index exceeds the size of that data source.</p>
-<p>In ImageTracker, image processing tasks are performed on the data source that is selected in the ImageTracker main window. If no data source is selected, ImageTracker will assume that the first data source in the list should be used.</p>
 
-<p class="section"><a name="savingdata"></a>Saving Data</p>
+When the list of file names is complete, click the Apply button to load the named files into ImageTracker. The first image in the list will be displayed in the image panel.  The Apply button should be pressed whenever any changes are made to the Image File control panel to have those changes reflected in ImageTracker.
+
+<h3><a name="loadingVectors"></a>Loading Vectors</h3>
+
+<p>A <em>vector image</em> is an image in which every pixel contains vector information instead of intensity information.  For example, the output of an optical flow computation, discussed elsewhere in this guide, is a vector image that explains the motion of intensities between images.</p>
+
+<p>Vector data is loaded in a similar way to image data.  Click on the Vectors tab of the data control panel to bring up the vector file control panel.  A list of vector image files can be modified in the same way as the list of image files on the Images tab.  The visualization control panel below the vector file list provides options for how to display the vector image data.</p>
+
+<h3><a name="vectorVisualization"></a>Vector Visualization</h3>
+
+<p>Vector images can be displayed with two different visualizations: Glyph and Height Map.  The Method combo box in the vector visualization control panel selects between these two options.  Controls below this combo box enable modifying aspects of the visualization.</p>
+
+<p><em>Note:</em> if the controls for the current visualization are not visible (this sometimes happens when the vector images are automatically loaded as the result of a processing task), press the Apply button below the vector image list.  This should update the control panel.</p>
+
+<p><span class="figure">
+<a href="img/GlyphVisualization.jpg"><img src="img/GlyphVisualization.jpg" alt="Image display"/></a><p>ImageTracker's vector glyph visualization.</p></span>
+The Glyph visualization displays regularly-spaced vector glyphs across a vector field. Each glyph is scaled according to the vector magnitude and oriented according to the vector direction. The vector visualization control enables rescaling glyphs&mdash;setting the scaling to 1.0 will match the glyph lengths to the underlying vector magnitudes. Drawing a glyph at every pixel location would clutter the visualization. The Mask Ratio slider adjusts the spacing between adjacent glyphs. Some spacings produce distracting patterns of glyph placement. Generally, adjusting the Mask Ratio up or down by a few values will correct this.</p>
+
+<p><span class="figure">
+<a href="img/HeightMapVisualization.jpg"><img src="img/HeightMapVisualization.jpg" alt="Image display"/></a><p>ImageTracker's vector height map visualization.</p></span>
+Height map visualization maps the magnitude of the vector image to the height of a surface.  It may be helpful to rotate the image plane to better view the surface when using this visualization.  The Color Map combo box controls the colormap used to paint the surface.  The Scale Factor slider controls the scaling of the surface.  The Magnitude Function combo box selects between height mapping the vector magnitude or a single vector component.</p>
+
+<h3><a name="imageControls"></a>Image Controls</h3>
+
+<p><span class="figure">
+<a href="img/ViewImage.jpg"><img src="img/ViewImage.jpg" alt="Image display"/></a><p>ImageTracker displaying an image sequence of fibrin sheet manipulation.</p></span>
+In the main ImageTracker window, the data control panel on the left displays which image files are currently loaded.  Images are drawn in the image display panel on the right.</p>
+
+<p>To change the magnification of the current image, right click on the image, and drag the mouse up or down. To move the current image, center click on the image and drag the mouse in the desired direction. To rotate an image, left click on the image and drag the mouse.</p>
+
+<p><span class="figure">
+<a href="img/WindowContrast.jpg"><img src="img/WindowContrast.jpg" alt="Image display"/></a><p>The Window/Contrast dialog controls display properties of images in ImageTracker.</p></span>
+The display properties of the image display panel can be adjusted by selecting View&mdash;&gt;Window/Contrast from the ImageTracker menu.  This dialog controls <em>only the display</em> of images, not the actual intensity values.  The Maximum and Minimum sliders change the intensity values displayed in the image panel.  The Range combo box controls the range of values displayed on the intensity sliders.  The Auto button automatically adjusts the maximum and minimum display values to the maximum and minimum intensity values in the currently displayed image.  You may need to adjust the display contrast when switching between different types of images (<em>e.g.</em> changing from 8-bit to 16-bit images).</p>
+
+<p>Image size and intensity statistics for the currently displayed image can be shown by selecting View&mdash;&gt;Image Info from the menu.  This will display the Logger window with the most recent message containing the image information.  Note that a log level of Info or lower needs to be selected in order for the image information to be displayed.</p>
+
+<p><span class="figure">
+<a href="img/FrameControl.jpg"><img src="img/FrameControl.jpg" alt="ImageTracker frame controls"/></a><p>The image frame control in ImageTracker.</p></span>
+Controls below the image display panel adjust the index of the frame that is displayed. Move the slider to scan through the loaded images. To jump to a specific frame, enter the frame index in the text box and press Enter. A set of buttons to the right of the slider enables playing, rewinding, pausing, single frame advance and rewind, and skipping to either end of the image sequence.</p>
+
+<p>Images and vector visualizations are displayed simultaneously.  The frame index range is based on the larger of the number of loaded images and loaded vectors.  If the two sequences are of different sizes, the visualization from the shorter sequence will no longer update once the frame index exceeds the length of that sequence.</p>
+
+<h3><a name="savingVisualizations"></a>Saving Visualizations</h3>
+
+<p>To save a visualization displayed by ImageTracker, select File&mdash;&gt;Save View Images. This will bring up a dialog that enables selecting an output directory, file naming convention, and the range of frames to save.</p>
+
+<p><span class="warning">Warning: Do not let any other window obscure the ImageTracker image display panel and do not minimize ImageTracker when saving visualizations.</span>  Doing so <em>will corrupt</em> the saved images. The frame index slider provides progress information and a message will be displayed when ImageTracker has finished saving the visualizations.</p>
+
+<p><span class="warning">Warning:</span> If you save a set of visualizations, then resize the image display panel, and then try to save another set of visualizations, ImageTracker will crash.  The VTK class responsible for capturing images from the image display panel does not handle this gracefully.</p>
+
+<h2><a name="filters"></a>Filters</h2>
+
+<p>ImageTracker has two main image manipulation modes: filtering and processing.  <em>Filtering</em> applies an operation on images as they are displayed in the ImageTracker image panel, and results are visible instantly.  (This is similar to filtering in other imaging applications such as ImageJ or Gimp.)  <em>Processing</em> typically involves more complex computations that create a new set of output images; those new images must be loaded into ImageTracker to see the results of a processing task.</p>
+
+<p>Filtering is often used to prepare an image set for processing.  The list at the top of the Images tab in the control panel contains the names of all filters that are being actively applied.  The Image Files filter is a special filter that is always present and can be used to load image files as shown above.  Other filters can be added to the list by selecting them from the Filters menu.  Filters are chained and applied in the order that they appear in this list.  Selecting any filter in the filter list displays that filter's configuration panel below the filter list.  Changes to filter parameters are visible instantly in the image window.</p>
+
+<p>The Remove button at the bottom of the filter list removes the currently selected filter from the filter list.  The Clear button resets the filter list to its initial state with no filters or image files loaded.</p>
+
+<h3><a name="threshold"></a>Threshold Filter</h3>
+<p><span class="figure">
+<a href="img/Threshold.jpg"><img src="img/Threshold.jpg" alt="Threshold filter"/></a><p>The Threshold filter limits the range of intensities present in an image.</p></span>
+The threshold filter sets any pixels from an input image that lie outside an intensity range to zero (black).  The threshold control panel has the following controls:</p>
+
+<dl>
+<dt>Upper and Lower Bound</dt><dd>Sliders that adjust the range of pixel intensities that pass through the threshold filter.</dd>
+<dt>Range</dt><dd>Controls the range of pixel intensities displayed on the threshold bound sliders.  There are presets for 8-bit and 16-bit images, and an option for setting the slider range to match the intensities of the current input image.</dd>
+</dl>
+
+<h3><a name="gaussian"></a>Gaussian Filter</h3>
+<p><span class="figure">
+<a href="img/GaussianFilter.jpg"><img src="img/GaussianFilter.jpg" alt="Gaussian filter"/></a><p>The Gaussian filter applies smoothing to an image.</p></span>
+The Gaussian filter convolves an input image with a Gaussian kernel.  Convolution with a zero-order Gaussian smooths (blurs) the image.  The scale (standard deviation) of the Gaussian filter determines the degree of smoothing applied.  Convolution with a first-order Gaussian along one dimension computes the derivative of the image along that dimension at the scale of the Gaussian.  The Gaussian filter control panel has the following controls:</p>
+
+<dl>
+<dt>X- and Y-direction Scale</dt><dd>Sliders that select the Gaussian kernel scale along the x and y dimension of the input image.  The scale determines the standard deviation of the Gaussian kernel in pixel units.</dd>
+<dt>X- and Y-direction Order</dt><dd>Controls the order of the Gaussian filter applied along each dimension.</dd>
+</dl>
+
+<h2><a name="savingdata"></a>Saving Data</h2>
 <p><span class="figure">
 <a href="img/OutputControlPanel.jpg"><img src="img/OutputControlPanel.jpg" width="300" alt="Output control panel"/></a><br/>
 This control panel is common to all ImageTracker processing tasks that output images.
@@ -120,23 +210,13 @@ Whenever ImageTracker needs to save image data, a dialog box will prompt for out
 </dl>
 </p>
 
-<p class="section"><a name="visualization"></a>Visualization</p>
+<h2><a name="visualization"></a>Visualization</h2>
 <p>ImageTracker provides different data source visualizations based on the type of data loaded. Selecting a data source will display appropriate visualization controls in the panel below the data source panel. For all visualization controls, a check box turns on and off the visibility of the currently selected data source.</p>
 
-<p><span class="figure">
-<a href="img/ScalarImageControl.jpg"><img src="img/ScalarImageControl.jpg" width="300" alt="Scalar image control"/></a><br/>
-The visualization control for scalar-pixeled images.
-</span>For images with scalar-valued pixels, the visualization control enables contrast adjustment by specifying the intensity range to use in the image display window. The Range select box sets the intensity range of the Maximum and Minimum sliders; selecting "From Image" will set the slider ranges to match the intensity values found in the currently displayed image.</p>
-
-<p><span class="figure">
-<a href="img/VectorGlyphControl.jpg"><img src="img/VectorGlyphControl.jpg" width="300" alt="Vector glyph control"/></a><br/>
-The visualization control for vector-pixeled images.
-</span>Images with vector-valued pixels (e.g. flow or displacement) are visualized with regularly-spaced vector glyphs. Each glyph is scaled according to the vector magnitude and oriented according to the vector direction. The vector visualization control enables rescaling glyphs&mdash;setting the scaling to 1.0 will match the glyph lengths to the underlying vector magnitudes. Drawing a glyph at every vector would clutter the visualization. The Mask Ratio slider adjusts the spacing between adjacent glyphs. Some spacings produce distracting patterns of glyph placement. Generally, adjusting the Mask Ratio up or down by a few values will correct this.</p>
-
-<p class="section"><a name="stabilization"></a>Stabilization</p>
+<h2><a name="stabilization"></a>Stabilization</h2>
 <p>ImageTracker can stabilize video sequences with respect to certain types of motion through image alignment or registration. In this process an object of interest is identified by the user. ImageTracker will attempt to align all images in the sequence such that this object of interest appears in the same location across all frames. In this context, <em>alignment</em>, <em>registration</em>, and <em>stabilization</em> are all terms that describe the same process.</p>
 
-<p class="subsection"><a name="multires"></a>Multiple Resolution Registration</p>
+<h3><a name="multires"></a>Multiple Resolution Registration</h3>
 <p><span class="figure">
 <a href="img/ImagePyramid.jpg"><img src="img/ImagePyramid.jpg" width="300" alt="Image pyramid"/></a><br/>
 A six level image pyramid.
@@ -145,14 +225,14 @@ Multiple resolution registration aligns images iteratively using a series of coa
 <p>Each lower resolution level of the image pyramid is generated by smoothing and rescaling the preceding image to half its width and height.</p>
 <p>Lauch the Multi-Resolution Registration dialog by selecting Enhance-&gt;Stabilize from the ImageTracker menu. The alignment dialog consists of several sections:  <em>thresholding</em>, <em>smoothing</em>, <em>optimization</em>, and <em>output</em>. Thresholding and Smoothing alter input images so that alignment is easier to perform. An altered sample image (the first in the data source) appears in ImageTracker's image display window.</p>
 
-<p class="subsubsection">Thresholding</p>
+<h3>Thresholding</h3>
 <p><span class="figure">
 <a href="img/Threshold.jpg"><img src="img/Threshold.jpg" width="300" alt="Intensity thresholding"/></a><br/>
 Thresholding an image controls what intensity ranges are considered during alignment. This image has been propery thresholded to select only the center part of the mitotic spindle.
 </span>
 Thresholding selects a range of pixel intensity values to use for registration. In many images, an object of interest will be of a certain intensity, and background objects will be of a different intensity. Selecting an appropriate threshold range enables the registration process to operate only on the object(s) of interest. Select upper and lower bounds for the threshold using the Upper and Lower Bound sliders.  Use the Range choice box to select an appropriate range for the sliders: 8-bit uses values 0&ndash;255, 16-bit uses values 0&ndash;65535, and From Image uses the minimum and maximum intensity values from the sample image.</p>
 
-<p class="subsubsection">Image Pyramid</p>
+<h3>Image Pyramid</h3>
 <p><span class="figure">
 <a href="img/MultiResRegistration.jpg"><img src="img/MultiResRegistration.jpg" width="300" alt="Multi-res registration"/></a><br/>
 Multiple resolution registration in action.
@@ -160,7 +240,7 @@ Multiple resolution registration in action.
 The image pyramids used in the multiple resolution registration method are generated using a maximum and minimum smoothing factor.  Adjust the Maximum and Minimum Smoothing sliders to change these parameters.  ImageTracker will automatically choose appropriate intermediate image pyramid resolutions. The smoothing factors specify the scaling to apply to an image; e.g. a factor of 2 shrinks an image by half its width and height; a factor of 8 creates an image 1/8 th the size of the original in each dimension. Note that changing the smoothing factor changes the smoothing applied to the preview image, but does not change the size of the preview image. During registration, the images are rescaled appropriately.</p>
 <p>The goal in adjusting the smoothing factors is to smooth enough of the &quot;uninteresting&quot; parts of the target object such that a good stabilization can easily be found. Adjust the maximum smoothing to completely blur all the details away from the preview image. Adjust the minimum smoothing to blur any noise present in the image as well as any small-scale features that are not of interest in the image alignment. It is best to exclude from registration scales at which noise will contribute significantly to the registration.</p>
 
-<p class="subsubsection">Optimizer</p>
+<h3>Optimizer</h3>
 <p>The optimizer parameters provide a fine level of control to the optimization module embedded in the registration. The defaults provided may work well in many situations, but if registrations do not provide the expected alignments, it may be useful to adjust some of these parameters.</p>
 <dl>
 <dt>Iterations</dt>
@@ -173,7 +253,7 @@ The image pyramids used in the multiple resolution registration method are gener
 <dd>Specifies the number by which the minimum step length is divided at each level of the multiple resolution pyramid.  This increases the precision of the attempted transform parameters at each level of the pyramid. </dd>
 </dl>
 
-<p class="subsubsection">Output</p>
+<h3>Output</h3>
 <p><span class="figure">
 <a href="img/PostRegistration.jpg"><img src="img/PostRegistration.jpg" width="300" alt="Post registration"/></a><br/>
 Viewing the results of a registration. Note that the absolute black regions of the image were outside the view of the original image frame.
@@ -181,11 +261,11 @@ Viewing the results of a registration. Note that the absolute black regions of t
 The output from image stabilization is a list of image transformations that describe how to align images in the sequence. In the output section of the multi-resolution registration dialog, specify the directory and file pattern to use for the transformed images and the text file that will contain a description of the computed transforms. If &quot;Open output when finished&quot; is checked, ImageTracker will create a new data source containing the transformed images and open it when the alignment process completes.</p>
 <p><span class="warning">Please note</span>:</p>
 <ul>
-<li>ImageTracker saves images in 16 bit grayscale format. 16 bit images may appear completely dark in image viewers that only handle 8 bit images. ImageTracker, of course, is a 16 bit image viewer.</li>
+<li>ImageTracker saves images in 16 bit grayscale format. 16 bit images may appear completely dark in image viewers that only handle 8 bit images. ImageTracker, of course, is a 16 bit image viewer, and can be used to view the images it outputs.</li>
 <li>ImageTracker adds black pixels to transformed images where there is no original image data. Because ImageTracker also rescales images to maximize contrast when displaying images, it may appear that the image intensity has shifted in transformed images.</li>
 </ul>
 
-<p class="section"><a name="transforms"></a>Transforms</p>
+<h2><a name="transforms"></a>Transforms</h2>
 <p>Often more than one image sequence is captured during an experiment. In some situations it may be easier to compute registration transforms from one series of images and apply them to another. For example, with separate fluorescent labeling of a mitotic spindle and kinetechores, the spindle image channel contains enough information to obtain a good alignment while the kinetechore channel does not.</p>
 <p><span class="figure">
 <a href="img/ApplyTransform.jpg"><img src="img/ApplyTransform.jpg" width="300" alt="Applying transform"/></a><br/>
@@ -193,7 +273,7 @@ Applying a set of transforms from a previous alignment to a new data source.
 </span>
 Select Enhance-&gt;Apply Transform to show the Apply Transform dialog. Specify the text file that contains the transform information from the previous alignment operation and choose a directory and prefix for the resulting images. If &quot;Open output when finished&quot; is checked, ImageTracker will create and open a new data source containing the results of the transformation.</p>
 
-<p class="section"><a name="occlusions"></a>Removing Occlusions</p>
+<h2><a name="occlusions"></a>Removing Occlusions</h2>
 <p><span class="figure">
 <a href="img/RemoveOcclusions.jpg"><img src="img/RemoveOcclusions.jpg" width="300" alt="Removing occlusions"/></a><br/>
 Removing fixed partial occlusions from a video of beating cilia.<br/><br/>
@@ -217,14 +297,14 @@ A lot of factors can contribute to microscopy images that are not optically opti
 <dd>If this box is checked, ImageTracker will create an open a new data source containing the output images.</dd>
 </dl>
 
-<p class="section"><a name="flow"></a>Flow Computation</p>
+<h2><a name="flow"></a>Flow Computation</h2>
 <p>ImageTracker provides methods to determine the image flow from an image sequence. Optical flow is an estimation of real-world motion projected onto the image plane. In the case of 2D motion where the image plane is parallel to the motion plane, optical flow is a good estimate of real-world motion. This scenario is common in microscopy.</p>
 <p>Flow computation results in a vector image in which each pixel vector represents the computed velocity in the image's x and y directions. Visualization of these images is described in a later section.</p>
 <p><span class="warning">Please note</span>:</p>
 <p>In ImageTracker v 2.03, the feature tracking optical flow methods have been removed. This is because they were found to be slow and not terribly useful. A future version of ImageTracker may again include feature tracking when these algorithms have been refined.</p>
 <p>To access optical flow computation, select Compute-&gt;CLG Optic Flow from the ImageTracker menu.</p>
 
-<p class="subsection"><a name="clg"></a>CLG Optical Flow</p>
+<h3><a name="clg"></a>CLG Optical Flow</h3>
 <p>The Combined Local Global (CLG) method of optical flow computation is described in:</p>
 <p><em>Bruhn, Andres, Joachim Weickert, and Christoph Schnorr. Lucas/Kanade meets Horn/Schunck: Combining local and global optic flow methods. International Journal of Computer Vision, 61(3), 211-231, 2005.</em></p>
 <p><span class="figure">
@@ -249,7 +329,7 @@ The implementation provided in ImageTracker is the single-resolution, simple tem
 </dl>
 <p>Click the Run button to start the optic flow computation. ImageTracker's implementation of the algorithm is notoriously slow to run; The progress bar will provide an estimate of how long the process will take after computing the flow for the first image pair.</p>
 
-<p class="subsection"><a name="horn"></a>Horn &amp; Schunck Optical Flow</p>
+<h3><a name="horn"></a>Horn &amp; Schunck Optical Flow</h3>
 <p>The Horn and Schunck optical flow algorithm computes flow using only the global term from the Combined Local Global method described above.  The dialog box and options are very similar.</p>
 <dl>
 <dt>Spatial Smoothing</dt>
@@ -264,11 +344,11 @@ The implementation provided in ImageTracker is the single-resolution, simple tem
 <dd>This option is disabled until flow visualization is included in ImageTracker.  See the section on <a href="#visualization">visualization</a> to find out how to view the output in ParaView.</dd>
 </dl>
 
-<p class="section"><a name="integration"></a>Flow Integration</p>
+<h2><a name="integration"></a>Flow Integration</h2>
 <p><span class="figure">
 <a href="img/IntegrateFlowDialog.jpg"><img src="img/IntegrateFlowDialog.jpg" width="300" alt="Integrate flow dialog"/></a><br/>
 The ImageTracker flow integration dialog.
-</span>The optical flow methods described above compute displacement from one frame to the next&mdash;this is velocity over the time between frames. Integrating a series of flow fields yeilds net displacement. ImageTracker provides flow integration through Compute--&gt;Integrate Flow.</p>
+</span>The optical flow methods described above compute displacement from one frame to the next&mdash;this is velocity over the time between frames. Integrating a series of flow fields yeilds net displacement. ImageTracker provides flow integration through Compute&mdash;&gt;Integrate Flow.</p>
 <dl>
 <dt>Step size</dt>
 <dd>Specifies the step size (in frames) of the Runge-Kutta 4th order integration. The integration process saves results at the nearest whole step size, to match the spacing of input flow data. So, with a step size of 0.1 frames, displacement images will be saved every 10 steps.</dd>
@@ -276,48 +356,48 @@ The ImageTracker flow integration dialog.
 <dd>The common output options are available.</dd>
 </dl>
 
-<p class="section"><a name="saveView"></a>Saving View Images</p>
+<h2><a name="saveView"></a>Saving View Images</h2>
 <p><span class="figure">
 <a href="img/SaveVisualizationsDialog.jpg"><img src="img/SaveVisualizationsDialog.jpg" width="300" alt="Save visualizations dialog" /></a><br/>
 Saving a visualization sequence in ImageTracker.
-</span>The visualization from any sequence of images can be saved by selecting File--&gt;Save View Images. The dialog prompts for the directory in which to save the files and a file pattern to use to generate file names. The default directory is the current directory, from which data sources were most recently loaded. Most of the file pattern is automatic; specify a prefix, and files with the pattern MyPrefix-0000.tif will be generated. Below the file pattern, one can select whether to save a visualization for all possible frames, frames within a range, or just the currently displayed frame.</p>
+</span>The visualization from any sequence of images can be saved by selecting File&mdash;&gt;Save View Images. The dialog prompts for the directory in which to save the files and a file pattern to use to generate file names. The default directory is the current directory, from which data sources were most recently loaded. Most of the file pattern is automatic; specify a prefix, and files with the pattern MyPrefix-0000.tif will be generated. Below the file pattern, one can select whether to save a visualization for all possible frames, frames within a range, or just the currently displayed frame.</p>
 <p>There also appears a very important warning in the dialog, which is repeated here: <span class="warning">Do not let any other window obscure the ImageTracker render window and do not minimize ImageTracker when saving visualizations. Doing so will probably corrupt the saved images.</span></p>
 <p>Clicking run will start the save process. ImageTracker will play through all specified frames to generate the visualizations; the frame index slider will follow the progress of the visualization generation. (No progress dialog will be provided, as displaying one could violate the warning above.)</p>
 
-<p class="section"><a name="visParaView"></a>Visualization with ParaView</p>
+<h2><a name="visParaView"></a>Visualization with ParaView</h2>
 <p>ImageTracker provides visualization for computed flow fields (as of version 2.06). <a href="http://www.paraview.org/HTML/Index.html" target="_blank">ParaView</a>, a free application from <a href="http://www.kitware.com/" target="_blank">Kitware</a>, provides a more flexible visualization application that may be useful when ImageTracker's visualizations are not sufficient. Follow the instructions from Kitware on how to install and run ParaView. The following  will help you create a visualization of flow fields with ParaView 2.6.2.</p>
-<p>Select File--&gt;Open Data from the ParaView menu. Navigate to and select the flow field file(s) created by ImageTracker (.mha extension). The default visualization for vector image data is a scalar field of vector magnitude intensities. We will create arrow glyphs that will represent the magnitude and direction of the flow field.</p>
+<p>Select File&mdash;&gt;Open Data from the ParaView menu. Navigate to and select the flow field file(s) created by ImageTracker (.mha extension). The default visualization for vector image data is a scalar field of vector magnitude intensities. We will create arrow glyphs that will represent the magnitude and direction of the flow field.</p>
 <p>Becaues of a disconnect between image and data origin conventions, flow fields computed in ImageTracker are flipped in ParaView. To correct this, choose Filter-&gt;Reflection from the ParaView menu. Configure the reflection filter as follows: Plane = Y; Copy Input off. After clicking accept, the flow field image will flip. Click the Reset View button on the tool bar (<img src="img/ResetViewButton.jpg" alt="Reset view button"/>) to recenter the data within the view.  If the "Reset center of rotation" option on this toolbar button is enabled, the center of rotation will also be reset.</p>
-<p>Click on the Calculator icon on the ParaView tool bar, or select Filter--&gt;Calculator from the menu. Use the buttons on the calculator parameters tab to create the following expression:</p>
+<p>Click on the Calculator icon on the ParaView tool bar, or select Filter&mdash;&gt;Calculator from the menu. Use the buttons on the calculator parameters tab to create the following expression:</p>
 <p><code>iHat*ImageFile_0-jHat*ImageFile_1</code></p>
 <p>The ImageFile_x expressions are available under the scalars dropdown box. This expression computes a vector in ParaView from the scalar components stored in the image file. (Note that the negative sign in front of the y-axis expression is due to the flipped flow field.) Once the expression is entered, press the Accept button.</p>
-<p>Select Filter--&gt;Glyph from the menu. ParaView will automatically select a vector scale factor appropriate to make the glyphs visible. Press the Accept button. </p>
+<p>Select Filter&mdash;&gt;Glyph from the menu. ParaView will automatically select a vector scale factor appropriate to make the glyphs visible. Press the Accept button. </p>
 <p>The default colormap in ParaView is a blue-to-red rainbow color scale. To change this, select the Display tab from the Glyph property control, and then press the Edit Color Map button. Click on the preset colormap button (beneath the lock icon), and select either Greyscale or CIELab Blue to Red. These colormaps may be easier to use to interpret vector data. </p>
 <p><span class="figure">
 <a href="img/ParaViewMucus.jpg"><img src="img/ParaViewMucus.jpg" width="300" alt="Vector fields"/></a><br/>
 Visualizing vector flow fields using ParaView.
 </span>
-It may be helpful to view the original image data along with the vector flow fields. To do this, turn off the visualization of the Calculator filter (the arrow glyphs should remain). Select File--&gt;Open Data from the menu, and select the original image file(s).  Adjust the translation on the image data's display tab to align the image with the flow field.  Note that Paraview does not support TIFF images, so you may have to convert files to a supported format, such as PNG. You may also want to adjust the maximum number of glyphs to display, or their scale factor. The image at the right shows a visualization of fibrin sheet deformation using the steps thus far.</p>
+It may be helpful to view the original image data along with the vector flow fields. To do this, turn off the visualization of the Calculator filter (the arrow glyphs should remain). Select File&mdash;&gt;Open Data from the menu, and select the original image file(s).  Adjust the translation on the image data's display tab to align the image with the flow field.  Note that Paraview does not support TIFF images, so you may have to convert files to a supported format, such as PNG. You may also want to adjust the maximum number of glyphs to display, or their scale factor. The image at the right shows a visualization of fibrin sheet deformation using the steps thus far.</p>
 <p>ParaView automatically detects other files that are part of the same file sequence. On the image file Parameter panel, use the Timestemps button to control the files that are part of a sequence and the Timestep slider to select the frame currently visible. The keyframe animation feature of ParaView can be used to create flow field animations.</p>
 
-<p class="subsection"><a name="sparse"></a>Sparse Fields</p>
+<h2><a name="sparse"></a>Sparse Fields</h2>
 <p><span class="warning">Note:</span> Sparse fields are not part of ImageTracker at this time because feature tracking is not convincingly implemented.</p>
 <p><span class="figure">
 <a href="img/ParaViewSparseIce.jpg"><img src="img/ParaViewSparseIce.jpg" width="300" alt="Sparse vector field"/></a><br/>
 Sparse flow field generated by feature tracking.
 </span>
 The method described above works well for dense flow fields, such as those created using the CLG Optical Flow method. Sparse fields, such as those created by Feature Tracking, may not contain enough data to effectively represent the image motion without displaying a very large number of vector glyphs. An alternative is to crop the flow field data to restrict the region of interest.</p>
-<p>Select the input vector image source from the Selection Window, and select Filter--&gt;Crop from the  menu. Adjust the exten to crop using the Parameters tab. Click the Accept button when the crop region corresponds with the desired region of interest.</p>
+<p>Select the input vector image source from the Selection Window, and select Filter&mdash;&gt;Crop from the  menu. Adjust the exten to crop using the Parameters tab. Click the Accept button when the crop region corresponds with the desired region of interest.</p>
 <p><span class="figure">
 <a href="img/ParaViewCropIce.jpg"><img src="img/ParaViewCropIce.jpg" width="300" alt="Cropped sparse vector field"/></a><br/>
 Region of interest selection using a Crop filter.
 </span>
 Select the Calculator filter object, and change its input to ImageClip1. This will change the region over which vector data is calculated and displayed. You may wish to adjust the glyph filter's parameters to increase the number of glyphs displayed or change the scaling factor. The image at the right show the results of cropping the sparse fields generated by feature tracking.</p>
 
-<p class="section"><a name="versionhistory"></a>Version History</p>
+<h2><a name="versionhistory"></a>Version History</h2>
 <p>The sections below outline the changes made to ImageTracker at each revision.</p>
 
-<p class="subsection"><a name="v2.07"></a>Version 2.07</p>
+<h3><a name="v2.07"></a>Version 2.07</h3>
 <p>Features</p>
 <ul>
 <li>Data source selection based on matching single file naming convention</li>
@@ -329,7 +409,7 @@ Select the Calculator filter object, and change its input to ImageClip1. This wi
 <li>The installer does not seem to work on some Windows machines</li>
 </ul>
 
-<p class="subsection"><a name="v2.06"></a>Version 2.06</p>
+<h3><a name="v2.06"></a>Version 2.06</h3>
 <p>Features</p>
 <ul>
 <li>Vector image visualization</li>
@@ -348,7 +428,7 @@ Select the Calculator filter object, and change its input to ImageClip1. This wi
 <li>There is no check that a processing task can be performed on a selected data source; this can lead to a crash for mismatched data sources and processes.</li>
 </ul>
 
-<p class="subsection"><a name="v2.05"></a>Version 2.05</p>
+<h3><a name="v2.05"></a>Version 2.05</h3>
 <p>Features</p>
 <ul>
 <li>Significant usability improvements and bug fixes</li>
@@ -366,13 +446,13 @@ Select the Calculator filter object, and change its input to ImageClip1. This wi
 <li>The upper threshold slider is set improperly on the multiple-resolution registration dialog box; the application code really, really, tries to set this&mdash;the same style code works for setting up the range on 16-bit images. (fixed: v2.06)</li>
 </ul>
 
-<p class="subsection"><a name="v2.04"></a>Version 2.04</p>
+<h3><a name="v2.04"></a>Version 2.04</h3>
 <p>Features</p>
 <ul>
 <li>Minor bug fixes, including file naming and a correction of the sign of computed flow fields</li>
 </ul>
 
-<p class="subsection"><a name="v2.03"></a>Version 2.03</p>
+<h3><a name="v2.03"></a>Version 2.03</h3>
 <p>Features</p>
 <ul>
 <li>Remove fixed partial occlusions from brigt-field microscopy videos</li>
@@ -393,7 +473,7 @@ Select the Calculator filter object, and change its input to ImageClip1. This wi
 <li>If the ImageTracker main window split panes (which separate the logging and data source panels from the image panel) are collapsed, there is no way to recover the hidden panels.</li>
 </ul>
 
-<p class="subsection"><a name="v2.02"></a>Version 2.02</p>
+<h3><a name="v2.02"></a>Version 2.02</h3>
 <p>Features</p>
 <ul>
 <li>A multiple resolution registration method that provides  faster, more robust, and more flexible image alignment</li>
@@ -401,7 +481,7 @@ Select the Calculator filter object, and change its input to ImageClip1. This wi
 <li>Adjustable logging message level in help menu</li>
 </ul>
 
-<p class="subsection"><a name="v2.01"></a>Version 2.01</p>
+<h3><a name="v2.01"></a>Version 2.01</h3>
 <p>Features</p>
 <ul>
 <li>A  new main application window combines an image file list, image window, and logging window all in one</li>
@@ -415,7 +495,7 @@ Select the Calculator filter object, and change its input to ImageClip1. This wi
 <li>ParaView will not read some flow fields generated by ImageTracker; this seems very random, as changing a parameter slightly may generate a readable flow field.</li>
 </ul>
 
-<p class="subsection"><a name="v2.00"></a>Version 2.00</p>
+<h3><a name="v2.00"></a>Version 2.00</h3>
 <p>Features</p>
 <ul>
 <li>Feature-based tracking</li>
@@ -430,7 +510,7 @@ Select the Calculator filter object, and change its input to ImageClip1. This wi
 <li>Reloading the Feature Tracker dialog does not reflect changes to the current images list (fixed: v2.01).</li>
 </ul>
 
-<p class="subsection"><a name="v1.00"></a>Version 1.00</p>
+<h3><a name="v1.00"></a>Version 1.00</h3>
 <p>Features</p>
 <ul>
 <li>Loading and viewing images sequences</li>
@@ -457,10 +537,10 @@ Experiments in Fluids, Vol. 25, pp. 177-189, 1998.</p>
 <div id="footer">
 <p>ImageTracker<br/>
 by Brian Eastwood</p>
-<div class="validation">
+<p class="validation">
 <a href="http://validator.w3.org/check/referer">xhtml</a> | 
 <a href="http://jigsaw.w3.org/css-validator/check/referer">css</a>
-</div>
+</p>
 </div> <!-- end footer -->
 
 </body>
