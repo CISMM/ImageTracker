@@ -9,8 +9,6 @@ LogStream Logger::info(Info,        "INFO:     ");
 LogStream Logger::debug(Debug,      "DEBUG:    ");
 LogStream Logger::verbose(Verbose,  "VERBOSE:  ");
 
-StreamRedirector* Logger::redirector = NULL;
-
 Mutex ToggleLogStream::mutex;
 ToggleLogStream LogStream::toggleStream(true);
 
@@ -22,36 +20,34 @@ void Logger::logDebug(const std::string msg)    { Logger::debug     << msg << st
 void Logger::logVerbose(const std::string msg)  { Logger::verbose   << msg << std::endl; }
 
 Logger::Logger()
-{
-}
+{}
 
 Logger::~Logger()
+{}
+
+void Logger::SetStream(std::ostream& stream)
 {
-    if (Logger::redirector)
-        delete Logger::redirector;
+    // Setting the stream on one LogStream changes all LogStreams.
+    Logger::error.GetToggleLogStream().SetStream(stream);
 }
 
-void Logger::redirect(std::ostream& target)
+//--- ToggleLogStream ---//
+
+ToggleLogStream::ToggleLogStream(bool enable, std::ostream& stream)
+    : enabled(enable)
 {
-    if (!Logger::redirector)
-        Logger::redirector = new StreamRedirector(std::cout, target);
-    else
-        Logger::redirector->setTarget(target);
+    this->stream = &stream;
 }
 
-void Logger::undirect()
-{
-    if (Logger::redirector)
-        delete Logger::redirector;
-    Logger::redirector = NULL;
-}
+ToggleLogStream::~ToggleLogStream()
+{}
 
 ToggleLogStream& ToggleLogStream::operator<<(std::ostream& (*op)(std::ostream&))
 {
     if (this->enabled)
     {
         MutexLocker lock(this->mutex);
-        (*op)(std::cout);
+        (*op)(*this->stream);
     }
     return *this;
 }
@@ -65,5 +61,31 @@ void ToggleLogStream::Disable()
 void ToggleLogStream::SetEnabled(bool enable)
 { this->enabled = enable; }
 
-bool ToggleLogStream::GetEnabled()
+bool ToggleLogStream::IsEnabled()
 { return this->enabled; }
+
+void ToggleLogStream::SetStream(std::ostream& stream)
+{
+    this->stream = &stream;
+}
+
+//--- LogStream ---//
+
+LogStream::LogStream(LogLevel level, std::string msg) 
+    : level(level),
+      message(msg)
+{}
+                
+LogStream::~LogStream() 
+{}
+
+ToggleLogStream& LogStream::operator<<(std::ostream& (*op)(std::ostream&))
+{
+    toggleStream.SetEnabled(this->level <= Logger::getLevel());
+    return (toggleStream << this->message << (*op));
+}
+
+ToggleLogStream& LogStream::GetToggleLogStream()
+{
+    return LogStream::toggleStream;
+}

@@ -18,11 +18,11 @@ enum LogLevel {
 
 // Forward delcaration of LogStream
 class LogStream;
-class StreamRedirector;
 
 /**
  * \class Logger
  * \brief A multi-level, streaming logger.
+ * 
  * Logger provides access to the logging system. It enables writing
  * application messages of varying levels to output streams. The general
  * format for messaging follows std c++ streaming:
@@ -51,38 +51,27 @@ public:
     static void logInfo(const std::string msg);
     static void logDebug(const std::string msg);
     static void logVerbose(const std::string msg);
-
-    /*
-     * Redirect logger output.  Users must call undirect() before
-     * the target ostream is destroyed.
-     */
-    static void redirect(std::ostream& target);
-
-    /*
-     * Stop redirection of output.
-     */
-    static void undirect();
+    
+    static void SetStream(std::ostream& stream);
 
 protected:
     Logger();
     virtual ~Logger();
-
-    static StreamRedirector* redirector;
 };
 
 /**
  * \class ToggleLogStream
  * \brief A LogStream that can be toggled on and off.
- * A logging stream class that can be turned on and off (enabled or disabled).
- * ToggleLogStream is thread-safe.
+ * 
+ * A logging class that can be turned on and off (enabled or disabled).
+ * ToggleLogStream is thread-safe.  ToggleLogStream can stream to any
+ * arbitrary std::ostream object; the default is std::cout.
  */
 class ToggleLogStream
 {
 public:
-    ToggleLogStream(bool enable = true) : 
-        enabled(enable)
-    {}
-    virtual ~ToggleLogStream(){}
+    ToggleLogStream(bool enable = true, std::ostream& stream = std::cout);
+    virtual ~ToggleLogStream();
 
     /**
      * Stream arbitrary types and values.
@@ -93,7 +82,7 @@ public:
         if (this->enabled)
         {
                 MutexLocker lock(this->mutex);
-                std::cout << val;
+                (*this->stream) << val;
         }
         return *this;
     }
@@ -115,10 +104,13 @@ public:
     void SetEnabled(bool enable);
     
     /** Determine if this log stream is on or off. */
-    bool GetEnabled();
+    bool IsEnabled();
+    
+    void SetStream(std::ostream& stream);
 
 protected:
     bool enabled;
+    std::ostream* stream;
 
     // A mutex controls access to the log stream; this makes logging
     // tread-safe.
@@ -129,17 +121,17 @@ private:
 /**
  * \class LogStream
  * \brief Streams text and other data to output.
+ * 
  * LogStream handles streaming of data to output streams. A LogStream
  * has an associated LogLevel that controls whether output is generated.
+ * LogStream acts as a gateway to log streaming by appending a standard
+ * message to logs and then forwarding logging requests to a ToggleLogStream.
  */
 class LogStream
 {
 public:
-    LogStream(LogLevel level = Error, std::string msg = "ERROR: ") : 
-        level(level),
-        message(msg)
-        {}
-    virtual ~LogStream() {}
+    LogStream(LogLevel level = Error, std::string msg = "ERROR: ");
+    virtual ~LogStream();
     
     /**
      * Stream arbitrary types and values.
@@ -151,51 +143,17 @@ public:
         return (toggleStream << this->message << val);
     }
     
-    virtual ToggleLogStream& operator<<(std::ostream& (*op)(std::ostream&))
-    {
-        toggleStream.SetEnabled(this->level <= Logger::getLevel());
-        return (toggleStream << this->message << (*op));
-    }
-
+    virtual ToggleLogStream& operator<<(std::ostream& (*op)(std::ostream&));
+    
+    ToggleLogStream& GetToggleLogStream();
     
 protected:
     LogLevel level;
     std::string message;
+    
+    // The toggle stream to forward all requests to
     static ToggleLogStream toggleStream;
+    
 private:
 };
 
-/*
- * Redirects a source ostream to a target ostream. Redirection continues
- * until the StreamRedirector is destroyed.
- */
-class StreamRedirector
-{
-public:
-    StreamRedirector(std::ostream& source, std::ostream& target)
-    {
-        this->target = NULL;
-        this->originalStream = &source;
-        this->originalBuffer = source.rdbuf();
-        this->setTarget(target);
-    }
-    virtual ~StreamRedirector()
-    {
-        this->originalStream->rdbuf(this->originalBuffer);
-    }
-
-    void setTarget(std::ostream& oTarget)
-    {
-        if (this->target)
-            this->target->flush();
-
-        this->target = &oTarget;
-        this->target->copyfmt(*this->originalStream);
-        this->originalStream->rdbuf(this->target->rdbuf());
-    }
-
-protected:
-    std::streambuf* originalBuffer;
-    std::ostream* originalStream;
-    std::ostream* target;
-};
