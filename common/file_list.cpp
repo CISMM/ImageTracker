@@ -36,7 +36,7 @@ static string make_filename(const string file_name, string::size_type start, str
   // to prefix the % with another % to stick it into the string, then
   // add the  %02u  that is used to fill in the format descriptor, then
   // add the  u  that is written into the format descriptor.
-  char	format_descriptor[6];
+  char	format_descriptor[7];
   char	num_as_chars[100];
   sprintf(format_descriptor, "%%0%02ulu", len);
   sprintf(num_as_chars, format_descriptor, value);
