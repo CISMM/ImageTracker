@@ -92,4 +92,5 @@ private:
     
     Function function;
     ColorMap colorMapType;
+	bool initialized;
 };

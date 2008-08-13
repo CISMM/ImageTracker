@@ -12,6 +12,7 @@ const std::string VectorHeightMapVisualization::X_COMPONENT("u");
 const std::string VectorHeightMapVisualization::Y_COMPONENT("v");
 
 VectorHeightMapVisualization::VectorHeightMapVisualization()
+	: initialized(false)
 {
     // Create pipeline components
     this->exporter      = ExportType::New();
@@ -30,12 +31,10 @@ VectorHeightMapVisualization::VectorHeightMapVisualization()
     this->calculator->AddScalarVariable("u", "vector", 0);
     this->calculator->AddScalarVariable("v", "vector", 1);
     this->calculator->SetResultArrayName("magnitude");
-    this->SetMagnitudeFunction(VectorMagnitude);
-    
-    this->SetScaleFactor(10.0);
-    
+
+    this->SetMagnitudeFunction(VectorMagnitude);    
+    this->SetScaleFactor(1.0);
     this->normals->SetFeatureAngle(180.0);
-    
     this->SetColorMapType(IsoGray);
     
     // Connect pipeline components
@@ -54,6 +53,20 @@ VectorHeightMapVisualization::~VectorHeightMapVisualization()
 {
     if (this->actor)
         this->actor->Delete();
+	if (this->mapper)
+		this->mapper->Delete();
+	if (this->normals)
+		this->normals->Delete();
+	if (this->warp)
+		this->warp->Delete();
+	if (this->calculator)
+		this->calculator->Delete();
+	if (this->surface)
+		this->surface->Delete();
+	if (this->flip)
+		this->flip->Delete();
+	if (this->importer)
+		this->importer->Delete();
 }
 
 void VectorHeightMapVisualization::SetInput(itk::DataObject* input)
@@ -73,6 +86,7 @@ void VectorHeightMapVisualization::SetInput(itk::DataObject* input)
         this->importer->GetOutput()->GetPointData()->GetScalars()->SetName("vector");
     }
     
+	this->initialized = true;
     this->Update();
 }
 
@@ -95,7 +109,8 @@ void VectorHeightMapVisualization::SetScaleFactor(double scale)
 {
     this->warp->SetScaleFactor(scale);
     this->warp->Modified();
-    ImageTrackerController::Instance()->Render();
+	if (this->initialized)
+	    ImageTrackerController::Instance()->Render();
 }
 
 double VectorHeightMapVisualization::GetScaleFactor()
@@ -119,7 +134,8 @@ void VectorHeightMapVisualization::SetMagnitudeFunction(Function function)
             break;
     }
     this->calculator->Modified();
-    ImageTrackerController::Instance()->Render();
+	if (this->initialized)
+        ImageTrackerController::Instance()->Render();
 }
 
 VectorHeightMapVisualization::Function VectorHeightMapVisualization::GetMagnitudeFunction()
@@ -135,7 +151,8 @@ void VectorHeightMapVisualization::SetColorMapType(ColorMap type)
     this->mapper->SetLookupTable(MakeLookupTable(this->colorMapType, minmax[0], minmax[1]));
     
     this->mapper->Modified();
-    ImageTrackerController::Instance()->Render();
+	if (this->initialized)
+	    ImageTrackerController::Instance()->Render();
 }
 
 ColorMap VectorHeightMapVisualization::GetColorMapType()

@@ -63,9 +63,24 @@ VectorGlyphVisualization::VectorGlyphVisualization()
 
 VectorGlyphVisualization::~VectorGlyphVisualization()
 {
-    // TODO: Do we need to delete all elements of the pipeline?
+    // Do we need to delete all elements of the pipeline?
+	// Yes, according to David Feng.
     if (this->actor)
         this->actor->Delete();;
+	if (this->mapper)
+		this->mapper->Delete();
+	if (this->glyph)
+		this->glyph->Delete();
+	if (this->mask)
+		this->mask->Delete();
+	if (this->calculator)
+		this->calculator->Delete();
+	if (this->surface)
+		this->surface->Delete();
+	if (this->flip)
+		this->flip->Delete();
+	if (this->importer)
+		this->importer->Delete();
 }
 
 void VectorGlyphVisualization::SetInput(itk::DataObject* input)

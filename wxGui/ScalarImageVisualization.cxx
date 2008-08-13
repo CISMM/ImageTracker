@@ -33,9 +33,16 @@ ScalarImageVisualization::ScalarImageVisualization() :
 
 ScalarImageVisualization::~ScalarImageVisualization()
 {
-    // TODO: Do we need to delete all elements of the pipeline?
+    // Do we need to delete all elements of the pipeline?
+	// Yes, according to David Feng.
     if (this->actor)
-        this->actor->Delete();;
+        this->actor->Delete();
+	if (this->rescaler)
+		this->rescaler->Delete();
+	if (this->flipper)
+		this->flipper->Delete();
+	if (this->importer)
+		this->importer->Delete();
 }
 
 void ScalarImageVisualization::SetInput(itk::DataObject* input)
