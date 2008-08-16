@@ -12,16 +12,22 @@
 #include <string>
 
 #include <wx/apptrait.h>
+#include <wx/filefn.h>
 #include <wx/stdpaths.h>
+#include <wx/utils.h>
 
 #include "vtkInteractorStyleSwitch.h"
 
 #include "FileUtils.h"
+#include "FlatfieldPanel.h"
 #include "GaussianFilterPanel.h"
+#include "GradientMagnitudePanel.h"
 #include "ImageTrackerController.h"
 #include "ImageUtils.h"
 #include "ItkVtkPipeline.h"
+#include "LogarithmPanel.h"
 #include "Logger.h"
+#include "RegionPanel.h"
 #include "ScalarImageVisualization.h"
 #include "ThresholdPanel.h"
 #include "VectorGlyphVisualization.h"
@@ -29,7 +35,7 @@
 #include "wxUtils.h"
 
 static const std::string APP_NAME("ImageTracker");
-static const std::string APP_VERSION("v 2.09");
+static const std::string APP_VERSION("v 3.00");
 static const std::string APP_AUTHOR("Brian Eastwood");
 static const std::string APP_COPYRIGHT("(c) 2004 - 2008");
 static const std::string APP_WEBSITE("http://www.cs.unc.edu/Research/nano/cismm/download/imagetracker");
@@ -61,20 +67,25 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     panelFilterControl = new wxPanel(notebook_1_pane_1, wxID_ANY);
     itMenuBar = new wxMenuBar();
     wxMenu* menuFile = new wxMenu();
-    menuFile->Append(MENU_SAVE_IMAGES, wxT("&Save View Images"), wxT("Save data visualizations as a set of images"), wxITEM_NORMAL);
+    menuFile->Append(MENU_OPEN, wxT("&Open Image Files"), wxT("Open image files"), wxITEM_NORMAL);
+    menuFile->Append(MENU_SAVE_FILTER, wxT("Save &Filter Images"), wxT("Save result of active image filters"), wxITEM_NORMAL);
+    menuFile->Append(MENU_SAVE_VIEW, wxT("Save &View Images"), wxT("Save data visualizations as a set of images"), wxITEM_NORMAL);
     menuFile->Append(MENU_EXIT, wxT("E&xit"), wxT("Quit ImageTracker"), wxITEM_NORMAL);
     itMenuBar->Append(menuFile, wxT("&File"));
     wxMenu* menuFilter = new wxMenu();
-    menuFilter->Append(MENU_THRESHOLD, wxT("&Threshold"), wxT("Apply a threshold"), wxITEM_NORMAL);
+    menuFilter->Append(MENU_FLATFIELD, wxT("&Flatfield"), wxT("Apply a constant image flatfielding and/or background subtraction"), wxITEM_NORMAL);
     menuFilter->Append(MENU_GAUSSIAN, wxT("&Gaussian"), wxT("Apply 2D Gaussian smoothing"), wxITEM_NORMAL);
+    menuFilter->Append(MENU_GRADIENT_MAGNITUDE, wxT("Gradient &Magnitude"), wxT("Detect edges with a gradient magnitude image filter"), wxITEM_NORMAL);
+    menuFilter->Append(MENU_LOGARITHM, wxT("&Logarithm"), wxT("Take the logarithm of images"), wxITEM_NORMAL);
+    menuFilter->Append(MENU_THRESHOLD, wxT("&Threshold"), wxT("Apply a threshold"), wxITEM_NORMAL);
     itMenuBar->Append(menuFilter, wxT("Fil&ter"));
     wxMenu* menuProcess = new wxMenu();
-    menuProcess->Append(MENU_OCCLUSIONS, wxT("&Remove Occlusions"), wxT("Detect and remove static partial occlusions from bright-field microscopy images"), wxITEM_NORMAL);
-    menuProcess->Append(MENU_STABILIZE, wxT("&Stabilize"), wxT("Remove global drift to keep an object stationary"), wxITEM_NORMAL);
     menuProcess->Append(MENU_APPLY_TRANSFORM, wxT("Apply &Transform"), wxT("Apply a transforms from one stabilization to another data source"), wxITEM_NORMAL);
     menuProcess->Append(MENU_CLG_OPTICAL_FLOW, wxT("CLG &Optical Flow"), wxT("Combined local and global optical flow computation"), wxITEM_NORMAL);
-    menuProcess->Append(MENU_INTEGRATE_FLOW, wxT("&Integrate Flow"), wxT("Integrate flow fields into displacement fields"), wxITEM_NORMAL);
     menuProcess->Append(MENU_HORN_OPTICAL_FLOW, wxT("&Horn Optical Flow"), wxT("Horn and Schunck global optical flow computation"), wxITEM_NORMAL);
+    menuProcess->Append(MENU_INTEGRATE_FLOW, wxT("&Integrate Flow"), wxT("Integrate flow fields into displacement fields"), wxITEM_NORMAL);
+    menuProcess->Append(MENU_OCCLUSIONS, wxT("&Remove Occlusions"), wxT("Detect and remove static partial occlusions from bright-field microscopy images"), wxITEM_NORMAL);
+    menuProcess->Append(MENU_STABILIZE, wxT("&Stabilize"), wxT("Remove global drift to keep an object stationary"), wxITEM_NORMAL);
     itMenuBar->Append(menuProcess, wxT("&Process"));
     wxMenu* menuView = new wxMenu();
     menuView->Append(MENU_WINDOW_CONTRAST, wxT("&Window/Contrast"), wxT("Adjust display contrast levels"), wxITEM_NORMAL);
@@ -83,6 +94,7 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     menuView->Append(MENU_LOOP_PLAY, wxT("Loop &play"), wxT("Specify whether image set playback should loop at the ends"), wxITEM_CHECK);
     itMenuBar->Append(menuView, wxT("&View"));
     wxMenu* menuHelp = new wxMenu();
+    menuHelp->Append(MENU_MANUAL, wxT("&Manual"), wxT("Open application documentation"), wxITEM_NORMAL);
     menuHelp->Append(MENU_ABOUT, wxT("&About"), wxT("About this application"), wxITEM_NORMAL);
     itMenuBar->Append(menuHelp, wxT("&Help"));
     SetMenuBar(itMenuBar);
@@ -143,6 +155,7 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     ImageTrackerController::Instance()->ClearFilters();
     
     // Initialize the filter list
+    this->selectLastFilter = false;
     this->UpdateFilterList();
     this->SetPlayState(Pause);
     this->loopPlay = true;
@@ -159,6 +172,7 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     this->dlgLogger = new LoggerDialog(this, -1, wxT("Logger"));
     this->dlgLogger->SetFileName(logFileName);
     
+    this->dlgSaveFilterImage = new SaveFilterImageDialog(this, -1, wxT("Save Filter Images"));
     this->dlgSaveVisualization = new SaveVisualizationDialog(this, -1, wxT("Save View Images"));
     this->dlgScalarImageControl = new ScalarImageControlDialog(this, -1, wxT("Window/Contrast"));
     
@@ -173,6 +187,8 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     this->saveFormat = "visualization-%04d.tif";
     this->saveFromIdx = 0;
     this->saveToIdx = 0;
+    
+    this->Layout();
 }
 
 ImageTracker::~ImageTracker()
@@ -189,20 +205,26 @@ BEGIN_EVENT_TABLE(ImageTracker, wxFrame)
     EVT_IDLE(ImageTracker::OnIdle)
     EVT_SLIDER(SLIDE_IMAGE_INDEX, ImageTracker::OnImageIndex)
     // begin wxGlade: ImageTracker::event_table
-    EVT_MENU(MENU_SAVE_IMAGES, ImageTracker::OnSaveViewImages)
+    EVT_MENU(MENU_OPEN, ImageTracker::OnOpen)
+    EVT_MENU(MENU_SAVE_FILTER, ImageTracker::OnSaveFilterImages)
+    EVT_MENU(MENU_SAVE_VIEW, ImageTracker::OnSaveViewImages)
     EVT_MENU(MENU_EXIT, ImageTracker::OnExit)
-    EVT_MENU(MENU_THRESHOLD, ImageTracker::OnThreshold)
+    EVT_MENU(MENU_FLATFIELD, ImageTracker::OnFlatfield)
     EVT_MENU(MENU_GAUSSIAN, ImageTracker::OnGaussian)
-    EVT_MENU(MENU_OCCLUSIONS, ImageTracker::OnOcclusions)
-    EVT_MENU(MENU_STABILIZE, ImageTracker::OnStabilize)
+    EVT_MENU(MENU_GRADIENT_MAGNITUDE, ImageTracker::OnGradientMagnitude)
+    EVT_MENU(MENU_LOGARITHM, ImageTracker::OnLogarithm)
+    EVT_MENU(MENU_THRESHOLD, ImageTracker::OnThreshold)
     EVT_MENU(MENU_APPLY_TRANSFORM, ImageTracker::OnApplyTransform)
     EVT_MENU(MENU_CLG_OPTICAL_FLOW, ImageTracker::OnCLGOpticalFlow)
-    EVT_MENU(MENU_INTEGRATE_FLOW, ImageTracker::OnIntegrateFlow)
     EVT_MENU(MENU_HORN_OPTICAL_FLOW, ImageTracker::OnHornOpticalFlow)
+    EVT_MENU(MENU_INTEGRATE_FLOW, ImageTracker::OnIntegrateFlow)
+    EVT_MENU(MENU_OCCLUSIONS, ImageTracker::OnOcclusions)
+    EVT_MENU(MENU_STABILIZE, ImageTracker::OnStabilize)
     EVT_MENU(MENU_WINDOW_CONTRAST, ImageTracker::OnWindowContrast)
     EVT_MENU(MENU_LOGGER, ImageTracker::OnLogger)
     EVT_MENU(MENU_IMAGE_INFO, ImageTracker::OnImageInfo)
     EVT_MENU(MENU_LOOP_PLAY, ImageTracker::OnLoopPlay)
+    EVT_MENU(MENU_MANUAL, ImageTracker::OnManual)
     EVT_MENU(MENU_ABOUT, ImageTracker::OnAbout)
     EVT_LISTBOX_DCLICK(LIST_FILTERS, ImageTracker::OnSelectFilter)
     EVT_LISTBOX(LIST_FILTERS, ImageTracker::OnSelectFilter)
@@ -237,8 +259,17 @@ void ImageTracker::OnIdle(wxIdleEvent &event)
 
 void ImageTracker::OnOpen(wxCommandEvent &event)
 {
-    event.Skip();
-    wxLogDebug(wxT("Event handler (ImageTracker::OnOpen) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+    this->listFilters->Select(0);
+    this->OnSelectFilter(event);
+}
+
+
+void ImageTracker::OnSaveFilterImages(wxCommandEvent &event)
+{
+    if (this->AssertImageCount(1))
+    {
+        this->dlgSaveFilterImage->ShowModal();
+    }
 }
 
 
@@ -262,113 +293,126 @@ void ImageTracker::OnExit(wxCommandEvent &event)
 
 void ImageTracker::OnThreshold(wxCommandEvent &event)
 {
-    if (ImageTrackerController::Instance()->GetImageCount() < 1)
+    if (this->AssertImageCount(1))
     {
-        wxMessageDialog alert(this, wxT("Please load some image files first."), wxT("No data"), wxOK);
-        alert.ShowModal();
-        return;
+        this->selectLastFilter = true;
+        ThresholdPanel* threshold = new ThresholdPanel(this->panelFilterControl, -1);
+        ImageTrackerController::Instance()->AddFilter(threshold);
     }
-    
-    ThresholdPanel* threshold = new ThresholdPanel(this->panelFilterControl, -1);
-    ImageTrackerController::Instance()->AddFilter(threshold);
+}
+
+void ImageTracker::OnFlatfield(wxCommandEvent &event)
+{
+    if (this->AssertImageCount(1))
+    {
+        this->selectLastFilter = true;
+        FlatfieldPanel* flatfield = new FlatfieldPanel(this->panelFilterControl, -1);
+        ImageTrackerController::Instance()->AddFilter(flatfield);
+    }
 }
 
 void ImageTracker::OnGaussian(wxCommandEvent &event)
 {
-    if (ImageTrackerController::Instance()->GetImageCount() < 1)
+    if (this->AssertImageCount(1))
     {
-        wxMessageDialog alert(this, wxT("Please load some image files first."), wxT("No data"), wxOK);
-        alert.ShowModal();
-        return;
+        this->selectLastFilter = true;
+        GaussianFilterPanel* gaussian = new GaussianFilterPanel(this->panelFilterControl, -1);
+        ImageTrackerController::Instance()->AddFilter(gaussian);
     }
-    
-    GaussianFilterPanel* gaussian = new GaussianFilterPanel(this->panelFilterControl, -1);
-    ImageTrackerController::Instance()->AddFilter(gaussian);
 }
 
+void ImageTracker::OnGradientMagnitude(wxCommandEvent &event)
+{
+    if (this->AssertImageCount(1))
+    {
+        this->selectLastFilter = true;
+        GradientMagnitudePanel* gradient = new GradientMagnitudePanel(this->panelFilterControl, -1);
+        ImageTrackerController::Instance()->AddFilter(gradient);
+    }
+}
+
+void ImageTracker::OnLogarithm(wxCommandEvent &event)
+{
+    if (this->AssertImageCount(1))
+    {
+        this->selectLastFilter = true;
+        LogarithmPanel* log = new LogarithmPanel(this->panelFilterControl, -1);
+        ImageTrackerController::Instance()->AddFilter(log);
+    }
+}
+
+void ImageTracker::OnRegion(wxCommandEvent &event)
+{
+    if (this->AssertImageCount(1))
+    {
+        this->selectLastFilter = true;
+        RegionPanel* region = new RegionPanel(this->panelFilterControl, -1);
+        ImageTrackerController::Instance()->AddFilter(region);
+    }
+}
 
 void ImageTracker::OnOcclusions(wxCommandEvent &event)
 {
-    if (ImageTrackerController::Instance()->GetImageCount() < 2)
+    if (this->AssertImageCount(2))
     {
-        wxMessageDialog alert(this, wxT("Please load at least two image files first."), wxT("No data"), wxOK);
-        alert.ShowModal();
-        return;
+        this->theStatusBar->SetStatusText(wxT("Removing occlusions..."));
+        this->SetPlayState(Pause);  // pause play, at least initially
+    
+        this->dlgRemoveOcclusions->SetInput(ImageTrackerController::Instance()->GetImageFileSet());
+        this->dlgRemoveOcclusions->Show(true);
     }
-    
-    this->theStatusBar->SetStatusText(wxT("Removing occlusions..."));
-    this->SetPlayState(Pause);  // pause play, at least initially
-    
-    this->dlgRemoveOcclusions->SetInput(ImageTrackerController::Instance()->GetImageFileSet());
-    this->dlgRemoveOcclusions->Show(true);
 }
 
 
 void ImageTracker::OnStabilize(wxCommandEvent &event)
 {
-    if (ImageTrackerController::Instance()->GetImageCount() < 2)
+    if (this->AssertImageCount(2))
     {
-        wxMessageDialog alert(this, wxT("Please load at least two image files first."), wxT("No data"), wxOK);
-        alert.ShowModal();
-        return;
+        this->theStatusBar->SetStatusText(wxT("Stabilizing..."));
+        this->SetPlayState(Pause);  // pause play, at least initially
+        
+        this->dlgRegistration->SetInput(ImageTrackerController::Instance()->GetImageFileSet());
+        this->dlgRegistration->Show(true);
     }
-    
-    this->theStatusBar->SetStatusText(wxT("Stabilizing..."));
-    this->SetPlayState(Pause);  // pause play, at least initially
-    
-    this->dlgRegistration->SetInput(ImageTrackerController::Instance()->GetImageFileSet());
-    this->dlgRegistration->Show(true);
 }
 
 
 void ImageTracker::OnApplyTransform(wxCommandEvent &event)
 {
-    if (ImageTrackerController::Instance()->GetImageCount() == 0)
+    if (this->AssertImageCount(1))
     {
-        wxMessageDialog alert(this, wxT("Please load some files first."), wxT("No data"), wxOK);
-        alert.ShowModal();
-        return;
+        this->theStatusBar->SetStatusText(wxT("Applying transform..."));
+        this->SetPlayState(Pause);  // pause play, at least initially
+    
+        this->dlgApplyTransform->SetInput(ImageTrackerController::Instance()->GetImageFileSet());
+        this->dlgApplyTransform->Show(true);
     }
-    
-    this->theStatusBar->SetStatusText(wxT("Applying transform..."));
-    this->SetPlayState(Pause);  // pause play, at least initially
-    
-    this->dlgApplyTransform->SetInput(ImageTrackerController::Instance()->GetImageFileSet());
-    this->dlgApplyTransform->Show(true);
 }
 
 
 void ImageTracker::OnCLGOpticalFlow(wxCommandEvent &event)
 {
-    if (ImageTrackerController::Instance()->GetImageCount() < 2)
+    if (this->AssertImageCount(2))
     {
-        wxMessageDialog alert(this, wxT("Please load at least two image files."), wxT("No data"), wxOK);
-        alert.ShowModal();
-        return;
+        this->theStatusBar->SetStatusText(wxT("Computing optical flow..."));
+        this->SetPlayState(Pause);  // pause play, at least initially
+        
+        this->dlgCLGOpticalFlow->SetInput(ImageTrackerController::Instance()->GetImageFileSet());
+        this->dlgCLGOpticalFlow->Show(true);
     }
-    
-    this->theStatusBar->SetStatusText(wxT("Computing optical flow..."));
-    this->SetPlayState(Pause);  // pause play, at least initially
-    
-    this->dlgCLGOpticalFlow->SetInput(ImageTrackerController::Instance()->GetImageFileSet());
-    this->dlgCLGOpticalFlow->Show(true);
 }
 
 
 void ImageTracker::OnHornOpticalFlow(wxCommandEvent &event)
 {
-    if (ImageTrackerController::Instance()->GetImageCount() < 2)
+    if (this->AssertImageCount(2))
     {
-        wxMessageDialog alert(this, wxT("Please load at least two image files."), wxT("No data"), wxOK);
-        alert.ShowModal();
-        return;
+        this->theStatusBar->SetStatusText(wxT("Computing optical flow..."));
+        this->SetPlayState(Pause);  // pause play, at least initially
+    
+        this->dlgHornOpticalFlow->SetInput(ImageTrackerController::Instance()->GetImageFileSet());
+        this->dlgHornOpticalFlow->Show(true);
     }
-    
-    this->theStatusBar->SetStatusText(wxT("Computing optical flow..."));
-    this->SetPlayState(Pause);  // pause play, at least initially
-    
-    this->dlgHornOpticalFlow->SetInput(ImageTrackerController::Instance()->GetImageFileSet());
-    this->dlgHornOpticalFlow->Show(true);
 }
 
 
@@ -398,15 +442,11 @@ void ImageTracker::OnImageInfo(wxCommandEvent &event)
 {
     std::string function("ImageTracker::OnImageInfo");
     
-    if (ImageTrackerController::Instance()->GetImageCount() < 1)
-    {
-        Logger::warning << function << ": There are no images open for which to provide information." << std::endl;
-    }
-    else
+    if (this->AssertImageCount(1))
     {
         PrintImageInfo(ImageTrackerController::Instance()->GetImageFileSet()->GetOutput(), "", Logger::info);
+        this->OnLogger(event);
     }
-    this->OnLogger(event);
 }
 
 
@@ -426,6 +466,32 @@ void ImageTracker::OnAbout(wxCommandEvent &event)
 {
     this->theStatusBar->SetStatusText(wxT("About..."));
     this->dlgAbout->Show(true);
+}
+
+
+void ImageTracker::OnManual(wxCommandEvent &event)
+{
+    // the documentation lives in the application install folder, under docs/manual.html.
+    std::string manualHtml(
+        nano::wx2std(wxGetApp().GetTraits()->GetStandardPaths().GetExecutablePath()));
+    manualHtml = DirectoryPart(manualHtml);
+	manualHtml.append("docs");
+	CapDirectory(manualHtml);
+	manualHtml.append("manual.html");
+    
+    // launch in the system default browser, if the file exists
+    if (wxFileExists(nano::std2wx(manualHtml)))
+    {
+        wxLaunchDefaultBrowser(nano::std2wx(manualHtml));
+    }
+    else
+    {
+        // Oddly, wxString.Printf doesn't seem to work with string arguments.  We'll append.
+        wxString message(wxT("Sorry, help documentation not found in expected location:\n"));
+        message.Append(nano::std2wx(manualHtml));
+        wxMessageDialog alert(this, message, wxT("Documentation not found"), wxOK);
+        alert.ShowModal();
+    }
 }
 
 
@@ -632,7 +698,7 @@ void ImageTracker::do_layout()
     sizer_61->Add(buttonClearFilters, 0, 0, 0);
     sizer_47->Add(sizer_61, 0, wxALIGN_CENTER_HORIZONTAL, 0);
     sizer_46->Add(sizer_47, 1, wxEXPAND, 0);
-    sizer_4->Add(20, 20, 0, 0, 0);
+    sizer_4->Add(340, 20, 0, 0, 0);
     panelFilterControl->SetSizer(sizer_4);
     sizer_46->Add(panelFilterControl, 3, wxEXPAND, 0);
     notebook_1_pane_1->SetSizer(sizer_46);
@@ -705,7 +771,16 @@ void ImageTracker::UpdateFilterList()
 
 	// Update the selected filter
 	int filterCount = this->listFilters->GetCount();
-	if (filterCount > 0 && oldIdx != wxNOT_FOUND)
+    if (filterCount > 0 && this->selectLastFilter)
+    {
+        this->selectLastFilter = false;
+        this->listFilters->SetSelection(filterCount-1);
+        
+        // Force display of the control panel
+        wxCommandEvent evt;
+        this->OnSelectFilter(evt);
+    }
+	else if (filterCount > 0 && oldIdx != wxNOT_FOUND)
 	{
 		int newIdx = std::min(oldIdx, filterCount - 1);		// prefer the last filter in the list if count changed
 		newIdx = std::max(newIdx, 0);						// prefer the first filter rather than none
@@ -820,4 +895,18 @@ void ImageTracker::UpdatePlayState()
         this->slideImageIndex->SetValue(nextIdx);
         ImageTrackerController::Instance()->SetImageIndex(nextIdx);
     }
+}
+
+bool ImageTracker::AssertImageCount(unsigned int count)
+{
+    bool result = true;
+    if (ImageTrackerController::Instance()->GetImageCount() < count)
+    {
+        wxString message;
+        message.Printf(wxT("There are not enough image files loaded: at least %d image(s) required to perform this operation."), count);
+        wxMessageDialog alert(this, message, wxT("Insufficient Data"), wxOK);
+        alert.ShowModal();
+        result = false;
+    }
+    return result;
 }

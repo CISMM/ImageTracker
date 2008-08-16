@@ -424,13 +424,15 @@ void ImageTrackerController::UpdateView()
 			this->GetRenderer()->ResetCamera();
 			this->resetCamera = false;
 		}
-	    
-		// render
+
+		// render (we need to ensure rendering does not happen before the 
+		// render window is visible on Windows.  Updating only when files
+		// are loaded ensures this.
 		if (this->GetRenderWindow())
 		{
 			this->GetRenderWindow()->Render();
 		}
-	}
+    }
 }
 
 void ImageTrackerController::SaveViewImage(const std::string& fileName)

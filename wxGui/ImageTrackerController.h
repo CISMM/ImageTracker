@@ -129,7 +129,7 @@ public:
      * may not be immediately visible and may be swapped for other 
      * content in some window.
      */
-    wxWindow* GetFilterParent();    
+    wxWindow* GetFilterParent();
     
     /**
      * Return a reference to the currently loaded ImageFileSet, with

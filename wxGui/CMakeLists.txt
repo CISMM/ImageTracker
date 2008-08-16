@@ -11,18 +11,23 @@ SET (Gui_SRCS
     FilePatternPanel.cpp                        FilePatternPanel.h
     FileSetPanel.cpp                            FileSetPanel.h
     FilterControlPanel.cxx                      FilterControlPanel.h
+    FlatfieldPanel.cpp                          FlatfieldPanel.h
     GaussianFilterPanel.cpp                     GaussianFilterPanel.h
+    GradientMagnitudePanel.cpp                  GradientMagnitudePanel.h
     HornOpticalFlowDialog.cpp                   HornOpticalFlowDialog.h
     ImageFileSetPanel.cpp                       ImageFileSetPanel.h
     ImageTracker.cpp                            ImageTracker.h
     ImageTrackerController.cxx                  ImageTrackerController.h
     ItkVtkPipeline.cxx                          ItkVtkPipeline.h
     IntegrateFlowDialog.cpp                     IntegrateFlowDialog.h
+    LogarithmPanel.cpp                          LogarithmPanel.h
     LoggerDialog.cpp                            LoggerDialog.h
     LookupTableUtil.cxx                         LookupTableUtil.h
     MultiResolutionRegistrationDialog.cpp       MultiResolutionRegistrationDialog.h
     PipelineExecutor.cxx                        PipelineExecutor.h
+    RegionPanel.cpp                             RegionPanel.h
     RemoveOcclusionsDialog.cpp                  RemoveOcclusionsDialog.h
+    SaveFilterImageDialog.cpp                   SaveFilterImageDialog.h
     SaveVisualizationDialog.cpp                 SaveVisualizationDialog.h
     ScalarImageControlDialog.cpp                ScalarImageControlDialog.h
     ScalarImageControlPanel.cpp                 ScalarImageControlPanel.h

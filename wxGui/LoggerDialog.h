@@ -19,8 +19,8 @@ class LoggerDialog: public wxDialog {
 public:
     // begin wxGlade: LoggerDialog::ids
     enum {
-        RADIO_LOG_LEVEL = wxID_HIGHEST + 1118,
-        BUTTON_REFRESH = wxID_HIGHEST + 1120
+        RADIO_LOG_LEVEL = wxID_HIGHEST + 1136,
+        BUTTON_REFRESH = wxID_HIGHEST + 1138
     };
     // end wxGlade
 

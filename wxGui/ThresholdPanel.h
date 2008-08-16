@@ -21,9 +21,9 @@ class ThresholdPanel: public FilterControlPanel {
 public:
     // begin wxGlade: ThresholdPanel::ids
     enum {
-        SLIDE_UPPER_BOUND = wxID_HIGHEST + 1106,
-        SLIDE_LOWER_BOUND = wxID_HIGHEST + 1107,
-        COMBO_RANGE = wxID_HIGHEST + 1108
+        SLIDE_UPPER_BOUND = wxID_HIGHEST + 1124,
+        SLIDE_LOWER_BOUND = wxID_HIGHEST + 1125,
+        COMBO_RANGE = wxID_HIGHEST + 1126
     };
     // end wxGlade
 

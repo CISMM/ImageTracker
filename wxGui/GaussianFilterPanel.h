@@ -7,6 +7,7 @@
 #define GAUSSIANFILTERPANEL_H
 
 // begin wxGlade: ::dependencies
+#include <wx/tglbtn.h>
 // end wxGlade
 
 // begin wxGlade: ::extracode
@@ -21,10 +22,11 @@ class GaussianFilterPanel: public FilterControlPanel {
 public:
     // begin wxGlade: GaussianFilterPanel::ids
     enum {
-        SLIDE_SIGMA_X = wxID_HIGHEST + 1122,
-        COMBO_ORDER_X = wxID_HIGHEST + 1123,
-        SLIDE_SIGMA_Y = wxID_HIGHEST + 1125,
-        COMBO_ORDER_Y = wxID_HIGHEST + 1126
+        SLIDE_SIGMA_X = wxID_HIGHEST + 1140,
+        COMBO_ORDER_X = wxID_HIGHEST + 1141,
+        BUTTON_LOCK_SLIDERS = wxID_HIGHEST + 1143,
+        SLIDE_SIGMA_Y = wxID_HIGHEST + 1145,
+        COMBO_ORDER_Y = wxID_HIGHEST + 1146
     };
     // end wxGlade
 
@@ -50,6 +52,7 @@ protected:
     wxStaticText* label_2;
     wxDoubleSlider* slideSigmaX;
     wxComboBox* comboOrderX;
+    wxToggleButton* buttonLockSliders;
     wxStaticText* label_17;
     wxDoubleSlider* slideSigmaY;
     wxComboBox* comboOrderY;
@@ -58,8 +61,10 @@ protected:
     DECLARE_EVENT_TABLE();
 
 public:
-    virtual void OnSigma(wxCommandEvent &event);
+    virtual void OnSigmaX(wxCommandEvent &event);
+    virtual void OnSigmaY(wxCommandEvent &event);
     virtual void OnOrder(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void OnLockSliders(wxCommandEvent &event); // wxGlade: <event_handler>
 }; // wxGlade: end class
 
 

@@ -20,6 +20,7 @@ GaussianFilterPanel::GaussianFilterPanel(wxWindow* parent, int id, const wxPoint
         wxT("Second Order")
     };
     comboOrderX = new wxComboBox(this, COMBO_ORDER_X, wxT(""), wxDefaultPosition, wxDefaultSize, 3, comboOrderX_choices, wxCB_DROPDOWN|wxCB_READONLY);
+    buttonLockSliders = new wxToggleButton(this, BUTTON_LOCK_SLIDERS, wxT("Lock"));
     label_17 = new wxStaticText(this, wxID_ANY, wxT("Y-direction"));
     slideSigmaY = new wxDoubleSlider(this, SLIDE_SIGMA_Y);
     const wxString comboOrderY_choices[] = {
@@ -53,10 +54,11 @@ GaussianFilterPanel::GaussianFilterPanel(wxWindow* parent, int id, const wxPoint
 
 
 BEGIN_EVENT_TABLE(GaussianFilterPanel, wxPanel)
-    EVT_SLIDER(SLIDE_SIGMA_X, GaussianFilterPanel::OnSigma)
-    EVT_SLIDER(SLIDE_SIGMA_Y, GaussianFilterPanel::OnSigma)
+    EVT_SLIDER(SLIDE_SIGMA_X, GaussianFilterPanel::OnSigmaX)
+    EVT_SLIDER(SLIDE_SIGMA_Y, GaussianFilterPanel::OnSigmaY)
     // begin wxGlade: GaussianFilterPanel::event_table
     EVT_COMBOBOX(COMBO_ORDER_X, GaussianFilterPanel::OnOrder)
+    EVT_TOGGLEBUTTON(BUTTON_LOCK_SLIDERS, GaussianFilterPanel::OnLockSliders)
     EVT_COMBOBOX(COMBO_ORDER_Y, GaussianFilterPanel::OnOrder)
     // end wxGlade
 END_EVENT_TABLE();
@@ -100,9 +102,29 @@ void GaussianFilterPanel::OnOrder(wxCommandEvent &event)
 // wxGlade: add GaussianFilterPanel event handlers
 
 
-void GaussianFilterPanel::OnSigma(wxCommandEvent &event)
+void GaussianFilterPanel::OnSigmaX(wxCommandEvent &event)
 {
     this->gaussians[0]->SetSigma(this->slideSigmaX->GetValue());
+    if (this->buttonLockSliders->GetValue())
+    {
+        this->slideSigmaY->SetValue(this->slideSigmaX->GetValue());
+        this->gaussians[1]->SetSigma(this->slideSigmaY->GetValue());
+    }
+}
+
+void GaussianFilterPanel::OnSigmaY(wxCommandEvent &event)
+{
+    this->gaussians[1]->SetSigma(this->slideSigmaY->GetValue());
+    if (this->buttonLockSliders->GetValue())
+    {
+        this->slideSigmaX->SetValue(this->slideSigmaY->GetValue());
+        this->gaussians[0]->SetSigma(this->slideSigmaX->GetValue());
+    }
+}
+
+void GaussianFilterPanel::OnLockSliders(wxCommandEvent &event)
+{
+    this->slideSigmaY->SetValue(this->slideSigmaX->GetValue());
     this->gaussians[1]->SetSigma(this->slideSigmaY->GetValue());
 }
 
@@ -111,6 +133,8 @@ void GaussianFilterPanel::set_properties()
     // begin wxGlade: GaussianFilterPanel::set_properties
     comboOrderX->SetMinSize(wxSize(110, 29));
     comboOrderX->SetSelection(0);
+    buttonLockSliders->SetToolTip(wxT("Lock the scale sliders"));
+    buttonLockSliders->SetValue(1);
     comboOrderY->SetMinSize(wxSize(110, 29));
     comboOrderY->SetSelection(0);
     // end wxGlade
@@ -121,10 +145,13 @@ void GaussianFilterPanel::do_layout()
 {
     // begin wxGlade: GaussianFilterPanel::do_layout
     wxStaticBoxSizer* sizer_5 = new wxStaticBoxSizer(sizer_5_staticbox, wxVERTICAL);
-    wxFlexGridSizer* grid_sizer_5 = new wxFlexGridSizer(2, 3, 5, 5);
+    wxFlexGridSizer* grid_sizer_5 = new wxFlexGridSizer(3, 3, 5, 5);
     grid_sizer_5->Add(label_2, 0, 0, 0);
     grid_sizer_5->Add(slideSigmaX, 1, wxEXPAND, 0);
     grid_sizer_5->Add(comboOrderX, 0, 0, 0);
+    grid_sizer_5->Add(20, 20, 0, 0, 0);
+    grid_sizer_5->Add(buttonLockSliders, 0, 0, 0);
+    grid_sizer_5->Add(20, 20, 0, 0, 0);
     grid_sizer_5->Add(label_17, 0, 0, 0);
     grid_sizer_5->Add(slideSigmaY, 1, wxEXPAND, 0);
     grid_sizer_5->Add(comboOrderY, 0, 0, 0);

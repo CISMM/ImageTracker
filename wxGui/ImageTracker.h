@@ -28,6 +28,7 @@
 #include "LoggerDialog.h"
 #include "MultiResolutionRegistrationDialog.h"
 #include "RemoveOcclusionsDialog.h"
+#include "SaveFilterImageDialog.h"
 #include "SaveVisualizationDialog.h"
 #include "ScalarImageControlDialog.h"
 
@@ -35,34 +36,40 @@ class ImageTracker: public wxFrame {
 public:
     // begin wxGlade: ImageTracker::ids
     enum {
-        MENU_SAVE_IMAGES = wxID_HIGHEST + 1015,
-        MENU_EXIT = wxID_HIGHEST + 1016,
-        MENU_THRESHOLD = wxID_HIGHEST + 1017,
-        MENU_GAUSSIAN = wxID_HIGHEST + 1018,
-        MENU_OCCLUSIONS = wxID_HIGHEST + 1019,
-        MENU_STABILIZE = wxID_HIGHEST + 1020,
-        MENU_APPLY_TRANSFORM = wxID_HIGHEST + 1021,
-        MENU_CLG_OPTICAL_FLOW = wxID_HIGHEST + 1022,
-        MENU_INTEGRATE_FLOW = wxID_HIGHEST + 1023,
-        MENU_HORN_OPTICAL_FLOW = wxID_HIGHEST + 1024,
-        MENU_WINDOW_CONTRAST = wxID_HIGHEST + 1025,
-        MENU_LOGGER = wxID_HIGHEST + 1026,
-        MENU_IMAGE_INFO = wxID_HIGHEST + 1027,
-        MENU_LOOP_PLAY = wxID_HIGHEST + 1028,
-        MENU_ABOUT = wxID_HIGHEST + 1029,
-        LIST_FILTERS = wxID_HIGHEST + 1045,
-        BUTTON_REMOVE_FILTER = wxID_HIGHEST + 1047,
-        BUTTON_CLEAR_FILTERS = wxID_HIGHEST + 1049,
-        BUTTON_APPLY_VECTOR = wxID_HIGHEST + 1051,
-        COMBO_VECTOR_METHOD = wxID_HIGHEST + 1053,
-        SLIDE_IMAGE_INDEX = wxID_HIGHEST + 1055,
-        BUTTON_FIRST = wxID_HIGHEST + 1056,
-        BUTTON_PREVIOUS = wxID_HIGHEST + 1058,
-        BUTTON_REWIND = wxID_HIGHEST + 1060,
-        BUTTON_PAUSE = wxID_HIGHEST + 1062,
-        BUTTON_PLAY = wxID_HIGHEST + 1064,
-        BUTTON_NEXT = wxID_HIGHEST + 1066,
-        BUTTON_LAST = wxID_HIGHEST + 1068
+        MENU_OPEN = wxID_HIGHEST + 1021,
+        MENU_SAVE_FILTER = wxID_HIGHEST + 1022,
+        MENU_SAVE_VIEW = wxID_HIGHEST + 1023,
+        MENU_EXIT = wxID_HIGHEST + 1024,
+        MENU_FLATFIELD = wxID_HIGHEST + 1025,
+        MENU_GAUSSIAN = wxID_HIGHEST + 1026,
+        MENU_GRADIENT_MAGNITUDE = wxID_HIGHEST + 1027,
+        MENU_LOGARITHM = wxID_HIGHEST + 1028,
+        MENU_THRESHOLD = wxID_HIGHEST + 1029,
+        MENU_APPLY_TRANSFORM = wxID_HIGHEST + 1030,
+        MENU_CLG_OPTICAL_FLOW = wxID_HIGHEST + 1031,
+        MENU_HORN_OPTICAL_FLOW = wxID_HIGHEST + 1032,
+        MENU_INTEGRATE_FLOW = wxID_HIGHEST + 1033,
+        MENU_OCCLUSIONS = wxID_HIGHEST + 1034,
+        MENU_STABILIZE = wxID_HIGHEST + 1035,
+        MENU_WINDOW_CONTRAST = wxID_HIGHEST + 1036,
+        MENU_LOGGER = wxID_HIGHEST + 1037,
+        MENU_IMAGE_INFO = wxID_HIGHEST + 1038,
+        MENU_LOOP_PLAY = wxID_HIGHEST + 1039,
+        MENU_MANUAL = wxID_HIGHEST + 1040,
+        MENU_ABOUT = wxID_HIGHEST + 1041,
+        LIST_FILTERS = wxID_HIGHEST + 1063,
+        BUTTON_REMOVE_FILTER = wxID_HIGHEST + 1065,
+        BUTTON_CLEAR_FILTERS = wxID_HIGHEST + 1067,
+        BUTTON_APPLY_VECTOR = wxID_HIGHEST + 1069,
+        COMBO_VECTOR_METHOD = wxID_HIGHEST + 1071,
+        SLIDE_IMAGE_INDEX = wxID_HIGHEST + 1073,
+        BUTTON_FIRST = wxID_HIGHEST + 1074,
+        BUTTON_PREVIOUS = wxID_HIGHEST + 1076,
+        BUTTON_REWIND = wxID_HIGHEST + 1078,
+        BUTTON_PAUSE = wxID_HIGHEST + 1080,
+        BUTTON_PLAY = wxID_HIGHEST + 1082,
+        BUTTON_NEXT = wxID_HIGHEST + 1084,
+        BUTTON_LAST = wxID_HIGHEST + 1086
     };
     // end wxGlade
 
@@ -101,6 +108,10 @@ private:
 
     PlayState playState;
     bool loopPlay;
+    
+    // flag to indicate the last filter should be selected next time the
+    // filter list is updated.
+    bool selectLastFilter;
     
 protected:
     // begin wxGlade: ImageTracker::attributes
@@ -142,15 +153,23 @@ protected:
      * image index slider appropriately.
      */
     void UpdateFilterList();
+    
     /**
      * Updates the currently displayed image index based on the ImageTracker
      * PlayState state machine.
      */
     void UpdatePlayState();
     
+    /**
+     * Ensures a certain number of image files exist. Displays a warning if
+     * this condition is not upheld
+     */
+    bool AssertImageCount(unsigned int count);
+    
     std::ofstream* logfile;
     
     AboutDialog* dlgAbout;
+    SaveFilterImageDialog* dlgSaveFilterImage;
     SaveVisualizationDialog* dlgSaveVisualization;
     LoggerDialog* dlgLogger;
     ScalarImageControlDialog* dlgScalarImageControl;
@@ -197,6 +216,12 @@ public:
     virtual void OnGaussian(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void OnWindowContrast(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void OnRemoveFilter(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void OnRegion(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void OnFlatfield(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void OnGradientMagnitude(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void OnLogarithm(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void OnSaveFilterImages(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void OnManual(wxCommandEvent &event); // wxGlade: <event_handler>
 }; // wxGlade: end class
 
 class ITApp : public wxApp

@@ -4,6 +4,7 @@
 
 #include "ConnectVTKITK.h"
 #include "ImageTrackerController.h"
+#include "ImageUtils.h"
 #include "ScalarImageControlPanel.h"
 
 ScalarImageVisualization::ScalarImageVisualization() :
@@ -83,13 +84,19 @@ void ScalarImageVisualization::Update()
     // Yes, but if you try to remove any of these lines of code, suddenly your image
     // data doesn't get updated in the view panel.  sigh.
 //     Logger::verbose << "ScalarImageVisualization::Update()" << std::endl;
-    this->window->UpdateLargestPossibleRegion();
-    this->exporter->UpdateLargestPossibleRegion();
+//     this->window->Update();
+    this->exporter->UpdateOutputInformation();
+    this->exporter->Update();
+//     PrintImageInfo(this->window->GetOutput(), "ITK exporting...");
     
-    this->importer->SetDataExtentToWholeExtent();
-    this->importer->UpdateWholeExtent();
-    this->flipper->UpdateWholeExtent();
-    this->rescaler->UpdateWholeExtent();
+    this->importer->InvokeUpdateInformationCallbacks();
+    this->importer->UpdateInformation();
+//     this->importer->SetDataExtentToWholeExtent();
+    this->importer->Update();
+    this->flipper->UpdateInformation();
+    this->flipper->Update();
+    this->rescaler->UpdateInformation();
+    this->rescaler->Update();
 }
 
 wxWindow* ScalarImageVisualization::CreateWxControl(wxWindow* parent)

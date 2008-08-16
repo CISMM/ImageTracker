@@ -188,7 +188,6 @@ void CLGOpticalFlowDialog::UpdatePreview()
     if (this->preview)
     {
         this->visual->Update();
-        ImageTrackerController::Instance()->Render();
     }
 }
 

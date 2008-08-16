@@ -24,8 +24,8 @@ class CLGOpticalFlowDialog: public wxDialog {
 public:
     // begin wxGlade: CLGOpticalFlowDialog::ids
     enum {
-        SLIDE_DERIVATIVE_SCALE = wxID_HIGHEST + 1072,
-        SLIDE_INTEGRATION_SCALE = wxID_HIGHEST + 1073
+        SLIDE_DERIVATIVE_SCALE = wxID_HIGHEST + 1090,
+        SLIDE_INTEGRATION_SCALE = wxID_HIGHEST + 1091
     };
     // end wxGlade
 

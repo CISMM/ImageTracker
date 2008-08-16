@@ -97,7 +97,8 @@ void ImageFileSetPanel::set_properties()
     // begin wxGlade: ImageFileSetPanel::set_properties
     Hide();
     radioPixelType->SetToolTip(wxT("Select the type of data stored in the images"));
-    radioPixelType->SetSelection(1);
+    radioPixelType->Hide();
+    radioPixelType->SetSelection(2);
     buttonApply->SetToolTip(wxT("Apply changes; this loads the selected files"));
     // end wxGlade
 }

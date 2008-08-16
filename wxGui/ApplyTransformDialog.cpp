@@ -20,6 +20,7 @@ bool ApplyTransformDialog::TransferDataToWindow()
 
     this->textTransform->SetValue(nano::std2wx(dir + "transforms.txt"));
     
+    this->panelFilePattern->SetRangeEnabled(false);
     this->panelFilePattern->TransferDataToWindow();
     
     return true;

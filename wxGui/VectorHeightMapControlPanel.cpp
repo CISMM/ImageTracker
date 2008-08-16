@@ -157,6 +157,10 @@ void VectorHeightMapControlPanel::set_properties()
     // begin wxGlade: VectorHeightMapControlPanel::set_properties
     checkVisible->SetValue(1);
     comboColorMapType->SetSelection(0);
+    label_47->Hide();
+    slideColorMapMaximum->Hide();
+    label_48->Hide();
+    slideColorMapMinimum->Hide();
     comboMagnitudeFunction->SetSelection(0);
     // end wxGlade
 }
