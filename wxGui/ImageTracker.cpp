@@ -187,8 +187,16 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     this->saveFormat = "visualization-%04d.tif";
     this->saveFromIdx = 0;
     this->saveToIdx = 0;
-    
-    this->Layout();
+
+	// If you like hacks, you'll love this.  
+	// The ImageTracker window was coming up without its children properly displayed.  After a resize
+	// event, everything displayed fine.  So, this forces a resize event.  Why not use a function that
+	// from the wxWidgets documentation sounds like might do the same thing?  Like "SendResizeEvent" or
+	// Layout()?  They don't work.  This does.  I'm not happy about it, but I need to move on.
+	int h, w;
+	this->GetSize(&w, &h);
+	this->SetSize(w+1, h);
+	this->SetSize(w, h);
 }
 
 ImageTracker::~ImageTracker()
