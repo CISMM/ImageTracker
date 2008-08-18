@@ -12,6 +12,10 @@
 
 bool SaveVisualizationDialog::TransferDataToWindow()
 {
+	std::string dir(nano::wx2std(wxGetCwd()));
+    CapDirectory(dir);
+	this->textDirectory->SetValue(nano::std2wx(dir));
+
     char text[80];
     
     int curIdx = ImageTrackerController::Instance()->GetImageIndex();
