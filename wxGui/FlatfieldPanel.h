@@ -22,10 +22,10 @@ class FlatfieldPanel: public FilterControlPanel {
 public:
     // begin wxGlade: FlatfieldPanel::ids
     enum {
-        CHECK_FLAT_IMAGE = wxID_HIGHEST + 1152,
-        BUTTON_BROWSE_FLAT = wxID_HIGHEST + 1154,
-        CHECK_BACKGROUND_IMAGE = wxID_HIGHEST + 1156,
-        BUTTON_BROWSE_BACKGROUND = wxID_HIGHEST + 1158
+        CHECK_FLAT_IMAGE = wxID_HIGHEST + 1155,
+        BUTTON_BROWSE_FLAT = wxID_HIGHEST + 1157,
+        CHECK_BACKGROUND_IMAGE = wxID_HIGHEST + 1159,
+        BUTTON_BROWSE_BACKGROUND = wxID_HIGHEST + 1161
     };
     // end wxGlade
 

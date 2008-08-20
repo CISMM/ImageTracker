@@ -18,6 +18,7 @@
 
 #include "vtkInteractorStyleSwitch.h"
 
+#include "DifferenceOfGaussiansPanel.h"
 #include "FileUtils.h"
 #include "FlatfieldPanel.h"
 #include "GaussianFilterPanel.h"
@@ -73,6 +74,7 @@ ImageTracker::ImageTracker(wxWindow* parent, int id, const wxString& title, cons
     menuFile->Append(MENU_EXIT, wxT("E&xit"), wxT("Quit ImageTracker"), wxITEM_NORMAL);
     itMenuBar->Append(menuFile, wxT("&File"));
     wxMenu* menuFilter = new wxMenu();
+    menuFilter->Append(MENU_DIFFERENCE_OF_GAUSSIANS, wxT("&Difference of Gaussians"), wxT("Apply a difference of gaussians filter"), wxITEM_NORMAL);
     menuFilter->Append(MENU_FLATFIELD, wxT("&Flatfield"), wxT("Apply a constant image flatfielding and/or background subtraction"), wxITEM_NORMAL);
     menuFilter->Append(MENU_GAUSSIAN, wxT("&Gaussian"), wxT("Apply 2D Gaussian smoothing"), wxITEM_NORMAL);
     menuFilter->Append(MENU_GRADIENT_MAGNITUDE, wxT("Gradient &Magnitude"), wxT("Detect edges with a gradient magnitude image filter"), wxITEM_NORMAL);
@@ -217,6 +219,7 @@ BEGIN_EVENT_TABLE(ImageTracker, wxFrame)
     EVT_MENU(MENU_SAVE_FILTER, ImageTracker::OnSaveFilterImages)
     EVT_MENU(MENU_SAVE_VIEW, ImageTracker::OnSaveViewImages)
     EVT_MENU(MENU_EXIT, ImageTracker::OnExit)
+    EVT_MENU(MENU_DIFFERENCE_OF_GAUSSIANS, ImageTracker::OnDifferenceOfGaussians)
     EVT_MENU(MENU_FLATFIELD, ImageTracker::OnFlatfield)
     EVT_MENU(MENU_GAUSSIAN, ImageTracker::OnGaussian)
     EVT_MENU(MENU_GRADIENT_MAGNITUDE, ImageTracker::OnGradientMagnitude)
@@ -326,6 +329,16 @@ void ImageTracker::OnGaussian(wxCommandEvent &event)
         this->selectLastFilter = true;
         GaussianFilterPanel* gaussian = new GaussianFilterPanel(this->panelFilterControl, -1);
         ImageTrackerController::Instance()->AddFilter(gaussian);
+    }
+}
+
+void ImageTracker::OnDifferenceOfGaussians(wxCommandEvent &event)
+{
+    if (this->AssertImageCount(1))
+    {
+        this->selectLastFilter = true;
+        DifferenceOfGaussiansPanel* dog = new DifferenceOfGaussiansPanel(this->panelFilterControl, -1);
+        ImageTrackerController::Instance()->AddFilter(dog);
     }
 }
 

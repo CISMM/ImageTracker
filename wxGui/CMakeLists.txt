@@ -6,6 +6,7 @@ SET (Gui_SRCS
     CLGOpticalFlowDialog.cpp                    CLGOpticalFlowDialog.h
     CompositeImageFileSet.cxx                   CompositeImageFileSet.h
 						                        ConnectVTKITK.h
+    DifferenceOfGaussiansPanel.cpp              DifferenceOfGaussiansPanel.h
     EmptyVisualizationControl.cpp               EmptyVisualizationControl.h
     FilePatternDialog.cpp                       FilePatternDialog.h
     FilePatternPanel.cpp                        FilePatternPanel.h

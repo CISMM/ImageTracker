@@ -21,10 +21,10 @@ class RegionPanel: public FilterControlPanel {
 public:
     // begin wxGlade: RegionPanel::ids
     enum {
-        SLIDE_REGION_LEFT = wxID_HIGHEST + 1148,
-        SLIDE_REGION_RIGHT = wxID_HIGHEST + 1149,
-        SLIDE_REGION_BOTTOM = wxID_HIGHEST + 1150,
-        SLIDE_REGION_TOP = wxID_HIGHEST + 1151
+        SLIDE_REGION_LEFT = wxID_HIGHEST + 1151,
+        SLIDE_REGION_RIGHT = wxID_HIGHEST + 1152,
+        SLIDE_REGION_BOTTOM = wxID_HIGHEST + 1153,
+        SLIDE_REGION_TOP = wxID_HIGHEST + 1154
     };
     // end wxGlade
 

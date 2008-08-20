@@ -21,8 +21,8 @@ class GradientMagnitudePanel: public FilterControlPanel {
 public:
     // begin wxGlade: GradientMagnitudePanel::ids
     enum {
-        SLIDE_SPATIAL_SCALE = wxID_HIGHEST + 1160,
-        CHECK_NORMALIZE_SCALE = wxID_HIGHEST + 1161
+        SLIDE_SPATIAL_SCALE = wxID_HIGHEST + 1163,
+        CHECK_NORMALIZE_SCALE = wxID_HIGHEST + 1164
     };
     // end wxGlade
 

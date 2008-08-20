@@ -14,9 +14,9 @@ class SaveVisualizationDialog: public wxDialog {
 public:
     // begin wxGlade: SaveVisualizationDialog::ids
     enum {
-        BUTTON_BROWSE = wxID_HIGHEST + 1100,
-        TEXT_RANGE_FROM = wxID_HIGHEST + 1102,
-        TEXT_RANGE_TO = wxID_HIGHEST + 1104
+        BUTTON_BROWSE = wxID_HIGHEST + 1103,
+        TEXT_RANGE_FROM = wxID_HIGHEST + 1105,
+        TEXT_RANGE_TO = wxID_HIGHEST + 1107
     };
     // end wxGlade
 

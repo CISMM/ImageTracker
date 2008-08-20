@@ -28,10 +28,10 @@ class FileSetPanel: public wxPanel {
 public:
     // begin wxGlade: FileSetPanel::ids
     enum {
-        BUTTON_ADD_EXAMPLE = wxID_HIGHEST + 1128,
-        BUTTON_ADD_SELECTION = wxID_HIGHEST + 1130,
-        BUTTON_ADD_PATTERN = wxID_HIGHEST + 1132,
-        BUTTON_REMOVE_SELECTION = wxID_HIGHEST + 1134
+        BUTTON_ADD_EXAMPLE = wxID_HIGHEST + 1131,
+        BUTTON_ADD_SELECTION = wxID_HIGHEST + 1133,
+        BUTTON_ADD_PATTERN = wxID_HIGHEST + 1135,
+        BUTTON_REMOVE_SELECTION = wxID_HIGHEST + 1137
     };
     // end wxGlade
 

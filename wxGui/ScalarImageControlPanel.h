@@ -20,11 +20,11 @@ class ScalarImageControlPanel: public wxPanel {
 public:
     // begin wxGlade: ScalarImageControlPanel::ids
     enum {
-        CHECK_VISIBILITY = wxID_HIGHEST + 1092,
-        SLIDE_WINDOW_MAX = wxID_HIGHEST + 1094,
-        SLIDE_WINDOW_MIN = wxID_HIGHEST + 1095,
-        COMBO_WINDOW_RANGE = wxID_HIGHEST + 1096,
-        BUTTON_AUTO = wxID_HIGHEST + 1098
+        CHECK_VISIBILITY = wxID_HIGHEST + 1095,
+        SLIDE_WINDOW_MAX = wxID_HIGHEST + 1097,
+        SLIDE_WINDOW_MIN = wxID_HIGHEST + 1098,
+        COMBO_WINDOW_RANGE = wxID_HIGHEST + 1099,
+        BUTTON_AUTO = wxID_HIGHEST + 1101
     };
     // end wxGlade
 

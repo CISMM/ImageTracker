@@ -22,11 +22,11 @@ class GaussianFilterPanel: public FilterControlPanel {
 public:
     // begin wxGlade: GaussianFilterPanel::ids
     enum {
-        SLIDE_SIGMA_X = wxID_HIGHEST + 1140,
-        COMBO_ORDER_X = wxID_HIGHEST + 1141,
-        BUTTON_LOCK_SLIDERS = wxID_HIGHEST + 1143,
-        SLIDE_SIGMA_Y = wxID_HIGHEST + 1145,
-        COMBO_ORDER_Y = wxID_HIGHEST + 1146
+        SLIDE_SIGMA_X = wxID_HIGHEST + 1143,
+        COMBO_ORDER_X = wxID_HIGHEST + 1144,
+        BUTTON_LOCK_SLIDERS = wxID_HIGHEST + 1146,
+        SLIDE_SIGMA_Y = wxID_HIGHEST + 1148,
+        COMBO_ORDER_Y = wxID_HIGHEST + 1149
     };
     // end wxGlade
 

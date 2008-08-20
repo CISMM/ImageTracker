@@ -36,40 +36,41 @@ class ImageTracker: public wxFrame {
 public:
     // begin wxGlade: ImageTracker::ids
     enum {
-        MENU_OPEN = wxID_HIGHEST + 1021,
-        MENU_SAVE_FILTER = wxID_HIGHEST + 1022,
-        MENU_SAVE_VIEW = wxID_HIGHEST + 1023,
-        MENU_EXIT = wxID_HIGHEST + 1024,
-        MENU_FLATFIELD = wxID_HIGHEST + 1025,
-        MENU_GAUSSIAN = wxID_HIGHEST + 1026,
-        MENU_GRADIENT_MAGNITUDE = wxID_HIGHEST + 1027,
-        MENU_LOGARITHM = wxID_HIGHEST + 1028,
-        MENU_THRESHOLD = wxID_HIGHEST + 1029,
-        MENU_APPLY_TRANSFORM = wxID_HIGHEST + 1030,
-        MENU_CLG_OPTICAL_FLOW = wxID_HIGHEST + 1031,
-        MENU_HORN_OPTICAL_FLOW = wxID_HIGHEST + 1032,
-        MENU_INTEGRATE_FLOW = wxID_HIGHEST + 1033,
-        MENU_OCCLUSIONS = wxID_HIGHEST + 1034,
-        MENU_STABILIZE = wxID_HIGHEST + 1035,
-        MENU_WINDOW_CONTRAST = wxID_HIGHEST + 1036,
-        MENU_LOGGER = wxID_HIGHEST + 1037,
-        MENU_IMAGE_INFO = wxID_HIGHEST + 1038,
-        MENU_LOOP_PLAY = wxID_HIGHEST + 1039,
-        MENU_MANUAL = wxID_HIGHEST + 1040,
-        MENU_ABOUT = wxID_HIGHEST + 1041,
-        LIST_FILTERS = wxID_HIGHEST + 1063,
-        BUTTON_REMOVE_FILTER = wxID_HIGHEST + 1065,
-        BUTTON_CLEAR_FILTERS = wxID_HIGHEST + 1067,
-        BUTTON_APPLY_VECTOR = wxID_HIGHEST + 1069,
-        COMBO_VECTOR_METHOD = wxID_HIGHEST + 1071,
-        SLIDE_IMAGE_INDEX = wxID_HIGHEST + 1073,
-        BUTTON_FIRST = wxID_HIGHEST + 1074,
-        BUTTON_PREVIOUS = wxID_HIGHEST + 1076,
-        BUTTON_REWIND = wxID_HIGHEST + 1078,
-        BUTTON_PAUSE = wxID_HIGHEST + 1080,
-        BUTTON_PLAY = wxID_HIGHEST + 1082,
-        BUTTON_NEXT = wxID_HIGHEST + 1084,
-        BUTTON_LAST = wxID_HIGHEST + 1086
+        MENU_OPEN = wxID_HIGHEST + 1022,
+        MENU_SAVE_FILTER = wxID_HIGHEST + 1023,
+        MENU_SAVE_VIEW = wxID_HIGHEST + 1024,
+        MENU_EXIT = wxID_HIGHEST + 1025,
+        MENU_DIFFERENCE_OF_GAUSSIANS = wxID_HIGHEST + 1026,
+        MENU_FLATFIELD = wxID_HIGHEST + 1027,
+        MENU_GAUSSIAN = wxID_HIGHEST + 1028,
+        MENU_GRADIENT_MAGNITUDE = wxID_HIGHEST + 1029,
+        MENU_LOGARITHM = wxID_HIGHEST + 1030,
+        MENU_THRESHOLD = wxID_HIGHEST + 1031,
+        MENU_APPLY_TRANSFORM = wxID_HIGHEST + 1032,
+        MENU_CLG_OPTICAL_FLOW = wxID_HIGHEST + 1033,
+        MENU_HORN_OPTICAL_FLOW = wxID_HIGHEST + 1034,
+        MENU_INTEGRATE_FLOW = wxID_HIGHEST + 1035,
+        MENU_OCCLUSIONS = wxID_HIGHEST + 1036,
+        MENU_STABILIZE = wxID_HIGHEST + 1037,
+        MENU_WINDOW_CONTRAST = wxID_HIGHEST + 1038,
+        MENU_LOGGER = wxID_HIGHEST + 1039,
+        MENU_IMAGE_INFO = wxID_HIGHEST + 1040,
+        MENU_LOOP_PLAY = wxID_HIGHEST + 1041,
+        MENU_MANUAL = wxID_HIGHEST + 1042,
+        MENU_ABOUT = wxID_HIGHEST + 1043,
+        LIST_FILTERS = wxID_HIGHEST + 1066,
+        BUTTON_REMOVE_FILTER = wxID_HIGHEST + 1068,
+        BUTTON_CLEAR_FILTERS = wxID_HIGHEST + 1070,
+        BUTTON_APPLY_VECTOR = wxID_HIGHEST + 1072,
+        COMBO_VECTOR_METHOD = wxID_HIGHEST + 1074,
+        SLIDE_IMAGE_INDEX = wxID_HIGHEST + 1076,
+        BUTTON_FIRST = wxID_HIGHEST + 1077,
+        BUTTON_PREVIOUS = wxID_HIGHEST + 1079,
+        BUTTON_REWIND = wxID_HIGHEST + 1081,
+        BUTTON_PAUSE = wxID_HIGHEST + 1083,
+        BUTTON_PLAY = wxID_HIGHEST + 1085,
+        BUTTON_NEXT = wxID_HIGHEST + 1087,
+        BUTTON_LAST = wxID_HIGHEST + 1089
     };
     // end wxGlade
 
@@ -222,6 +223,7 @@ public:
     virtual void OnLogarithm(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void OnSaveFilterImages(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void OnManual(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void OnDifferenceOfGaussians(wxCommandEvent &event); // wxGlade: <event_handler>
 }; // wxGlade: end class
 
 class ITApp : public wxApp

@@ -16,13 +16,13 @@ class FilePatternPanel: public wxPanel {
 public:
     // begin wxGlade: FilePatternPanel::ids
     enum {
-        TEXT_DIRECTORY = wxID_HIGHEST + 1106,
-        BUTTON_BROWSE = wxID_HIGHEST + 1108,
-        TEXT_PREFIX = wxID_HIGHEST + 1110,
-        TEXT_NUMBER_FORMAT = wxID_HIGHEST + 1112,
-        TEXT_EXTENSION = wxID_HIGHEST + 1114,
-        TEXT_RANGE_START = wxID_HIGHEST + 1116,
-        TEXT_RANGE_END = wxID_HIGHEST + 1118
+        TEXT_DIRECTORY = wxID_HIGHEST + 1109,
+        BUTTON_BROWSE = wxID_HIGHEST + 1111,
+        TEXT_PREFIX = wxID_HIGHEST + 1113,
+        TEXT_NUMBER_FORMAT = wxID_HIGHEST + 1115,
+        TEXT_EXTENSION = wxID_HIGHEST + 1117,
+        TEXT_RANGE_START = wxID_HIGHEST + 1119,
+        TEXT_RANGE_END = wxID_HIGHEST + 1121
     };
     // end wxGlade
     

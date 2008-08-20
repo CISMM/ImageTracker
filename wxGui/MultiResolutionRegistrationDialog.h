@@ -24,8 +24,8 @@ class MultiResolutionRegistrationDialog: public wxDialog {
 public:
     // begin wxGlade: MultiResolutionRegistrationDialog::ids
     enum {
-        SLIDE_MAX_SMOOTH = wxID_HIGHEST + 1088,
-        SLIDE_MIN_SMOOTH = wxID_HIGHEST + 1089
+        SLIDE_MAX_SMOOTH = wxID_HIGHEST + 1091,
+        SLIDE_MIN_SMOOTH = wxID_HIGHEST + 1092
     };
     // end wxGlade
 

@@ -22,8 +22,8 @@ class ImageFileSetPanel: public FilterControlPanel {
 public:
     // begin wxGlade: ImageFileSetPanel::ids
     enum {
-        RADIO_PIXEL_TYPE = wxID_HIGHEST + 1120,
-        BUTTON_APPLY = wxID_HIGHEST + 1122
+        RADIO_PIXEL_TYPE = wxID_HIGHEST + 1123,
+        BUTTON_APPLY = wxID_HIGHEST + 1125
     };
     // end wxGlade
 
