@@ -144,6 +144,8 @@ private:
 
 #include "itkImageRegionConstIterator.h"
 
+#include <algorithm>
+                 
 #include "ImageUtils.h"
 #include "Logger.h"
 
@@ -174,7 +176,11 @@ void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
     step->SetStructureTensor(tensor->GetOutput());
     step->SetRegularization(this->GetRegularization());
     // step->SetRelaxation(this->GetRelaxation());
-    // step->SetNumberOfThreads(4);
+    
+    // throttle number of threads to 4 to keep BASS admins happy.  :)
+    // the flow computation doesn't seem to benefit from much more than 4
+    int threads = step->GetNumberOfThreads();
+    step->SetNumberOfThreads(std::min(4, threads));
     Logger::debug << function << ": iterative step filter threads: " << step->GetNumberOfThreads() << std::endl;
 
     // Initialize output to zero flow field	
@@ -187,7 +193,7 @@ void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
     OutputPixelType zero;
     zero.Fill(0);
     output->FillBuffer(zero);
-    PrintImageInfo<OutputImageType>(output, "Initial flow");
+//     PrintImageInfo<OutputImageType>(output, "Initial flow");
 
     // Iteratively calculate flow field
     Logger::debug << function << ": caluculating flow field" << std::endl;
@@ -209,9 +215,9 @@ void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
 // 	sprintf(msg, "Flow after step %d", i);
 // 	PrintImageInfo<OutputImageType>(output, std::string(msg));
     }
-    char msg[80];
-    sprintf(msg, "Flow after step %d", this->m_Iterations);
-    PrintImageInfo<OutputImageType>(output, std::string(msg));
+//     char msg[80];
+//     sprintf(msg, "Flow after step %d", this->m_Iterations);
+//     PrintImageInfo<OutputImageType>(output, std::string(msg));
 
     // Call AfterGenerateData to calculate the confidence image.
     this->AfterGenerateData();
@@ -251,7 +257,7 @@ bool CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
 
     Logger::debug << function << ": Completion metric: " << (ssd/pixCount) << std::endl;
     
-    // complete = (ssd/pixCount) < 1e-9;
+//     complete = (ssd/pixCount) < 4e-11;
 
     return complete;
 }
