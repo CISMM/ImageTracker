@@ -20,14 +20,14 @@ int main(int argc, char** argv)
     Logger::debug << function << ": Parsing parameters" << std::endl;
     if (argc < 6)
     {
-        Logger::warning << "Usage:\n\t" << argv[0] << " dir formatIn start end formatOut [sigmaD] [sigmaI] [regularization] [iterations] [levels]" << std::endl;
+        Logger::warning << "Usage:\n\t" << argv[0] << " dir formatIn start count formatOut [sigmaD] [sigmaI] [regularization] [iterations] [levels]" << std::endl;
         return 1;
     }
 
     std::string dir = argv[1];
     std::string formatIn = argv[2];
     int start = atoi(argv[3]);
-    int end = atoi(argv[4]);
+    int count = atoi(argv[4]);
     std::string formatOut = argv[5];
     float sigmaI = argc > 6 ? atof(argv[6]) : 1.0;
     float sigmaD = argc > 7 ? atof(argv[7]) : 2.4;
@@ -36,8 +36,8 @@ int main(int argc, char** argv)
     int levels = argc > 10 ? atoi(argv[10]) : 3;
     
     Logger::debug << function << ": Setting up image I/O" << std::endl;
-    FileSet filesIn(FilePattern(dir, formatIn, start, end));
-    FileSet filesOut(FilePattern(dir, formatOut, start, end));
+    FileSet filesIn(FilePattern(dir, formatIn, start, start + count));
+    FileSet filesOut(FilePattern(dir, formatOut, start, start + count));
     ImageFileSetReader::Pointer images = ImageFileSetReader::New();
     images->SetFileSet(filesIn);
     
