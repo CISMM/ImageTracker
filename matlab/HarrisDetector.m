@@ -32,7 +32,7 @@ if (nargin < 2)
     params = [];
 end
 
-featureRadius = GetFieldDefault(params, 'patchRadius', 5);
+featureRadius = GetFieldDefault(params, 'searchRadius', 5);
 featureRadius = max(featureRadius);
 
 % Create some Gaussian filters

@@ -3,7 +3,7 @@ function [ features, corrMaps ] = NCCFlow(imgs, frameIdx, params, features )
 % cross-correlation (NCC) block matching.
 % Input (default)
 %   imgs            - the images to track
-%   frameIdx        - the indeces of the frames to track
+%   frameIdx        - the indices of the frames to track
 %   params          - tracking parameters, including:
 %       .patchRadius    - the radius of each feature patch
 %       .searchRadius   - the radius of the matching search region

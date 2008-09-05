@@ -1,4 +1,4 @@
-function [ features ] = KLTTracker( imgs, sigmaS, count, featRadius, featFrame, windRadius, iters, trackError, comparePrev )
+function [ features ] = KLTTracker( imgs, params )
 % KLTTracker( imgs, sigmaS, sigmaT, count, featRadius, featFrame ) Tracks
 % features in an image sequence.
 %
@@ -11,101 +11,104 @@ function [ features ] = KLTTracker( imgs, sigmaS, count, featRadius, featFrame, 
 % that fail the error test are no longer tracked.  New features, however,
 % can be detected periodically.
 %
-% The tracked feature information is stored in a F x 4 x N matrix, where F
-% is the total number of features detected throughout the video sequence
-% and N is the number of frames in the image sequence.  For each feature at
-% each frame, the 4-vector provides:
-% y-position  - in pixels
-% x-position  - in pixels
-% error       - the error metric value for the feature in the current
-% frame; this value ranges between 0 and 1, 1 representing the best
-% tracking. This value is used to determine when tracking fails, so once
-% the error metric for a particular feature drops below a certain
-% threshold, the features is no longer considered valid and all subsequent
-% error values should be 0.
-% valid       - Indicates whether the feature is successfully tracked in
-% the current frame
+% The tracked feature information is stored in an F-element feature
+% structure array, where F is the total number of features detected
+% throughout the video sequence. For each feature the structure provides:
+%
+%   features        - the structure array of features, with fields
+%       .pos        - the Nx2 positions of a feature, where N is the frame
+%       index and the positions are stored (y,x) in each row
+%       .error      - the Nx1 error metric values for the feature
+%       .active     - a Nx1 array indicating if a feature is valid in a
+%       given frame this value ranges between 0 and 1, 1 representing the
+%       best tracking. This value is used to determine when tracking fails,
+%       so once the error metric for a particular feature drops below a
+%       certain threshold, the features is no longer considered valid and
+%       all subsequent error values should be 0
+%       .patch      - the patch appearance when first detected
 %
 % Some progress information is provided to give some indication of how long
 % the tracking process is likely to take.
 %
 % Input (default):
-% imgs        - The image sequence on which to perform tracking
-% sigmaS      - The spatial scale to use for image smoothing and image
-% derivative computation (1.0)
-% count       - The maximum number of concurrent actively tracked features
-% (500)
-% featRadius  - The minimum distance in pixels between two features (5)
-% featFrame   - The number of frames to wait before searching for new
-% features to track (5)
-% windRadius  - The radius of the feature window
-% iters       - The number of linear equation iterations to use when
-% tracking features
-% trackError  - The error threshold for accepting a tracked feature, based
-% on NCC (0.5)
-% comparePrev - Whether to compare features to the previous frame instead
-% of the first frame in which the feature appeared (0, false).
+% imgs -                The image sequence on which to perform tracking
+% params -              A parameters structure with the following elements:
+%   .derivativeScale -  the spatial scale to use for derivative computation
+%   .integralScale -    the spatial scale to use for image smoothing
+%   .featureRadius -    the minimum distance in pixels between two features
+%   .featureFrames -    the number of frames to wait before searching for
+%   new features to track
+%   .maxFeatures -      the maximum number of actively tracked features
+%   .featureThreshold - the Harris feature detector value below which to
+%   reject features
+%   .windowRadius -     the radius of the window to use when computing
+%   patch displacements
+%   .iterations -       the number of iterations to use when solving for
+%   motion
+%   .errorTolerance -   the error threshold for accepting a tracked feature
+%   .updateFeature -    whether to update the feature appearances at each
+%   frame instead of always comparing to the first feature appearance.
 %
-% Output:
-% features    - The Fx4xN feature tracking matrix, as described above
+% Output
+% features -    the feature structure array as described above
 
 display(sprintf('KLTTracker: %s \t Starting', datestr(now, 'HH:MM:SS')));
 
-if (nargin < 9)
-    comparePrev = 0;
-end;
-if (nargin < 8)
-    trackError = 0.50;
-end;
-if (nargin < 7)
-    iters = 1;
-end;
-if (nargin < 6)
-    windRadius = 2;
-end;
-if (nargin < 5)
-    featFrame = 5;
-end;
-if (nargin < 4)
-    featRadius = 5;
-end;
-if (nargin < 3)
-    count = 500;
-end;
 if (nargin < 2)
-    sigmaS = 1.0;
-end;
+    params = [];
+end
+
+% setup default parameters
+[v, params] = GetFieldDefault(params, 'derivativeScale', 1.0);
+[v, params] = GetFieldDefault(params, 'integralScale', 2.4);
+[v, params] = GetFieldDefault(params, 'featureRadius', [2 2]);
+[v, params] = GetFieldDefault(params, 'searchRadius', ceil(2.5 * params.featureRadius));
+[v, params] = GetFieldDefault(params, 'featureFrames', 5);
+[v, params] = GetFieldDefault(params, 'maxFeatures', 500);
+[v, params] = GetFieldDefault(params, 'featureThreshold', 0.0025);
+[v, params] = GetFieldDefault(params, 'iterations', 2);
+[v, params] = GetFieldDefault(params, 'errorTolerance', 0.65);
+[v, params] = GetFieldDefault(params, 'updateFeature', 0);
 
 [h w t] = size(imgs);
 
-featCutoff = 0.0025;
-
 % Find initial features
-features(:,:,1) = HarrisDetector(squeeze(imgs(:,:,1)), sigmaS, sigmaS, count, featRadius, [], featCutoff);
-displayFeatures(imgs(:,:,1), features(:,:,1));
-pause(0.25);
+featurePos = HarrisDetector(imgs(:,:,1), params);
+features = CreateFeatures(featurePos);
+features = ExtractFeatureImages(imgs(:,:,1), features, params.featureRadius);
+
+[ph, pw] = size(features(1).patch);
+patches = reshape([features.patch], ph, pw, []);
+
+figure(1); clf;
+subplot(2,1,1)
+displayFeatures(imgs(:,:,1), featurePos);
+subplot(2,1,2);
+dispimg(ImageMontage(patches, 20, 1, 0));
+drawnow;
 
 for i=1:t-1
     % Find new features, if need be
-    if (i > 1 && mod(i-1,featFrame) == 0)
-        newFeat = HarrisDetector(imgs(:,:,i), sigmaS, sigmaS, count, featRadius, features(:,:,i), featCutoff);
-        features(end:size(newFeat,1),:,:) = 0; % expand features
-        features(:,:,i) = newFeat;
-        clear newFeat;
+    if (i > 1 && mod(i-1,params.featureFrames) == 0)
+        N = length(features);
+        position = reshape([features.pos], [], 2, N);   % i x 2 x N matrix
+        active = logical(reshape([features.active], [], N));     % i x N matrix
+        oldPos = squeeze(position(end, :, active(end,:)))';
+        newPos = HarrisDetector(imgs(:,:,i), params, oldPos);
+        oldCnt = length(oldPos);
+        newCnt = length(newPos) - oldCnt;
+        newIdx = N+1:N+newCnt;
+        features = CreateFeatures(newPos(oldCnt+1:end,:), i, features);
+        features(newIdx) = ExtractFeatureImages(imgs(:,:,i), features(newIdx), params.featureRadius, i);
     end;
     
-    % Kill features that have gotten too close to the edge of the image
-    fidx = find(features(:,4,end));
-    features(fidx,4,end) = (features(fidx,1,end) > 1+featRadius).*(features(fidx,1,end) < h-featRadius).*(features(fidx,2,end) > 1+featRadius).*(features(fidx,2,end) < w-featRadius);
-
     % Track the features for one frame
-    d = TrackFeatures(imgs(:,:,i), imgs(:,:,i+1), features(:,:,i), windRadius, sigmaS, iters);
-    features(:,1:2,i+1) = features(:,1:2,i) + d;
-    % Check the error on tracked features
-    [err, val] = CheckError(imgs, features, trackError, windRadius, comparePrev);
-    features(:,3:4,i+1) = [err val];
+    features = KLTTrackerStep(imgs, [i i+1], features, params);
     
     % Progress update
-    display(sprintf('Progress %s: %3d of %3d (%3d%%), %5d of %5d features valid', datestr(now, 'HH:MM:SS'), i, t-1, round(100*i/(t-1)), sum(features(:,4,i+1)), size(features,1)));
+    N = length(features);
+    active = reshape([features.active], [], N);
+    nowActive = sum(active(end,:));
+    display(sprintf('Progress %s: %3d of %3d (%3d%%), %5d of %5d features valid', datestr(now, 'HH:MM:SS'), i, t-1, round(100*i/(t-1)), nowActive, N));
 end;
 display(sprintf('KLTTracker: %s \t Finished', datestr(now, 'HH:MM:SS')));
