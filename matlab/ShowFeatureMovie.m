@@ -31,6 +31,9 @@ function [ ] = ShowFeatureMovie( imgs, features, tracks, fps, filename )
 % Output:
 % none
 
+figure(gcf);
+clf;
+
 % Setup defaults
 if (nargin < 5)
     filename = '';
