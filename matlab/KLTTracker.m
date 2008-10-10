@@ -65,10 +65,11 @@ end
 [v, params] = GetFieldDefault(params, 'searchRadius', ceil(2.5 * params.featureRadius));
 [v, params] = GetFieldDefault(params, 'featureFrames', 5);
 [v, params] = GetFieldDefault(params, 'maxFeatures', 500);
-[v, params] = GetFieldDefault(params, 'featureThreshold', 0.0025);
+[v, params] = GetFieldDefault(params, 'featureCutoff', 0.80);
 [v, params] = GetFieldDefault(params, 'iterations', 2);
 [v, params] = GetFieldDefault(params, 'errorTolerance', 0.65);
 [v, params] = GetFieldDefault(params, 'updateFeature', 0);
+disp(params);
 
 [h w t] = size(imgs);
 
@@ -76,6 +77,8 @@ end
 featurePos = HarrisDetector(imgs(:,:,1), params);
 features = CreateFeatures(featurePos);
 features = ExtractFeatureImages(imgs(:,:,1), features, params.featureRadius);
+
+fprintf('Harris features: %d\tCreatedFeatures %d\n', length(featurePos), length(features));
 
 [ph, pw] = size(features(1).patch);
 patches = reshape([features.patch], ph, pw, []);
