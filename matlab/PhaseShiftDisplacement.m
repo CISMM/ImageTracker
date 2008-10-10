@@ -1,4 +1,4 @@
-function [disp, shift, rotation, harmonics] = PhaseShiftDisplacement(img1, img2, featSize)
+function [disp, theta, harmonics] = PhaseShiftDisplacement(img1, img2, featSize, theta)
 % PhaseShiftDisplacement finds the displacement between two images
 % considering the frequencies represented by a particular feature size.
 %
@@ -17,83 +17,80 @@ if (isempty(debug))
     debug = false;
 end
 
-% window the images and compute fft
 [h, w] = size(img1);
+% frequency and harmonics
+if (featSize < 2 | featSize > h)
+    warning('feature size must be between 2 pixels and %d pixels', h);
+    return;
+end
+freqs = h / featSize * [1 2 3 4 5 6];
+
+% window the images and compute fft
 rad = round(size(img1,1)/2);
 imgWind1 = WindowImage(img1, 'none', rad);
 imgWind2 = WindowImage(img2, 'none', rad);
 fftimg1 = fftshift(fft2(imgWind1));
 fftimg2 = fftshift(fft2(imgWind2));
 
-% if (debug)
-%     figure(1); clf;
-%     ShowMovie(cat(3, imgWind1, imgWind2), 2);
-% end
-
 % extract frequency components for the feature size
-samps = 1440;
-[fcomp1, theta1] = ExtractFrequency(fftimg1, featSize, samps); %, [-1 0 1]/2, [1/4, 1/2, 1/4]);
-[fcomp2, theta2] = ExtractFrequency(fftimg2, featSize, samps); %, [-1 0 1]/2, [1/4, 1/2, 1/4]);
+if (nargin < 4)
+    samps = 720;
+    [magCirc1, theta1] = ExtractFrequency(fftimg1, freqs(1), samps);
+    [magCirc2, theta2] = ExtractFrequency(fftimg2, freqs(1), samps);
 
-% find maxima around the extracted circle
-[max1, imax1] = FindCircularMaxima(abs(fcomp1), theta1);
-[max2, imax2] = FindCircularMaxima(abs(fcomp2), theta2);
+    % find maxima around the extracted circle
+    [max1, imax1] = FindCircularMaxima(magCirc1, theta1);
+    [max2, imax2] = FindCircularMaxima(magCirc2, theta2);
+    theta = theta1(imax1(:,1));
+end
+
+% extract all components along the angles of dominant frequency
+[magPhase1, frequency1] = ExtractAngle(fftimg1, theta, freqs);
+[magPhase2, frequency2] = ExtractAngle(fftimg2, theta, freqs);
+
+% find phase differences at all frequencies along orientation lines
+wavelength = h ./ frequency1;
+[dmin, fundamentalIdx] = min((wavelength - featSize).^2);
+phaseShift = magPhase1(:,3:4) - magPhase2(:,3:4);           % N x 2
+
+% correct for > pi displacements
+wrapIdx = phaseShift > pi;
+phaseShift(wrapIdx) = phaseShift(wrapIdx) - 2 * pi;
+wrapIdx = phaseShift < -pi;
+phaseShift(wrapIdx) = phaseShift(wrapIdx) + 2 * pi;
+
+% find displacement along orientation directions
+dispDiff = phaseShift/(2*pi) .* repmat(wavelength, 1, 2);   % N x 2
+% fprintf('At %0.3f px, phase => %0.3f\t%0.3f\n', wavelength(fundamentalIdx), phaseShift(fundamentalIdx, :));
+
+% compute x,y translation
+basis = [cos(theta) sin(theta)];  % 2 x 2
+dispBasis = dispDiff * basis;                               % N x 2
+disp = dispBasis(fundamentalIdx, :);
 
 % find harmonic frequency components along the angles of dominant frequency
-[harmComp1, harmFreq1] = FindHarmonics(fftimg1, theta1(imax1(1,1)), featSize, [1:3]);
-[harmComp2, harmFreq2] = FindHarmonics(fftimg2, theta1(imax1(1,1)), featSize, [1:3]);
+[harmComp1, harmFreq1] = FindHarmonics(fftimg1, theta(1), featSize, [1:3]);
+[harmComp2, harmFreq2] = FindHarmonics(fftimg2, theta(1), featSize, [1:3]);
 harmonics = [harmComp1, harmComp2];
 
-% find phase differences at all points
-shiftDiff = angle(fcomp1)-angle(fcomp2);
-dispDiff = shiftDiff/(2*pi) * featSize;
-
 % phase correlation at all points
-spectrum = fcomp1.*conj(fcomp2) ./ abs(fcomp1.*fcomp2);
-shiftSpec = angle(spectrum);
-dispSpec = shiftSpec/(2*pi) * featSize;
+% spectrum = fcomp1.*conj(fcomp2) ./ abs(fcomp1.*fcomp2);
+% shiftSpec = angle(spectrum);
+% dispSpec = shiftSpec/(2*pi) * featSize;
 
 % find phase difference at maxima, and compute x,y translation
-shift = [shiftDiff(imax1(:,1)) shiftSpec(imax1(:,1))];
-basis = [cos(theta1(imax1(:,1))) sin(theta1(imax1(:,1)))];
-dispBasis = dispSpec(imax1(:,1));
-disp = dispBasis' * basis;
-rotation = theta1(imax1(1,1));
+% shift = [shiftDiff(imax1(:,1)) shiftSpec(imax1(:,1))];
+% basis = [cos(theta1(imax1(:,1))) sin(theta1(imax1(:,1)))];
+% dispBasis = dispSpec(imax1(:,1));
+% disp = dispBasis' * basis;
+% rotation = theta1(imax1(1,1));
 
 if (debug)
     figure(3); clf;
-
     subplot(2,1,1);
-    plot(theta1, [(log10(abs(fcomp1))) log10(abs(fcomp2))]);
-    hold on;
-    plot(theta1(imax1(:)), log10(max1([1 2 1 2])), 'bo', theta1(imax2(:)), log10(max2([1 2 1 2])), 'go');
-    hold off;
-    grid on;
-    title('Freq. Mag.');
-    xlabel('angle (rad)');
-    legend({'img1', 'img2'});
-
+    plot(wavelength, phaseShift);
     subplot(2,1,2);
-    plot(theta1, [dispSpec]); % dispDiff]);
-    grid on;
-    title('Displacement');
-    xlabel('angle (rad)');
-    ylabel('displacement (px)');
-%     legend({'spectrum','difference'});
-
-%     subplot(3,1,3);
-%     plot(harmFreq1, log10(abs(harmComp1)), 'go', harmFreq2, log10(abs(harmComp2)), 'ro');
-%     title('Freq. Mag.');
-%     xlabel('radius');
-%     legend({'img1', 'img2'});
-    
-%     subplot(3,1,3);
-%     plot(theta1, [shiftSpec shiftDiff]);
-%     title('Phase shift');
-%     xlabel('angle (rad)');
-%     ylabel('shift (rad)');
-%     legend({'spectrum','difference'});
-%     grid on;
+    plot(wavelength, dispBasis);
 end
 
 function [maxVal, maxIdx] = FindCircularMaxima(data, angles)
@@ -133,7 +130,7 @@ maxIdx(2,2) = maxPos(sortIdx(minIdx));
 maxIdx(1,:) = [min(maxIdx(1,:)) max(maxIdx(1,:))];
 maxIdx(2,:) = [min(maxIdx(2,:)) max(maxIdx(2,:))];
 
-function [fftcirc, tt] = ExtractFrequency(fftimg, featSize, samples, ring, weight)
+function [fftcirc, tt] = ExtractFrequency(fftimg, freq, samples)
 % ExtractFrequency extracts all frequency components for a given feature
 % size from an image.  This is conducted in frequency space: the
 % fundamental frequency for the given feature size is determined.  A circle
@@ -143,7 +140,7 @@ function [fftcirc, tt] = ExtractFrequency(fftimg, featSize, samples, ring, weigh
 %
 % Input
 %   fftimg -    the fft of the image on which to operate
-%   featSize -  the size of features asserted to be in the image, in pixels
+%   freq -      the frequency asserted to be in the image
 %   samples -   the number of samples to extract along the circle in
 %   frequency space
 % Output
@@ -153,24 +150,11 @@ function [fftcirc, tt] = ExtractFrequency(fftimg, featSize, samples, ring, weigh
 
 global debug;
 
-if (nargin < 4)
-    ring = 0;
-    weight = 1;
-end
-
 [h, w] = size(fftimg);
 if (h ~= w)
     warning('image must be square');
     return;
 end
-
-if (featSize < 2 | featSize > h)
-    warning('feature size must be between 2 pixels and %d pixels', h);
-    return;
-end
-
-% find fundamental frequency corresponding to feature size
-freq = h/featSize;
 
 % choose a good sampling rate, if not provided explicitly
 if (nargin < 3)
@@ -185,34 +169,55 @@ tt = linspace(0,2*pi,samples+1)';
 tt = tt(1:end-1); % last sample is a repeat
 unitCx = cos(tt);
 unitCy = sin(tt);
-% replicate unit circle for different rings
-circsX = repmat(unitCx, 1, length(ring));
-circsY = repmat(unitCy, 1, length(ring));
-bands = repmat((freq + ring), samples, 1);
-px = circsX.*bands + center(2);
-py = circsY.*bands + center(1);
-% flatten samples
-px = px(:);
-py = py(:);
+% find points on frequency-specific circle
+px = unitCx*freq + center(2);
+py = unitCy*freq + center(1);
+
+% sample the fourier transform along the circles
+fftcirc = interp2(abs(fftimg), px, py, 'linear');
 
 if (debug)
     % debug plot
     figure(2); clf;
+    subplot(2,1,1);
     dispimg(log(abs(fftimg)));
     hold on; plot(px, py, 'r.'); hold off;
+    subplot(2,1,2);
+    plot(tt, log(fftcirc));
+	drawnow;
     pause(0.5);
 end
 
-% sample the fourier transform along the circles
-fftcircR = interp2(real(fftimg), px, py);
-fftcircI = interp2(imag(fftimg), px, py);
+function [magPhase, radius] = ExtractAngle(fftimg, theta, freqs)
+% ExtractAngle extracts all frequency components in a line oriented by the
+% given angles
+global debug;
 
-% reshape and average samples
-fftcircR = reshape(fftcircR, samples, [])*weight';
-fftcircI = reshape(fftcircI, samples, [])*weight';
+[h, w] = size(fftimg);
+center = floor([h w] / 2) + 1;
+radius = (1:0.02:1.25*freqs(end))';          % N x 1
+posX = center(2) + radius * cos(theta(:)'); % N x t
+posY = center(1) + radius * sin(theta(:)'); % N x t
+compR = interp2(real(fftimg), posX, posY, 'linear');
+compI = interp2(imag(fftimg), posX, posY, 'linear');
+compM = interp2(abs(fftimg), posX, posY, 'linear');
+compP = interp2(angle(fftimg), posX, posY, 'linear');
+magPhase = [compM compP];
 
-fftcirc = complex(fftcircR, fftcircI);
-
+if (debug)
+    figure(2); clf;
+    subplot(1,2,1);
+    dispimg(log(abs(fftimg)));
+    hold on; plot(posX(:,1), posY(:,1), 'r-', posX(:,2), posY(:,2), 'g-'); hold off;
+    subplot(1,2,2);
+    hold on;
+    plot(radius, log(compM(:,1)), 'r-', radius, log(compM(:,2)), 'g-');
+    plot(radius, compP(:,1), 'r-', radius, compP(:,2), 'g-');
+    plot(freqs, zeros(size(freqs)), 'b+');
+    hold off;
+    drawnow;
+    pause(0.5);
+end
 
 function [harmComp, freqs] = FindHarmonics(fftimg, theta, featSize, harmonics)
 % ExtractAngle extracts all frequency components in a line oriented by the

@@ -85,7 +85,7 @@ mosaic = StitchImages(imgs, kltDx);
 % frame-to-frame displacement, which is used to stitch images together.
 %
 % First, load the image sequence.
-imgs = LoadImages('/home/beastwoo/Nano/data/kier/20080821-octopus-01/oct+30umdy-%04d.tif', 20, 40, 2);
+imgs = LoadImages('/home/beastwoo/Nano/data/kier/20080821-octopus/octgrid01+30dy-%04d.tif', 20, 40, 2);
 imgs = imgs(:,8:end,:);
 figure(1); clf;
 ShowMovie(imgs);

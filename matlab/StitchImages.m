@@ -34,4 +34,5 @@ for i = 1:t
     imgMosaic(coordWorld1(2):coordWorld2(2), coordWorld1(1):coordWorld2(1)) = interp2(imgs(:,:,i), gridX, gridY, 'linear', 0);
     dispimg(imgMosaic);
     drawnow;
+%     saveas(gca, sprintf('imgs/stitch-%04d.tif', i));
 end

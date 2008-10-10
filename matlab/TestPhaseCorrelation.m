@@ -92,7 +92,7 @@ fprintf('Computed translation (x,y): (%d, %d)\n', dt(1), dt(2));
 % Even a small amount of noise confounds phase correlation of a pattern
 % that does not have broad spectrum support.
 t = 1:1024;
-patSize = 16;
+patSize = 32;
 [xx, yy] = meshgrid(t,t);
 img = cos(2*pi*xx/patSize) + sin(2*pi*yy/patSize);
 img = ScaleData(img, [0 255]);
@@ -189,11 +189,13 @@ fprintf('Computed translation (x,y): (%0.4f, %0.4f)\n', disp);
 % translation is simulated.
 img = double(imread('~/Nano/data/grids/grid01-320z-dx/grid01-0000.tif'));
 img = ScaleData(img, [0 255]);
-imgs = TransformSequence(img, [380 380], [20 20], [1 1], [1 1], 0, [3.4 -8.3], 2);
-imgs = imgs + 5*randn(size(imgs));
+imgs = TransformSequence(img, [440 440], [40 10], [1 1], [1 1], 0, [15.5 -20.8], 10);
+% imgs = imgs + 5*randn(size(imgs));
+[h w N] = size(imgs);
 
 figure(1);clf;
 dispimg(ImageMontage(imgs, 2, 10, 0));
+ShowMovie(imgs);
 
 %%
 % An attempt to register these images using normal phase correlation.
@@ -206,8 +208,21 @@ fprintf('Computed translation (x,y): (%d, %d)\n', dt(1), dt(2));
 %% 
 % Use frequency-specific phase correlation.
 debug = true;
-[disp, phaz, rot] = PhaseShiftDisplacement(imgs(:,:,1), imgs(:,:,end), 110/2);
+[disp, rot] = PhaseShiftDisplacement(imgs(:,:,end), imgs(:,:,2), 110);
 fprintf('Computed translation (x,y): (%0.4f, %0.4f)\n', disp);
+
+%%
+% Look at the frequencies in the image
+fPass = h ./ (110 + [-5 5]);
+imgPass = zeros(h, w, N);
+for i = 1:N
+    imgPass(:,:,i) = real(BandPass(WindowImage(imgs(:,:,i), 'none'), fPass));
+end
+ShowMovie(imgPass);
+
+%%
+debug = true;
+[disp, rot] = FrequencyDisplacement(imgs(:,:,1), imgs(:,:,end), 110)
 
 %% Real data
 % The following is a sequence of the TEM pattern translated by the Mad City
@@ -233,13 +248,13 @@ fprintf('Computed translation (x,y): (%d, %d)\n', dt(1), dt(2));
 %% 
 % Use frequency-specific phase correlation.
 debug = true;
-[disp, phaz, rot] = PhaseShiftDisplacement(imgs(:,:,end), imgs(:,:,1), 110);
+[disp, rot] = PhaseShiftDisplacement(imgs(:,:,end), imgs(:,:,1), 110);
 fprintf('Computed translation (x,y): (%0.4f, %0.4f)\n', disp);
 
 %%
 % Track using phase correlation.
 debug = false;
-dispPx = PhaseShiftTrack(imgs, 109);
+dispPx = PhaseShiftTrack(imgs, 110);
 
 %%
 % Apply physical units and a tracking marker.
@@ -277,21 +292,18 @@ ApplyImageUnits(gca, uppx, '\mum');
 % The following image sequences are taken of octopus tentacle muscle,
 % provided by Bill Kier.  A 1000 mesh grid pattern on a #0 cover slip was
 % fixed to the slide over some muscle regions.
-imgs = LoadImages('~/Nano/data/kier/20080821-octopus-01/oct-30umdx-%04d.tif', 0, 139);
-[h, w, N] = size(imgs);
-imgs = imgs(:, 120:120+h-1, :);
-imgs = 255 * (imgs-min(imgs(:))) / (max(imgs(:))-min(imgs(:)));
+imgs = LoadImages('~/Nano/data/kier/20080821-octopus/octgrid01+30dy-%04d.tif', 0, 90);
+imgs = imgs(11:450, 161:600, 1:end);
+% imgs = 255 * (imgs-min(imgs(:))) / (max(imgs(:))-min(imgs(:)));
 [h, w, N] = size(imgs);
 
 figure(1); clf;
-montSet = round(linspace(1,N,5));
-dispimg(ImageMontage(imgs(:,:,montSet), 5, 10, 0));
 ShowMovie(imgs);
 
 %%
 % Track using phase correlation.
 debug = false;
-dispPx = PhaseShiftTrack(imgs, 110/2);
+dispPx = PhaseShiftTrack(imgs, 110);
 
 %%
 % Apply physical units and a tracking marker.
@@ -323,11 +335,11 @@ end
 % Mosaic.
 
 % load full file sequence
-% imgs = LoadImages('~/Nano/data/kier/20080821-octopus-01/oct-30umdx-%04d.tif', 0, 139);
-% imgs = imgs(5:end-5,5:end-10,:);
+% imgs = LoadImages('~/Nano/data/kier/20080821-octopus/octgrid01+30dx-%04d.tif', 0, 90);
+% imgs = imgs(5:end-5,5:end-10,1:3:end);
 figure(1); clf;
 mosaic = StitchImages(imgs, dispPx);
-dispimg(mosaic);
+dispimg(mosaic(10:end-10,10:end-10));
 ApplyImageUnits(gca, uppx, '\mum');
 
 %% Focus
@@ -353,7 +365,7 @@ debug = false;
 clear harmonics;
 tic;
 for i=1:N-1
-    [disp, phaz, rot, harmonics(i,:)] = PhaseShiftDisplacement(imgs(:,:,i), imgs(:,:,i+1), 110);
+    [disp, rot, harmonics(i,:)] = PhaseShiftDisplacement(imgs(:,:,i), imgs(:,:,i+1), 110);
 end
 elapsed = toc;
 fprintf('Elapsed time: %6.2f\tFPS: %6.2f\n', elapsed, (size(imgs,3)/elapsed));
@@ -372,8 +384,10 @@ legend({num2str((1:3)')});
 %%
 % One possible absolute focus metric is the fall-off between the
 % fundamental and first harmonic in one frame.
-fallOff = abs(harmonics(:,2))./abs(harmonics(:,1));
+h = 2:3;
+fallOff(:,h-1) = abs(harmonics(:,h))./(repmat(abs(harmonics(:,1)), 1, length(h)));
 plot(fallOff);
 title(sprintf('Absolute focus metric:\nharmonic fall-off'));
 xlabel('Frame');
-ylabel('1st harmonic / fundamental');
+ylabel('harmonic / fundamental');
+legend({num2str(h')});

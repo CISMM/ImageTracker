@@ -1,4 +1,4 @@
-function [imgs, dx, dy] = TransformSequence(img, outSize, offset, center, scale, angle, translate, steps)
+function [imgs, tran, dx, dy] = TransformSequence(img, outSize, offset, center, scale, angle, translate, steps)
 % TransformSequence creates a video of an affine transform on an input image.
 %
 % Input:
@@ -15,6 +15,7 @@ function [imgs, dx, dy] = TransformSequence(img, outSize, offset, center, scale,
 imgs = zeros(outSize(1), outSize(2), steps);
 dx = zeros(outSize(1), outSize(2), steps);
 dy = zeros(outSize(1), outSize(2), steps);
+tran = zeros(3,3,steps);
 
 % Parameters to increment at each step
 dAngle = (1/(steps-1)) * angle;
@@ -28,7 +29,7 @@ for i = 1:steps
     iTran = (i-1) * dTran;
     iScale = 1 + (i-1) * dScale;
     
-    tran = CreateTransform(center, iScale, iAngle, iTran);
+    tran(:,:,i) = CreateTransform(center, iScale, iAngle, iTran);
     
-    [imgs(:,:,i), dx(:,:,i), dy(:,:,i)] = TransformImage(img, outSize, offset, tran);
+    [imgs(:,:,i), dx(:,:,i), dy(:,:,i)] = TransformImage(img, outSize, offset, tran(:,:,i));
 end;
