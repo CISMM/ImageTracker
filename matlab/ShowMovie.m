@@ -2,7 +2,8 @@ function [ ] = ShowMovie( frames, fps, filename )
 % ShowMovie(frames, fps) Displays an image sequence in a figure window at
 % the requested frame rate (fps, default is 30).
 
-
+% force the current frame to have focus
+figure(gcf);
 
 if (nargin < 3)
     filename = '';

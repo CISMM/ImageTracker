@@ -1,8 +1,7 @@
 function [hsurf] = NiceSurf(height, cmap)
 
-hsurf = surf(height);
-
 if (nargin > 1)
+    hsurf = surf(height);
     set(hsurf, 'CData', cmap, 'FaceColor', 'texturemap');
 else
     hsurf = surf(height);

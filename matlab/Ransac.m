@@ -4,7 +4,7 @@ function [model, inliers] = Ransac(data, modelFunc, distanceFunc, minModel, tole
 % Input:
 %   data -      the data to evaluate, an MxN matrix where M is the number
 %   of elements per point and N is the number of data points
-%   modelFunc(data) : model -       a function handle that returns a model
+%   modelFunc(data) : model - a function handle that returns a model
 %   given at least minModel points from the data 
 %   distanceFunc(data, model) : error - a function handle that evaluates
 %   the error for all data points given a model
@@ -66,4 +66,10 @@ while tries < maxTries
     end
 end
 
-fprintf('RANSAC: Best transform found in %d tries with %0.3f %% inliers.\n', tries, (100 * count / N));
+global debug;
+if (isempty(debug))
+    debug = false;
+end
+if (debug)
+    fprintf('RANSAC: Best transform found in %d tries with %0.3f %% inliers.\n', tries, (100 * count / N));
+end

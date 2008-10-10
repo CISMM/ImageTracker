@@ -8,19 +8,21 @@ function [ img ] = RandomSplat( imgSize, thresh, kernel )
 % Output
 %   img -       the random image
 
-img = zeros(imgSize);
 rKern = floor(size(kernel) / 2);
 
 % Select a random set of points
 rimg = rand(imgSize) > thresh;
-rimg(1:rKern(1),:) = 0;
-rimg(imgSize(1)-rKern(1):imgSize(1),:) = 0;
-rimg(:,1:rKern(2)) = 0;
-rimg(:,imgSize(2)-rKern(2):imgSize(2)) = 0;
+img = filter2(kernel, rimg, 'same');
 
-[i,j] = find(rimg);
-for p = 1:length(i)
-    x = j(p);
-    y = i(p);
-    img(y-rKern(1):y+rKern(1),x-rKern(2):x+rKern(2)) = img(y-rKern(1):y+rKern(1),x-rKern(2):x+rKern(2)) + kernel;
-end;
+% rimg(1:rKern(1),:) = 0;
+% rimg(imgSize(1)-rKern(1):imgSize(1),:) = 0;
+% rimg(:,1:rKern(2)) = 0;
+% rimg(:,imgSize(2)-rKern(2):imgSize(2)) = 0;
+% 
+% img = zeros(imgSize);
+% [i,j] = find(rimg);
+% for p = 1:length(i)
+%     x = j(p);
+%     y = i(p);
+%     img(y-rKern(1):y+rKern(1),x-rKern(2):x+rKern(2)) = img(y-rKern(1):y+rKern(1),x-rKern(2):x+rKern(2)) + kernel;
+% end;
