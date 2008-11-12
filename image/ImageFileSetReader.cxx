@@ -6,7 +6,7 @@
 #include "Logger.h"
 
 ImageFileSetReader::ImageFileSetReader()
-    : pixelType(ShortPixel), files(), index(0)
+    : pixelType(FloatPixel), files(), index(0)
 {
     this->readerUC2 = ReaderTypeUC2::New();
     this->readerUS2 = ReaderTypeUS2::New();
