@@ -162,11 +162,11 @@ void MultiResolutionOpticalFlowMethod< TFixedImage, TMovingImage >::GenerateData
         warp->SetOutputSpacing(movingImg->GetSpacing());
         warp->UpdateLargestPossibleRegion();
         
-        Logger::debug << function << ": Level => " << level << " Flow input image information:" << std::endl;
-        PrintImageInfo<FixedImageType>(fixedImg, "Fixed image", Logger::debug);
-        PrintImageInfo<MovingImageType>(movingImg, "Moving image", Logger::debug);
-        PrintImageInfo(warp->GetOutput(), "Warped image", Logger::debug);
-        PrintImageInfo<OutputImageType>(currentFlow, "Current flow", Logger::debug);
+//         Logger::debug << function << ": Level => " << level << " Flow input image information:" << std::endl;
+//         PrintImageInfo<FixedImageType>(fixedImg, "Fixed image", Logger::debug);
+//         PrintImageInfo<MovingImageType>(movingImg, "Moving image", Logger::debug);
+//         PrintImageInfo(warp->GetOutput(), "Warped image", Logger::debug);
+//         PrintImageInfo<OutputImageType>(currentFlow, "Current flow", Logger::debug);
         
 //         char filename[80];
 //         sprintf(filename, "warp-lev-%d.tif", level);
@@ -216,16 +216,16 @@ void MultiResolutionOpticalFlowMethod< TFixedImage, TMovingImage >::GenerateData
         currentFlow->DisconnectPipeline();
         
         Logger::debug << function << ": Level => " << level << " Flow output image information:" << std::endl;
-        PrintImageInfo< OutputImageType >(this->GetOpticalFlow()->GetOutput(), "Flow output", Logger::debug);
-        PrintImageInfo< OutputImageType >(add->GetOutput(), "Add output", Logger::debug);
-        PrintImageInfo< OutputImageType >(resample->GetOutput(), "Resample output", Logger::debug);
-        PrintImageInfo< OutputImageType >(scale->GetOutput(), "Scale output", Logger::debug);
+//         PrintImageInfo< OutputImageType >(this->GetOpticalFlow()->GetOutput(), "Flow output", Logger::debug);
+//         PrintImageInfo< OutputImageType >(add->GetOutput(), "Add output", Logger::debug);
+//         PrintImageInfo< OutputImageType >(resample->GetOutput(), "Resample output", Logger::debug);
+//         PrintImageInfo< OutputImageType >(scale->GetOutput(), "Scale output", Logger::debug);
         PrintImageInfo< OutputImageType >(currentFlow, "Updated flow", Logger::debug);
     }
     
-    Logger::debug << function << "Final flow output image information:" << std::endl;
-    PrintImageInfo< OutputImageType >(this->GetOpticalFlow()->GetOutput(), "Flow output", Logger::debug);
-    PrintImageInfo< OutputImageType >(add->GetOutput(), "Add output", Logger::debug);
+//     Logger::debug << function << "Final flow output image information:" << std::endl;
+//     PrintImageInfo< OutputImageType >(this->GetOpticalFlow()->GetOutput(), "Flow output", Logger::debug);
+//     PrintImageInfo< OutputImageType >(add->GetOutput(), "Add output", Logger::debug);
 
     this->GraftOutput(add->GetOutput());
     PrintImageInfo< OutputImageType >(this->GetOutput(), "MR flow output", Logger::debug);
