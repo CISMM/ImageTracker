@@ -1,5 +1,7 @@
 #include "FileUtils.h"
 
+#include <cstdlib>
+
 #ifdef _WIN32
 extern const std::string PATH_DELIMITER("\\");
 #else
