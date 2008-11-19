@@ -6,7 +6,7 @@
 #include "itkVector.h"
 
 #include "CommonTypes.h"
-#include "ItkPipeline.h"
+#include "ItkVectorPipeline.h"
 
 /**
  * \class StrainTensorPipeline
@@ -18,7 +18,7 @@
  * Strain is a measure of change in displacement as an object is deformed.
  */
 class StrainTensorPipeline :
-    public ItkPipeline
+    public ItkVectorPipeline
 {
 public:
     // Common itk typedefs

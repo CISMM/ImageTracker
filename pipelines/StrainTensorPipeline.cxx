@@ -22,7 +22,7 @@ void StrainTensorPipeline::Update()
     StrainType::Pointer strain = StrainType::New();
     strain->SetSigma(this->GetSigma());
 
-    int count = this->GetInput()->size();
+    int count = this->GetInput()->GetImageCount();
     char file[120];
     
     for (unsigned int i = 0;
