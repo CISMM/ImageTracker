@@ -6,7 +6,7 @@
 
 #include "FilePattern.h"
 #include "FileSet.h"
-#include "ImageSetReader.h"
+#include "VectorFileSetReader.h"
 #include "StrainTensorPipeline.h"
 #include "TextPipelineObserver.h"
 
@@ -45,12 +45,13 @@ int main(int argc, char** argv)
     Logger::info << function << ": Initializing IO" << std::endl;
     FileSet filesIn(FilePattern(dir, formatIn, start, end));
     FileSet filesOut(FilePattern(dir, formatOut, start, end));
-    ImageSetReader< ImageType > video(filesIn);
+    VectorFileSetReader::Pointer video = VectorFileSetReader::New();
+    video->SetFileSet(filesIn);
     
     // Create processing pipeline
     Logger::info << function << ": Creating processing pipeline" << std::endl;
     StrainTensorPipeline::Pointer pipeline = StrainTensorPipeline::New();
-    pipeline->SetInput(&video);
+    pipeline->SetInput(video);
     pipeline->SetOutputFiles(filesOut);
     pipeline->SetSigma(sigma);
     
