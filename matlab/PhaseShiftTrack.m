@@ -35,7 +35,7 @@ for i = 2:N
     img1 = imgs(:,:,i-1);
     img2 = imgs(:,:,i);
     
-    [disp, rot] = FrequencyDisplacement(img1, img2, featSize, thetaFD);
+    [disp, rot] = FrequencyDisplacement(img1, img2, featSize, thetaFD, false);
 %     [disp, rot] = PhaseShiftDisplacement(img1, img2, featSize, thetaPSD);
     rot = rot(1);
     dispPx(i,:) = dispPx(i-1,:) + disp;

@@ -6,8 +6,6 @@ function [ Z, C, cp, cq ] = FourierIntegrate( p, q )
 [Nx, Ny] = size(p);
 
 % Compute Fourier transforms.
-% cp = myDFT(p);
-% cq = myDFT(q);
 cp = fft2(p);
 cq = fft2(q);
 
@@ -49,5 +47,4 @@ end;
 PrintImageInfo(real(C), 'Real coefficients');
 PrintImageInfo(imag(C), 'Imaginary coefficients');
 
-% Z = myDFT(C, 1);
 Z = ifft2(C);

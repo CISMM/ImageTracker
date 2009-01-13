@@ -42,16 +42,6 @@ if (nargin < 4)
     theta = FindOrientation(imgWind1, frequency(1));
 end
 
-% Frequency-specific FFTs
-fftU1 = CustomDFT(imgWind1, theta, frequency);
-fftU1 = diag(fftU1);
-fftV1 = CustomDFT(imgWind1, theta + pi/2, frequency);
-fftV1 = diag(fftV1);
-fftU2 = CustomDFT(imgWind2, theta, frequency);
-fftU2 = diag(fftU2);
-fftV2 = CustomDFT(imgWind2, theta + pi/2, frequency);
-fftV2 = diag(fftV2);
-
 % Phase correlation
 % specU = fftU1.*conj(fftU2) ./ abs(fftU1.*fftU2);
 % specV = fftV1.*conj(fftV2) ./ abs(fftV1.*fftV2);
@@ -63,6 +53,15 @@ if (taylor)
     dpt2 = TaylorDPT(img2, wavelength, theta);
     phaseUV = angle(dpt1) - angle(dpt2);
 else
+    % Frequency-specific FFTs
+    fftU1 = CustomDFT(imgWind1, theta, frequency);
+    fftU1 = diag(fftU1);
+    fftV1 = CustomDFT(imgWind1, theta + pi/2, frequency);
+    fftV1 = diag(fftV1);
+    fftU2 = CustomDFT(imgWind2, theta, frequency);
+    fftU2 = diag(fftU2);
+    fftV2 = CustomDFT(imgWind2, theta + pi/2, frequency);
+    fftV2 = diag(fftV2);
     shiftU = angle(fftU1) - angle(fftU2);
     shiftV = angle(fftV1) - angle(fftV2);
     phaseUV = [shiftU shiftV];

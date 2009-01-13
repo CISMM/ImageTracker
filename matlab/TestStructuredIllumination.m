@@ -79,20 +79,49 @@ rots = rot + [-pi : pi/4 : pi]
 % The following data sets have only the structured grid present.
 %
 % Here the grid is close to in focus.  The tracking seems good.
-imgs = LoadImages('~/Nano/data/grids/grid01-300z-dx/grid01-%04d.tif', 0, 59);
-imgs = imgs(11:450, 111:550, :);
+imgs = ReadPulnix('/home/beastwoo/Nano/data/grids/grid01-40x-1fps-1upsx-300z.raw');
+imgs = double(imgs(11:450, 111:550, :));
 RunStructuredIllumination;
 
 %%
 % Here the grid is out of focus.
-imgs = LoadImages('~/Nano/data/grids/grid01-260z-dy/grid01-%04d.tif', 0, 59);
-imgs = imgs(11:450, 111:550, :);
+imgs = ReadPulnix('/home/beastwoo/Nano/data/grids/grid01-40x-1fps-1upsy-260z.raw');
+imgs = double(imgs(11:450, 111:550, :));
 RunStructuredIllumination;
 
 %%
 % Here the grid is at an angle; the stage moves in x.
-imgs = LoadImages('~/Nano/data/kier/20080916-octopus/grid01+40dx-%04d.tif', 0, 99);
-imgs = imgs(11:450, 111:550, 10:4:end);
+imgs = ReadPulnix('~/Nano/data/kier/20080916-octopus/grid01-40x-000um+040dx.raw');
+imgs = double(imgs(11:450, 111:550, 10:4:end));
+RunStructuredIllumination;
+
+%%
+% Grid at an angle, moves in X.
+imgs = ReadPulnix('~/Nano/data/kier/20081010-grids/grid01-40x+000z+040dx.raw', 200);
+imgs = double(imgs(11:450, 111:550, 1:2:end));
+RunStructuredIllumination;
+
+%%
+% This is a 12nm gold plated grid, moved by hand.
+imgs = ReadPulnix('~/Nano/data/kier/20081010-grids/grid01-2cr12au-40x-000z-hand.raw', 200);
+imgs = double(imgs(11:450, 111:550, 1:2:end));
+RunStructuredIllumination;
+
+%%
+% This is the 12nm grid, out of focus by +10 um.
+imgs = ReadPulnix('~/Nano/data/kier/20081010-grids/grid02-2cr12au-40x+010z-hand.raw', 200);
+imgs = double(imgs(11:450, 111:550, 1:end));
+RunStructuredIllumination;
+
+%%
+% This is a 20nm grid, which has high SNR.
+imgs = ReadPulnix('~/Nano/data/kier/20081210-grids/grid20-su02-40x-000z-40dx.raw', [51 200]);
+imgs = double(imgs(11:450, 111:550, :));
+RunStructuredIllumination;
+
+%%
+imgs = ReadPulnix('~/Nano/data/kier/20081215-grids/grid20-01-40x-000z-40dx.raw');
+imgs = double(imgs(11:450, 111:550, :));
 RunStructuredIllumination;
 
 %% Octopus
@@ -102,15 +131,15 @@ RunStructuredIllumination;
 % some sequences with the patterned substrate.  Drift becomes apparent as
 % the stage returns to its initial position.  There is a slight jump in y
 % when the stage starts to move.
-imgs = LoadImages('~/Nano/data/kier/20080909-octopus/oct01-80dx-%04d.tif', 0, 199);
-imgs = imgs(11:450, 111:550, 1:2:end);
+imgs = ReadPulnix('~/Nano/data/kier/20080909-octopus/oct01-40x-000z-80dx.raw', 200);
+imgs = double(imgs(11:450, 111:550, 1:2:end));
 RunStructuredIllumination;
 
 %%
 % The stage pans in y.  There is definitely some horizontal drift in the
 % tracking for this sequence.
-imgs = LoadImages('~/Nano/data/kier/20080909-octopus/oct01+80dy-%04d.tif', 0, 399);
-imgs = imgs(11:450, 111:550, 1:2:end);
+imgs = ReadPulnix('~/Nano/data/kier/20080909-octopus/oct01-40x-000z+80dy.raw', 200);
+imgs = double(imgs(11:450, 111:550, 1:2:end));
 RunStructuredIllumination;
 
 %%
@@ -120,16 +149,23 @@ RunStructuredIllumination;
 % This image sequence has a jump in y early on, which the tracking picks
 % up.  The tracking is OK, but not great--seams are apparent during image
 % stitching.
-imgs = LoadImages('~/Nano/data/kier/20080909-octopus/oct02-80dx-%04d.tif', 0, 399);
-imgs = imgs(11:450, 111:550, 1:2:end);
+imgs = ReadPulnix('~/Nano/data/kier/20080909-octopus/oct02-40x-000z-80dx.raw', 200);
+imgs = double(imgs(11:450, 111:550, 1:2:end));
 RunStructuredIllumination;
 
 %%
 % The stage pans in y.  The pesky MCL puts another jump in x in the
 % beginning of this video, which is not handled well.  The remainder of the
 % video seems to stitch well, however.
-imgs = LoadImages('~/Nano/data/kier/20080909-octopus/oct02+80dy-%04d.tif', 0, 399);
-imgs = imgs(11:450, 111:550, 1:2:end);
+imgs = ReadPulnix('~/Nano/data/kier/20080909-octopus/oct02-40x-000z+80dy.raw', 200);
+imgs = double(imgs(11:450, 111:550, 1:2:end));
+RunStructuredIllumination;
+
+%% Frog
+% The following videos are of tungara midbrain sections.
+
+imgs = ReadPulnix('~/Nano/data/kier/20081010-grids/frog01-40x+000z+040dx.raw', 200);
+imgs = double(imgs(11:450, 111:550, 1:2:end));
 RunStructuredIllumination;
 
 %% Octopus and Pattern
@@ -144,9 +180,8 @@ RunStructuredIllumination;
 %
 % The stage moves in x from the edge of a muscle section towards the
 % middle.  Tracking and stitching seem reliable.
-imgs = LoadImages('~/Nano/data/kier/20080821-octopus/octgrid01-30dx-%04d.tif', 0, 139);
-imgs = imgs(11:450, 11:450, 1:2:end);
-debug = false;
+imgs = ReadPulnix('/home/beastwoo/Nano/data/kier/20080821-octopus/octgrid01-40x-000um-30umdx.raw');
+imgs = double(imgs(11:450, 11:450, 1:2:end));
 RunStructuredIllumination;
 
 %%
@@ -157,8 +192,8 @@ RunStructuredIllumination;
 %
 % In the first, the crop is done such that the edge of the section is not
 % visible in most of the frame.  This seems to track and stitch well.
-imgs = LoadImages('~/Nano/data/kier/20080821-octopus/octgrid01+30dy-%04d.tif', 0, 139);
-imgs = imgs(11:450, 201:640, 1:2:end);
+imgs = ReadPulnix('/home/beastwoo/Nano/data/kier/20080821-octopus/octgrid01-40x-000um+30umdy.raw');
+imgs = double(imgs(11:450, 201:640, 1:2:end));
 doBandPass = true;
 RunStructuredIllumination;
 doBandPass = false;
@@ -166,8 +201,8 @@ doBandPass = false;
 %%
 % In this crop, the edge of the muscle is near the middle of the image
 % frame throughout the sequence.  Here the tracking fails.
-imgs = LoadImages('~/Nano/data/kier/20080821-octopus/octgrid01+30dy-%04d.tif', 0, 139);
-imgs = imgs(11:450, 11:450, 1:2:end);
+imgs = ReadPulnix('/home/beastwoo/Nano/data/kier/20080821-octopus/octgrid01-40x-000um+30umdy.raw');
+imgs = double(imgs(11:450, 11:450, 1:2:end));
 doBandPass = true;
 RunStructuredIllumination;
 doBandPass = false;
@@ -177,14 +212,14 @@ doBandPass = false;
 % is also the patterned substrate.
 %
 % The stage pans in x.
-imgs = LoadImages('~/Nano/data/kier/20080821-octopus/octgrid02+30dx-%04d.tif', 0, 139);
-imgs = imgs(11:450, 11:450, 1:2:end);
+imgs = ReadPulnix('/home/beastwoo/Nano/data/kier/20080821-octopus/octgrid02-40x-000um+30umdx.raw');
+imgs = double(imgs(11:450, 11:450, 1:2:end));
 RunStructuredIllumination;
 
 %%
 % The stage pans in y.
-imgs = LoadImages('~/Nano/data/kier/20080821-octopus/octgrid02-30dy-%04d.tif', 0, 139);
-imgs = imgs(11:450, 11:450, 1:2:end);
+imgs = ReadPulnix('/home/beastwoo/Nano/data/kier/20080821-octopus/octgrid02-40x-000um-30umdy.raw');
+imgs = double(imgs(11:450, 11:450, 1:2:end));
 RunStructuredIllumination;
 
 %%
@@ -192,49 +227,49 @@ RunStructuredIllumination;
 % below.  Clearly stitching in this case makes no sense.  But, we do take a
 % look at the band pass images....note that they do not change because the
 % pattern frequency does not get extinguished by the defocusing.
-imgs = LoadImages('~/Nano/data/kier/20080821-octopus/octgrid02+40dz-%04d.tif', 0, 179);
-imgs = imgs(11:450, 11:450, 1:2:end);
+imgs = ReadPulnix('/home/beastwoo/Nano/data/kier/20080821-octopus/octgrid02-40x-000um+40umdz.raw');
+imgs = double(imgs(11:450, 11:450, 1:2:end));
 doBandPass = true;
 RunStructuredIllumination;
 doBandPass = false;
 
 %%
-imgs = LoadImages('~/Nano/data/kier/20080916-octopus/octgrid03+40dx-%04d.tif', 0, 199);
-imgs = imgs(11:450, 11:450, 1:4:end);
+imgs = ReadPulnix('/home/beastwoo/Nano/data/kier/20080916-octopus/octgrid03+40x-000um+040dx.raw');
+imgs = double(imgs(11:450, 11:450, 1:4:end));
 RunStructuredIllumination;
 
 %%
-imgs = LoadImages('~/Nano/data/kier/20080916-octopus/octgrid04+40dx-%04d.tif', 0, 199);
-imgs = imgs(11:450, 11:450, 1:4:end);
+imgs = ReadPulnix('/home/beastwoo/Nano/data/kier/20080916-octopus/octgrid04+40x-000um+040dx.raw');
+imgs = double(imgs(11:450, 11:450, 1:4:end));
 imgs = ScaleData(imgs, [0 255]);
 RunStructuredIllumination;
 
 %%
-imgs = LoadImages('~/Nano/data/kier/20080916-octopus/octgrid04+40dz-%04d.tif', 0, 99);
-imgs = imgs(11:450, 11:450, end:-4:1);
+imgs = ReadPulnix('/home/beastwoo/Nano/data/kier/20080916-octopus/octgrid04+40x-000um+040dz.raw');
+imgs = double(imgs(11:450, 11:450, end:-4:1));
 imgs = ScaleData(imgs, [0 255]);
 RunStructuredIllumination;
 
 %%
-imgs = LoadImages('~/Nano/data/kier/20080916-octopus/octgrid05+40dx-%04d.tif', 0, 199);
-imgs = imgs(11:450, 11:450, 1:4:end);
+imgs = ReadPulnix('/home/beastwoo/Nano/data/kier/20080916-octopus/octgrid05+40x-000um+040dx.raw');
+imgs = double(imgs(11:450, 11:450, 1:4:end));
 RunStructuredIllumination;
 
 %% Tungara
 % The following image sequences have only tungara midbrain tissue present.
 %
 % The stage pans in x.
-imgs = LoadImages('~/Nano/data/kier/20080916-tungara/frog01+40dx-%04d.tif', 0, 399);
-imgs = imgs(11:450, 111:550, 1:2:end);
+imgs = ReadPulnix('/home/beastwoo/Nano/data/kier/20080916-tungara/frog01+40x-000um+040dx.raw', 200);
+imgs = double(imgs(11:450, 111:550, 1:2:end));
 RunStructuredIllumination;
 
 %%
 
-imgs = LoadImages('~/Nano/data/kier/20080916-tungara/frog01+40dy-%04d.tif', 0, 399);
-imgs = imgs(11:450, 111:550, 1:2:end);
+imgs = ReadPulnix('/home/beastwoo/Nano/data/kier/20080916-tungara/frog01+40x-000um+040dy.raw', 200);
+imgs = double(imgs(11:450, 111:550, 1:2:end));
 RunStructuredIllumination;
 
 %%
-imgs = LoadImages('~/Nano/data/kier/20080916-tungara/frog02+40dx-%04d.tif', 0, 399);
-imgs = imgs(11:450, 111:550, 1:2:end);
+imgs = ReadPulnix('/home/beastwoo/Nano/data/kier/20080916-tungara/frog02+40x-000um+040dx.raw', 200);
+imgs = double(imgs(11:450, 111:550, 1:2:end));
 RunStructuredIllumination;

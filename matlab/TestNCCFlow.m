@@ -23,7 +23,7 @@ corner = [50 90];
 steps = 10;
 scale = [1 1];
 rotate = 0;
-translate = [9 -8]*1.55;
+translate = [10 -10]*1;
 
 % create an image sequence from a single image
 img = double(rgb2gray(imread('davidbowie.jpg')));
@@ -197,7 +197,7 @@ corner = [50 90];
 steps = 10;
 scale = [1 1];
 rotate = 0;
-translate = [10 -10]*1.0;
+translate = [10 0] * 2.0;
 
 % create an image sequence from a single image
 img1 = double(rgb2gray(imread('davidbowie.jpg')));
@@ -207,11 +207,11 @@ imgs1 = TransformSequence(img1, outSize, corner, corner+middle, scale, rotate, t
 % create an image sequence from random splats
 % corner = [250 100];
 corner = floor(outSize/2);
-translate = [-10 10] * 1.0;
+translate = [0 10] * 2.0;
 g = GaussianKernel1D(1.4, 0, 3);
 gg = g'*g;
-img2 = RandomSplat(2*outSize, 0.97, gg);
-% img2 = double(rgb2gray(imread('einstein.jpg')));
+% img2 = RandomSplat(2*outSize, 0.97, gg);
+img2 = double(rgb2gray(imread('einstein.jpg')));
 img2 = ScaleData(img2, [0 255]);
 imgs2 = TransformSequence(img2, outSize, corner, corner+middle, scale, rotate, translate, steps);
 
@@ -220,7 +220,7 @@ imgs = imgs1 + imgs2;
 [h, w, t] = size(imgs);
 
 % add some noise
-imgs = imgs + 10*randn(size(imgs));
+imgs = imgs + 0*randn(size(imgs));
 
 % show the image sequence
 figure(1); clf;
