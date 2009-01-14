@@ -1,5 +1,5 @@
 function [ featurePos, himg ] = HarrisDetector( img, params, featurePos )
-% [ features, himg ] = HarrisDetector( img, scaleD, scaleI, count ) - Harris
+% [ features, himg ] = HarrisDetector( img, params, featurePos ) - Harris
 % interest feature point detector.
 %
 % Finds Harris corner features in a given image. If featurePos is supplied
@@ -16,7 +16,7 @@ function [ featurePos, himg ] = HarrisDetector( img, params, featurePos )
 %       .maxFeatures        The targeted number of feature points
 %       .searchRadius       The radius around an established feature where
 %       no other features should be selected (5)
-%       .featureThreshold   The percentage of maximum below which to ignore
+%       .featureCutoff      The percentage of maximum below which to ignore
 %       features (0.05)
 %   featurePos  - existing features, an Nx2 array
 %
