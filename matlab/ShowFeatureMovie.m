@@ -1,4 +1,4 @@
-function [ ] = ShowFeatureMovie( imgs, features, tracks, fps, filename )
+function [ ] = ShowFeatureMovie( imgs, features, tracks, fps, filePattern )
 % ShowFeatureMovie(imgs, feats) displays an image sequence along with
 % tracked features.
 %
@@ -25,8 +25,8 @@ function [ ] = ShowFeatureMovie( imgs, features, tracks, fps, filename )
 % feats       - The features tracked in the image sequence
 % tracks      - A flag indicating whether to display the feature tracks
 % fps         - The target display frame rate (20)
-% filename    - The file name to use to save an AVI movie of the feature
-% tracking
+% filePattern - The image filename pattern to use to save each frame
+% (optional)
 %
 % Output:
 % none
@@ -63,7 +63,7 @@ hold on;
 plot(squeeze(position(1, 2, fidx)), squeeze(position(1, 1, fidx)), 'ys');
 hold off;
 if (save)
-    mov(1) = getframe;
+	saveas(gcf, sprintf(filePattern, 1));
 end
 pause(1/fps);
 
@@ -101,17 +101,17 @@ for i=2:t
 
     % Grab frame, if we're saving the movie
     if (save)
-        mov(i) = getframe;
+        saveas(gcf, sprintf(filePattern, i));
     end
     pause(1/fps);
 end
 
 % Save the video file
 if (save)
-    display(sprintf('Saving avi file to %s', filename));
-    for i = 1:length(mov)
-        imwrite(mov(i).cdata, sprintf(filename, i), 'Compression', 'None');
-    end
+%     display(sprintf('Saving avi file to %s', filename));
+%     for i = 1:length(mov)
+%         imwrite(mov(i).cdata, sprintf(filename, i), 'Compression', 'None');
+%     end
 %     movie2avi(mov,filename,'FPS',fps,'Quality',90);
 %     movie2avi(mov,filename,'FPS',fps,'Compression','None');
 end
