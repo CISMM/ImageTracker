@@ -45,13 +45,13 @@ dispimg(ImageMontage(imgs(:,:,[1:3:10]), 2, 5, 0));
 % possible image patches within a set radius of the previously known
 % position of the feature.  If the best match within this region does not
 % match the appearance of the feature, the feature is considered lost.
-params.patchRadius = [8 8];
+params.patchRadius = [9 9];
 params.searchRadius = ceil(1.5*params.patchRadius);
 params.featureThreshold = 0.90;
 params.nccAccuracy = 1.0; 
 params.errorTolerance = 0.65;
 params.evolveFeatures = 0;
-params.maxFeatures = 1000;
+params.maxFeatures = 108;
 params.derivativeScale = 0.8;
 params.integralScale = 2.0;
 
@@ -65,7 +65,7 @@ features = ExtractFeatureImages(imgs(:,:,1), features, params.patchRadius);
 
 patches = reshape([features.patch], 2*params.patchRadius(1)+1, 2*params.patchRadius(2)+1, []);
 figure(1);
-dispimg(ImageMontage(patches, 10, 1, 0));
+dispimg(ImageMontage(patches, 12, 1, 0));
 title('Initial features to track');
 figure(2);
 dispimg(himg);
@@ -134,10 +134,10 @@ origPatches = reshape([features.originalPatch], 2*params.patchRadius(1)+1, 2*par
 finalPatches = reshape([features.patch], 2*params.patchRadius(1)+1, 2*params.patchRadius(2)+1, []);
 figure(1); clf;
 subplot(1,2,1);
-dispimg(ImageMontage(origPatches(:,:,activeIdx(1:100)), 10, 1, 0));
+dispimg(ImageMontage(origPatches(:,:,activeIdx(1:98)), 10, 1, 0)); axis off;
 title('Initial tracked features');
 subplot(1,2,2);
-dispimg(ImageMontage(finalPatches(:,:,activeIdx(1:100)), 10, 1, 0));
+dispimg(ImageMontage(finalPatches(:,:,activeIdx(1:98)), 10, 1, 0)); axis off;
 title('Final tracked features');
 drawnow;
 
@@ -192,27 +192,30 @@ plot(error, 'b-');
 outSize = [256 256];
 middle = floor(outSize/2);
 corner = [50 90];
+% corner = floor(outSize/2);
 
 % transform parameters
-steps = 10;
+steps = 20;
 scale = [1 1];
 rotate = 0;
-translate = [10 0] * 2.0;
+translate = [0 20];
+
+% create a Gaussian splat kernel
+% corner = [250 100];
+g = GaussianKernel1D(1.2, 0, 4);
+gg = g'*g;
 
 % create an image sequence from a single image
 img1 = double(rgb2gray(imread('davidbowie.jpg')));
-img1 = ScaleData(img1, [0 255]);
+% img1 = RandomSplat(2*outSize, 0.98, gg);
+img1 = ScaleData(img1, [20 255]);
 imgs1 = TransformSequence(img1, outSize, corner, corner+middle, scale, rotate, translate, steps);
 
-% create an image sequence from random splats
-% corner = [250 100];
+% img2 = double(rgb2gray(imread('einstein.jpg')));
 corner = floor(outSize/2);
-translate = [0 10] * 2.0;
-g = GaussianKernel1D(1.4, 0, 3);
-gg = g'*g;
-% img2 = RandomSplat(2*outSize, 0.97, gg);
-img2 = double(rgb2gray(imread('einstein.jpg')));
-img2 = ScaleData(img2, [0 255]);
+translate = [20 -20];
+img2 = RandomSplat(2*outSize, 0.97, gg);
+img2 = ScaleData(img2, [20 255]);
 imgs2 = TransformSequence(img2, outSize, corner, corner+middle, scale, rotate, translate, steps);
 
 % create multilayer image
@@ -347,9 +350,9 @@ active = logical(reshape([features.active], [], fcount));
 for f = 1:t-1
     f1 = f; f2 = f+1;
     activeFrame = find(active(f1,:) & active(f2,:));
-    [tformA, ptsA] = RansacRigidTransform(squeeze(pos(f1,:,activeFrame)), squeeze(pos(f2,:,activeFrame)), 0.25, 0.95, 0.15);
+    [tformA, ptsA] = RansacRigid(squeeze(pos(f1,:,activeFrame)), squeeze(pos(f2,:,activeFrame)), 0.25, 0.95, 0.15);
     activeNotA = activeFrame(~ptsA);
-    [tformB, ptsB] = RansacRigidTransform(squeeze(pos(f1,:,activeNotA)), squeeze(pos(f2,:,activeNotA)), 0.25, 0.95, 0.15);
+    [tformB, ptsB] = RansacRigid(squeeze(pos(f1,:,activeNotA)), squeeze(pos(f2,:,activeNotA)), 0.25, 0.95, 0.15);
 
     figure(1); clf;
     ShowFeatureMovie(imgs, features(activeFrame(ptsA)), 1);

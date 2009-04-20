@@ -6,8 +6,8 @@ function [ n ] = ncc(imgX, imgY)
 n = 0;
 if (size(imgX) ~= size(imgY))
     disp('Image patch sizes do not match.');
-    return;
-end;
+    return
+end
 
 Ix = imgX(:);
 Iy = imgY(:);
