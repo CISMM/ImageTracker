@@ -34,17 +34,23 @@
 <li class="toch2"><a href="#linux">Linux</a></li>
 </ul>
 
-<h2><a name="windows"></a>Windows XP</h2>
+    <h2><a name="windows"></a>Windows (7 Professional used 10/10/2013)</h2>
 
-<p>ImageTracker leverages a number of open-source software packages. To build ImageTracker from source, one first needs to build these packages. The following instructions create a build of ImageTracker on a Windows XP machine using Microsoft's Visual Studio 2003 .NET.</p>
+<p>ImageTracker leverages a number of open-source software packages. To build 
+      ImageTracker from source, one first needs to build these packages. The following 
+      instructions create a build of ImageTracker on a Windows 7 Pro 64-bit machine 
+      using Microsoft's Visual Studio 2010.</p>
 
-<h3>CMAKE</h3>
+    <h3>CMAKE (2.8.11 used 10/10/2013)</h3>
 <p>CMAKE is a cross-platform, compiler-independent make system. It is available from Kitware at <a href="http://www.cmake.org">www.cmake.org</a>. Download and install the latest stable release for Windows.</p>
 
-<h3>fftw</h3>
-<p>fftw is a fast Fourier transform library.  Download the Windows DLLs from <a href="http://www.fftw.org/">www.fftw.org</a>. Then, follow the instructions to create "lib import libraries."</p>
+    <h3>fftw (3.3.3 used 10/10/2013)</h3>
+<p>fftw is a fast Fourier transform library. Download the Windows DLLs from 
+      <a href="http://www.fftw.org/">www.fftw.org</a>. Then, follow the instructions 
+      to create "lib import libraries." (I put them into C:/usr/local/include 
+      and C:/usr/local/lib.)</p>
 
-<h3>ITK</h3>
+    <h3>ITK (3.20.1 used on 10/10/2013, 4.4.2 failed)</h3>
 <p>ITK is a powerful image processing and analysis library available from Kitware at <a href="http://www.itk.org">www.itk.org</a>. Download the latest source code release. Follow the instructions for using CMAKE to configure ITK for Visual Studio with the following important exceptions:</p>
 <ul>
 <li>In CMAKE, click on the &quot;Show Advanced Values&quot; checkbox to display advanced ITK configuration parameters</li>
@@ -53,12 +59,12 @@
 <li>Press &quot;Configure&quot;.  If you receive errors about not being able to find fftw components, fix the flagged CMake parameters by pointing to the appropriate files on your system.</li>
 <li>Press &quot;Configure&quot; and &quot;OK&quot; to build the Visual Studio project file</li>
 </ul>
-<p>Build &quot;Debug&quot; (if you plan to do any development) and &quot;Release&quot; versions of the generated ITK solution.</p>
-
-<h3>VTK</h3>
+    <p>Build &quot;Debug&quot; (if you plan to do any development) and &quot;Release&quot; 
+      versions of the generated ITK solution.</p>
+    <h3>VTK (5.8.0 used 10/10/2013)</h3>
 <p>VTK is a data visualization library available from Kitware at <a href="http://www.vtk.org">www.vtk.org</a>. Download, configure, and build the latest source code release using CMAKE and Visual Studio, or obtain the CVS version from the VTK repositories. Build both a &quot;Debug&quot; and &quot;Release&quot; version.</p>
 
-<h3>wxWidgets</h3>
+    <h3>wxWidgets (2.8.12 used 10/10/2013)</h3>
 <p>wxWidgets is a platform-independent graphical user interface (GUI) development library. Download and install MSW version 2.6.3 from <a href="http://www.wxWidgets.org">www.wxwidgets.org</a>. ImageTracker uses a feature of wxWidgets that is disabled by default:</p>
 <ul>
 <li>Open wx.dsw and convert to a .NET solution</li>
@@ -67,11 +73,13 @@
 <li>Build a Release version of the .NET project.</li>
 </ul>
 
-<h3>ImageTracker</h3>
-<p>The ImageTracker source is available by request or from NSRG's CVS:</p>
+    <h3>nanoCommon</h3>
+    <p>You need to check out the nanoCommon project from the CISMM CVS repository 
+      and place it at the same level as the ImageTracker source tree. CVSROOT: 
+      /afs/unc/proj/stm/src/CVS_repository; cvs checkout nanoCommon</p>
+    <h3>ImageTracker</h3>    <p>The ImageTracker source is available by request or from NSRG's Git repository:</p>
 <ul>
-<li>CVSROOT: /afs/cs.unc.edu/proj/stm/src/</li>
-<li>Repository: ImageTracker </li>
+      <li>git clone ssh://`whoami`@login.cs.unc.edu/afs/unc/proj/stm/src/git/ImageTracker.git</li>
 </ul>
 <p>Create an ImageTracker solution file using CMAKE. I would suggest an out-of-source build to keep the code and binaries separate. The CMakeLists.txt file provided from CVS should configure everything for you; you may need to point to the compiled ITK, VTK, wxWidgets, or fftw libraries. There is an advanced option to turn on or off building of test cases. Generate the solution file, and build the ImageTracker project! When you are done, you need to put the fftw dlls and the ImageTracker executable in the same directory.</p>
 

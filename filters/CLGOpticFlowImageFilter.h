@@ -177,11 +177,13 @@ void CLGOpticFlowImageFilter<TInputImage1, TInputImage2, TOutputValueType>
     step->SetRegularization(this->GetRegularization());
     // step->SetRelaxation(this->GetRelaxation());
     
-    // throttle number of threads to 4 to keep BASS admins happy.  :)
-    // the flow computation doesn't seem to benefit from much more than 4
+/*
+	// throttle number of threads to 6.
+    // the flow computation doesn't seem to benefit from much more than 6.
     int threads = step->GetNumberOfThreads();
     step->SetNumberOfThreads(std::min(4, threads));
     Logger::debug << function << ": iterative step filter threads: " << step->GetNumberOfThreads() << std::endl;
+*/
 
     // Initialize output to zero flow field	
     Logger::debug << function << ": initializing flow field" << std::endl;
